@@ -13,6 +13,7 @@ class canyon(ConanFile):
         self.requires("sdl_ttf/2.20.2")
         self.requires("glfw/3.3.8")
         self.requires("libpng/1.6.42", override=True)
+        self.requires("nlohmann_json/3.11.2")
 
     def build_requirements(self):
         self.tool_requires("cmake/3.27.9")

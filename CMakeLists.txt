@@ -21,6 +21,15 @@ set(SOURCES ${SOURCES}
 	external/imgui/backends/imgui_impl_sdl2.cpp
 #	external/imgui/backends/imgui_impl_vulkan.cpp
 #	external/imgui/backends/imgui_impl_glfw.cpp
+    src/graphics/sdl/SDL_FontCache.c
+    src/graphics/sdl/sdl_events.cpp
+    src/graphics/sdl/sdl_font.cpp
+    src/graphics/sdl/sdl_font_factory.cpp
+    src/graphics/sdl/sdl_graphics.cpp
+    src/graphics/sdl/sdl_image.cpp
+    src/graphics/sdl/sdl_image_factory.cpp
+    src/graphics/sdl/sdl_ui_renderer.cpp
+    src/graphics/font_factory.cpp
 	src/layers/layer.cpp
 	src/layers/layer_stack.cpp
 	src/platform/glfw/glfw_app.cpp
@@ -35,6 +44,7 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
@@ -44,6 +54,7 @@ target_link_libraries(${PROJECT_NAME} SDL2::SDL2main)
 target_link_libraries(${PROJECT_NAME} SDL2_image::SDL2_image)
 target_link_libraries(${PROJECT_NAME} SDL2_ttf::SDL2_ttf-static)
 target_link_libraries(${PROJECT_NAME} glfw)
+target_link_libraries(${PROJECT_NAME} nlohmann_json::nlohmann_json)
 
 if (MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ignore:4099")
