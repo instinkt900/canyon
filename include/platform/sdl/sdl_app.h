@@ -11,6 +11,9 @@ public:
 
     void SetWindowTitle(std::string const& title) override;
 
+    SDL_Window* GetSDLWindow() const { return m_window; }
+    SDL_Renderer* GetSDLRenderer() const { return m_renderer; }
+
 protected:
     bool CreateWindow() override;
     void DestroyWindow() override;
