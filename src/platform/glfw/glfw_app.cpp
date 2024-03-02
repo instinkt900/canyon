@@ -9,7 +9,7 @@ GLFWApplication::GLFWApplication(std::string const& applicationTitle)
 GLFWApplication::~GLFWApplication() {
 }
 
-void GLFWApplication::UpdateWindow() {
+void GLFWApplication::Update() {
     glfwPollEvents();
 
     if (glfwWindowShouldClose(m_glfwWindow)) {
@@ -84,8 +84,6 @@ bool GLFWApplication::CreateWindow() {
     int width, height;
     glfwGetFramebufferSize(m_glfwWindow, &width, &height);
 
-    SetupLayers();
-
     if (m_windowMaximized) {
         glfwMaximizeWindow(m_glfwWindow);
     }
@@ -99,18 +97,12 @@ void GLFWApplication::SetWindowTitle(std::string const& title) {
 }
 
 void GLFWApplication::Draw() {
-    m_layerStack->Draw();
 }
 
 void GLFWApplication::DestroyWindow() {
-    m_layerStack.reset(); // force layers to cleanup before we destroy all the devices.
     m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
     glfwDestroyWindow(m_glfwWindow);
     glfwTerminate();
-}
-
-void GLFWApplication::SetupLayers() {
-
 }
 
 void GLFWApplication::OnResize() {

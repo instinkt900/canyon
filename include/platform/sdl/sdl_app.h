@@ -17,8 +17,7 @@ public:
 protected:
     bool CreateWindow() override;
     void DestroyWindow() override;
-    void SetupLayers() override;
-    void UpdateWindow() override;
+    void Update() override;
     void Draw() override;
 
 private:

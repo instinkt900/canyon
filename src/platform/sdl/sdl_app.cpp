@@ -8,7 +8,7 @@ SDLApplication::SDLApplication(std::string const& applicationTitle)
 SDLApplication::~SDLApplication() {
 }
 
-void SDLApplication::UpdateWindow() {
+void SDLApplication::Update() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (auto const translatedEvent = FromSDL(event)) {
@@ -30,8 +30,6 @@ bool SDLApplication::CreateWindow() {
         return false;
     }
     
-    SetupLayers();
-
     return true;
 }
 
@@ -41,7 +39,6 @@ void SDLApplication::SetWindowTitle(std::string const& title) {
 }
 
 void SDLApplication::Draw() {
-    m_layerStack->Draw();
     SDL_RenderPresent(m_renderer);
 }
 
@@ -51,6 +48,3 @@ void SDLApplication::DestroyWindow() {
     SDL_Quit();
 }
 
-void SDLApplication::SetupLayers() {
-    
-}

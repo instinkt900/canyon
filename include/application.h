@@ -1,7 +1,8 @@
 #pragma once
 
-#include "layers/layer_stack.h"
+#include "events/event_listener.h"
 #include "events/event_window.h"
+#include "utils/vector.h"
 #include <string>
 #include <chrono>
 
@@ -22,13 +23,9 @@ public:
 protected:
     virtual bool CreateWindow() = 0;
     virtual void DestroyWindow() = 0;
-    virtual void SetupLayers() = 0;
-    virtual void UpdateWindow() = 0;
+    virtual void Update() = 0;
     virtual void Draw() = 0;
 
-    void Update();
-
-    bool OnWindowSizeEvent(EventWindowSize const& event);
     bool OnRequestQuitEvent(EventRequestQuit const& event);
     bool OnQuitEvent(EventQuit const& event);
 
@@ -43,9 +40,4 @@ protected:
     bool m_windowMaximized = false;
 
     bool m_running = false;
-    bool m_paused = false;
-    std::chrono::milliseconds m_updateTicks;
-    std::chrono::time_point<std::chrono::steady_clock> m_lastUpdateTicks;
-
-    std::unique_ptr<LayerStack> m_layerStack;
 };
