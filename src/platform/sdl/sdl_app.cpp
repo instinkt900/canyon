@@ -29,6 +29,8 @@ bool SDLApplication::CreateWindow() {
     if (nullptr == (m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC))) {
         return false;
     }
+    
+    SetupLayers();
 
     return true;
 }

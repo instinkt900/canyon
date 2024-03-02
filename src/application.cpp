@@ -16,9 +16,6 @@ int Application::Run() {
         return 1;
     }
 
-    m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
-    m_layerStack->SetEventListener(this);
-
     m_running = true;
     m_lastUpdateTicks = std::chrono::steady_clock::now();
 

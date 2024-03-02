@@ -29,12 +29,18 @@ public:
         if (!SDLApplication::CreateWindow()) {
             return false;
         }
-        m_graphics = std::make_unique<SDLGraphics>(GetSDLRenderer());
+        
         return true;
     }
 
     void SetupLayers() override {
         SDLApplication::SetupLayers();
+
+        m_graphics = std::make_unique<SDLGraphics>(GetSDLRenderer());
+
+        m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
+        m_layerStack->SetEventListener(this);
+
         std::unique_ptr<TestLayer> layer(std::make_unique<TestLayer>(m_graphics.get()));
         m_layerStack->PushLayer(std::move(layer));
     }
@@ -43,7 +49,7 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-	SDLApplication app{"Testing"};
+	TestApplication app{};
 	//GLFWApplication app{"Testing"};
 	app.Run();
 	return 0;
