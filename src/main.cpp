@@ -23,10 +23,10 @@ public:
     graphics::sdl::SDLGraphics* m_graphics;
 };
 
-class BaseApplication : public SDLApplication {
+class BaseApplication : public GLFWApplication {
     public:
         BaseApplication(std::string const& title)
-            :SDLApplication(title) {}
+            :GLFWApplication(title) {}
 };
 
 class TestApplication : public BaseApplication {

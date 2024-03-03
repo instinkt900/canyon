@@ -29,8 +29,8 @@ protected:
     bool OnRequestQuitEvent(EventRequestQuit const& event);
     bool OnQuitEvent(EventQuit const& event);
 
-    static int constexpr INIT_WINDOW_WIDTH = 1280;
-    static int constexpr INIT_WINDOW_HEIGHT = 960;
+    static int constexpr INIT_WINDOW_WIDTH = 640;
+    static int constexpr INIT_WINDOW_HEIGHT = 480;
 
     std::string m_applicationTitle;
     std::string m_imguiSettingsPath;

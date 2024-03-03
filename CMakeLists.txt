@@ -11,16 +11,18 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 add_compile_definitions(_CRT_SECURE_NO_WARNINGS IMGUI_DEFINE_MATH_OPERATORS)
 
 include_directories(external/imgui)
+include_directories(external/murmurhash.c)
 
 set(SOURCES ${SOURCES}
+    external/murmurhash.c/murmurhash.c
 	external/imgui/imgui.cpp
 	external/imgui/imgui_draw.cpp
 	external/imgui/imgui_tables.cpp
 	external/imgui/imgui_widgets.cpp
 	external/imgui/backends/imgui_impl_sdlrenderer2.cpp
 	external/imgui/backends/imgui_impl_sdl2.cpp
-#	external/imgui/backends/imgui_impl_vulkan.cpp
-#	external/imgui/backends/imgui_impl_glfw.cpp
+	external/imgui/backends/imgui_impl_vulkan.cpp
+	external/imgui/backends/imgui_impl_glfw.cpp
     src/graphics/sdl/SDL_FontCache.c
     src/graphics/sdl/sdl_events.cpp
     src/graphics/sdl/sdl_font.cpp
@@ -30,6 +32,29 @@ set(SOURCES ${SOURCES}
     src/graphics/sdl/sdl_image_factory.cpp
     src/graphics/sdl/sdl_ui_renderer.cpp
     src/graphics/font_factory.cpp
+	src/graphics/vulkan/vulkan_buffer.cpp
+	src/graphics/vulkan/vulkan_command_buffer.cpp
+	src/graphics/vulkan/vulkan_context.cpp
+	src/graphics/vulkan/vulkan_events.cpp
+	src/graphics/vulkan/vulkan_fence.cpp
+	src/graphics/vulkan/vulkan_font.cpp
+	src/graphics/vulkan/vulkan_font_cache.cpp
+	src/graphics/vulkan/vulkan_font_factory.cpp
+	src/graphics/vulkan/vulkan_framebuffer.cpp
+	src/graphics/vulkan/vulkan_graphics.cpp
+	src/graphics/vulkan/vulkan_image.cpp
+	src/graphics/vulkan/vulkan_image_factory.cpp
+	src/graphics/vulkan/vulkan_pipeline.cpp
+	src/graphics/vulkan/vulkan_renderpass.cpp
+	src/graphics/vulkan/vulkan_shader.cpp
+	src/graphics/vulkan/vulkan_subimage.cpp
+	src/graphics/vulkan/vulkan_swapchain.cpp
+	src/graphics/vulkan/vulkan_ui_renderer.cpp
+	src/graphics/vulkan/vulkan_vma.cpp
+	src/graphics/vulkan/shaders/vulkan_shaders.cpp
+	src/graphics/stb_image.cpp
+	src/graphics/stb_image_write.cpp
+	src/graphics/stb_rect_pack.cpp
 	src/layers/layer.cpp
 	src/layers/layer_stack.cpp
 	src/platform/glfw/glfw_app.cpp
@@ -45,6 +70,11 @@ find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(Vulkan REQUIRED)
+find_package(vulkan-memory-allocator REQUIRED)
+find_package(Freetype REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(harfbuzz REQUIRED)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
@@ -55,6 +85,10 @@ target_link_libraries(${PROJECT_NAME} SDL2_image::SDL2_image)
 target_link_libraries(${PROJECT_NAME} SDL2_ttf::SDL2_ttf-static)
 target_link_libraries(${PROJECT_NAME} glfw)
 target_link_libraries(${PROJECT_NAME} nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan)
+target_link_libraries(${PROJECT_NAME} vulkan-memory-allocator::vulkan-memory-allocator)
+target_link_libraries(${PROJECT_NAME} spdlog::spdlog)
+target_link_libraries(${PROJECT_NAME} harfbuzz::harfbuzz)
 
 if (MSVC)
     set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES COMPILE_FLAGS "/W0")
