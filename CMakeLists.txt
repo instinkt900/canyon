@@ -57,11 +57,11 @@ set(SOURCES ${SOURCES}
 	src/graphics/stb_rect_pack.cpp
 	src/layers/layer.cpp
 	src/layers/layer_stack.cpp
-	src/platform/glfw/glfw_app.cpp
+	src/platform/glfw/glfw_window.cpp
 	src/platform/glfw/glfw_events.cpp
-	src/platform/sdl/sdl_app.cpp
+	src/platform/sdl/sdl_window.cpp
 	src/platform/sdl/sdl_events.cpp
-	src/application.cpp
+	src/platform_window.cpp
 	src/main.cpp
 )
 
