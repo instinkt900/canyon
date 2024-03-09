@@ -39,6 +39,15 @@ public:
         m_context = std::make_unique<graphics::vulkan::Context>();
         glfwCreateWindowSurface(m_context->m_vkInstance, GetGLFWWindow(), nullptr, &m_customVkSurface);
         m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_context, m_customVkSurface, GetWidth(), GetHeight());
+
+        m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
+        m_layerStack->SetEventListener(this);
+
+        std::unique_ptr<TestLayer> layer(std::make_unique<TestLayer>(m_graphics.get()));
+        m_layerStack->PushLayer(std::move(layer));
+
+        m_lastUpdateTicks = std::chrono::steady_clock::now();
+
         return true;
     }
 
@@ -70,8 +79,10 @@ public:
     }
 
     void Draw() override {
+        m_graphics->Begin();
         m_layerStack->Draw();
         GLFWApplication::Draw();
+        m_graphics->End();
     }
 
 private:
@@ -146,8 +157,8 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    VulkApplication app{};
-    // GLFWApplication app{"Testing"};
+    //VulkApplication app{};
+    TestApplication app{};
     app.Run();
     return 0;
 }
