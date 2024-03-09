@@ -1,14 +1,17 @@
 #include "events/event_dispatch.h"
+#include "graphics/vulkan/vulkan_subimage.h"
 #include "platform/sdl/sdl_app.h"
 #include "platform/glfw/glfw_app.h"
 #include "layers/layer.h"
 #include "graphics/sdl/sdl_graphics.h"
-
-using namespace graphics::sdl;
+#include "graphics/vulkan/vulkan_graphics.h"
+#include <vulkan/vulkan_core.h>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 class TestLayer : public Layer {
 public:
-    TestLayer(SDLGraphics* graphics)
+    TestLayer(graphics::IGraphics* graphics)
         : m_graphics(graphics) {
     }
 
@@ -20,28 +23,79 @@ public:
         m_graphics->DrawFillRectF(MakeRect(10.0f,10.0f,50.0f,50.0f));
     }
 
-    graphics::sdl::SDLGraphics* m_graphics;
+    graphics::IGraphics* m_graphics;
 };
 
-class BaseApplication : public GLFWApplication {
-    public:
-        BaseApplication(std::string const& title)
-            :GLFWApplication(title) {}
+class VulkApplication : public GLFWApplication {
+public:
+    VulkApplication()
+    :GLFWApplication("test") {
+    }
+
+    bool CreateWindow() override {
+        if (!GLFWApplication::CreateWindow()) {
+            return false;
+        }
+        m_context = std::make_unique<graphics::vulkan::Context>();
+        glfwCreateWindowSurface(m_context->m_vkInstance, GetGLFWWindow(), nullptr, &m_customVkSurface);
+        m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_context, m_customVkSurface, GetWidth(), GetHeight());
+        return true;
+    }
+
+    bool OnEvent(Event const& event) override {
+        if (!GLFWApplication::OnEvent(event)) {
+            return false;
+        }
+
+        EventDispatch dispatch(event);
+        dispatch.Dispatch(this, &VulkApplication::OnWindowSizeEvent);
+        dispatch.Dispatch(m_layerStack.get());
+        return dispatch.GetHandled();
+    }
+
+    bool OnWindowSizeEvent(EventWindowSize const& event) {
+        m_layerStack->SetWindowSize({ event.GetWidth(), event.GetHeight() });
+        return true;
+    }
+
+    void Update() override {
+        auto const nowTicks = std::chrono::steady_clock::now();
+        auto deltaTicks = std::chrono::duration_cast<std::chrono::milliseconds>(nowTicks - m_lastUpdateTicks);
+        while (deltaTicks > m_updateTicks) {
+            GLFWApplication::Update();
+            m_layerStack->Update(static_cast<uint32_t>(m_updateTicks.count()));
+            m_lastUpdateTicks += m_updateTicks;
+            deltaTicks -= m_updateTicks;
+        }
+    }
+
+    void Draw() override {
+        m_layerStack->Draw();
+        GLFWApplication::Draw();
+    }
+
+private:
+    std::unique_ptr<graphics::vulkan::Context> m_context;
+    VkSurfaceKHR m_customVkSurface = VK_NULL_HANDLE;
+    std::unique_ptr<graphics::vulkan::Graphics> m_graphics;
+    std::unique_ptr<LayerStack> m_layerStack;
+    std::chrono::milliseconds m_updateTicks;
+    std::chrono::time_point<std::chrono::steady_clock> m_lastUpdateTicks;
 };
 
-class TestApplication : public BaseApplication {
+class TestApplication : public SDLApplication {
 public:
     TestApplication()
-        : BaseApplication("Testing") {
+        : SDLApplication("Testing") {
         m_updateTicks = std::chrono::milliseconds(1000 / 60);
     }
 
     bool CreateWindow() override {
-        if (!BaseApplication::CreateWindow()) {
+        if (!SDLApplication::CreateWindow()) {
             return false;
         }
 
-        m_graphics = std::make_unique<SDLGraphics>(GetSDLRenderer());
+        m_graphics = std::make_unique<graphics::sdl::Graphics>(GetSDLRenderer());
         m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
         m_layerStack->SetEventListener(this);
 
@@ -54,7 +108,7 @@ public:
     }
 
     bool OnEvent(Event const& event) override {
-        if (!BaseApplication::OnEvent(event)) {
+        if (!SDLApplication::OnEvent(event)) {
             return false;
         }
 
@@ -73,7 +127,7 @@ public:
         auto const nowTicks = std::chrono::steady_clock::now();
         auto deltaTicks = std::chrono::duration_cast<std::chrono::milliseconds>(nowTicks - m_lastUpdateTicks);
         while (deltaTicks > m_updateTicks) {
-            BaseApplication::Update();
+            SDLApplication::Update();
             m_layerStack->Update(static_cast<uint32_t>(m_updateTicks.count()));
             m_lastUpdateTicks += m_updateTicks;
             deltaTicks -= m_updateTicks;
@@ -82,17 +136,17 @@ public:
 
     void Draw() override {
         m_layerStack->Draw();
-        BaseApplication::Draw();
+        SDLApplication::Draw();
     }
 
-    std::unique_ptr<SDLGraphics> m_graphics;
+    std::unique_ptr<graphics::sdl::Graphics> m_graphics;
     std::unique_ptr<LayerStack> m_layerStack;
     std::chrono::milliseconds m_updateTicks;
     std::chrono::time_point<std::chrono::steady_clock> m_lastUpdateTicks;
 };
 
 int main(int argc, char* argv[]) {
-    TestApplication app{};
+    VulkApplication app{};
     // GLFWApplication app{"Testing"};
     app.Run();
     return 0;

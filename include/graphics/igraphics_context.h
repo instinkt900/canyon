@@ -10,9 +10,9 @@
 #include <filesystem>
 
 namespace graphics {
-    class IGraphicsContext {
+    class IGraphics {
     public:
-	virtual ~IGraphicsContext() {}
+	virtual ~IGraphics() {}
         virtual void SetBlendMode(BlendMode mode) = 0;
         //virtual void SetBlendMode(std::shared_ptr<IImage> target, EBlendMode mode) = 0;
         //virtual void SetColorMod(std::shared_ptr<IImage> target, Color const& color) = 0;

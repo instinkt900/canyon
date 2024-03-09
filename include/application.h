@@ -20,6 +20,9 @@ public:
 
     virtual bool OnEvent(Event const& event);
 
+    int GetWidth() const { return m_windowWidth; }
+    int GetHeight() const { return m_windowHeight; }
+
 protected:
     virtual bool CreateWindow() = 0;
     virtual void DestroyWindow() = 0;

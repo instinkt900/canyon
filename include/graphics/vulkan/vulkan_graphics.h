@@ -13,7 +13,7 @@
 #include <stack>
 
 namespace graphics::vulkan {
-    class Graphics : public IGraphicsContext {
+    class Graphics : public IGraphics {
     public:
         Graphics(Context& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
         ~Graphics();

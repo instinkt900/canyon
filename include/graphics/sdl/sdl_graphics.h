@@ -4,9 +4,9 @@
 #include <SDL.h>
 
 namespace graphics::sdl {
-    class SDLGraphics : public IGraphicsContext {
+    class Graphics : public IGraphics {
     public:
-        SDLGraphics(SDL_Renderer* renderer);
+        Graphics(SDL_Renderer* renderer);
 
         void SetBlendMode(graphics::BlendMode mode) override;
         //void SetBlendMode(std::shared_ptr<graphics::IImage> target, EBlendMode mode) override;

@@ -9,6 +9,7 @@ public:
     virtual ~GLFWApplication();
 
     void SetWindowTitle(std::string const& title) override;
+    GLFWwindow* GetGLFWWindow() const { return m_glfwWindow; }
 
 protected:
     bool CreateWindow() override;

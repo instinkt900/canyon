@@ -4,10 +4,10 @@
 #include "../utils.h"
 
 namespace graphics::sdl {
-    SDLGraphics::SDLGraphics(SDL_Renderer* renderer)
+    Graphics::Graphics(SDL_Renderer* renderer)
     :m_renderer(renderer) {
     }
-    void SDLGraphics::SetBlendMode(graphics::BlendMode mode) {
+    void Graphics::SetBlendMode(graphics::BlendMode mode) {
         SDL_SetRenderDrawBlendMode(m_renderer, ToSDL(mode));
     }
 
@@ -25,16 +25,16 @@ namespace graphics::sdl {
     //    SDL_SetTextureAlphaMod(sdlTexture->GetImpl(), components.a);
     //}
 
-    void SDLGraphics::SetColor(graphics::Color const& color) {
+    void Graphics::SetColor(graphics::Color const& color) {
         ColorComponents components(color);
         SDL_SetRenderDrawColor(m_renderer, components.r, components.g, components.b, components.a);
     }
 
-    void SDLGraphics::Clear() {
+    void Graphics::Clear() {
         SDL_RenderClear(m_renderer);
     }
 
-    void SDLGraphics::DrawImage(graphics::IImage& image, IntRect const* sourceRect, IntRect const* destRect) {
+    void Graphics::DrawImage(graphics::IImage& image, IntRect const* sourceRect, IntRect const* destRect) {
         auto& sdlImage = dynamic_cast<Image&>(image);
         auto sdlTexture = sdlImage.GetTexture();
 
@@ -53,7 +53,7 @@ namespace graphics::sdl {
         }
     }
 
-    void SDLGraphics::DrawToPNG(std::filesystem::path const& path) {
+    void Graphics::DrawToPNG(std::filesystem::path const& path) {
         Uint32 rmask, gmask, bmask, amask;
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
         rmask = 0xff000000;
@@ -76,21 +76,21 @@ namespace graphics::sdl {
         IMG_SavePNG(surface.get(), path.string().c_str());
     }
 
-    void SDLGraphics::DrawRectF(FloatRect const& rect) {
+    void Graphics::DrawRectF(FloatRect const& rect) {
         auto const sdlRectF = ToSDL(rect);
         SDL_RenderDrawRectF(m_renderer, &sdlRectF);
     }
 
-    void SDLGraphics::DrawFillRectF(FloatRect const& rect) {
+    void Graphics::DrawFillRectF(FloatRect const& rect) {
         auto const sdlRectF = ToSDL(rect);
         SDL_RenderFillRectF(m_renderer, &sdlRectF);
     }
 
-    void SDLGraphics::DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) {
+    void Graphics::DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) {
         SDL_RenderDrawLineF(m_renderer, p0.x, p0.y, p1.x, p1.y);
     }
 
-    std::unique_ptr<graphics::ITarget> SDLGraphics::CreateTarget(int width, int height) {
+    std::unique_ptr<graphics::ITarget> Graphics::CreateTarget(int width, int height) {
         auto sdlTexture = CreateTextureRef(SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height));
 
         IntVec2 const dimensions{ width, height };
@@ -98,13 +98,13 @@ namespace graphics::sdl {
         return std::make_unique<Image>(sdlTexture, dimensions, sourceRect);
     }
 
-    graphics::ITarget* SDLGraphics::GetTarget() {
+    graphics::ITarget* Graphics::GetTarget() {
         //std::shared_ptr<SDLTextureWrap> sdlTexture = SDLTextureWrap::CreateNonOwning(SDL_GetRenderTarget(m_renderer));
         //return std::make_shared<Image>(sdlTexture);
         return nullptr;
     }
 
-    void SDLGraphics::SetTarget(graphics::ITarget* target) {
+    void Graphics::SetTarget(graphics::ITarget* target) {
         if (!target) {
             SDL_SetRenderTarget(m_renderer, nullptr);
         } else {
@@ -114,7 +114,7 @@ namespace graphics::sdl {
         }
     }
 
-    void SDLGraphics::SetLogicalSize(IntVec2 const& logicalSize) {
+    void Graphics::SetLogicalSize(IntVec2 const& logicalSize) {
         SDL_RenderSetLogicalSize(m_renderer, logicalSize.x, logicalSize.y);
     }
 }
