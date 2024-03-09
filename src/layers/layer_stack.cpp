@@ -73,11 +73,5 @@ void LayerStack::SetRenderSize(IntVec2 const& dimensions) {
     m_renderHeight = dimensions.y;
 }
 
-void LayerStack::BroadcastEvent(Event const& event) {
-    if (m_eventListener) {
-        m_eventListener->OnEvent(event);
-    }
-}
-
 void LayerStack::SetLayerLogicalSize(IntVec2 const& size) {
 }

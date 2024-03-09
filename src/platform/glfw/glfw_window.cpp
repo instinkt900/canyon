@@ -17,7 +17,7 @@ namespace platform::glfw {
 
         if (glfwWindowShouldClose(m_glfwWindow)) {
             glfwSetWindowShouldClose(m_glfwWindow, 0);
-            OnEvent(EventRequestQuit());
+            EmitEvent(EventRequestQuit());
         }
 
         m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
@@ -54,13 +54,13 @@ namespace platform::glfw {
             }
             app->OnResize();
             const auto translatedEvent = std::make_unique<EventWindowSize>(width, height);
-            app->OnEvent(*translatedEvent);
+            app->EmitEvent(*translatedEvent);
         });
 
         glfwSetKeyCallback(m_glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
             if (auto const translatedEvent = FromGLFW(key, scancode, action, mods)) {
-                app->OnEvent(*translatedEvent);
+                app->EmitEvent(*translatedEvent);
             }
         });
 
@@ -74,13 +74,13 @@ namespace platform::glfw {
             app->m_lastMousePos = newMousePos;
             app->m_haveMousePos = true;
             auto const translatedEvent = std::make_unique<EventMouseMove>(static_cast<IntVec2>(app->m_lastMousePos), static_cast<FloatVec2>(mouseDelta));
-            app->OnEvent(*translatedEvent);
+            app->EmitEvent(*translatedEvent);
         });
 
         glfwSetMouseButtonCallback(m_glfwWindow, [](GLFWwindow* window, int button, int action, int mods) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
             if (auto const translatedEvent = FromGLFW(button, action, mods, static_cast<IntVec2>(app->m_lastMousePos))) {
-                app->OnEvent(*translatedEvent);
+                app->EmitEvent(*translatedEvent);
             }
         });
 

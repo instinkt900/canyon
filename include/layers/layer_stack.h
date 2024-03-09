@@ -1,5 +1,6 @@
 #pragma once
 
+#include "events/event_emitter.h"
 #include "events/event_listener.h"
 #include "utils/vector.h"
 
@@ -8,7 +9,7 @@
 
 class Layer;
 
-class LayerStack : public EventListener {
+class LayerStack : public EventEmitter, public EventListener {
 public:
     LayerStack(int renderWidth, int renderHeight, int windowWidth, int windowHeight);
     virtual ~LayerStack();
@@ -30,14 +31,10 @@ public:
     int GetWindowWidth() const { return m_windowWidth; }
     int GetWindowHeight() const { return m_windowHeight; }
 
-    void SetEventListener(EventListener* listener) { m_eventListener = listener; }
-    void BroadcastEvent(Event const& event);
-
 protected:
     virtual void SetLayerLogicalSize(IntVec2 const& size);
 
     std::vector<std::unique_ptr<Layer>> m_layers;
-    EventListener* m_eventListener = nullptr;
 
     int m_renderWidth = 0;
     int m_renderHeight = 0;

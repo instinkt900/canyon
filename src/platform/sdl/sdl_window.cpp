@@ -15,7 +15,7 @@ namespace platform::sdl {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (auto const translatedEvent = FromSDL(event)) {
-                OnEvent(*translatedEvent);
+                EmitEvent(*translatedEvent);
             }
         }
     }
