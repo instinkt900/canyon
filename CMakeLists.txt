@@ -61,7 +61,9 @@ set(SOURCES ${SOURCES}
 	src/platform/glfw/glfw_events.cpp
 	src/platform/sdl/sdl_window.cpp
 	src/platform/sdl/sdl_events.cpp
-	src/platform_window.cpp
+	src/platform/window.cpp
+	src/platform/vulkan_application.cpp
+	src/platform/sdl_application.cpp
 	src/main.cpp
 )
 
@@ -97,5 +99,9 @@ if (MSVC)
 else()
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall -Werror")
 endif()
+
+target_precompile_headers(${PROJECT_NAME} PRIVATE include/canyon.h)
+set_source_files_properties(external/murmurhash.c/murmurhash.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vulkan/vulkan.hpp>
-#include <vk_mem_alloc.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 

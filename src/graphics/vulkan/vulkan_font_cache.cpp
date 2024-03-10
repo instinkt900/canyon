@@ -1,3 +1,4 @@
+#include "canyon.h"
 #include "graphics/vulkan/vulkan_font_cache.h"
 
 namespace graphics::vulkan {

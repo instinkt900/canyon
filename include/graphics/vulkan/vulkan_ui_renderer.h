@@ -1,7 +1,6 @@
 #pragma once
 
 #include "graphics/irenderer.h"
-#include <stack>
 
 namespace graphics::vulkan {
     class Graphics;

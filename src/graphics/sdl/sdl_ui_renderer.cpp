@@ -1,3 +1,4 @@
+#include "canyon.h"
 #include "graphics/sdl/sdl_ui_renderer.h"
 #include "graphics/sdl/sdl_image.h"
 #include "graphics/sdl/sdl_font.h"

@@ -1,9 +1,9 @@
+#include "canyon.h"
 #include "graphics/sdl/sdl_events.h"
 #include "events/event_key.h"
 #include "events/event_mouse.h"
 #include "events/event_window.h"
 #include "events/event.h"
-#include <SDL.h>
 
 namespace {
     MouseButton FromSDLMouse(uint8_t button) {

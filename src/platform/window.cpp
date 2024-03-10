@@ -1,4 +1,5 @@
-#include "platform_window.h"
+#include "canyon.h"
+#include "platform/window.h"
 #include "events/event_dispatch.h"
 
 namespace platform {

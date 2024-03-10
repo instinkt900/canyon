@@ -1,7 +1,6 @@
 #pragma once
 
 #include "iimage.h"
-#include <filesystem>
 
 namespace graphics {
     class IImageFactory {

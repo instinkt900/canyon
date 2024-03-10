@@ -4,7 +4,6 @@
 #include "graphics/iimage.h"
 #include "smart_sdl.h"
 #include "utils/rect.h"
-#include <unordered_map>
 
 namespace graphics::sdl {
     class ImageFactory : public graphics::IImageFactory {

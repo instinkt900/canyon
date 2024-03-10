@@ -1,7 +1,6 @@
 #pragma once
 
 #include "graphics/igraphics.h"
-#include <SDL.h>
 
 namespace graphics::sdl {
     class Graphics : public IGraphics {

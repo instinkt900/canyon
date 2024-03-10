@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 enum EventType : int {
     EVENTTYPE_KEY,
     EVENTTYPE_MOUSE_DOWN,

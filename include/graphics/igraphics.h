@@ -7,7 +7,6 @@
 #include "graphics/text_alignment.h"
 #include "graphics/itarget.h"
 #include "graphics/ifont.h"
-#include <filesystem>
 
 namespace graphics {
     class IGraphics {

@@ -1,3 +1,4 @@
+#include "canyon.h"
 #include "graphics/vulkan/vulkan_command_buffer.h"
 #include "graphics/vulkan/vulkan_context.h"
 #include "graphics/vulkan/vulkan_utils.h"

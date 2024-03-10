@@ -2,6 +2,8 @@
     "cmake.configureOnOpen": true,
     "files.associations": {
         "memory": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "algorithm": "cpp",
+        "cmath": "cpp"
     }
 }

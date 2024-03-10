@@ -1,7 +1,5 @@
 #pragma once
 
-#include <array>
-
 #pragma pack(push, 1)
 
 template <class T, int Dim>

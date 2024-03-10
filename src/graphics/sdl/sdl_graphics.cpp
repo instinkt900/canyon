@@ -1,3 +1,4 @@
+#include "canyon.h"
 #include "graphics/sdl/sdl_graphics.h"
 #include "graphics/sdl/sdl_image.h"
 #include "graphics/sdl/sdl_utils.h"

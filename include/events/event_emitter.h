@@ -2,7 +2,6 @@
 
 #include "events/event_listener.h"
 #include "events/event_dispatch.h"
-#include <vector>
 
 class EventEmitter {
 public:

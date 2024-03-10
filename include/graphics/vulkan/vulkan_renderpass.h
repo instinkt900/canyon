@@ -1,8 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <vulkan/vulkan.hpp>
-
 namespace graphics::vulkan {
     class RenderPass {
     public:

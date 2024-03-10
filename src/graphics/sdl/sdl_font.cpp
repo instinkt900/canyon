@@ -1,3 +1,4 @@
+#include "canyon.h"
 #include "graphics/sdl/sdl_font.h"
 
 namespace graphics::sdl {

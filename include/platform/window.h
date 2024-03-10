@@ -3,10 +3,6 @@
 #include "events/event_emitter.h"
 #include "events/event_window.h"
 #include "utils/vector.h"
-#include <string>
-#include <chrono>
-
-#undef CreateWindow
 
 namespace platform {
     class Window : public EventEmitter {

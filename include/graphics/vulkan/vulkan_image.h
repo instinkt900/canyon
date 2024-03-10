@@ -1,8 +1,6 @@
 #pragma once
 
 #include "vulkan_context.h"
-#include <filesystem>
-#include <memory>
 
 namespace graphics::vulkan {
     class Image {

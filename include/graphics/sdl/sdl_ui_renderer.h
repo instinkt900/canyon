@@ -1,8 +1,6 @@
 #pragma once
 
 #include "graphics/irenderer.h"
-#include <SDL.h>
-#include <stack>
 
 namespace graphics::sdl {
     class UIRenderer : public graphics::IRenderer {

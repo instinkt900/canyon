@@ -2,7 +2,6 @@
 
 #include "graphics/font_factory.h"
 #include "graphics/ifont.h"
-#include <SDL.h>
 
 namespace graphics::sdl {
     class FontFactory : public graphics::FontFactory {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "vulkan_image.h"
-#include <map>
 
 namespace graphics::vulkan {
     struct Shader {

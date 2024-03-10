@@ -3,7 +3,6 @@
 #include "graphics/iimage.h"
 #include "graphics/itarget.h"
 #include "utils/rect.h"
-#include "smart_sdl.h"
 
 namespace graphics::sdl {
     class Image : public graphics::IImage, public graphics::ITarget {

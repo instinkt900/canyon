@@ -1,9 +1,9 @@
+#include "canyon.h"
 #include "graphics/vulkan/vulkan_events.h"
 
 #include "events/event_key.h"
 #include "events/event_mouse.h"
 #include "events/event.h"
-#include <GLFW/glfw3.h>
 
 namespace {
     Key FromGLFWKey(int key) {

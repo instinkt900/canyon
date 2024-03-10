@@ -1,6 +1,6 @@
+#include "canyon.h"
 #include "graphics/sdl/sdl_font_factory.h"
 #include "graphics/sdl/sdl_font.h"
-#include <cassert>
 
 namespace graphics::sdl {
     FontFactory::FontFactory(SDL_Renderer& renderer)

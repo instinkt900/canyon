@@ -1,3 +1,4 @@
+#include "canyon.h"
 #include "graphics/vulkan/vulkan_fence.h"
 
 namespace graphics::vulkan {

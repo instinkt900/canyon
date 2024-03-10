@@ -1,8 +1,8 @@
+#include "canyon.h"
 #include "graphics/vulkan/vulkan_image.h"
 #include "graphics/vulkan/vulkan_command_buffer.h"
 #include "graphics/vulkan/vulkan_utils.h"
 #include "graphics/stb_image.h"
-#include <backends/imgui_impl_vulkan.h>
 
 namespace {
     static uint32_t NextTextureId = 1;

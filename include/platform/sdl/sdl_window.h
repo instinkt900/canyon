@@ -1,8 +1,6 @@
 #pragma once
 
-#include "platform_window.h"
-#include <SDL.h>
-#include <string>
+#include "platform/window.h"
 
 namespace platform::sdl {
     class Window : public platform::Window {

@@ -1,9 +1,6 @@
 #pragma once
 
 #include "ifont.h"
-#include <filesystem>
-#include <map>
-#include <vector>
 
 namespace graphics {
     class FontFactory {

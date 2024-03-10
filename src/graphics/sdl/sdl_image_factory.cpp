@@ -1,8 +1,7 @@
+#include "canyon.h"
 #include "graphics/sdl/sdl_image_factory.h"
 #include "graphics/sdl/sdl_image.h"
 #include "utils/rect_serialization.h"
-#include <fstream>
-#include <nlohmann/json.hpp>
 
 namespace graphics::sdl {
     ImageFactory::ImageFactory(SDL_Renderer& renderer)

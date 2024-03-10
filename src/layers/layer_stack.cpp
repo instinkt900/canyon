@@ -1,6 +1,6 @@
+#include "canyon.h"
 #include "layers/layer_stack.h"
 #include "layers/layer.h"
-#include <algorithm>
 
 LayerStack::LayerStack(int renderWidth, int renderHeight, int windowWidth, int windowHeight)
     : m_renderWidth(renderWidth)

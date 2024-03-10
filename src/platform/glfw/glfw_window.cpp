@@ -1,3 +1,4 @@
+#include "canyon.h"
 #include "platform/glfw/glfw_window.h"
 #include "platform/glfw/glfw_events.h"
 #include "events/event_mouse.h"

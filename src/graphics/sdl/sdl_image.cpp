@@ -1,5 +1,5 @@
+#include "canyon.h"
 #include "graphics/sdl/sdl_image.h"
-#include <imgui.h>
 
 namespace graphics::sdl {
     Image::Image(TextureRef texture)

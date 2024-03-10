@@ -7,7 +7,6 @@
 #include "graphics/blend_mode.h"
 #include "graphics/text_alignment.h"
 #include "graphics/image_scale_type.h"
-#include <string>
 
 namespace graphics {
     class IRenderer {

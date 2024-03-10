@@ -1,7 +1,6 @@
 #pragma once
 
-#include "platform_window.h"
-#include <GLFW/glfw3.h>
+#include "platform/window.h"
 
 namespace platform::glfw {
     class Window : public platform::Window {

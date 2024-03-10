@@ -1,7 +1,7 @@
+#include "canyon.h"
 #include "graphics/vulkan/vulkan_image_factory.h"
 #include "utils/rect_serialization.h"
 #include "graphics/vulkan/vulkan_subimage.h"
-#include <fstream>
 
 namespace graphics::vulkan {
     ImageFactory::ImageFactory(Context& context, Graphics& graphics)

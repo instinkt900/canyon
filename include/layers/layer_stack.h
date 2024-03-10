@@ -4,9 +4,6 @@
 #include "events/event_listener.h"
 #include "utils/vector.h"
 
-#include <memory>
-#include <vector>
-
 class Layer;
 
 class LayerStack : public EventEmitter, public EventListener {

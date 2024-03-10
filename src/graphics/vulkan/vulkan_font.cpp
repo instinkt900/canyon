@@ -1,3 +1,4 @@
+#include "canyon.h"
 #include "graphics/vulkan/vulkan_font.h"
 #include "graphics/stb_rect_pack.h"
 #include "harfbuzz/hb-ft.h"

@@ -1,6 +1,5 @@
+#include "canyon.h"
 #include "graphics/font_factory.h"
-#include <fstream>
-#include <nlohmann/json.hpp>
 
 namespace graphics {
     void FontFactory::AddFont(char const* name, std::filesystem::path const& path) {

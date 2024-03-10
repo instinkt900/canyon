@@ -1,3 +1,4 @@
+#include "canyon.h"
 #include "graphics/vulkan/vulkan_pipeline.h"
 
 namespace graphics::vulkan {
