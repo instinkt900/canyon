@@ -18,6 +18,9 @@ public:
 
     void Tick(uint32_t ticks) override;
 
+    LayerStack& GetLayerStack() { return *m_layerStack; }
+    graphics::IGraphics& GetGraphics() { return *m_graphics; }
+
 private:
     std::unique_ptr<platform::glfw::Window> m_window;
     std::unique_ptr<graphics::vulkan::Context> m_context;

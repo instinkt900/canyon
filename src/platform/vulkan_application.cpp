@@ -22,6 +22,7 @@ bool VulkApplication::OnEvent(Event const& event) {
 
 bool VulkApplication::OnWindowSizeEvent(EventWindowSize const& event) {
     m_layerStack->SetWindowSize({ event.GetWidth(), event.GetHeight() });
+    m_graphics->OnResize(m_customVkSurface, event.GetWidth(), event.GetHeight());
     return true;
 }
 
