@@ -1,16 +1,16 @@
 #pragma once
 
-#include "events/event.h"
+#include "moth_ui/events/event.h"
 
 enum WindowEventType : int {
-    EVENTTYPE_RENDERDEVICERESET = EventType::EVENTTYPE_USER,
+    EVENTTYPE_RENDERDEVICERESET = moth_ui::EVENTTYPE_USER0,
     EVENTTYPE_RENDERTARGETRESET,
     EVENTTYPE_WINDOWSIZE,
     EVENTTYPE_REQUEST_QUIT,
     EVENTTYPE_QUIT,
 };
 
-class EventRenderDeviceReset : public Event {
+class EventRenderDeviceReset : public moth_ui::Event {
 public:
     EventRenderDeviceReset()
         : Event(GetStaticType()) {}
@@ -23,7 +23,7 @@ public:
     }
 };
 
-class EventRenderTargetReset : public Event {
+class EventRenderTargetReset : public moth_ui::Event {
 public:
     EventRenderTargetReset()
         : Event(GetStaticType()) {}
@@ -36,7 +36,7 @@ public:
     }
 };
 
-class EventWindowSize : public Event {
+class EventWindowSize : public moth_ui::Event {
 public:
     EventWindowSize(int width, int height)
         : Event(GetStaticType())
@@ -58,7 +58,7 @@ private:
     int m_height = 0;
 };
 
-class EventRequestQuit : public Event {
+class EventRequestQuit : public moth_ui::Event {
 public:
     EventRequestQuit()
         : Event(GetStaticType()) {}
@@ -71,7 +71,7 @@ public:
     }
 };
 
-class EventQuit : public Event {
+class EventQuit : public moth_ui::Event {
 public:
     EventQuit()
         : Event(GetStaticType()) {}

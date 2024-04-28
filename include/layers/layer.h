@@ -1,14 +1,14 @@
 #pragma once
 
-#include "events/event_listener.h"
+#include "moth_ui/event_listener.h"
 #include "layers/layer_stack.h"
 
-class Layer : public EventListener {
+class Layer : public moth_ui::EventListener {
 public:
     Layer();
     virtual ~Layer();
 
-    bool OnEvent(Event const& event) override;
+    bool OnEvent(moth_ui::Event const& event) override;
 
     virtual void Update(uint32_t ticks);
     virtual void Draw();

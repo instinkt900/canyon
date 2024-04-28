@@ -19,9 +19,10 @@ namespace platform::glfw {
 
     private:
         GLFWwindow* m_glfwWindow = nullptr;
-        FloatVec2 m_lastMousePos;
+        moth_ui::FloatVec2 m_lastMousePos;
         bool m_haveMousePos = false;
 
         void OnResize();
     };
 }
+

@@ -1,6 +1,5 @@
 #include "canyon.h"
 #include "platform/window.h"
-#include "events/event_dispatch.h"
 
 namespace platform {
     Window::Window(std::string const& title, int width, int height)
@@ -12,3 +11,4 @@ namespace platform {
     Window::~Window() {
     }
 }
+

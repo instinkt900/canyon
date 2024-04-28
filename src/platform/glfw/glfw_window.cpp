@@ -1,7 +1,8 @@
 #include "canyon.h"
 #include "platform/glfw/glfw_window.h"
 #include "platform/glfw/glfw_events.h"
-#include "events/event_mouse.h"
+#include "moth_ui/events/event_mouse.h"
+#include "events/event_window.h"
 
 namespace platform::glfw {
     Window::Window(std::string const& title, int width, int height)
@@ -67,20 +68,20 @@ namespace platform::glfw {
 
         glfwSetCursorPosCallback(m_glfwWindow, [](GLFWwindow* window, double xpos, double ypos) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
-            auto const newMousePos = FloatVec2{ xpos, ypos };
-            FloatVec2 mouseDelta{ 0, 0 };
+            auto const newMousePos = moth_ui::FloatVec2{ xpos, ypos };
+            moth_ui::FloatVec2 mouseDelta{ 0, 0 };
             if (app->m_haveMousePos) {
                 mouseDelta = newMousePos - app->m_lastMousePos;
             }
             app->m_lastMousePos = newMousePos;
             app->m_haveMousePos = true;
-            auto const translatedEvent = std::make_unique<EventMouseMove>(static_cast<IntVec2>(app->m_lastMousePos), static_cast<FloatVec2>(mouseDelta));
+            auto const translatedEvent = std::make_unique<moth_ui::EventMouseMove>(static_cast<moth_ui::IntVec2>(app->m_lastMousePos), static_cast<moth_ui::FloatVec2>(mouseDelta));
             app->EmitEvent(*translatedEvent);
         });
 
         glfwSetMouseButtonCallback(m_glfwWindow, [](GLFWwindow* window, int button, int action, int mods) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
-            if (auto const translatedEvent = FromGLFW(button, action, mods, static_cast<IntVec2>(app->m_lastMousePos))) {
+            if (auto const translatedEvent = FromGLFW(button, action, mods, static_cast<moth_ui::IntVec2>(app->m_lastMousePos))) {
                 app->EmitEvent(*translatedEvent);
             }
         });
@@ -110,3 +111,4 @@ namespace platform::glfw {
 
     }
 }
+

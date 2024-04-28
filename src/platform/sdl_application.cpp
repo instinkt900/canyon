@@ -9,8 +9,8 @@ SDLApplication::SDLApplication() {
     m_layerStack->AddEventListener(this);
 }
 
-bool SDLApplication::OnEvent(Event const& event) {
-    EventDispatch dispatch(event);
+bool SDLApplication::OnEvent(moth_ui::Event const& event) {
+    moth_ui::EventDispatch dispatch(event);
     dispatch.Dispatch(this, &SDLApplication::OnWindowSizeEvent);
     dispatch.Dispatch(m_layerStack.get());
     dispatch.Dispatch(this, &SDLApplication::OnRequestQuitEvent);

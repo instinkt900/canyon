@@ -1,12 +1,12 @@
 #pragma once
 
 #include "events/event_emitter.h"
-#include "events/event_listener.h"
+#include "moth_ui/event_listener.h"
 #include "utils/vector.h"
 
 class Layer;
 
-class LayerStack : public EventEmitter, public EventListener {
+class LayerStack : public EventEmitter, public moth_ui::EventListener {
 public:
     LayerStack(int renderWidth, int renderHeight, int windowWidth, int windowHeight);
     virtual ~LayerStack();
@@ -15,7 +15,7 @@ public:
     std::unique_ptr<Layer> PopLayer();
     void RemoveLayer(Layer* layer);
 
-    virtual bool OnEvent(Event const& event) override;
+    virtual bool OnEvent(moth_ui::Event const& event) override;
     virtual void Update(uint32_t ticks);
     virtual void Draw();
     virtual void DebugDraw();

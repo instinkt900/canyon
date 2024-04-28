@@ -11,8 +11,8 @@ VulkApplication::VulkApplication() {
     m_layerStack->AddEventListener(this);
 }
 
-bool VulkApplication::OnEvent(Event const& event) {
-    EventDispatch dispatch(event);
+bool VulkApplication::OnEvent(moth_ui::Event const& event) {
+    moth_ui::EventDispatch dispatch(event);
     dispatch.Dispatch(this, &VulkApplication::OnWindowSizeEvent);
     dispatch.Dispatch(this, &VulkApplication::OnRequestQuitEvent);
     dispatch.Dispatch(this, &VulkApplication::OnQuitEvent);
@@ -44,3 +44,4 @@ void VulkApplication::Tick(uint32_t ticks) {
     m_window->Draw();
     m_graphics->End();
 }
+

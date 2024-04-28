@@ -1,8 +1,7 @@
 #pragma once
 
 #include "events/event_emitter.h"
-#include "events/event_window.h"
-#include "utils/vector.h"
+#include "moth_ui/utils/vector.h"
 
 namespace platform {
     class Window : public EventEmitter {
@@ -25,7 +24,7 @@ namespace platform {
         std::string m_title;
         int m_windowWidth = 0;
         int m_windowHeight = 0;
-        IntVec2 m_windowPos = { -1, -1 };
+        moth_ui::IntVec2 m_windowPos = { -1, -1 };
         bool m_windowMaximized = false;
     };
 }

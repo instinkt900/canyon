@@ -7,6 +7,7 @@ message("Building with CMake version: ${CMAKE_VERSION}")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_compile_definitions(_CRT_SECURE_NO_WARNINGS IMGUI_DEFINE_MATH_OPERATORS)
 
@@ -24,7 +25,6 @@ set(SOURCES ${SOURCES}
 	external/imgui/backends/imgui_impl_vulkan.cpp
 	external/imgui/backends/imgui_impl_glfw.cpp
     src/graphics/sdl/SDL_FontCache.c
-    src/graphics/sdl/sdl_events.cpp
     src/graphics/sdl/sdl_font.cpp
     src/graphics/sdl/sdl_font_factory.cpp
     src/graphics/sdl/sdl_graphics.cpp
@@ -64,6 +64,7 @@ set(SOURCES ${SOURCES}
 	src/platform/window.cpp
 	src/platform/vulkan_application.cpp
 	src/platform/sdl_application.cpp
+    src/ui_button.cpp
 	src/main.cpp
 )
 
@@ -77,6 +78,7 @@ find_package(vulkan-memory-allocator REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(harfbuzz REQUIRED)
+find_package(moth_ui REQUIRED)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
@@ -91,6 +93,7 @@ target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan)
 target_link_libraries(${PROJECT_NAME} vulkan-memory-allocator::vulkan-memory-allocator)
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog)
 target_link_libraries(${PROJECT_NAME} harfbuzz::harfbuzz)
+target_link_libraries(${PROJECT_NAME} moth_ui::moth_ui)
 
 if (MSVC)
     set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES COMPILE_FLAGS "/W0")

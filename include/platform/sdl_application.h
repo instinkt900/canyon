@@ -1,16 +1,17 @@
 #pragma once
 
 #include "ticker.h"
-#include "events/event_listener.h"
+#include "moth_ui//event_listener.h"
 #include "platform/sdl/sdl_window.h"
 #include "graphics/sdl/sdl_graphics.h"
 #include "layers/layer_stack.h"
+#include "events/event_window.h"
 
-class SDLApplication : public Ticker, public EventListener {
+class SDLApplication : public Ticker, public moth_ui::EventListener {
 public:
     SDLApplication();
 
-    bool OnEvent(Event const& event) override;
+    bool OnEvent(moth_ui::Event const& event) override;
     bool OnWindowSizeEvent(EventWindowSize const& event);
     bool OnRequestQuitEvent(EventRequestQuit const& event);
     bool OnQuitEvent(EventQuit const& event);
@@ -25,3 +26,4 @@ private:
     std::unique_ptr<graphics::sdl::Graphics> m_graphics;
     std::unique_ptr<LayerStack> m_layerStack;
 };
+

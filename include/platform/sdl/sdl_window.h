@@ -25,3 +25,4 @@ namespace platform::sdl {
         SDL_Renderer* m_renderer = nullptr;
     };
 }
+

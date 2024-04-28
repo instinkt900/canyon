@@ -5,7 +5,7 @@
 namespace platform::sdl {
     Window::Window(std::string const& title, int width, int height)
         :platform::Window(title, width, height) {
-            CreateWindow();
+        CreateWindow();
     }
 
     Window::~Window() {
@@ -52,3 +52,4 @@ namespace platform::sdl {
         SDL_Quit();
     }
 }
+
