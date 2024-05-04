@@ -14,7 +14,7 @@ namespace graphics::vulkan {
         Framebuffer(Context& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkRenderPass renderPass);
         virtual ~Framebuffer();
 
-        IntVec2 GetDimensions() const override;
+        moth_ui::IntVec2 GetDimensions() const override;
 
         //void BeginPass(RenderPass& renderPass);
         //void EndPass();

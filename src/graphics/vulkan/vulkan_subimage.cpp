@@ -22,11 +22,11 @@ namespace graphics::vulkan {
         return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
     }
 
-    IntVec2 SubImage::GetDimensions() const {
+    moth_ui::IntVec2 SubImage::GetDimensions() const {
         return { GetWidth(), GetHeight() };
     }
 
-    void SubImage::ImGui(IntVec2 const& size, FloatVec2 const& uv0, FloatVec2 const& uv1) const {
+    void SubImage::ImGui(moth_ui::IntVec2 const& size, moth_ui::FloatVec2 const& uv0, moth_ui::FloatVec2 const& uv1) const {
         if (m_texture && s_graphicsContext) {
             ImGui::Image(m_texture->GetDescriptorSet(),
                             ImVec2(static_cast<float>(size.x), static_cast<float>(size.y)),

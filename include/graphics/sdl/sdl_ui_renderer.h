@@ -1,30 +1,30 @@
 #pragma once
 
-#include "graphics/irenderer.h"
+#include "moth_ui/irenderer.h"
 
 namespace graphics::sdl {
-    class UIRenderer : public graphics::IRenderer {
+    class UIRenderer : public moth_ui::IRenderer {
     public:
         UIRenderer(SDL_Renderer& renderer);
         virtual ~UIRenderer() = default;
 
-        void PushBlendMode(graphics::BlendMode mode) override;
+        void PushBlendMode(moth_ui::BlendMode mode) override;
         void PopBlendMode() override;
-        void PushColor(graphics::Color const& color) override;
+        void PushColor(moth_ui::Color const& color) override;
         void PopColor() override;
 
-        void PushClip(IntRect const& rect) override;
+        void PushClip(moth_ui::IntRect const& rect) override;
         void PopClip() override;
 
-        void RenderRect(IntRect const& rect) override;
-        void RenderFilledRect(IntRect const& rect) override;
-        void RenderImage(graphics::IImage& image, IntRect const& sourceRect, IntRect const& destRect, graphics::ImageScaleType scaleType, float scale) override;
-        void RenderText(std::string const& text, graphics::IFont& font, graphics::TextHorizAlignment horizontalAlignment, graphics::TextVertAlignment verticalAlignment, IntRect const& destRect) override;
+        void RenderRect(moth_ui::IntRect const& rect) override;
+        void RenderFilledRect(moth_ui::IntRect const& rect) override;
+        void RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) override;
+        void RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) override;
 
     private:
         SDL_Renderer& m_renderer;
-        std::stack<graphics::Color> m_drawColor;
-        std::stack<graphics::BlendMode> m_blendMode;
-        std::stack<IntRect> m_clip;
+        std::stack<moth_ui::Color> m_drawColor;
+        std::stack<moth_ui::BlendMode> m_blendMode;
+        std::stack<moth_ui::IntRect> m_clip;
     };
 }

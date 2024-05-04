@@ -7,6 +7,10 @@
 #include "events/event_window.h"
 #include "moth_ui/events/event_animation.h"
 #include "ui_button.h"
+#include "moth_ui/iimage_factory.h"
+#include "moth_ui/font_factory.h"
+#include "moth_ui/node_factory.h"
+#include "moth_ui/context.h"
 
 class TestLayer : public Layer {
 public:
@@ -60,7 +64,7 @@ public:
             rect.topLeft = { 0, 0 };
             rect.bottomRight = { GetWidth(), GetHeight() };
             m_root->SetScreenRect(rect);
-        }   
+        }
     }
 
     void LoadLayout(std::filesystem::path const& path) {
@@ -92,6 +96,10 @@ public:
     // }
 
     graphics::IGraphics& m_graphics;
+    std::unique_ptr<moth_ui::IImageFactory> m_imageFactory;
+    std::unique_ptr<moth_ui::FontFactory> m_fontFactory;
+    std::unique_ptr<moth_ui::IRenderer> m_uiRenderer;
+
     std::shared_ptr<moth_ui::Group> m_root;
     moth_ui::IntVec2 m_lastDrawnSize;
 };
@@ -99,7 +107,8 @@ public:
 int main(int argc, char* argv[]) {
     // VulkApplication app{};
     SDLApplication app{};
-    app.GetLayerStack().PushLayer(std::make_unique<TestLayer>(app.GetGraphics(), ""));
+    moth_ui::Context::GetCurrentContext()->GetFontFactory().LoadProject("assets/fonts.json");
+    app.GetLayerStack().PushLayer(std::make_unique<TestLayer>(app.GetGraphics(), "assets/layouts/basic.mothui"));
     app.TickSync();
     return 0;
 }

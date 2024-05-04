@@ -1,13 +1,13 @@
 #pragma once
 
 #include "graphics/iimage.h"
+#include "moth_ui/itarget.h"
 
 namespace graphics {
-    class ITarget {
+    class ITarget : public moth_ui::ITarget {
     public:
         virtual ~ITarget() = default;
 
-        virtual IntVec2 GetDimensions() const = 0;
         virtual IImage* GetImage() = 0;
     };
 }

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "graphics/color.h"
-#include "utils/rect.h"
+#include "moth_ui/utils/color.h"
 
 // returns a rect with the coordinates of b within a
-inline IntRect MergeRects(IntRect const& a, IntRect const& b) {
-    IntRect c;
+inline moth_ui::IntRect MergeRects(moth_ui::IntRect const& a, moth_ui::IntRect const& b) {
+    moth_ui::IntRect c;
     c.topLeft = a.topLeft + b.topLeft;
     c.bottomRight = b.bottomRight + a.topLeft;
     // contain c within a
@@ -18,6 +18,13 @@ inline IntRect MergeRects(IntRect const& a, IntRect const& b) {
 
 struct ColorComponents {
     explicit ColorComponents(graphics::Color const& color)
+        : r(static_cast<uint8_t>(255 * std::clamp(color.r, 0.0f, 1.0f)))
+        , g(static_cast<uint8_t>(255 * std::clamp(color.g, 0.0f, 1.0f)))
+        , b(static_cast<uint8_t>(255 * std::clamp(color.b, 0.0f, 1.0f)))
+        , a(static_cast<uint8_t>(255 * std::clamp(color.a, 0.0f, 1.0f))) {
+    }
+
+    explicit ColorComponents(moth_ui::Color const& color)
         : r(static_cast<uint8_t>(255 * std::clamp(color.r, 0.0f, 1.0f)))
         , g(static_cast<uint8_t>(255 * std::clamp(color.g, 0.0f, 1.0f)))
         , b(static_cast<uint8_t>(255 * std::clamp(color.b, 0.0f, 1.0f)))

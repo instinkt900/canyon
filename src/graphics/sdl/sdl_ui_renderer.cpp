@@ -9,10 +9,10 @@ namespace graphics::sdl {
     UIRenderer::UIRenderer(SDL_Renderer& renderer)
         : m_renderer(renderer) {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });
-        m_blendMode.push(BlendMode::Replace);
+        m_blendMode.push(moth_ui::BlendMode::Replace);
     }
 
-    void UIRenderer::PushBlendMode(BlendMode mode) {
+    void UIRenderer::PushBlendMode(moth_ui::BlendMode mode) {
         m_blendMode.push(mode);
     }
 
@@ -22,7 +22,7 @@ namespace graphics::sdl {
         }
     }
 
-    void UIRenderer::PushColor(Color const& color) {
+    void UIRenderer::PushColor(moth_ui::Color const& color) {
         auto const modColor = m_drawColor.top() * color;
         m_drawColor.push(modColor);
     }
@@ -33,8 +33,8 @@ namespace graphics::sdl {
         }
     }
 
-    IntRect ClipRect(IntRect const& parentRect, IntRect const& childRect) {
-        IntRect result;
+    moth_ui::IntRect ClipRect(moth_ui::IntRect const& parentRect, moth_ui::IntRect const& childRect) {
+        moth_ui::IntRect result;
         result.topLeft.x = std::max(parentRect.topLeft.x, childRect.topLeft.x);
         result.topLeft.y = std::max(parentRect.topLeft.y, childRect.topLeft.y);
         result.bottomRight.x = std::min(parentRect.bottomRight.x, childRect.bottomRight.x);
@@ -42,7 +42,7 @@ namespace graphics::sdl {
         return result;
     }
 
-    void UIRenderer::PushClip(IntRect const& rect) {
+    void UIRenderer::PushClip(moth_ui::IntRect const& rect) {
         if (m_clip.empty()) {
             m_clip.push(rect);
         } else {
@@ -67,7 +67,7 @@ namespace graphics::sdl {
         }
     }
 
-    void UIRenderer::RenderRect(IntRect const& rect) {
+    void UIRenderer::RenderRect(moth_ui::IntRect const& rect) {
         auto const sdlRect{ ToSDL(rect) };
         ColorComponents components{ m_drawColor.top() };
         SDL_SetRenderDrawBlendMode(&m_renderer, ToSDL(m_blendMode.top()));
@@ -75,7 +75,7 @@ namespace graphics::sdl {
         SDL_RenderDrawRect(&m_renderer, &sdlRect);
     }
 
-    void UIRenderer::RenderFilledRect(IntRect const& rect) {
+    void UIRenderer::RenderFilledRect(moth_ui::IntRect const& rect) {
         auto const sdlRect{ ToSDL(rect) };
         ColorComponents components{ m_drawColor.top() };
         SDL_SetRenderDrawBlendMode(&m_renderer, ToSDL(m_blendMode.top()));
@@ -83,20 +83,20 @@ namespace graphics::sdl {
         SDL_RenderFillRect(&m_renderer, &sdlRect);
     }
 
-    void UIRenderer::RenderImage(IImage& image, IntRect const& sourceRect, IntRect const& destRect, ImageScaleType scaleType, float scale) {
+    void UIRenderer::RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) {
         auto const& internalImage = static_cast<Image&>(image);
         auto const texture = internalImage.GetTexture();
         auto const& textureSourceRect = internalImage.GetSourceRect();
-        auto const sdlsourceRect{ ToSDL(MergeRects(textureSourceRect, sourceRect)) };
+        auto const sdlsourceRect{ ToSDL(MergeRects(ToMothUI(textureSourceRect), sourceRect)) };
         ColorComponents const components{ m_drawColor.top() };
         SDL_SetTextureBlendMode(texture->GetImpl(), ToSDL(m_blendMode.top()));
         SDL_SetTextureColorMod(texture->GetImpl(), components.r, components.g, components.b);
         SDL_SetTextureAlphaMod(texture->GetImpl(), components.a);
 
-        if (scaleType == ImageScaleType::Stretch) {
+        if (scaleType == moth_ui::ImageScaleType::Stretch) {
             auto const sdlDestRect{ ToSDL(destRect) };
             SDL_RenderCopy(&m_renderer, texture->GetImpl(), &sdlsourceRect, &sdlDestRect);
-        } else if (scaleType == ImageScaleType::Tile) {
+        } else if (scaleType == moth_ui::ImageScaleType::Tile) {
             // sdl doesnt have a tiling texture ability. we need to manually tile
             auto const imageWidth = static_cast<int>(image.GetWidth() * scale);
             auto const imageHeight = static_cast<int>(image.GetHeight() * scale);
@@ -112,7 +112,7 @@ namespace graphics::sdl {
         }
     }
 
-    void UIRenderer::RenderText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) {
+    void UIRenderer::RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) {
         auto const fcFont = static_cast<Font&>(font).GetFontObj();
 
         auto const destWidth = destRect.bottomRight.x - destRect.topLeft.x;
@@ -121,24 +121,24 @@ namespace graphics::sdl {
 
         auto x = static_cast<float>(destRect.topLeft.x);
         switch (horizontalAlignment) {
-        case TextHorizAlignment::Left:
+            case moth_ui::TextHorizAlignment::Left:
             break;
-        case TextHorizAlignment::Center:
+            case moth_ui::TextHorizAlignment::Center:
             x = x + destWidth / 2.0f;
             break;
-        case TextHorizAlignment::Right:
+            case moth_ui::TextHorizAlignment::Right:
             x = x + destWidth;
             break;
         }
 
         auto y = static_cast<float>(destRect.topLeft.y);
         switch (verticalAlignment) {
-        case TextVertAlignment::Top:
+            case moth_ui::TextVertAlignment::Top:
             break;
-        case TextVertAlignment::Middle:
+            case moth_ui::TextVertAlignment::Middle:
             y = y + (destHeight - textHeight) / 2.0f;
             break;
-        case TextVertAlignment::Bottom:
+            case moth_ui::TextVertAlignment::Bottom:
             y = y + destHeight - textHeight;
             break;
         }

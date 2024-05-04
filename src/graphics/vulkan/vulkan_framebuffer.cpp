@@ -44,7 +44,7 @@ namespace graphics::vulkan {
         vkDestroyFramebuffer(m_context.m_vkDevice, m_vkFramebuffer, nullptr);
     }
 
-    IntVec2 Framebuffer::GetDimensions() const {
+    moth_ui::IntVec2 Framebuffer::GetDimensions() const {
         return { m_image->m_texture->GetVkExtent().width, m_image->m_texture->GetVkExtent().height };
     }
 

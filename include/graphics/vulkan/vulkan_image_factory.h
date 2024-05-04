@@ -1,13 +1,12 @@
 #pragma once
 
-#include "graphics/iimage_factory.h"
-#include "graphics/iimage.h"
+#include "moth_ui/iimage_factory.h"
 #include "vulkan_context.h"
 #include "vulkan_image.h"
 #include "vulkan_graphics.h"
 
 namespace graphics::vulkan {
-    class ImageFactory : public IImageFactory {
+    class ImageFactory : public moth_ui::IImageFactory {
     public:
         ImageFactory(Context& m_context, Graphics& graphics);
         virtual ~ImageFactory() = default;
@@ -15,7 +14,7 @@ namespace graphics::vulkan {
         void FlushCache() override;
         bool LoadTexturePack(std::filesystem::path const& path) override;
 
-        std::unique_ptr<IImage> GetImage(std::filesystem::path const& path) override;
+        std::unique_ptr<moth_ui::IImage> GetImage(std::filesystem::path const& path) override;
 
     private:
         Context& m_context;

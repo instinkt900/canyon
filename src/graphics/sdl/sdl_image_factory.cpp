@@ -51,7 +51,7 @@ namespace graphics::sdl {
         return true;
     }
 
-    std::unique_ptr<IImage> ImageFactory::GetImage(std::filesystem::path const& path) {
+    std::unique_ptr<moth_ui::IImage> ImageFactory::GetImage(std::filesystem::path const& path) {
         auto const cacheIt = m_cachedImages.find(path.string());
         if (std::end(m_cachedImages) != cacheIt) {
             auto const& imageDesc = cacheIt->second;

@@ -31,7 +31,6 @@ set(SOURCES ${SOURCES}
     src/graphics/sdl/sdl_image.cpp
     src/graphics/sdl/sdl_image_factory.cpp
     src/graphics/sdl/sdl_ui_renderer.cpp
-    src/graphics/font_factory.cpp
 	src/graphics/vulkan/vulkan_buffer.cpp
 	src/graphics/vulkan/vulkan_command_buffer.cpp
 	src/graphics/vulkan/vulkan_context.cpp

@@ -7,7 +7,7 @@ namespace graphics::sdl {
         : m_renderer(renderer) {
     }
 
-    std::shared_ptr<IFont> FontFactory::GetFont(char const* name, int size) {
+    std::shared_ptr<moth_ui::IFont> FontFactory::GetFont(char const* name, int size) {
         assert(!m_fontPaths.empty() && "No known fonts.");
         auto const it = m_fontPaths.find(name);
         if (std::end(m_fontPaths) == it) {

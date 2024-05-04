@@ -22,11 +22,11 @@ namespace graphics::sdl {
         return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
     }
 
-    IntVec2 Image::GetDimensions() const {
+    moth_ui::IntVec2 Image::GetDimensions() const {
         return { GetWidth(), GetHeight() };
     }
 
-    void Image::ImGui(IntVec2 const& size, FloatVec2 const& uv0, FloatVec2 const& uv1) const {
+    void Image::ImGui(moth_ui::IntVec2 const& size, moth_ui::FloatVec2 const& uv0, moth_ui::FloatVec2 const& uv1) const {
         ImGui::Image(m_texture ? m_texture->GetImpl() : nullptr,
                      ImVec2(static_cast<float>(size.x), static_cast<float>(size.y)),
                      ImVec2(uv0.x, uv0.y),

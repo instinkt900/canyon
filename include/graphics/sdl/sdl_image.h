@@ -13,8 +13,8 @@ namespace graphics::sdl {
 
         int GetWidth() const override;
         int GetHeight() const override;
-        IntVec2 GetDimensions() const override;
-        void ImGui(IntVec2 const& size, FloatVec2 const& uv0, FloatVec2 const& uv1) const override;
+        moth_ui::IntVec2 GetDimensions() const override;
+        void ImGui(moth_ui::IntVec2 const& size, moth_ui::FloatVec2 const& uv0, moth_ui::FloatVec2 const& uv1) const override;
 
         //virtual IntVec2 GetDimensions() const = 0;
         IImage* GetImage() override { return this; }

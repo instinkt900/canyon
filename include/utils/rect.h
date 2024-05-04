@@ -1,5 +1,6 @@
 #pragma once
 
+#include <moth_ui/utils/rect.h>
 #include "vector.h"
 
 template <typename T>
@@ -171,3 +172,9 @@ template <typename T>
 inline bool Intersects(Rect<T> const& rect1, Rect<T> const& rect2) {
     return !(rect2.topLeft.x > rect1.bottomRight.x || rect2.bottomRight.x < rect1.topLeft.x || rect2.topLeft.y > rect1.bottomRight.y || rect2.bottomRight.y < rect1.topLeft.y);
 }
+
+template <typename T>
+inline moth_ui::Rect<T> ToMothUI(Rect<T> const& r) {
+    return { ToMothUI(r.topLeft), ToMothUI(r.bottomRight) };
+}
+

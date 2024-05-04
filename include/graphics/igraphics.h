@@ -31,3 +31,4 @@ namespace graphics {
         virtual void SetLogicalSize(IntVec2 const& logicalSize) = 0;
     };
 }
+

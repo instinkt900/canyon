@@ -12,8 +12,8 @@ namespace graphics::vulkan {
 
         int GetWidth() const override;
         int GetHeight() const override;
-        IntVec2 GetDimensions() const override;
-        void ImGui(IntVec2 const& size, FloatVec2 const& uv0, FloatVec2 const& uv1) const override;
+        moth_ui::IntVec2 GetDimensions() const override;
+        void ImGui(moth_ui::IntVec2 const& size, moth_ui::FloatVec2 const& uv0, moth_ui::FloatVec2 const& uv1) const override;
 
         std::shared_ptr<Image> m_texture;
         IntVec2 m_textureDimensions;
