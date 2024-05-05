@@ -105,8 +105,8 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    // VulkApplication app{};
-    SDLApplication app{};
+    VulkApplication app{};
+    // SDLApplication app{};
     moth_ui::Context::GetCurrentContext()->GetFontFactory().LoadProject("assets/fonts.json");
     app.GetLayerStack().PushLayer(std::make_unique<TestLayer>(app.GetGraphics(), "assets/layouts/basic.mothui"));
     app.TickSync();

@@ -178,3 +178,8 @@ inline moth_ui::Rect<T> ToMothUI(Rect<T> const& r) {
     return { ToMothUI(r.topLeft), ToMothUI(r.bottomRight) };
 }
 
+template <typename T>
+inline Rect<T> FromMothUI(moth_ui::Rect<T> const& r) {
+    return { FromMothUI(r.topLeft), FromMothUI(r.bottomRight) };
+}
+

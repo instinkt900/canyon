@@ -1,26 +1,28 @@
 #pragma once
 
-#include "graphics/irenderer.h"
+#include "graphics/color.h"
+#include "utils/rect.h"
+#include <moth_ui/irenderer.h>
 
 namespace graphics::vulkan {
     class Graphics;
-    class UIRenderer : public IRenderer {
+    class UIRenderer : public moth_ui::IRenderer {
     public:
         UIRenderer(Graphics& graphics);
         virtual ~UIRenderer() = default;
 
-        void PushBlendMode(BlendMode mode) override;
+        void PushBlendMode(moth_ui::BlendMode mode) override;
         void PopBlendMode() override;
-        void PushColor(Color const& color) override;
+        void PushColor(moth_ui::Color const& color) override;
         void PopColor() override;
 
-        void PushClip(IntRect const& rect) override;
+        void PushClip(moth_ui::IntRect const& rect) override;
         void PopClip() override;
 
-        void RenderRect(IntRect const& rect) override;
-        void RenderFilledRect(IntRect const& rect) override;
-        void RenderImage(IImage& image, IntRect const& sourceRect, IntRect const& destRect, ImageScaleType scaleType, float scale) override;
-        void RenderText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) override;
+        void RenderRect(moth_ui::IntRect const& rect) override;
+        void RenderFilledRect(moth_ui::IntRect const& rect) override;
+        void RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) override;
+        void RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) override;
 
     private:
         Graphics& m_graphics;

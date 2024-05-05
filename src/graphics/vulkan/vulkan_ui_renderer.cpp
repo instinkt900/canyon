@@ -2,6 +2,7 @@
 #include "graphics/vulkan/vulkan_ui_renderer.h"
 #include "graphics/vulkan/vulkan_graphics.h"
 #include "graphics/vulkan/vulkan_font.h"
+#include "utils/rect.h"
 
 namespace graphics::vulkan {
     UIRenderer::UIRenderer(Graphics& graphics)
@@ -10,8 +11,8 @@ namespace graphics::vulkan {
         m_blendMode.push(BlendMode::Replace);
     }
 
-    void UIRenderer::PushBlendMode(BlendMode mode) {
-        m_blendMode.push(mode);
+    void UIRenderer::PushBlendMode(moth_ui::BlendMode mode) {
+        m_blendMode.push(FromMothUI(mode));
     }
 
     void UIRenderer::PopBlendMode() {
@@ -20,8 +21,8 @@ namespace graphics::vulkan {
         }
     }
 
-    void UIRenderer::PushColor(Color const& color) {
-        auto const modColor = m_drawColor.top() * color;
+    void UIRenderer::PushColor(moth_ui::Color const& color) {
+        auto const modColor = m_drawColor.top() * ::FromMothUI(color);
         m_drawColor.push(modColor);
     }
 
@@ -40,13 +41,13 @@ namespace graphics::vulkan {
         return result;
     }
 
-    void UIRenderer::PushClip(IntRect const& rect) {
+    void UIRenderer::PushClip(moth_ui::IntRect const& rect) {
         if (m_clip.empty()) {
-            m_clip.push(rect);
+            m_clip.push(::FromMothUI(rect));
         } else {
             // want to clip rect within the current clip
             auto const parentRect = m_clip.top();
-            auto const newRect = ClipRect(parentRect, rect);
+            auto const newRect = ClipRect(parentRect, ::FromMothUI(rect));
             m_clip.push(newRect);
         }
 
@@ -67,27 +68,34 @@ namespace graphics::vulkan {
         }
     }
 
-    void UIRenderer::RenderRect(IntRect const& rect) {
+    void UIRenderer::RenderRect(moth_ui::IntRect const& rect) {
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
-        m_graphics.DrawRectF(static_cast<FloatRect>(rect));
+        IntRect const internalRect = ::FromMothUI(rect);
+        m_graphics.DrawRectF(static_cast<FloatRect>(internalRect));
     }
 
-    void UIRenderer::RenderFilledRect(IntRect const& rect) {
+    void UIRenderer::RenderFilledRect(moth_ui::IntRect const& rect) {
+        auto const internalRect = ::FromMothUI(rect);
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
-        m_graphics.DrawFillRectF(static_cast<FloatRect>(rect));
+        m_graphics.DrawFillRectF(static_cast<FloatRect>(internalRect));
     }
 
-    void UIRenderer::RenderImage(IImage& image, IntRect const& sourceRect, IntRect const& destRect, ImageScaleType scaleType, float scale) {
+    void UIRenderer::RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) {
+        auto& internalImage = static_cast<SubImage&>(image);
+        auto const internalSourceRect = ::FromMothUI(sourceRect);
+        auto const internalDestRect = ::FromMothUI(destRect);
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
-        m_graphics.DrawImage(image, &sourceRect, &destRect);
+        m_graphics.DrawImage(internalImage, &internalSourceRect, &internalDestRect);
     }
 
-    void UIRenderer::RenderText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) {
+    void UIRenderer::RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) {
+        auto& internalFont = static_cast<IFont&>(font);
+        auto const internalDestRect = ::FromMothUI(destRect);
         m_graphics.SetBlendMode(BlendMode::Alpha);
         m_graphics.SetColor(m_drawColor.top());
-        m_graphics.DrawText(text, font, horizontalAlignment, verticalAlignment, destRect);
+        m_graphics.DrawText(text, internalFont, FromMothUI(horizontalAlignment), FromMothUI(verticalAlignment), internalDestRect);
     }
 }

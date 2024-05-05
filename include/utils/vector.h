@@ -186,4 +186,13 @@ inline moth_ui::Vector<T, Dim> ToMothUI(Vector<T, Dim> const& a) {
     return b;
 }
 
+template<typename T, int Dim>
+inline Vector<T, Dim> FromMothUI(moth_ui::Vector<T, Dim> const& a) {
+    Vector<T, Dim> b{};
+    for (int i = 0; i < Dim; ++i) {
+        b.data[i] = a.data[i];
+    }
+    return b;
+}
+
 #pragma pack(pop)

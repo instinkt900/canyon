@@ -1,4 +1,8 @@
 #include "canyon.h"
+#include "graphics/vulkan/vulkan_font_factory.h"
+#include "graphics/vulkan/vulkan_image_factory.h"
+#include "graphics/vulkan/vulkan_ui_renderer.h"
+#include <moth_ui/context.h>
 #include "platform/vulkan_application.h"
 
 VulkApplication::VulkApplication() {
@@ -7,6 +11,11 @@ VulkApplication::VulkApplication() {
     m_context = std::make_unique<graphics::vulkan::Context>();
     glfwCreateWindowSurface(m_context->m_vkInstance, m_window->GetGLFWWindow(), nullptr, &m_customVkSurface);
     m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_context, m_customVkSurface, m_window->GetWidth(), m_window->GetHeight());
+    m_imageFactory = std::make_unique<graphics::vulkan::ImageFactory>(*m_context, *m_graphics);
+    m_fontFactory = std::make_unique<graphics::vulkan::FontFactory>(*m_context, *m_graphics);
+    m_uiRenderer = std::make_unique<graphics::vulkan::UIRenderer>(*m_graphics);
+    auto uiContext = std::make_shared<moth_ui::Context>(m_imageFactory.get(), m_fontFactory.get(), m_uiRenderer.get());
+    moth_ui::Context::SetCurrentContext(uiContext);
     m_layerStack = std::make_unique<LayerStack>(m_window->GetWidth(), m_window->GetHeight(), m_window->GetWidth(), m_window->GetHeight());
     m_layerStack->AddEventListener(this);
 }

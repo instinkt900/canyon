@@ -7,6 +7,9 @@
 #include "graphics/vulkan/vulkan_graphics.h"
 #include "layers/layer_stack.h"
 #include "events/event_window.h"
+#include <moth_ui/font_factory.h>
+#include <moth_ui/iimage_factory.h>
+#include <moth_ui/irenderer.h>
 
 class VulkApplication : public Ticker, public moth_ui::EventListener {
 public:
@@ -28,5 +31,9 @@ private:
     VkSurfaceKHR m_customVkSurface = VK_NULL_HANDLE;
     std::unique_ptr<graphics::vulkan::Graphics> m_graphics;
     std::unique_ptr<LayerStack> m_layerStack;
+
+    std::unique_ptr<moth_ui::IImageFactory> m_imageFactory;
+    std::unique_ptr<moth_ui::FontFactory> m_fontFactory;
+    std::unique_ptr<moth_ui::IRenderer> m_uiRenderer;
 };
 
