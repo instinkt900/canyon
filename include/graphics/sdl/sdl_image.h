@@ -3,6 +3,7 @@
 #include "graphics/iimage.h"
 #include "graphics/itarget.h"
 #include "utils/rect.h"
+#include <filesystem>
 
 namespace graphics::sdl {
     class Image : public graphics::IImage, public graphics::ITarget {
@@ -16,7 +17,6 @@ namespace graphics::sdl {
         moth_ui::IntVec2 GetDimensions() const override;
         void ImGui(moth_ui::IntVec2 const& size, moth_ui::FloatVec2 const& uv0, moth_ui::FloatVec2 const& uv1) const override;
 
-        //virtual IntVec2 GetDimensions() const = 0;
         IImage* GetImage() override { return this; }
 
         TextureRef GetTexture() const {
@@ -30,6 +30,8 @@ namespace graphics::sdl {
         IntRect const& GetSourceRect() const {
             return m_sourceRect;
         }
+
+        static std::unique_ptr<Image> Load(SDL_Renderer& renderer, std::filesystem::path const& path);
 
     private:
         TextureRef m_texture;

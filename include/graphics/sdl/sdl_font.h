@@ -2,6 +2,7 @@
 
 #include "graphics/ifont.h"
 #include "smart_sdl.h"
+#include <filesystem>
 
 namespace graphics::sdl {
     class Font : public IFont {
@@ -12,6 +13,8 @@ namespace graphics::sdl {
         CachedFontRef GetFontObj() const {
             return m_fontObj;
         }
+
+        static std::unique_ptr<IFont> LoadFont(SDL_Renderer& renderer, const std::filesystem::path &path, int size);
 
     private:
         CachedFontRef m_fontObj;

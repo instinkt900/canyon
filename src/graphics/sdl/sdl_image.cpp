@@ -1,5 +1,6 @@
 #include "canyon.h"
 #include "graphics/sdl/sdl_image.h"
+#include "graphics/sdl/smart_sdl.h"
 
 namespace graphics::sdl {
     Image::Image(TextureRef texture)
@@ -32,4 +33,15 @@ namespace graphics::sdl {
                      ImVec2(uv0.x, uv0.y),
                      ImVec2(uv1.x, uv1.y));
     }
+
+    std::unique_ptr<Image> Image::Load(SDL_Renderer& renderer, std::filesystem::path const& path) {
+        if (auto texture = CreateTextureRef(&renderer, path)) {
+            IntVec2 textureDimensions{};
+            SDL_QueryTexture(texture->GetImpl(), NULL, NULL, &textureDimensions.x, &textureDimensions.y);
+            IntRect sourceRect{ { 0, 0 }, textureDimensions };
+            return std::make_unique<Image>(texture, textureDimensions, sourceRect);
+        }
+        return nullptr;
+    }
+
 }

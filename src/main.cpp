@@ -14,6 +14,7 @@
 #include "moth_ui/font_factory.h"
 #include "moth_ui/node_factory.h"
 #include "moth_ui/context.h"
+#include "graphics/sdl/sdl_image.h"
 
 class TestLayer : public Layer {
 public:
@@ -108,22 +109,26 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    // auto window = std::make_unique<platform::sdl::Window>("testing", 640, 480);
-    // auto renderer = window->GetSDLRenderer();
-    // auto graphics = std::make_unique<graphics::sdl::Graphics>(renderer);
-    //
-    // while (true) {
-    //     graphics->SetColor(graphics::BasicColors::Red);
-    //     graphics->DrawFillRectF(MakeRect(0.0f, 0.0f, 100.0f, 100.0f));
-    //     window->Draw();
-    //     using namespace std::chrono_literals;
-    //     std::this_thread::sleep_for(1ms);
-    // }
+    auto window = std::make_unique<platform::sdl::Window>("testing", 640, 480);
+    auto renderer = window->GetSDLRenderer();
+    auto graphics = std::make_unique<graphics::sdl::Graphics>(renderer);
+    auto texture = graphics::sdl::Image::Load(*renderer, "assets/images/playership.png");
 
-    // VulkApplication app{};
-    SDLApplication app{};
-    moth_ui::Context::GetCurrentContext()->GetFontFactory().LoadProject("assets/fonts.json");
-    app.GetWindow().GetLayerStack().PushLayer(std::make_unique<TestLayer>(app.GetWindow().GetGraphics(), "assets/layouts/basic.mothui"));
-    app.TickSync();
+    while (true) {
+        graphics->SetColor(graphics::BasicColors::Red);
+        graphics->DrawFillRectF(MakeRect(0.0f, 0.0f, 100.0f, 100.0f));
+        graphics->SetColor(graphics::BasicColors::White);
+        auto destRect = MakeRect(100, 100, 200, 200);
+        graphics->DrawImage(*texture, nullptr, &destRect);
+        window->Draw();
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(1ms);
+    }
+
+    // // VulkApplication app{};
+    // SDLApplication app{};
+    // moth_ui::Context::GetCurrentContext()->GetFontFactory().LoadProject("assets/fonts.json");
+    // app.GetWindow().GetLayerStack().PushLayer(std::make_unique<TestLayer>(app.GetWindow().GetGraphics(), "assets/layouts/basic.mothui"));
+    // app.TickSync();
     return 0;
 }
