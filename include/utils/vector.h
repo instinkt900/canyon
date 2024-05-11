@@ -1,6 +1,5 @@
 #pragma once
 
-#include <moth_ui/utils/vector.h>
 #pragma pack(push, 1)
 
 template <class T, int Dim>
@@ -177,22 +176,5 @@ inline bool operator!=(Vector<T, Dim> const& a, Vector<T, Dim> const& b) {
 using FloatVec2 = Vector<float, 2>;
 using IntVec2 = Vector<int, 2>;
 
-template<typename T, int Dim>
-inline moth_ui::Vector<T, Dim> ToMothUI(Vector<T, Dim> const& a) {
-    moth_ui::Vector<T, Dim> b{};
-    for (int i = 0; i < Dim; ++i) {
-        b.data[i] = a.data[i];
-    }
-    return b;
-}
-
-template<typename T, int Dim>
-inline Vector<T, Dim> FromMothUI(moth_ui::Vector<T, Dim> const& a) {
-    Vector<T, Dim> b{};
-    for (int i = 0; i < Dim; ++i) {
-        b.data[i] = a.data[i];
-    }
-    return b;
-}
-
 #pragma pack(pop)
+

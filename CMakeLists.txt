@@ -34,7 +34,6 @@ set(SOURCES ${SOURCES}
 	src/graphics/vulkan/vulkan_buffer.cpp
 	src/graphics/vulkan/vulkan_command_buffer.cpp
 	src/graphics/vulkan/vulkan_context.cpp
-	src/graphics/vulkan/vulkan_events.cpp
 	src/graphics/vulkan/vulkan_fence.cpp
 	src/graphics/vulkan/vulkan_font.cpp
 	src/graphics/vulkan/vulkan_font_cache.cpp

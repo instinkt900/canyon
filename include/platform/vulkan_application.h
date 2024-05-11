@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ticker.h"
+#include "utils/ticker.h"
 #include "moth_ui/event_listener.h"
 #include "platform/glfw/glfw_window.h"
 #include "graphics/vulkan/vulkan_context.h"

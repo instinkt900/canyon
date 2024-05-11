@@ -4,6 +4,7 @@
 #include "graphics/sdl/sdl_font.h"
 #include "graphics/sdl/sdl_utils.h"
 #include "graphics/utils.h"
+#include "utils/conversions.h"
 
 namespace graphics::sdl {
     UIRenderer::UIRenderer(SDL_Renderer& renderer)

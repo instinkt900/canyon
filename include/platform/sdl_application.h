@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ticker.h"
+#include "utils/ticker.h"
 #include "moth_ui//event_listener.h"
 #include "platform/sdl/sdl_window.h"
 #include "events/event_window.h"

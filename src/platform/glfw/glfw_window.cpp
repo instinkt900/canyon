@@ -4,6 +4,7 @@
 #include "platform/glfw/glfw_events.h"
 #include "moth_ui/events/event_mouse.h"
 #include "events/event_window.h"
+#include "utils/conversions.h"
 
 namespace platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
