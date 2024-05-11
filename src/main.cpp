@@ -15,6 +15,7 @@
 #include "moth_ui/node_factory.h"
 #include "moth_ui/context.h"
 #include "graphics/sdl/sdl_image.h"
+#include "graphics/sdl/sdl_graphics.h"
 
 class TestLayer : public Layer {
 public:

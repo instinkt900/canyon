@@ -4,8 +4,6 @@
 #include "moth_ui/event_listener.h"
 #include "platform/glfw/glfw_window.h"
 #include "graphics/vulkan/vulkan_context.h"
-#include "graphics/vulkan/vulkan_graphics.h"
-#include "layers/layer_stack.h"
 #include "events/event_window.h"
 #include <moth_ui/font_factory.h>
 #include <moth_ui/iimage_factory.h>

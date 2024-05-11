@@ -3,8 +3,6 @@
 #include "ticker.h"
 #include "moth_ui//event_listener.h"
 #include "platform/sdl/sdl_window.h"
-#include "graphics/sdl/sdl_graphics.h"
-#include "layers/layer_stack.h"
 #include "events/event_window.h"
 #include <moth_ui/font_factory.h>
 #include <moth_ui/iimage_factory.h>
