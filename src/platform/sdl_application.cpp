@@ -9,27 +9,24 @@ SDLApplication::SDLApplication() {
     m_window = std::make_unique<platform::sdl::Window>("testing", 640, 480);
     m_window->AddEventListener(this);
     auto renderer = m_window->GetSDLRenderer();
-    m_graphics = std::make_unique<graphics::sdl::Graphics>(renderer);
     m_imageFactory = std::make_unique<graphics::sdl::ImageFactory>(*renderer);
     m_fontFactory = std::make_unique<graphics::sdl::FontFactory>(*renderer);
     m_uiRenderer = std::make_unique<graphics::sdl::UIRenderer>(*renderer);
     auto uiContext = std::make_shared<moth_ui::Context>(m_imageFactory.get(), m_fontFactory.get(), m_uiRenderer.get());
     moth_ui::Context::SetCurrentContext(uiContext);
-    m_layerStack = std::make_unique<LayerStack>(m_window->GetWidth(), m_window->GetHeight(), m_window->GetWidth(), m_window->GetHeight());
-    m_layerStack->AddEventListener(this);
+    m_window->GetLayerStack().AddEventListener(this);
 }
 
 bool SDLApplication::OnEvent(moth_ui::Event const& event) {
     moth_ui::EventDispatch dispatch(event);
     dispatch.Dispatch(this, &SDLApplication::OnWindowSizeEvent);
-    dispatch.Dispatch(m_layerStack.get());
+    dispatch.Dispatch(&m_window->GetLayerStack());
     dispatch.Dispatch(this, &SDLApplication::OnRequestQuitEvent);
     dispatch.Dispatch(this, &SDLApplication::OnQuitEvent);
     return dispatch.GetHandled();
 }
 
 bool SDLApplication::OnWindowSizeEvent(EventWindowSize const& event) {
-    m_layerStack->SetWindowSize({ event.GetWidth(), event.GetHeight() });
     return true;
 }
 
@@ -44,8 +41,6 @@ bool SDLApplication::OnQuitEvent(EventQuit const& event) {
 }
 
 void SDLApplication::Tick(uint32_t ticks) {
-    m_window->Update();
-    m_layerStack->Update(ticks);
-    m_layerStack->Draw();
+    m_window->Update(ticks);
     m_window->Draw();
 }

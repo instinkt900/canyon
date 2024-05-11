@@ -1,4 +1,7 @@
 #include "canyon.h"
+#include "graphics/sdl/sdl_font_factory.h"
+#include "graphics/sdl/sdl_image_factory.h"
+#include "graphics/sdl/sdl_ui_renderer.h"
 #include "layers/layer.h"
 #include "platform/vulkan_application.h"
 #include "platform/sdl_application.h"
@@ -105,10 +108,22 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    VulkApplication app{};
-    // SDLApplication app{};
+    // auto window = std::make_unique<platform::sdl::Window>("testing", 640, 480);
+    // auto renderer = window->GetSDLRenderer();
+    // auto graphics = std::make_unique<graphics::sdl::Graphics>(renderer);
+    //
+    // while (true) {
+    //     graphics->SetColor(graphics::BasicColors::Red);
+    //     graphics->DrawFillRectF(MakeRect(0.0f, 0.0f, 100.0f, 100.0f));
+    //     window->Draw();
+    //     using namespace std::chrono_literals;
+    //     std::this_thread::sleep_for(1ms);
+    // }
+
+    // VulkApplication app{};
+    SDLApplication app{};
     moth_ui::Context::GetCurrentContext()->GetFontFactory().LoadProject("assets/fonts.json");
-    app.GetLayerStack().PushLayer(std::make_unique<TestLayer>(app.GetGraphics(), "assets/layouts/basic.mothui"));
+    app.GetWindow().GetLayerStack().PushLayer(std::make_unique<TestLayer>(app.GetWindow().GetGraphics(), "assets/layouts/basic.mothui"));
     app.TickSync();
     return 0;
 }

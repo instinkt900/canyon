@@ -1,12 +1,14 @@
 #include "canyon.h"
 #include "platform/glfw/glfw_window.h"
+#include "graphics/vulkan/vulkan_graphics.h"
 #include "platform/glfw/glfw_events.h"
 #include "moth_ui/events/event_mouse.h"
 #include "events/event_window.h"
 
 namespace platform::glfw {
-    Window::Window(std::string const& title, int width, int height)
-        : platform::Window(title, width, height) {
+    Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
+        : platform::Window(title, width, height)
+        , m_vulkanContext(context) {
             CreateWindow();
     }
 
@@ -14,7 +16,7 @@ namespace platform::glfw {
         DestroyWindow();
     }
 
-    void Window::Update() {
+    void Window::Update(uint32_t ticks) {
         glfwPollEvents();
 
         if (glfwWindowShouldClose(m_glfwWindow)) {
@@ -23,6 +25,14 @@ namespace platform::glfw {
         }
 
         m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
+        m_layerStack->Update(ticks);
+    }
+
+    void Window::Draw() {
+        graphics::vulkan::Graphics* graphics = static_cast<graphics::vulkan::Graphics*>(m_graphics.get());
+        graphics->Begin();
+        m_layerStack->Draw();
+        graphics->End();
     }
 
     bool Window::CreateWindow() {
@@ -68,20 +78,21 @@ namespace platform::glfw {
 
         glfwSetCursorPosCallback(m_glfwWindow, [](GLFWwindow* window, double xpos, double ypos) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
-            auto const newMousePos = moth_ui::FloatVec2{ xpos, ypos };
-            moth_ui::FloatVec2 mouseDelta{ 0, 0 };
+            auto const newMousePos = FloatVec2{ xpos, ypos };
+            FloatVec2 mouseDelta{ 0, 0 };
             if (app->m_haveMousePos) {
                 mouseDelta = newMousePos - app->m_lastMousePos;
             }
             app->m_lastMousePos = newMousePos;
             app->m_haveMousePos = true;
-            auto const translatedEvent = std::make_unique<moth_ui::EventMouseMove>(static_cast<moth_ui::IntVec2>(app->m_lastMousePos), static_cast<moth_ui::FloatVec2>(mouseDelta));
+            auto lastMousePos = static_cast<moth_ui::IntVec2>(ToMothUI(app->m_lastMousePos));
+            auto const translatedEvent = std::make_unique<moth_ui::EventMouseMove>(lastMousePos, ToMothUI(mouseDelta));
             app->EmitEvent(*translatedEvent);
         });
 
         glfwSetMouseButtonCallback(m_glfwWindow, [](GLFWwindow* window, int button, int action, int mods) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
-            if (auto const translatedEvent = FromGLFW(button, action, mods, static_cast<moth_ui::IntVec2>(app->m_lastMousePos))) {
+            if (auto const translatedEvent = FromGLFW(button, action, mods, static_cast<moth_ui::IntVec2>(ToMothUI(app->m_lastMousePos)))) {
                 app->EmitEvent(*translatedEvent);
             }
         });
@@ -92,6 +103,11 @@ namespace platform::glfw {
         if (m_windowMaximized) {
             glfwMaximizeWindow(m_glfwWindow);
         }
+
+        glfwCreateWindowSurface(m_vulkanContext.m_vkInstance, m_glfwWindow, nullptr, &m_customVkSurface);
+        m_graphics = std::make_unique<graphics::vulkan::Graphics>(m_vulkanContext, m_customVkSurface, m_windowWidth, m_windowHeight);
+
+        m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
 
         return true;
     }
@@ -108,6 +124,9 @@ namespace platform::glfw {
     }
 
     void Window::OnResize() {
+        graphics::vulkan::Graphics* graphics = static_cast<graphics::vulkan::Graphics*>(m_graphics.get());
+        graphics->OnResize(m_customVkSurface, m_windowWidth, m_windowHeight);
+        m_layerStack->SetWindowSize({ m_windowWidth, m_windowHeight });
 
     }
 }

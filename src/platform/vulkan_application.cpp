@@ -6,18 +6,16 @@
 #include "platform/vulkan_application.h"
 
 VulkApplication::VulkApplication() {
-    m_window = std::make_unique<platform::glfw::Window>("testing", 640, 480);
-    m_window->AddEventListener(this);
     m_context = std::make_unique<graphics::vulkan::Context>();
-    glfwCreateWindowSurface(m_context->m_vkInstance, m_window->GetGLFWWindow(), nullptr, &m_customVkSurface);
-    m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_context, m_customVkSurface, m_window->GetWidth(), m_window->GetHeight());
-    m_imageFactory = std::make_unique<graphics::vulkan::ImageFactory>(*m_context, *m_graphics);
-    m_fontFactory = std::make_unique<graphics::vulkan::FontFactory>(*m_context, *m_graphics);
-    m_uiRenderer = std::make_unique<graphics::vulkan::UIRenderer>(*m_graphics);
+    m_window = std::make_unique<platform::glfw::Window>(*m_context, "testing", 640, 480);
+    m_window->AddEventListener(this);
+    m_window->GetLayerStack().AddEventListener(this);
+    graphics::vulkan::Graphics& graphics = static_cast<graphics::vulkan::Graphics&>(m_window->GetGraphics());
+    m_imageFactory = std::make_unique<graphics::vulkan::ImageFactory>(*m_context, graphics);
+    m_fontFactory = std::make_unique<graphics::vulkan::FontFactory>(*m_context, graphics);
+    m_uiRenderer = std::make_unique<graphics::vulkan::UIRenderer>(graphics);
     auto uiContext = std::make_shared<moth_ui::Context>(m_imageFactory.get(), m_fontFactory.get(), m_uiRenderer.get());
     moth_ui::Context::SetCurrentContext(uiContext);
-    m_layerStack = std::make_unique<LayerStack>(m_window->GetWidth(), m_window->GetHeight(), m_window->GetWidth(), m_window->GetHeight());
-    m_layerStack->AddEventListener(this);
 }
 
 bool VulkApplication::OnEvent(moth_ui::Event const& event) {
@@ -25,13 +23,11 @@ bool VulkApplication::OnEvent(moth_ui::Event const& event) {
     dispatch.Dispatch(this, &VulkApplication::OnWindowSizeEvent);
     dispatch.Dispatch(this, &VulkApplication::OnRequestQuitEvent);
     dispatch.Dispatch(this, &VulkApplication::OnQuitEvent);
-    dispatch.Dispatch(m_layerStack.get());
+    dispatch.Dispatch(&m_window->GetLayerStack());
     return dispatch.GetHandled();
 }
 
 bool VulkApplication::OnWindowSizeEvent(EventWindowSize const& event) {
-    m_layerStack->SetWindowSize({ event.GetWidth(), event.GetHeight() });
-    m_graphics->OnResize(m_customVkSurface, event.GetWidth(), event.GetHeight());
     return true;
 }
 
@@ -46,11 +42,7 @@ bool VulkApplication::OnQuitEvent(EventQuit const& event) {
 }
 
 void VulkApplication::Tick(uint32_t ticks) {
-    m_window->Update();
-    m_layerStack->Update(ticks);
-    m_graphics->Begin();
-    m_layerStack->Draw();
+    m_window->Update(ticks);
     m_window->Draw();
-    m_graphics->End();
 }
 

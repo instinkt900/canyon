@@ -1,6 +1,7 @@
 #include "canyon.h"
 #include "platform/sdl/sdl_window.h"
 #include "platform/sdl/sdl_events.h"
+#include "graphics/sdl/sdl_graphics.h"
 
 namespace platform::sdl {
     Window::Window(std::string const& title, int width, int height)
@@ -12,14 +13,25 @@ namespace platform::sdl {
         DestroyWindow();
     }
 
-    void Window::Update() {
+    void Window::Update(uint32_t ticks) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (auto const translatedEvent = FromSDL(event)) {
-                EmitEvent(*translatedEvent);
+                moth_ui::EventDispatch dispatch(*translatedEvent);
+                dispatch.Dispatch(this, &Window::OnResizeEvent);
+                if (!dispatch.GetHandled()) {
+                    EmitEvent(*translatedEvent);
+                }
             }
         }
+        m_layerStack->Update(ticks);
     }
+
+    bool Window::OnResizeEvent(EventWindowSize const& event) {
+        m_layerStack->SetWindowSize({ event.GetWidth(), event.GetHeight() });
+        return false;
+    }
+
 
     bool Window::CreateWindow() {
         if (0 > SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -33,6 +45,9 @@ namespace platform::sdl {
         if (nullptr == (m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC))) {
             return false;
         }
+
+        m_graphics = std::make_unique<graphics::sdl::Graphics>(m_renderer);
+        m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
         
         return true;
     }
@@ -43,6 +58,7 @@ namespace platform::sdl {
     }
 
     void Window::Draw() {
+        m_layerStack->Draw();
         SDL_RenderPresent(m_renderer);
     }
 
