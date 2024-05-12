@@ -18,11 +18,13 @@ namespace graphics {
         virtual void SetColor(Color const& color) = 0;
         virtual void Clear() = 0;
         virtual void DrawImage(IImage& image, IntRect const* sourceRect, IntRect const* destRect) = 0;
+        virtual void DrawImageTiled(graphics::IImage& image, IntRect const* sourceRect, IntRect const* destRect, float scale) = 0;
         virtual void DrawToPNG(std::filesystem::path const& path) = 0;
         virtual void DrawRectF(FloatRect const& rect) = 0;
         virtual void DrawFillRectF(FloatRect const& rect) = 0;
         virtual void DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) = 0;
         virtual void DrawText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) = 0;
+        virtual void SetClip(IntRect const* rect) = 0;
 
         virtual std::unique_ptr<ITarget> CreateTarget(int width, int height) = 0;
         virtual ITarget* GetTarget() = 0;

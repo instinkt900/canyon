@@ -1,4 +1,5 @@
 #include "canyon.h"
+#include "graphics/sdl/sdl_font.h"
 #include "graphics/sdl/sdl_font_factory.h"
 #include "graphics/sdl/sdl_image_factory.h"
 #include "graphics/sdl/sdl_ui_renderer.h"
@@ -114,6 +115,7 @@ int main(int argc, char* argv[]) {
     auto renderer = window->GetSDLRenderer();
     auto graphics = std::make_unique<graphics::sdl::Graphics>(renderer);
     auto texture = graphics::sdl::Image::Load(*renderer, "assets/images/playership.png");
+    auto font = graphics::sdl::Font::Load(*renderer, "assets/fonts/pilotcommand.ttf", 12);
 
     while (true) {
         graphics->SetColor(graphics::BasicColors::Red);
@@ -121,6 +123,8 @@ int main(int argc, char* argv[]) {
         graphics->SetColor(graphics::BasicColors::White);
         auto destRect = MakeRect(100, 100, 200, 200);
         graphics->DrawImage(*texture, nullptr, &destRect);
+        graphics->SetColor(graphics::BasicColors::Green);
+        graphics->DrawText("hello", *font, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, 640, 480));
         window->Draw();
         using namespace std::chrono_literals;
         std::this_thread::sleep_for(1ms);

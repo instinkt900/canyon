@@ -1,11 +1,12 @@
 #pragma once
 
+#include "graphics/igraphics.h"
 #include "moth_ui/irenderer.h"
 
 namespace graphics::sdl {
     class UIRenderer : public moth_ui::IRenderer {
     public:
-        UIRenderer(SDL_Renderer& renderer);
+        UIRenderer(IGraphics& graphics);
         virtual ~UIRenderer() = default;
 
         void PushBlendMode(moth_ui::BlendMode mode) override;
@@ -22,9 +23,9 @@ namespace graphics::sdl {
         void RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) override;
 
     private:
-        SDL_Renderer& m_renderer;
-        std::stack<moth_ui::Color> m_drawColor;
-        std::stack<moth_ui::BlendMode> m_blendMode;
-        std::stack<moth_ui::IntRect> m_clip;
+        IGraphics& m_graphics;
+        std::stack<Color> m_drawColor;
+        std::stack<BlendMode> m_blendMode;
+        std::stack<IntRect> m_clip;
     };
 }

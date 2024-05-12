@@ -7,8 +7,8 @@
 #include "utils/conversions.h"
 
 namespace graphics::sdl {
-    UIRenderer::UIRenderer(SDL_Renderer& renderer)
-        : m_renderer(renderer) {
+    UIRenderer::UIRenderer(IGraphics& graphics)
+        : m_graphics(graphics) {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });
         m_blendMode.push(moth_ui::BlendMode::Replace);
     }
@@ -34,8 +34,8 @@ namespace graphics::sdl {
         }
     }
 
-    moth_ui::IntRect ClipRect(moth_ui::IntRect const& parentRect, moth_ui::IntRect const& childRect) {
-        moth_ui::IntRect result;
+    IntRect ClipRect(IntRect const& parentRect, IntRect const& childRect) {
+        IntRect result;
         result.topLeft.x = std::max(parentRect.topLeft.x, childRect.topLeft.x);
         result.topLeft.y = std::max(parentRect.topLeft.y, childRect.topLeft.y);
         result.bottomRight.x = std::min(parentRect.bottomRight.x, childRect.bottomRight.x);
@@ -45,7 +45,7 @@ namespace graphics::sdl {
 
     void UIRenderer::PushClip(moth_ui::IntRect const& rect) {
         if (m_clip.empty()) {
-            m_clip.push(rect);
+            m_clip.push(FromMothUI(rect));
         } else {
             // want to clip rect within the current clip
             auto const parentRect = m_clip.top();
@@ -53,48 +53,49 @@ namespace graphics::sdl {
             m_clip.push(newRect);
         }
 
-        auto const currentRect = ToSDL(m_clip.top());
-        SDL_RenderSetClipRect(&m_renderer, &currentRect);
+        m_graphics.SetClip(m_clip.top());
     }
 
     void UIRenderer::PopClip() {
         m_clip.pop();
 
         if (m_clip.empty()) {
-            SDL_RenderSetClipRect(&m_renderer, nullptr);
+            m_graphics.ClearClip();
         } else {
-            auto const currentRect = ToSDL(m_clip.top());
-            SDL_RenderSetClipRect(&m_renderer, &currentRect);
+            m_graphics.SetClip(m_clip.top());
         }
     }
 
     void UIRenderer::RenderRect(moth_ui::IntRect const& rect) {
-        auto const sdlRect{ ToSDL(rect) };
-        ColorComponents components{ m_drawColor.top() };
-        SDL_SetRenderDrawBlendMode(&m_renderer, ToSDL(m_blendMode.top()));
-        SDL_SetRenderDrawColor(&m_renderer, components.r, components.g, components.b, components.a);
-        SDL_RenderDrawRect(&m_renderer, &sdlRect);
+        auto const floatRect = static_cast<FloatRect>(FromMothUI(rect));
+        m_graphics.SetBlendMode(m_blendMode.top());
+        m_graphics.SetColor(m_drawColor.top());
+        m_graphics.DrawRectF(floatRect);
     }
 
     void UIRenderer::RenderFilledRect(moth_ui::IntRect const& rect) {
-        auto const sdlRect{ ToSDL(rect) };
-        ColorComponents components{ m_drawColor.top() };
-        SDL_SetRenderDrawBlendMode(&m_renderer, ToSDL(m_blendMode.top()));
-        SDL_SetRenderDrawColor(&m_renderer, components.r, components.g, components.b, components.a);
-        SDL_RenderFillRect(&m_renderer, &sdlRect);
+        auto const floatRect = static_cast<FloatRect>(FromMothUI(rect));
+        m_graphics.SetBlendMode(m_blendMode.top());
+        m_graphics.SetColor(m_drawColor.top());
+        m_graphics.DrawFillRectF(floatRect);
     }
 
     void UIRenderer::RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) {
-        auto const& internalImage = static_cast<Image&>(image);
-        auto const texture = internalImage.GetTexture();
-        auto const& textureSourceRect = internalImage.GetSourceRect();
-        auto const sdlsourceRect{ ToSDL(MergeRects(ToMothUI(textureSourceRect), sourceRect)) };
-        ColorComponents const components{ m_drawColor.top() };
-        SDL_SetTextureBlendMode(texture->GetImpl(), ToSDL(m_blendMode.top()));
-        SDL_SetTextureColorMod(texture->GetImpl(), components.r, components.g, components.b);
-        SDL_SetTextureAlphaMod(texture->GetImpl(), components.a);
+        m_graphics.SetBlendMode(m_blendMode.top());
+        m_graphics.SetColor(m_drawColor.top());
 
+        // auto const& internalImage = static_cast<Image&>(image);
+        // auto const texture = internalImage.GetTexture();
+        // auto const& textureSourceRect = internalImage.GetSourceRect();
+        // auto const sdlsourceRect{ ToSDL(MergeRects(ToMothUI(textureSourceRect), sourceRect)) };
+        // ColorComponents const components{ m_drawColor.top() };
+        // SDL_SetTextureBlendMode(texture->GetImpl(), ToSDL(m_blendMode.top()));
+        // SDL_SetTextureColorMod(texture->GetImpl(), components.r, components.g, components.b);
+        // SDL_SetTextureAlphaMod(texture->GetImpl(), components.a);
+
+        auto& internalImage = static_cast<graphics::IImage&>(image);
         if (scaleType == moth_ui::ImageScaleType::Stretch) {
+            m_graphics.DrawImage(internalImage, FromMothUI(sourceRect), FromMothUI(destRect));
             auto const sdlDestRect{ ToSDL(destRect) };
             SDL_RenderCopy(&m_renderer, texture->GetImpl(), &sdlsourceRect, &sdlDestRect);
         } else if (scaleType == moth_ui::ImageScaleType::Tile) {
@@ -114,6 +115,8 @@ namespace graphics::sdl {
     }
 
     void UIRenderer::RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) {
+
+
         auto const fcFont = static_cast<Font&>(font).GetFontObj();
 
         auto const destWidth = destRect.bottomRight.x - destRect.topLeft.x;
