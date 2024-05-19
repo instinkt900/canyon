@@ -1,7 +1,7 @@
 #include "canyon.h"
 #include "graphics/vulkan/vulkan_graphics.h"
 #include "graphics/vulkan/vulkan_command_buffer.h"
-#include "graphics/vulkan/vulkan_subimage.h"
+#include "graphics/vulkan/vulkan_texture.h"
 #include "graphics/vulkan/vulkan_font.h"
 #include "graphics/vulkan/shaders/vulkan_shaders.h"
 
@@ -149,19 +149,14 @@ namespace graphics::vulkan {
         DrawFillRectF({ { 0, 0 }, { static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height) } });
     }
 
-    void Graphics::DrawImage(IImage& image, IntRect const* sourceRect, IntRect const* destRect) {
+    void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto context = m_contextStack.top();
-        auto& vulkanImage = dynamic_cast<SubImage&>(image);
+        auto& vulkanImage = dynamic_cast<Image&>(image);
         auto texture = vulkanImage.m_texture;
 
-        FloatRect const targetRect = MakeRect(0.0f, 0.0f, static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height));
+        // FloatRect const targetRect = MakeRect(0.0f, 0.0f, static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height));
 
-        FloatRect fDestRect;
-        if (destRect) {
-            fDestRect = static_cast<FloatRect>(*destRect);
-        } else {
-            fDestRect = targetRect;
-        }
+        FloatRect fDestRect = static_cast<FloatRect>(destRect);
 
         FloatRect imageRect;
         if (sourceRect) {
@@ -200,6 +195,11 @@ namespace graphics::vulkan {
         SubmitVertices(vertices, 6, ETopologyType::Triangles, descriptorSet);
     }
 
+    void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
+        // TODO
+        DrawImage(image, destRect, sourceRect);
+    }
+
     void Graphics::DrawToPNG(std::filesystem::path const& path) {
         FlushCommands();
 
@@ -207,9 +207,9 @@ namespace graphics::vulkan {
         auto drawContext = m_contextStack.top();
 
         auto const targetFormat = VK_FORMAT_R8G8B8A8_UNORM;
-        auto targetImage = std::make_unique<Image>(context, drawContext->m_logicalExtent.width, drawContext->m_logicalExtent.height, targetFormat, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        auto targetImage = std::make_unique<Texture>(context, drawContext->m_logicalExtent.width, drawContext->m_logicalExtent.height, targetFormat, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        auto renderedSubImage = static_cast<SubImage*>(drawContext->m_target->GetImage());
+        auto renderedSubImage = static_cast<Image*>(drawContext->m_target->GetImage());
         auto srcImage = renderedSubImage->m_texture;
         auto srcFormat = srcImage->GetVkFormat();
 
@@ -409,7 +409,7 @@ namespace graphics::vulkan {
         }
     }
 
-    void Graphics::SetClipRect(IntRect const* clipRect) {
+    void Graphics::SetClip(IntRect const* clipRect) {
         auto context = m_contextStack.top();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         if (clipRect) {
@@ -464,7 +464,7 @@ namespace graphics::vulkan {
         commandBuffer.PushConstants(*m_fontShader, VK_SHADER_STAGE_VERTEX_BIT, sizeof(PushConstants), &constants);
     }
 
-    VkDescriptorSet Graphics::GetDescriptorSet(Image& image) {
+    VkDescriptorSet Graphics::GetDescriptorSet(Texture& image) {
         return m_drawingShader->GetDescriptorSet(image);
     }
 
@@ -637,7 +637,7 @@ namespace graphics::vulkan {
 
         const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 
-        m_defaultImage = std::make_unique<Image>(m_context, 1, 1, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+        m_defaultImage = std::make_unique<Texture>(m_context, 1, 1, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 
         auto commandBuffer = std::make_unique<CommandBuffer>(m_context);
         commandBuffer->BeginRecord();

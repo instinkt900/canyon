@@ -42,17 +42,17 @@ private:
     }
 };
 
-using TextureRef = std::shared_ptr<SDLTextureWrap>;
+using SDLTextureRef = std::shared_ptr<SDLTextureWrap>;
 
-inline TextureRef CreateTextureRef(SDL_Texture* texture) {
+inline SDLTextureRef CreateTextureRef(SDL_Texture* texture) {
     return SDLTextureWrap::CreateOwning(texture);
 }
 
-inline TextureRef CreateTextureRef(SDL_Renderer* renderer, std::filesystem::path const& assetPath) {
+inline SDLTextureRef CreateTextureRef(SDL_Renderer* renderer, std::filesystem::path const& assetPath) {
     return SDLTextureWrap::CreateOwning(SDL_CreateTextureFromSurface(renderer, CreateSurfaceRef(assetPath).get()));
 }
 
-inline TextureRef CreateTextureRef(SDL_Renderer* renderer, SurfaceRef surface) {
+inline SDLTextureRef CreateTextureRef(SDL_Renderer* renderer, SurfaceRef surface) {
     return SDLTextureWrap::CreateOwning(SDL_CreateTextureFromSurface(renderer, surface.get()));
 }
 

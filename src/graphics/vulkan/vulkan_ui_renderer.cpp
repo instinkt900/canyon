@@ -52,7 +52,7 @@ namespace graphics::vulkan {
         }
 
         auto const currentRect = m_clip.top();
-        m_graphics.SetClipRect(&currentRect);
+        m_graphics.SetClip(&currentRect);
     }
 
     void UIRenderer::PopClip() {
@@ -61,10 +61,10 @@ namespace graphics::vulkan {
         }
 
         if (m_clip.empty()) {
-            m_graphics.SetClipRect(nullptr);
+            m_graphics.SetClip(nullptr);
         } else {
             auto const currentRect = m_clip.top();
-            m_graphics.SetClipRect(&currentRect);
+            m_graphics.SetClip(&currentRect);
         }
     }
 
@@ -83,12 +83,12 @@ namespace graphics::vulkan {
     }
 
     void UIRenderer::RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) {
-        auto& internalImage = static_cast<SubImage&>(image);
+        auto& internalImage = static_cast<Image&>(image);
         auto const internalSourceRect = ::FromMothUI(sourceRect);
         auto const internalDestRect = ::FromMothUI(destRect);
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
-        m_graphics.DrawImage(internalImage, &internalSourceRect, &internalDestRect);
+        m_graphics.DrawImage(internalImage, internalDestRect, &internalSourceRect);
     }
 
     void UIRenderer::RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) {

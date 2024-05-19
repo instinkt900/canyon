@@ -10,10 +10,9 @@ namespace graphics::vulkan {
         m_commandBuffer = std::make_unique<CommandBuffer>(context);
         m_fence = std::make_unique<Fence>(context);
 
-        auto imagePtr = std::make_unique<Image>(context, image, view, VkExtent2D{ width, height }, format, false);
-        IntVec2 dim = { width, height };
+        auto texture = std::make_unique<Texture>(context, image, view, VkExtent2D{ width, height }, format, false);
         IntRect rec = { { 0, 0 }, { width, height } };
-        m_image = std::make_unique<SubImage>(std::move(imagePtr), dim, rec);
+        m_image = std::make_unique<Image>(std::move(texture), rec);
         CreateFramebufferResource(context, renderPass);
 
         VkSemaphoreCreateInfo semaphoreInfo{};
@@ -27,10 +26,9 @@ namespace graphics::vulkan {
         m_commandBuffer = std::make_unique<CommandBuffer>(context);
         m_fence = std::make_unique<Fence>(context);
 
-        auto image = std::make_unique<Image>(context, width, height, format, tiling, usage);
-        IntVec2 dim = { width, height };
+        auto texture = std::make_unique<Texture>(context, width, height, format, tiling, usage);
         IntRect rec = { { 0, 0 }, { width, height } };
-        m_image = std::make_unique<SubImage>(std::move(image), dim, rec);
+        m_image = std::make_unique<Image>(std::move(texture), rec);
         CreateFramebufferResource(context, renderPass);
     }
 
@@ -57,7 +55,7 @@ namespace graphics::vulkan {
     }
 
     Image& Framebuffer::GetVkImage() {
-        return *m_image->m_texture;
+        return *m_image;
     }
 
     void Framebuffer::CreateFramebufferResource(Context& context, VkRenderPass renderPass) {

@@ -17,6 +17,8 @@
 #include "moth_ui/context.h"
 #include "graphics/sdl/sdl_image.h"
 #include "graphics/sdl/sdl_graphics.h"
+#include "graphics/vulkan/vulkan_image.h"
+#include "graphics/vulkan/vulkan_font.h"
 
 class TestLayer : public Layer {
 public:
@@ -111,21 +113,27 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    auto window = std::make_unique<platform::sdl::Window>("testing", 640, 480);
-    auto renderer = window->GetSDLRenderer();
-    auto graphics = std::make_unique<graphics::sdl::Graphics>(renderer);
-    auto texture = graphics::sdl::Image::Load(*renderer, "assets/images/playership.png");
-    auto font = graphics::sdl::Font::Load(*renderer, "assets/fonts/pilotcommand.ttf", 12);
+    if (!glfwInit()) {
+        return false;
+    }
+
+    graphics::vulkan::Context context;
+    auto window = std::make_unique<platform::glfw::Window>(context, "testing", 640, 480);
+    auto graphics = std::make_unique<graphics::vulkan::Graphics>(context, window->GetVkSurface(), window->GetWidth(), window->GetHeight());
+    auto texture = graphics::vulkan::Image::Load(context, "assets/images/playership.png");
+    auto font = graphics::vulkan::Font::Load("assets/fonts/pilotcommand.ttf", 12, context, *graphics);
 
     while (true) {
+        graphics->Begin();
         graphics->SetColor(graphics::BasicColors::Red);
         graphics->DrawFillRectF(MakeRect(0.0f, 0.0f, 100.0f, 100.0f));
         graphics->SetColor(graphics::BasicColors::White);
         auto destRect = MakeRect(100, 100, 200, 200);
-        graphics->DrawImage(*texture, nullptr, &destRect);
+        graphics->DrawImage(*texture, destRect, nullptr);
         graphics->SetColor(graphics::BasicColors::Green);
         graphics->DrawText("hello", *font, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, 640, 480));
         window->Draw();
+        graphics->End();
         using namespace std::chrono_literals;
         std::this_thread::sleep_for(1ms);
     }

@@ -19,7 +19,8 @@ namespace graphics::sdl {
         detailsPath.replace_extension(".json");
 
         if (std::filesystem::exists(imagePath) && std::filesystem::exists(detailsPath)) {
-            auto const texture = CreateTextureRef(&m_renderer, imagePath);
+            auto const sdlTexture = CreateTextureRef(&m_renderer, imagePath);
+            auto const texture = std::make_shared<Texture>(sdlTexture);
 
             std::ifstream ifile(detailsPath);
             if (!ifile.is_open()) {
@@ -56,18 +57,18 @@ namespace graphics::sdl {
         if (std::end(m_cachedImages) != cacheIt) {
             auto const& imageDesc = cacheIt->second;
             IntVec2 const textureDimensions{ imageDesc.m_sourceRect.w(), imageDesc.m_sourceRect.h() };
-            return std::make_unique<Image>(imageDesc.m_texture, textureDimensions, imageDesc.m_sourceRect);
+            return std::make_unique<Image>(imageDesc.m_texture, imageDesc.m_sourceRect);
         } else {
-            if (auto texture = CreateTextureRef(&m_renderer, path)) {
-                IntVec2 textureDimensions{};
-                SDL_QueryTexture(texture->GetImpl(), NULL, NULL, &textureDimensions.x, &textureDimensions.y);
+            if (auto sdlTexture = CreateTextureRef(&m_renderer, path)) {
+                auto const texture = std::make_shared<Texture>(sdlTexture);
+                IntVec2 textureDimensions { texture->GetWidth(), texture->GetHeight() };
                 IntRect sourceRect{ { 0, 0 }, textureDimensions };
                 ImageDesc cacheDesc;
                 cacheDesc.m_path = path.string();
                 cacheDesc.m_sourceRect = sourceRect;
                 cacheDesc.m_texture = texture;
                 m_cachedImages.insert(std::make_pair(cacheDesc.m_path, cacheDesc));
-                return std::make_unique<Image>(texture, textureDimensions, sourceRect);
+                return std::make_unique<Image>(texture, sourceRect);
             }
         }
         return nullptr;

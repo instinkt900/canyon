@@ -19,10 +19,10 @@ namespace graphics::vulkan {
         void SubmitAndWait();
         void Reset();
 
-        void TransitionImageLayout(Image& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-        void CopyBufferToImage(Image& image, Buffer& buffer);
-        void CopyImageToBuffer(Buffer& buffer, Image& image);
-        void CopyImageToImage(Image& srcImage, Image& dstImage);
+        void TransitionImageLayout(Texture& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+        void CopyBufferToImage(Texture& image, Buffer& buffer);
+        void CopyImageToBuffer(Buffer& buffer, Texture& image);
+        void CopyImageToImage(Texture& srcImage, Texture& dstImage);
 
         void BeginRenderPass(RenderPass& renderPass, Framebuffer& frameBuffer);
         void EndRenderPass();

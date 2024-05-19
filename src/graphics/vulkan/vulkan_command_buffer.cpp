@@ -71,7 +71,7 @@ namespace graphics::vulkan {
         vkResetCommandBuffer(m_vkCommandBuffer, 0);
     }
 
-    void CommandBuffer::TransitionImageLayout(Image& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+    void CommandBuffer::TransitionImageLayout(Texture& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
         assert(m_recording);
 
         VkImageMemoryBarrier barrier{};
@@ -151,7 +151,7 @@ namespace graphics::vulkan {
         vkCmdPipelineBarrier(m_vkCommandBuffer, source_stage, destination_stage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
     }
 
-    void CommandBuffer::CopyBufferToImage(Image& image, Buffer& buffer) {
+    void CommandBuffer::CopyBufferToImage(Texture& image, Buffer& buffer) {
         assert(m_recording);
 
         VkBufferImageCopy region{};
@@ -168,7 +168,7 @@ namespace graphics::vulkan {
         vkCmdCopyBufferToImage(m_vkCommandBuffer, buffer.GetVKBuffer(), image.GetVkImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
     }
 
-    void CommandBuffer::CopyImageToBuffer(Buffer& buffer, Image& image) {
+    void CommandBuffer::CopyImageToBuffer(Buffer& buffer, Texture& image) {
         assert(m_recording);
 
         VkBufferImageCopy region{};
@@ -185,7 +185,7 @@ namespace graphics::vulkan {
         vkCmdCopyImageToBuffer(m_vkCommandBuffer, image.GetVkImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer.GetVKBuffer(), 1, &region);
     }
 
-    void CommandBuffer::CopyImageToImage(Image& srcImage, Image& dstImage) {
+    void CommandBuffer::CopyImageToImage(Texture& srcImage, Texture& dstImage) {
         assert(m_recording);
 
         VkImageCopy region{};

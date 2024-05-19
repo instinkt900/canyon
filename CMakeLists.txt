@@ -28,6 +28,7 @@ set(SOURCES ${SOURCES}
     src/graphics/sdl/sdl_font.cpp
     src/graphics/sdl/sdl_font_factory.cpp
     src/graphics/sdl/sdl_graphics.cpp
+    src/graphics/sdl/sdl_texture.cpp
     src/graphics/sdl/sdl_image.cpp
     src/graphics/sdl/sdl_image_factory.cpp
     src/graphics/sdl/sdl_ui_renderer.cpp
@@ -40,12 +41,12 @@ set(SOURCES ${SOURCES}
 	src/graphics/vulkan/vulkan_font_factory.cpp
 	src/graphics/vulkan/vulkan_framebuffer.cpp
 	src/graphics/vulkan/vulkan_graphics.cpp
-	src/graphics/vulkan/vulkan_image.cpp
+	src/graphics/vulkan/vulkan_texture.cpp
 	src/graphics/vulkan/vulkan_image_factory.cpp
 	src/graphics/vulkan/vulkan_pipeline.cpp
 	src/graphics/vulkan/vulkan_renderpass.cpp
 	src/graphics/vulkan/vulkan_shader.cpp
-	src/graphics/vulkan/vulkan_subimage.cpp
+	src/graphics/vulkan/vulkan_image.cpp
 	src/graphics/vulkan/vulkan_swapchain.cpp
 	src/graphics/vulkan/vulkan_ui_renderer.cpp
 	src/graphics/vulkan/vulkan_vma.cpp

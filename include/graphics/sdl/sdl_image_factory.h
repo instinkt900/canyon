@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/sdl/sdl_texture.h"
 #include "moth_ui/iimage_factory.h"
 #include "smart_sdl.h"
 #include "utils/rect.h"
@@ -19,7 +20,7 @@ namespace graphics::sdl {
         SDL_Renderer& m_renderer;
 
         struct ImageDesc {
-            TextureRef m_texture;
+            std::shared_ptr<Texture> m_texture;
             IntRect m_sourceRect;
             std::string m_path;
         };

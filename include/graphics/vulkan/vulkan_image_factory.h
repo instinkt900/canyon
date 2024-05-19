@@ -20,7 +20,7 @@ namespace graphics::vulkan {
         Context& m_context;
 
         struct ImageDesc {
-            std::shared_ptr<Image> m_texture;
+            std::shared_ptr<Texture> m_texture;
             IntRect m_sourceRect;
             std::string m_path;
         };

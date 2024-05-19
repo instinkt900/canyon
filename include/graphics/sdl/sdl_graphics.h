@@ -7,13 +7,16 @@ namespace graphics::sdl {
     public:
         Graphics(SDL_Renderer* renderer);
 
+        void Begin() override {}
+        void End() override {}
+
         void SetBlendMode(graphics::BlendMode mode) override;
         // void SetBlendMode(std::shared_ptr<graphics::IImage> target, graphics::BlendMode mode);
         //void SetColorMod(std::shared_ptr<graphics::IImage> target, graphics::Color const& color) override;
         void SetColor(graphics::Color const& color) override;
         void Clear() override;
-        void DrawImage(graphics::IImage& image, IntRect const* sourceRect, IntRect const* destRect) override;
-        void DrawImageTiled(graphics::IImage& image, IntRect const* sourceRect, IntRect const* destRect, float scale) override;
+        void DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect) override;
+        void DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
         void DrawToPNG(std::filesystem::path const& path) override;
         void DrawRectF(FloatRect const& rect) override;
         void DrawFillRectF(FloatRect const& rect) override;
@@ -31,5 +34,6 @@ namespace graphics::sdl {
         SDL_Renderer* m_renderer = nullptr;
         graphics::Color m_drawColor;
         graphics::BlendMode m_blendMode;
+        graphics::ITarget* m_currentRenderTarget;
     };
 }

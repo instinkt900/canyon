@@ -1,7 +1,7 @@
 #include "canyon.h"
 #include "graphics/vulkan/vulkan_image_factory.h"
 #include "utils/rect_serialization.h"
-#include "graphics/vulkan/vulkan_subimage.h"
+#include "graphics/vulkan/vulkan_image.h"
 
 namespace graphics::vulkan {
     ImageFactory::ImageFactory(Context& context, Graphics& graphics)
@@ -30,7 +30,7 @@ namespace graphics::vulkan {
                 return false;
             }
 
-            std::shared_ptr<Image> packTexture = Image::FromFile(m_context, imagePath);
+            std::shared_ptr<Texture> packTexture = Texture::FromFile(m_context, imagePath);
 
             auto const images = json["images"];
             for (auto&& imageJson : images) {
@@ -55,9 +55,9 @@ namespace graphics::vulkan {
         if (std::end(m_cachedImages) != cacheIt) {
             auto const& imageDesc = cacheIt->second;
             IntVec2 const textureDimensions{ imageDesc.m_sourceRect.w(), imageDesc.m_sourceRect.h() };
-            return std::make_unique<SubImage>(imageDesc.m_texture, textureDimensions, imageDesc.m_sourceRect);
+            return std::make_unique<Image>(imageDesc.m_texture, imageDesc.m_sourceRect);
         } else {
-            if (auto texture = Image::FromFile(m_context, path)) {
+            if (auto texture = Texture::FromFile(m_context, path)) {
                 IntVec2 textureDimensions = { texture->GetVkExtent().width, texture->GetVkExtent().height };
                 IntRect sourceRect{ { 0, 0 }, textureDimensions };
                 ImageDesc cacheDesc;
@@ -65,7 +65,7 @@ namespace graphics::vulkan {
                 cacheDesc.m_sourceRect = sourceRect;
                 cacheDesc.m_texture = std::move(texture);
                 m_cachedImages.insert(std::make_pair(cacheDesc.m_path, cacheDesc));
-                return std::make_unique<SubImage>(cacheDesc.m_texture, textureDimensions, sourceRect);
+                return std::make_unique<Image>(cacheDesc.m_texture, sourceRect);
             }
         }
         return nullptr;

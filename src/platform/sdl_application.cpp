@@ -1,6 +1,7 @@
 #include "canyon.h"
 #include "platform/sdl_application.h"
 #include "graphics/sdl/sdl_font_factory.h"
+#include "graphics/sdl/sdl_graphics.h"
 #include "graphics/sdl/sdl_image_factory.h"
 #include "graphics/sdl/sdl_ui_renderer.h"
 #include "moth_ui/context.h"
@@ -11,7 +12,8 @@ SDLApplication::SDLApplication() {
     auto renderer = m_window->GetSDLRenderer();
     m_imageFactory = std::make_unique<graphics::sdl::ImageFactory>(*renderer);
     m_fontFactory = std::make_unique<graphics::sdl::FontFactory>(*renderer);
-    m_uiRenderer = std::make_unique<graphics::sdl::UIRenderer>(*renderer);
+    m_graphics = std::make_unique<graphics::sdl::Graphics>(renderer);
+    m_uiRenderer = std::make_unique<graphics::sdl::UIRenderer>(*m_graphics);
     auto uiContext = std::make_shared<moth_ui::Context>(m_imageFactory.get(), m_fontFactory.get(), m_uiRenderer.get());
     moth_ui::Context::SetCurrentContext(uiContext);
     m_window->GetLayerStack().AddEventListener(this);

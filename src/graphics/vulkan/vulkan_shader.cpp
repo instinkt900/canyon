@@ -23,7 +23,7 @@ namespace graphics::vulkan {
         vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, nullptr);
     }
 
-    VkDescriptorSet Shader::GetDescriptorSet(Image& image) {
+    VkDescriptorSet Shader::GetDescriptorSet(Texture& image) {
         auto it = m_descriptorSets.find(image.GetId());
         if (std::end(m_descriptorSets) != it) {
             return it->second;
@@ -31,7 +31,7 @@ namespace graphics::vulkan {
         return CreateDescriptorSet(image);
     }
 
-    VkDescriptorSet Shader::CreateDescriptorSet(Image& image) {
+    VkDescriptorSet Shader::CreateDescriptorSet(Texture& image) {
         VkDescriptorSet descriptorSet;
 
         VkDescriptorSetAllocateInfo alloc_info{};

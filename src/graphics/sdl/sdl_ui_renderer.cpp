@@ -10,11 +10,11 @@ namespace graphics::sdl {
     UIRenderer::UIRenderer(IGraphics& graphics)
         : m_graphics(graphics) {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });
-        m_blendMode.push(moth_ui::BlendMode::Replace);
+        m_blendMode.push(BlendMode::Replace);
     }
 
     void UIRenderer::PushBlendMode(moth_ui::BlendMode mode) {
-        m_blendMode.push(mode);
+        m_blendMode.push(FromMothUI(mode));
     }
 
     void UIRenderer::PopBlendMode() {
@@ -24,7 +24,7 @@ namespace graphics::sdl {
     }
 
     void UIRenderer::PushColor(moth_ui::Color const& color) {
-        auto const modColor = m_drawColor.top() * color;
+        auto const modColor = m_drawColor.top() * ::FromMothUI(color);
         m_drawColor.push(modColor);
     }
 
@@ -45,36 +45,36 @@ namespace graphics::sdl {
 
     void UIRenderer::PushClip(moth_ui::IntRect const& rect) {
         if (m_clip.empty()) {
-            m_clip.push(FromMothUI(rect));
+            m_clip.push(::FromMothUI(rect));
         } else {
             // want to clip rect within the current clip
             auto const parentRect = m_clip.top();
-            auto const newRect = ClipRect(parentRect, rect);
+            auto const newRect = ClipRect(parentRect, ::FromMothUI(rect));
             m_clip.push(newRect);
         }
 
-        m_graphics.SetClip(m_clip.top());
+        m_graphics.SetClip(&m_clip.top());
     }
 
     void UIRenderer::PopClip() {
         m_clip.pop();
 
         if (m_clip.empty()) {
-            m_graphics.ClearClip();
+            m_graphics.SetClip(nullptr);
         } else {
-            m_graphics.SetClip(m_clip.top());
+            m_graphics.SetClip(&m_clip.top());
         }
     }
 
     void UIRenderer::RenderRect(moth_ui::IntRect const& rect) {
-        auto const floatRect = static_cast<FloatRect>(FromMothUI(rect));
+        auto const floatRect = static_cast<FloatRect>(::FromMothUI(rect));
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
         m_graphics.DrawRectF(floatRect);
     }
 
     void UIRenderer::RenderFilledRect(moth_ui::IntRect const& rect) {
-        auto const floatRect = static_cast<FloatRect>(FromMothUI(rect));
+        auto const floatRect = static_cast<FloatRect>(::FromMothUI(rect));
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
         m_graphics.DrawFillRectF(floatRect);
@@ -84,75 +84,17 @@ namespace graphics::sdl {
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
 
-        // auto const& internalImage = static_cast<Image&>(image);
-        // auto const texture = internalImage.GetTexture();
-        // auto const& textureSourceRect = internalImage.GetSourceRect();
-        // auto const sdlsourceRect{ ToSDL(MergeRects(ToMothUI(textureSourceRect), sourceRect)) };
-        // ColorComponents const components{ m_drawColor.top() };
-        // SDL_SetTextureBlendMode(texture->GetImpl(), ToSDL(m_blendMode.top()));
-        // SDL_SetTextureColorMod(texture->GetImpl(), components.r, components.g, components.b);
-        // SDL_SetTextureAlphaMod(texture->GetImpl(), components.a);
-
         auto& internalImage = static_cast<graphics::IImage&>(image);
+        auto const srcRect = ::FromMothUI(sourceRect);
         if (scaleType == moth_ui::ImageScaleType::Stretch) {
-            m_graphics.DrawImage(internalImage, FromMothUI(sourceRect), FromMothUI(destRect));
-            auto const sdlDestRect{ ToSDL(destRect) };
-            SDL_RenderCopy(&m_renderer, texture->GetImpl(), &sdlsourceRect, &sdlDestRect);
+            m_graphics.DrawImage(internalImage, ::FromMothUI(destRect), &srcRect);
         } else if (scaleType == moth_ui::ImageScaleType::Tile) {
-            // sdl doesnt have a tiling texture ability. we need to manually tile
-            auto const imageWidth = static_cast<int>(image.GetWidth() * scale);
-            auto const imageHeight = static_cast<int>(image.GetHeight() * scale);
-            auto const sdlTotalDestRect{ ToSDL(destRect) };
-            SDL_RenderSetClipRect(&m_renderer, &sdlTotalDestRect);
-            for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
-                for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
-                    SDL_Rect sdlDestRect{ x, y, imageWidth, imageHeight };
-                    SDL_RenderCopy(&m_renderer, texture->GetImpl(), &sdlsourceRect, &sdlDestRect);
-                }
-            }
-            SDL_RenderSetClipRect(&m_renderer, nullptr);
+            m_graphics.DrawImageTiled(internalImage, ::FromMothUI(destRect), &srcRect, scale);
         }
     }
 
     void UIRenderer::RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) {
-
-
-        auto const fcFont = static_cast<Font&>(font).GetFontObj();
-
-        auto const destWidth = destRect.bottomRight.x - destRect.topLeft.x;
-        auto const destHeight = destRect.bottomRight.y - destRect.topLeft.y;
-        auto const textHeight = FC_GetColumnHeight(fcFont.get(), destWidth, "%s", text.c_str());
-
-        auto x = static_cast<float>(destRect.topLeft.x);
-        switch (horizontalAlignment) {
-            case moth_ui::TextHorizAlignment::Left:
-            break;
-            case moth_ui::TextHorizAlignment::Center:
-            x = x + destWidth / 2.0f;
-            break;
-            case moth_ui::TextHorizAlignment::Right:
-            x = x + destWidth;
-            break;
-        }
-
-        auto y = static_cast<float>(destRect.topLeft.y);
-        switch (verticalAlignment) {
-            case moth_ui::TextVertAlignment::Top:
-            break;
-            case moth_ui::TextVertAlignment::Middle:
-            y = y + (destHeight - textHeight) / 2.0f;
-            break;
-            case moth_ui::TextVertAlignment::Bottom:
-            y = y + destHeight - textHeight;
-            break;
-        }
-
-        FC_Effect effect;
-        effect.alignment = ToSDL(horizontalAlignment);
-        effect.color = ToSDL(m_drawColor.top());
-        effect.scale.x = 1.0f;
-        effect.scale.y = 1.0f;
-
-        FC_DrawColumnEffect(fcFont.get(), &m_renderer, x, y, destWidth, effect, "%s", text.c_str());
+        auto& fcFont = static_cast<Font&>(font);
+        m_graphics.DrawText(text, fcFont, FromMothUI(horizontalAlignment), FromMothUI(verticalAlignment), ::FromMothUI(destRect));
     }
 }

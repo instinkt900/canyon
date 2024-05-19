@@ -47,7 +47,7 @@ namespace graphics::vulkan {
         mutable hb_buffer_t* m_hbBuffer = nullptr;
 
         // texture containing all glyphs
-        std::unique_ptr<Image> m_glyphAtlas;
+        std::unique_ptr<Texture> m_glyphAtlas;
 
         // global font measurements
         int32_t m_lineHeight;

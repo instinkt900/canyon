@@ -40,52 +40,51 @@ namespace graphics::sdl {
         SDL_RenderClear(m_renderer);
     }
 
-    void Graphics::DrawImage(graphics::IImage& image, IntRect const* sourceRect, IntRect const* destRect) {
+    void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto& sdlImage = dynamic_cast<Image&>(image);
         auto sdlTexture = sdlImage.GetTexture();
         auto const& textureSourceRect = sdlImage.GetSourceRect();
-        auto const sdlsourceRect{ ToSDL(MergeRects(textureSourceRect, sourceRect)) };
 
         ColorComponents const components{ m_drawColor };
-        SDL_SetTextureBlendMode(sdlTexture->GetImpl(), ToSDL(m_blendMode));
-        SDL_SetTextureColorMod(sdlTexture->GetImpl(), components.r, components.g, components.b);
-        SDL_SetTextureAlphaMod(sdlTexture->GetImpl(), components.a);
+        SDL_SetTextureBlendMode(sdlTexture->GetSDLTexture()->GetImpl(), ToSDL(m_blendMode));
+        SDL_SetTextureColorMod(sdlTexture->GetSDLTexture()->GetImpl(), components.r, components.g, components.b);
+        SDL_SetTextureAlphaMod(sdlTexture->GetSDLTexture()->GetImpl(), components.a);
 
-        if (sourceRect && destRect) {
-            auto srcRect = ToSDL(*sdlsourceRect);
-            auto dstRect = ToSDL(*destRect);
-            SDL_RenderCopy(m_renderer, sdlTexture->GetImpl(), &srcRect, &dstRect);
-        } else if (sourceRect) {
-            auto srcRect = ToSDL(*sdlsourceRect);
-            SDL_RenderCopy(m_renderer, sdlTexture->GetImpl(), &srcRect, nullptr);
-        } else if (destRect) {
-            auto dstRect = ToSDL(*destRect);
-            SDL_RenderCopy(m_renderer, sdlTexture->GetImpl(), nullptr, &dstRect);
-        } else {
-            SDL_RenderCopy(m_renderer, sdlTexture->GetImpl(), nullptr, nullptr);
+        SDL_Rect sdlSrcRect = ToSDL(textureSourceRect);
+        SDL_Rect sdlDstRect = ToSDL(destRect);
+
+        if (sourceRect) {
+            sdlSrcRect.x += sourceRect->x();
+            sdlSrcRect.y += sourceRect->y();
         }
+
+        SDL_RenderCopy(m_renderer, sdlTexture->GetSDLTexture()->GetImpl(), &sdlSrcRect, &sdlDstRect);
     }
 
-    void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const* sourceRect, IntRect const* destRect, float scale) {
-        // 
+    void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
         auto& sdlImage = dynamic_cast<Image&>(image);
         auto sdlTexture = sdlImage.GetTexture();
         auto const& textureSourceRect = sdlImage.GetSourceRect();
-        auto const sdlsourceRect{ ToSDL(MergeRects(textureSourceRect, sourceRect)) };
 
         ColorComponents const components{ m_drawColor };
-        SDL_SetTextureBlendMode(sdlTexture->GetImpl(), ToSDL(m_blendMode));
-        SDL_SetTextureColorMod(sdlTexture->GetImpl(), components.r, components.g, components.b);
-        SDL_SetTextureAlphaMod(sdlTexture->GetImpl(), components.a);
+        SDL_SetTextureBlendMode(sdlTexture->GetSDLTexture()->GetImpl(), ToSDL(m_blendMode));
+        SDL_SetTextureColorMod(sdlTexture->GetSDLTexture()->GetImpl(), components.r, components.g, components.b);
+        SDL_SetTextureAlphaMod(sdlTexture->GetSDLTexture()->GetImpl(), components.a);
+
+        SDL_Rect sdlSrcRect = ToSDL(textureSourceRect);
+        if (sourceRect) {
+            sdlSrcRect.x += sourceRect->x();
+            sdlSrcRect.y += sourceRect->y();
+        }
 
         auto const imageWidth = static_cast<int>(image.GetWidth() * scale);
         auto const imageHeight = static_cast<int>(image.GetHeight() * scale);
-        auto const sdlTotalDestRect{ ToSDL(*destRect) };
+        auto const sdlTotalDestRect{ ToSDL(destRect) };
         SDL_RenderSetClipRect(m_renderer, &sdlTotalDestRect);
-        for (auto y = destRect->topLeft.y; y < destRect->bottomRight.y; y += imageHeight) {
-            for (auto x = destRect->topLeft.x; x < destRect->bottomRight.x; x += imageWidth) {
-                SDL_Rect sdlDestRect{ x, y, imageWidth, imageHeight };
-                SDL_RenderCopy(&m_renderer, sdlTexture->GetImpl(), &sdlsourceRect, &sdlDestRect);
+        for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
+            for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
+                SDL_Rect sdlDstRect{ x, y, imageWidth, imageHeight };
+                SDL_RenderCopy(m_renderer, sdlTexture->GetSDLTexture()->GetImpl(), &sdlSrcRect, &sdlDstRect);
             }
         }
         SDL_RenderSetClipRect(m_renderer, nullptr);
@@ -179,26 +178,24 @@ namespace graphics::sdl {
 
     std::unique_ptr<graphics::ITarget> Graphics::CreateTarget(int width, int height) {
         auto sdlTexture = CreateTextureRef(SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height));
-
-        IntVec2 const dimensions{ width, height };
+        auto texture = std::make_shared<Texture>(sdlTexture);
         IntRect const sourceRect{ { 0, 0 }, { width, height } };
-        return std::make_unique<Image>(sdlTexture, dimensions, sourceRect);
+        return std::make_unique<Image>(texture, sourceRect);
     }
 
     graphics::ITarget* Graphics::GetTarget() {
-        // std::shared_ptr<SDLTextureWrap> sdlTexture = SDLTextureWrap::CreateNonOwning(SDL_GetRenderTarget(m_renderer));
-        // return std::make_shared<Image>(sdlTexture);
-        return nullptr;
+        return m_currentRenderTarget;
     }
 
     void Graphics::SetTarget(graphics::ITarget* target) {
         if (!target) {
             SDL_SetRenderTarget(m_renderer, nullptr);
         } else {
-            auto sdlImage = dynamic_cast<Image*>(target);
-            auto sdlTexture = sdlImage->GetTexture();
+            auto sdlImage = dynamic_cast<Texture*>(target);
+            auto sdlTexture = sdlImage->GetSDLTexture();
             SDL_SetRenderTarget(m_renderer, sdlTexture->GetImpl());
         }
+        m_currentRenderTarget = target;
     }
 
     void Graphics::SetLogicalSize(IntVec2 const& logicalSize) {

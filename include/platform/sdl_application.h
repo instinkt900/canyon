@@ -27,4 +27,5 @@ private:
     std::unique_ptr<moth_ui::IImageFactory> m_imageFactory;
     std::unique_ptr<moth_ui::FontFactory> m_fontFactory;
     std::unique_ptr<moth_ui::IRenderer> m_uiRenderer;
+    std::unique_ptr<graphics::IGraphics> m_graphics;
 };

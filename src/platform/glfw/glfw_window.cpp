@@ -30,17 +30,10 @@ namespace platform::glfw {
     }
 
     void Window::Draw() {
-        graphics::vulkan::Graphics* graphics = static_cast<graphics::vulkan::Graphics*>(m_graphics.get());
-        graphics->Begin();
         m_layerStack->Draw();
-        graphics->End();
     }
 
     bool Window::CreateWindow() {
-        if (!glfwInit()) {
-            return false;
-        }
-
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         m_glfwWindow = glfwCreateWindow(m_windowWidth, m_windowHeight, m_title.c_str(), nullptr, nullptr);
         glfwSetWindowUserPointer(m_glfwWindow, this);

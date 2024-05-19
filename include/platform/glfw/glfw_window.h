@@ -11,6 +11,7 @@ namespace platform::glfw {
 
         void SetWindowTitle(std::string const& title) override;
         GLFWwindow* GetGLFWWindow() const { return m_glfwWindow; }
+        VkSurfaceKHR GetVkSurface() const { return m_customVkSurface; }
 
         void Update(uint32_t ticks) override;
         void Draw() override;

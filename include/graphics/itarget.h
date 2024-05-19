@@ -7,8 +7,6 @@ namespace graphics {
     class ITarget : public moth_ui::ITarget {
     public:
         virtual ~ITarget() = default;
-
-        virtual IImage* GetImage() = 0;
     };
 }
 

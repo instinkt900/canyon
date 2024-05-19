@@ -35,21 +35,22 @@ namespace graphics::vulkan {
             Color color;
         };
 
-        void Begin();
-        void End();
+        void Begin() override;
+        void End() override;
 
         void SetBlendMode(BlendMode mode) override;
         //void SetBlendMode(std::shared_ptr<IImage> target, EBlendMode mode) override;
         //void SetColorMod(std::shared_ptr<IImage> target, Color const& color) override;
         void SetColor(Color const& color) override;
         void Clear() override;
-        void DrawImage(IImage& image, IntRect const* sourceRect, IntRect const* destRect) override;
+        void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) override;
+        void DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
         void DrawToPNG(std::filesystem::path const& path) override;
         void DrawRectF(FloatRect const& rect) override;
         void DrawFillRectF(FloatRect const& rect) override;
         void DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) override;
         void DrawText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) override;
-        void SetClipRect(IntRect const* clipRect);
+        void SetClip(IntRect const* clipRect) override;
 
         std::unique_ptr<ITarget> CreateTarget(int width, int height) override;
         ITarget* GetTarget() override;
@@ -66,7 +67,7 @@ namespace graphics::vulkan {
             }
             return nullptr;
         }
-        VkDescriptorSet GetDescriptorSet(Image& image);
+        VkDescriptorSet GetDescriptorSet(Texture& image);
 
         Shader& GetFontShader() { return *m_fontShader; }
 
@@ -112,7 +113,7 @@ namespace graphics::vulkan {
         std::unique_ptr<Swapchain> m_swapchain;
         std::shared_ptr<Shader> m_drawingShader;
         std::shared_ptr<Shader> m_fontShader;
-        std::unique_ptr<Image> m_defaultImage;
+        std::unique_ptr<Texture> m_defaultImage;
 
         DrawContext m_defaultContext;
         DrawContext m_overrideContext;

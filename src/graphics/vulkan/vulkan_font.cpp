@@ -197,7 +197,7 @@ namespace graphics::vulkan {
 
         //stbi_write_png("test.png", packDim.x, packDim.y, 4, packData.data(), packDim.x * 4);
 
-        m_glyphAtlas = Image::FromRGBA(context, packDim.x, packDim.y, packData.data());
+        m_glyphAtlas = Texture::FromRGBA(context, packDim.x, packDim.y, packData.data());
         m_lineHeight = face->size->metrics.height / 64;
         m_ascent = face->size->metrics.ascender / 64;
         m_descent = face->size->metrics.descender / 64;
