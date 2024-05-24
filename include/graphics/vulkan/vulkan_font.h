@@ -9,7 +9,7 @@
 namespace graphics::vulkan {
     class Font : public IFont {
     public:
-        static std::shared_ptr<Font> Load(char const* path, int size, Context& context, Graphics& graphics);
+        static std::unique_ptr<Font> Load(std::filesystem::path const& path, int size, Context& context, Graphics& graphics);
         virtual ~Font();
 
         int32_t GetLineHeight() const { return m_lineHeight; }

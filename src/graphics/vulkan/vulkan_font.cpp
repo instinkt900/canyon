@@ -85,12 +85,12 @@ namespace {
 }
 
 namespace graphics::vulkan {
-    std::shared_ptr<Font> Font::Load(char const* path, int size, Context& context, Graphics& graphics) {
+    std::unique_ptr<Font> Font::Load(std::filesystem::path const& path, int size, Context& context, Graphics& graphics) {
         FT_Face face;
-        if (FT_New_Face(context.m_ftLibrary, path, 0, &face) != 0) {
+        if (FT_New_Face(context.m_ftLibrary, path.c_str(), 0, &face) != 0) {
             return nullptr;
         }
-        return std::shared_ptr<Font>(new Font(face, size, context, graphics));
+        return std::unique_ptr<Font>(new Font(face, size, context, graphics));
     }
 
     Font::Font(FT_Face face, int size, Context& context, Graphics& graphics) {

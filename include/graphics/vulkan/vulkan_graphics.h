@@ -16,6 +16,9 @@ namespace graphics::vulkan {
         Graphics(Context& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
         ~Graphics();
 
+        std::unique_ptr<IImage> LoadImage(std::filesystem::path const& path) override;
+        std::unique_ptr<IFont> LoadFont(std::filesystem::path const& path, int size) override;
+
         struct Vertex {
             FloatVec2 xy;
             FloatVec2 uv;

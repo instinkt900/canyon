@@ -4,6 +4,8 @@
 #include "graphics/sdl/sdl_image_factory.h"
 #include "graphics/sdl/sdl_ui_renderer.h"
 #include "layers/layer.h"
+#include "platform/glfw/glfw_platform.h"
+#include "platform/sdl/sdl_platform.h"
 #include "platform/vulkan_application.h"
 #include "platform/sdl_application.h"
 #include "moth_ui/group.h"
@@ -113,35 +115,29 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    if (!glfwInit()) {
-        return false;
-    }
-
-    graphics::vulkan::Context context;
-    auto window = std::make_unique<platform::glfw::Window>(context, "testing", 640, 480);
-    auto graphics = std::make_unique<graphics::vulkan::Graphics>(context, window->GetVkSurface(), window->GetWidth(), window->GetHeight());
-    auto texture = graphics::vulkan::Image::Load(context, "assets/images/playership.png");
-    auto font = graphics::vulkan::Font::Load("assets/fonts/pilotcommand.ttf", 12, context, *graphics);
+    auto platform = std::make_unique<platform::sdl::Platform>();
+    platform->Startup();
+    auto window = platform->CreateWindow("testing", 640, 480);
+    auto& graphics = window->GetGraphics();
+    auto texture = graphics.LoadImage("assets/images/playership.png");
+    auto font = graphics.LoadFont("assets/fonts/pilotcommand.ttf", 18);
 
     while (true) {
-        graphics->Begin();
-        graphics->SetColor(graphics::BasicColors::Red);
-        graphics->DrawFillRectF(MakeRect(0.0f, 0.0f, 100.0f, 100.0f));
-        graphics->SetColor(graphics::BasicColors::White);
-        auto destRect = MakeRect(100, 100, 200, 200);
-        graphics->DrawImage(*texture, destRect, nullptr);
-        graphics->SetColor(graphics::BasicColors::Green);
-        graphics->DrawText("hello", *font, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, 640, 480));
+        graphics.Begin();
+        graphics.SetColor(graphics::BasicColors::Red);
+        graphics.DrawFillRectF(MakeRect(0.0f, 0.0f, 100.0f, 100.0f));
+        graphics.SetColor(graphics::BasicColors::White);
+        auto destRect = MakeRect(0, 0, 640, 480);
+        graphics.DrawImageTiled(*texture, destRect, nullptr, 1.0f);
+        graphics.SetColor(graphics::BasicColors::Green);
+        graphics.DrawText("hello", *font, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, 640, 480));
+        window->Update(30);
         window->Draw();
-        graphics->End();
+        graphics.End();
         using namespace std::chrono_literals;
         std::this_thread::sleep_for(1ms);
     }
 
-    // // VulkApplication app{};
-    // SDLApplication app{};
-    // moth_ui::Context::GetCurrentContext()->GetFontFactory().LoadProject("assets/fonts.json");
-    // app.GetWindow().GetLayerStack().PushLayer(std::make_unique<TestLayer>(app.GetWindow().GetGraphics(), "assets/layouts/basic.mothui"));
-    // app.TickSync();
+    platform->Shutdown();
     return 0;
 }

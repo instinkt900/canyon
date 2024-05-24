@@ -34,10 +34,6 @@ namespace platform::sdl {
 
 
     bool Window::CreateWindow() {
-        if (0 > SDL_Init(SDL_INIT_EVERYTHING)) {
-            return false;
-        }
-
         if (nullptr == (m_window = SDL_CreateWindow(m_title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_windowWidth, m_windowHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE))) {
             return false;
         }
@@ -65,7 +61,6 @@ namespace platform::sdl {
     void Window::DestroyWindow() {
         SDL_DestroyRenderer(m_renderer);
         SDL_DestroyWindow(m_window);
-        SDL_Quit();
     }
 }
 

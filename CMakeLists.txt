@@ -58,8 +58,10 @@ set(SOURCES ${SOURCES}
 	src/layers/layer_stack.cpp
 	src/platform/glfw/glfw_window.cpp
 	src/platform/glfw/glfw_events.cpp
+    src/platform/glfw/glfw_platform.cpp
 	src/platform/sdl/sdl_window.cpp
 	src/platform/sdl/sdl_events.cpp
+    src/platform/sdl/sdl_platform.cpp
 	src/platform/window.cpp
 	src/platform/vulkan_application.cpp
 	src/platform/sdl_application.cpp

@@ -29,7 +29,7 @@ namespace graphics::vulkan {
     }
 
     std::shared_ptr<IFont> FontCache::LoadFont(std::string const& path, int size) {
-        auto font = Font::Load(path.c_str(), size, m_context, m_graphics);
+        std::shared_ptr<Font> font = Font::Load(path.c_str(), size, m_context, m_graphics);
 
         auto fontPathIt = m_fonts.find(path);
         if (std::end(m_fonts) == fontPathIt) {

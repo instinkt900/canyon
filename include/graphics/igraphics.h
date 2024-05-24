@@ -12,6 +12,10 @@ namespace graphics {
     class IGraphics {
     public:
 	virtual ~IGraphics() {}
+
+        virtual std::unique_ptr<IImage> LoadImage(std::filesystem::path const& path) = 0;
+        virtual std::unique_ptr<IFont> LoadFont(std::filesystem::path const& path, int size) = 0;
+
         virtual void Begin() = 0;
         virtual void End() = 0;
         virtual void SetBlendMode(BlendMode mode) = 0;

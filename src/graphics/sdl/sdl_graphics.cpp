@@ -11,6 +11,14 @@ namespace graphics::sdl {
         , m_drawColor(graphics::BasicColors::White) {
     }
 
+    std::unique_ptr<IImage> Graphics::LoadImage(std::filesystem::path const& path) {
+        return graphics::sdl::Image::Load(*m_renderer, path);
+    }
+
+    std::unique_ptr<IFont> Graphics::LoadFont(std::filesystem::path const& path, int size) {
+        return graphics::sdl::Font::Load(*m_renderer, path, size);
+    }
+
     void Graphics::SetBlendMode(graphics::BlendMode mode) {
         SDL_SetRenderDrawBlendMode(m_renderer, ToSDL(mode));
         m_blendMode = mode;

@@ -114,7 +114,6 @@ namespace platform::glfw {
     void Window::DestroyWindow() {
         m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
         glfwDestroyWindow(m_glfwWindow);
-        glfwTerminate();
     }
 
     void Window::OnResize() {
