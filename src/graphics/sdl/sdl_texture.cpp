@@ -1,5 +1,6 @@
 #include "canyon.h"
 #include "graphics/sdl/sdl_texture.h"
+#include "graphics/sdl/sdl_context.h"
 #include "graphics/sdl/smart_sdl.h"
 
 namespace graphics::sdl {
@@ -16,8 +17,8 @@ namespace graphics::sdl {
         return m_textureDimensions.y;
     }
 
-    std::unique_ptr<Texture> Texture::Load(SDL_Renderer& renderer, std::filesystem::path const& path) {
-        if (auto texture = CreateTextureRef(&renderer, path)) {
+    std::unique_ptr<Texture> Texture::FromFile(graphics::sdl::Context const& context, std::filesystem::path const& path) {
+        if (auto texture = CreateTextureRef(&context.m_renderer, path)) {
             return std::make_unique<Texture>(texture);
         }
         return nullptr;

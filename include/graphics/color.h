@@ -2,7 +2,6 @@
 
 #include "utils/vector.h"
 #include "graphics/blend_mode.h"
-#include "moth_ui/utils/color.h"
 
 namespace graphics {
     using Color = Vector<float, 4>;
@@ -121,9 +120,5 @@ namespace graphics {
         finalColor.a = finalAlpha;
         return finalColor;
     }
-
-    // inline Color FromMothUI(moth_ui::Color const& color) {
-    //
-    // }
 }
 

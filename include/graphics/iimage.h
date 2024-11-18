@@ -1,9 +1,7 @@
 #pragma once
 
-#include "moth_ui/iimage.h"
-
 namespace graphics {
-    class IImage : public moth_ui::IImage {
+    class IImage {
     public:
         virtual ~IImage() = default;
 

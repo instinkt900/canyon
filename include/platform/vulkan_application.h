@@ -27,7 +27,7 @@ private:
     std::unique_ptr<platform::glfw::Window> m_window;
 
     std::unique_ptr<moth_ui::IImageFactory> m_imageFactory;
-    std::unique_ptr<moth_ui::FontFactory> m_fontFactory;
+    std::unique_ptr<moth_ui::IFontFactory> m_fontFactory;
     std::unique_ptr<moth_ui::IRenderer> m_uiRenderer;
 };
 

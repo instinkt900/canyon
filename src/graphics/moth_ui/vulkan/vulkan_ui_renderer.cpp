@@ -1,13 +1,11 @@
 #include "canyon.h"
-#include "graphics/sdl/sdl_ui_renderer.h"
-#include "graphics/sdl/sdl_image.h"
-#include "graphics/sdl/sdl_font.h"
-#include "graphics/sdl/sdl_utils.h"
-#include "graphics/utils.h"
+#include "graphics/moth_ui/vulkan/vulkan_ui_renderer.h"
+#include "graphics/vulkan/vulkan_graphics.h"
+#include "utils/rect.h"
 #include "utils/conversions.h"
 
-namespace graphics::sdl {
-    UIRenderer::UIRenderer(IGraphics& graphics)
+namespace graphics::vulkan {
+    UIRenderer::UIRenderer(Graphics& graphics)
         : m_graphics(graphics) {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });
         m_blendMode.push(BlendMode::Replace);
@@ -18,7 +16,7 @@ namespace graphics::sdl {
     }
 
     void UIRenderer::PopBlendMode() {
-        if (m_blendMode.size() > 1) {
+        if (!m_blendMode.empty()) {
             m_blendMode.pop();
         }
     }
@@ -29,7 +27,7 @@ namespace graphics::sdl {
     }
 
     void UIRenderer::PopColor() {
-        if (m_drawColor.size() > 1) {
+        if (!m_drawColor.empty()) {
             m_drawColor.pop();
         }
     }
@@ -53,48 +51,51 @@ namespace graphics::sdl {
             m_clip.push(newRect);
         }
 
-        m_graphics.SetClip(&m_clip.top());
+        auto const currentRect = m_clip.top();
+        m_graphics.SetClip(&currentRect);
     }
 
     void UIRenderer::PopClip() {
-        m_clip.pop();
+        if (!m_clip.empty()) {
+            m_clip.pop();
+        }
 
         if (m_clip.empty()) {
             m_graphics.SetClip(nullptr);
         } else {
-            m_graphics.SetClip(&m_clip.top());
+            auto const currentRect = m_clip.top();
+            m_graphics.SetClip(&currentRect);
         }
     }
 
     void UIRenderer::RenderRect(moth_ui::IntRect const& rect) {
-        auto const floatRect = static_cast<FloatRect>(::FromMothUI(rect));
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
-        m_graphics.DrawRectF(floatRect);
+        IntRect const internalRect = ::FromMothUI(rect);
+        m_graphics.DrawRectF(static_cast<FloatRect>(internalRect));
     }
 
     void UIRenderer::RenderFilledRect(moth_ui::IntRect const& rect) {
-        auto const floatRect = static_cast<FloatRect>(::FromMothUI(rect));
+        auto const internalRect = ::FromMothUI(rect);
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
-        m_graphics.DrawFillRectF(floatRect);
+        m_graphics.DrawFillRectF(static_cast<FloatRect>(internalRect));
     }
 
     void UIRenderer::RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) {
+        auto& internalImage = static_cast<Image&>(image);
+        auto const internalSourceRect = ::FromMothUI(sourceRect);
+        auto const internalDestRect = ::FromMothUI(destRect);
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
-
-        auto& internalImage = static_cast<graphics::IImage&>(image);
-        auto const srcRect = ::FromMothUI(sourceRect);
-        if (scaleType == moth_ui::ImageScaleType::Stretch) {
-            m_graphics.DrawImage(internalImage, ::FromMothUI(destRect), &srcRect);
-        } else if (scaleType == moth_ui::ImageScaleType::Tile) {
-            m_graphics.DrawImageTiled(internalImage, ::FromMothUI(destRect), &srcRect, scale);
-        }
+        m_graphics.DrawImage(internalImage, internalDestRect, &internalSourceRect);
     }
 
     void UIRenderer::RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) {
-        auto& fcFont = static_cast<Font&>(font);
-        m_graphics.DrawText(text, fcFont, FromMothUI(horizontalAlignment), FromMothUI(verticalAlignment), ::FromMothUI(destRect));
+        auto& internalFont = static_cast<IFont&>(font);
+        auto const internalDestRect = ::FromMothUI(destRect);
+        m_graphics.SetBlendMode(BlendMode::Alpha);
+        m_graphics.SetColor(m_drawColor.top());
+        m_graphics.DrawText(text, internalFont, FromMothUI(horizontalAlignment), FromMothUI(verticalAlignment), internalDestRect);
     }
 }

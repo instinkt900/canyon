@@ -1,18 +1,20 @@
 #include "canyon.h"
 #include "graphics/sdl/sdl_graphics.h"
+#include "graphics/sdl/sdl_context.h"
 #include "graphics/sdl/sdl_font.h"
 #include "graphics/sdl/sdl_image.h"
 #include "graphics/sdl/sdl_utils.h"
 #include "../utils.h"
 
 namespace graphics::sdl {
-    Graphics::Graphics(SDL_Renderer* renderer)
-        : m_renderer(renderer)
+    Graphics::Graphics(graphics::Context const& context)
+        : m_context(static_cast<Context const&>(context))
         , m_drawColor(graphics::BasicColors::White) {
+        m_renderer = m_context.m_renderer;
     }
 
     std::unique_ptr<IImage> Graphics::LoadImage(std::filesystem::path const& path) {
-        return graphics::sdl::Image::Load(*m_renderer, path);
+        return graphics::sdl::Image::Load(m_context, path);
     }
 
     std::unique_ptr<IFont> Graphics::LoadFont(std::filesystem::path const& path, int size) {

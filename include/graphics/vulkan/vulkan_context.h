@@ -1,13 +1,19 @@
 #pragma once
 
+#include "graphics/context.h"
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
 namespace graphics::vulkan {
-    class Context {
+    class Context : public graphics::Context {
     public:
         Context();
         ~Context();
+
+        std::unique_ptr<ITexture> TextureFromFile(std::filesystem::path const& path) override;
+        std::unique_ptr<IImage> NewImage(std::shared_ptr<ITexture> texture) override;
+        std::unique_ptr<IImage> NewImage(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) override;
 
         VkCommandBuffer beginSingleTimeCommands();
         void endSingleTimeCommands(VkCommandBuffer commandBuffer);

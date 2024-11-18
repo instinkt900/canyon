@@ -14,10 +14,6 @@ namespace graphics::sdl {
 
         int GetWidth() const override;
         int GetHeight() const override;
-        moth_ui::IntVec2 GetDimensions() const override { return { GetWidth(), GetHeight() }; }
-        moth_ui::IImage* GetImage() override { return this; }
-
-        void ImGui(moth_ui::IntVec2 const& size, moth_ui::FloatVec2 const& uv0, moth_ui::FloatVec2 const& uv1) const override;
 
         std::shared_ptr<Texture> GetTexture() const {
             return m_texture;
@@ -27,7 +23,7 @@ namespace graphics::sdl {
             return m_sourceRect;
         }
 
-        static std::unique_ptr<Image> Load(SDL_Renderer& renderer, std::filesystem::path const& path);
+        static std::unique_ptr<Image> Load(graphics::Context const& context, std::filesystem::path const& path);
 
     private:
         std::shared_ptr<Texture> m_texture;

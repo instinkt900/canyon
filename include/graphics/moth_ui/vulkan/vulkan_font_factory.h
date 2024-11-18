@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/vulkan/vulkan_font_cache.h"
 #include "vulkan_context.h"
 #include "vulkan_graphics.h"
 #include "vulkan_font_cache.h"

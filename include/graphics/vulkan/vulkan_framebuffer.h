@@ -14,8 +14,6 @@ namespace graphics::vulkan {
         Framebuffer(Context& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkRenderPass renderPass);
         virtual ~Framebuffer();
 
-        moth_ui::IntVec2 GetDimensions() const override;
-
         //void BeginPass(RenderPass& renderPass);
         //void EndPass();
         //void Submit();
@@ -25,7 +23,7 @@ namespace graphics::vulkan {
         Fence& GetFence() const { return *m_fence; }
         VkSemaphore GetAvailableSemaphore() const { return m_imageAvailableSemaphore; }
         VkSemaphore GetRenderFinishedSemaphore() const { return m_renderFinishedSemaphore; }
-        moth_ui::IImage* GetImage() override { return m_image.get(); }
+        IImage* GetImage() override { return m_image.get(); }
         uint32_t GetSwapchainIndex() const { return m_swapchainIndex; }
         VkExtent2D GetVkExtent() const;
         VkFormat GetVkFormat() const;

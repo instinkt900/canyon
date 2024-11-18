@@ -4,7 +4,7 @@
 #include "moth_ui//event_listener.h"
 #include "platform/sdl/sdl_window.h"
 #include "events/event_window.h"
-#include <moth_ui/font_factory.h>
+#include <moth_ui/ifont_factory.h>
 #include <moth_ui/iimage_factory.h>
 #include <moth_ui/irenderer.h>
 
@@ -25,7 +25,7 @@ private:
     std::unique_ptr<platform::sdl::Window> m_window;
 
     std::unique_ptr<moth_ui::IImageFactory> m_imageFactory;
-    std::unique_ptr<moth_ui::FontFactory> m_fontFactory;
+    std::unique_ptr<moth_ui::IFontFactory> m_fontFactory;
     std::unique_ptr<moth_ui::IRenderer> m_uiRenderer;
     std::unique_ptr<graphics::IGraphics> m_graphics;
 };

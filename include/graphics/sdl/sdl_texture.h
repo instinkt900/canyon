@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/itexture.h"
+#include "graphics/sdl/sdl_context.h"
 #include "utils/vector.h"
 #include "graphics/sdl/smart_sdl.h"
 
@@ -15,7 +16,7 @@ namespace graphics::sdl {
 
         SDLTextureRef GetSDLTexture() const { return m_texture; }
 
-        static std::unique_ptr<Texture> Load(SDL_Renderer& renderer, std::filesystem::path const& path);
+        static std::unique_ptr<Texture> FromFile(graphics::sdl::Context const& context, std::filesystem::path const& path);
 
     private:
         SDLTextureRef m_texture;

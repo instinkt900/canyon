@@ -1,0 +1,19 @@
+#include "graphics/context.h"
+#include "graphics/image_factory.h"
+#include "moth_ui/iimage_factory.h"
+
+namespace graphics {
+    class MothImageFactory : public moth_ui::IImageFactory {
+    public:
+        MothImageFactory(Context& context);
+        virtual ~MothImageFactory() = default;
+
+        void FlushCache() override;
+        bool LoadTexturePack(std::filesystem::path const& path) override;
+        std::unique_ptr<moth_ui::IImage> GetImage(std::filesystem::path const& path) override;
+
+    private:
+        std::unique_ptr<ImageFactory> m_imageFactory;
+    };
+}
+

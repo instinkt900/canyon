@@ -26,31 +26,31 @@ set(SOURCES ${SOURCES}
 	external/imgui/backends/imgui_impl_glfw.cpp
     src/graphics/sdl/SDL_FontCache.c
     src/graphics/sdl/sdl_font.cpp
-    src/graphics/sdl/sdl_font_factory.cpp
     src/graphics/sdl/sdl_graphics.cpp
     src/graphics/sdl/sdl_texture.cpp
     src/graphics/sdl/sdl_image.cpp
-    src/graphics/sdl/sdl_image_factory.cpp
-    src/graphics/sdl/sdl_ui_renderer.cpp
+    src/graphics/moth_ui/sdl/sdl_ui_renderer.cpp
+    src/graphics/moth_ui/sdl/sdl_font_factory.cpp
+    src/graphics/moth_ui/sdl/sdl_image_factory.cpp
 	src/graphics/vulkan/vulkan_buffer.cpp
 	src/graphics/vulkan/vulkan_command_buffer.cpp
 	src/graphics/vulkan/vulkan_context.cpp
 	src/graphics/vulkan/vulkan_fence.cpp
 	src/graphics/vulkan/vulkan_font.cpp
 	src/graphics/vulkan/vulkan_font_cache.cpp
-	src/graphics/vulkan/vulkan_font_factory.cpp
 	src/graphics/vulkan/vulkan_framebuffer.cpp
 	src/graphics/vulkan/vulkan_graphics.cpp
 	src/graphics/vulkan/vulkan_texture.cpp
-	src/graphics/vulkan/vulkan_image_factory.cpp
 	src/graphics/vulkan/vulkan_pipeline.cpp
 	src/graphics/vulkan/vulkan_renderpass.cpp
 	src/graphics/vulkan/vulkan_shader.cpp
 	src/graphics/vulkan/vulkan_image.cpp
 	src/graphics/vulkan/vulkan_swapchain.cpp
-	src/graphics/vulkan/vulkan_ui_renderer.cpp
 	src/graphics/vulkan/vulkan_vma.cpp
 	src/graphics/vulkan/shaders/vulkan_shaders.cpp
+    src/graphics/moth_ui/vulkan/vulkan_ui_renderer.cpp
+    src/graphics/moth_ui/vulkan/vulkan_font_factory.cpp
+    src/graphics/moth_ui/vulkan/vulkan_image_factory.cpp
 	src/graphics/stb_image.cpp
 	src/graphics/stb_image_write.cpp
 	src/graphics/stb_rect_pack.cpp

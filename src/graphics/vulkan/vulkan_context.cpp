@@ -1,5 +1,7 @@
 #include "canyon.h"
 #include "graphics/vulkan/vulkan_context.h"
+#include "graphics/vulkan/vulkan_image.h"
+#include "graphics/vulkan/vulkan_texture.h"
 #include "graphics/vulkan/vulkan_utils.h"
 
 namespace {
@@ -26,7 +28,7 @@ namespace {
         void* pUserData) {
         switch (messageSeverity) {
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-            //spdlog::info("Validation Layer: {}", pCallbackData->pMessage);
+            // spdlog::info("Validation Layer: {}", pCallbackData->pMessage);
             break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
             spdlog::info("Validation Layer: {}", pCallbackData->pMessage);
@@ -37,8 +39,8 @@ namespace {
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
             spdlog::error("Validation Layer: {}", pCallbackData->pMessage);
             break;
-	default:
-	    break;
+        default:
+            break;
         }
 
         return VK_FALSE;
@@ -75,10 +77,10 @@ namespace {
     {                       \
         FT_Error err = (r); \
         assert(!err);       \
-	_unused(err);       \
+        _unused(err);       \
     }                       \
     while (0)               \
-    ;
+        ;
 
 namespace graphics::vulkan {
     Context::Context() {
@@ -262,6 +264,18 @@ namespace graphics::vulkan {
         vkDestroyDevice(m_vkDevice, nullptr);
         vkDestroyInstance(m_vkInstance, nullptr);
     }
+
+    std::unique_ptr<ITexture> Context::TextureFromFile(std::filesystem::path const& path) {
+        auto& vulkanContext = static_cast<graphics::vulkan::Context&>(*this);
+        return Texture::FromFile(vulkanContext, path);
+    }
+
+    std::unique_ptr<IImage> Context::NewImage(std::shared_ptr<ITexture> texture) {
+        auto vulkanTexture = std::dynamic_pointer_cast<Texture>(texture);
+        return std::make_unique<Image>(vulkanTexture);
+    }
+
+    std::unique_ptr<IImage> NewImage(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) override;
 
     VkCommandBuffer Context::beginSingleTimeCommands() {
         VkCommandBufferAllocateInfo allocInfo{};
