@@ -7,10 +7,12 @@
 namespace graphics::sdl {
     class Graphics : public IGraphics {
     public:
-        Graphics(graphics::Context const& context);
+        Graphics(graphics::Context& context);
 
         std::unique_ptr<IImage> LoadImage(std::filesystem::path const& path) override;
         std::unique_ptr<IFont> LoadFont(std::filesystem::path const& path, int size) override;
+
+        Context& GetContext() const override { return m_context; }
 
         void Begin() override {}
         void End() override {}
@@ -36,7 +38,7 @@ namespace graphics::sdl {
         void SetLogicalSize(IntVec2 const& logicalSize) override;
 
     private:
-        graphics::sdl::Context const& m_context;
+        graphics::sdl::Context& m_context;
         SDL_Renderer* m_renderer = nullptr;
         graphics::Color m_drawColor;
         graphics::BlendMode m_blendMode;

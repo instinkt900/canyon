@@ -23,7 +23,7 @@ namespace graphics::vulkan {
         Fence& GetFence() const { return *m_fence; }
         VkSemaphore GetAvailableSemaphore() const { return m_imageAvailableSemaphore; }
         VkSemaphore GetRenderFinishedSemaphore() const { return m_renderFinishedSemaphore; }
-        IImage* GetImage() override { return m_image.get(); }
+        IImage* GetImage() { return m_image.get(); }
         uint32_t GetSwapchainIndex() const { return m_swapchainIndex; }
         VkExtent2D GetVkExtent() const;
         VkFormat GetVkFormat() const;

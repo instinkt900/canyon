@@ -19,6 +19,8 @@ namespace graphics::vulkan {
         std::unique_ptr<IImage> LoadImage(std::filesystem::path const& path) override;
         std::unique_ptr<IFont> LoadFont(std::filesystem::path const& path, int size) override;
 
+        Context& GetContext() const override { return m_context; }
+
         struct Vertex {
             FloatVec2 xy;
             FloatVec2 uv;

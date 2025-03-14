@@ -7,8 +7,8 @@
 #include "../utils.h"
 
 namespace graphics::sdl {
-    Graphics::Graphics(graphics::Context const& context)
-        : m_context(static_cast<Context const&>(context))
+    Graphics::Graphics(graphics::Context& context)
+        : m_context(static_cast<Context&>(context))
         , m_drawColor(graphics::BasicColors::White) {
         m_renderer = m_context.m_renderer;
     }

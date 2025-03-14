@@ -1,5 +1,6 @@
 #include "canyon.h"
 #include "graphics/vulkan/vulkan_context.h"
+#include "graphics/vulkan/vulkan_font.h"
 #include "graphics/vulkan/vulkan_image.h"
 #include "graphics/vulkan/vulkan_texture.h"
 #include "graphics/vulkan/vulkan_utils.h"
@@ -275,7 +276,15 @@ namespace graphics::vulkan {
         return std::make_unique<Image>(vulkanTexture);
     }
 
-    std::unique_ptr<IImage> NewImage(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) override;
+    std::unique_ptr<IImage> Context::NewImage(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) {
+        auto vulkanTexture = std::dynamic_pointer_cast<Texture>(texture);
+        return std::make_unique<Image>(vulkanTexture, sourceRect);
+    }
+
+    std::unique_ptr<IFont> Context::FontFromFile(std::filesystem::path const& path, int size, IGraphics& graphics) {
+        auto& vulkanGraphics = static_cast<Graphics&>(graphics);
+        return Font::Load(path, size, *this, vulkanGraphics);
+    }
 
     VkCommandBuffer Context::beginSingleTimeCommands() {
         VkCommandBufferAllocateInfo allocInfo{};

@@ -18,3 +18,12 @@
 - context should have all the graphics api context stuff
 - graphics should be focused on just drawing
 
+- font factory is moth_ui
+- want to be able to easily init moth_ui with just the canyon interface
+- no user code should need to specify what graphics api to use except at initialisation
+- thus will need api agnostic factories for moth_ui surface
+- create an agnostic font factory
+- create a mothui wrapper for the font factory
+- the base font factory is created on platform creation?
+- the wrapper takes the canyon font factory
+
