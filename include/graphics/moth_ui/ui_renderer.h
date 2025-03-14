@@ -1,14 +1,12 @@
 #pragma once
 
-#include "graphics/color.h"
-#include "utils/rect.h"
-#include <moth_ui/irenderer.h>
+#include "graphics/igraphics.h"
+#include "moth_ui/irenderer.h"
 
-namespace graphics::vulkan {
-    class Graphics;
+namespace graphics {
     class UIRenderer : public moth_ui::IRenderer {
     public:
-        UIRenderer(Graphics& graphics);
+        UIRenderer(IGraphics& graphics);
         virtual ~UIRenderer() = default;
 
         void PushBlendMode(moth_ui::BlendMode mode) override;
@@ -25,7 +23,7 @@ namespace graphics::vulkan {
         void RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) override;
 
     private:
-        Graphics& m_graphics;
+        IGraphics& m_graphics;
         std::stack<Color> m_drawColor;
         std::stack<BlendMode> m_blendMode;
         std::stack<IntRect> m_clip;
