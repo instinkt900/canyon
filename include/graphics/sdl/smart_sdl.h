@@ -37,8 +37,8 @@ private:
     bool m_owning;
 
     SDLTextureWrap(SDL_Texture* texture, bool owning)
-    : m_impl(texture)
-    , m_owning(owning) {
+        : m_impl(texture)
+        , m_owning(owning) {
     }
 };
 
@@ -56,17 +56,17 @@ inline SDLTextureRef CreateTextureRef(SDL_Renderer* renderer, SurfaceRef surface
     return SDLTextureWrap::CreateOwning(SDL_CreateTextureFromSurface(renderer, surface.get()));
 }
 
-//using AudioRef = std::shared_ptr<Mix_Chunk>;
+// using AudioRef = std::shared_ptr<Mix_Chunk>;
 //
-//inline AudioRef CreateAudioRef(char const* assetPath) {
-//    return AudioRef(Mix_LoadWAV(assetPath), Mix_FreeChunk);
-//}
+// inline AudioRef CreateAudioRef(char const* assetPath) {
+//     return AudioRef(Mix_LoadWAV(assetPath), Mix_FreeChunk);
+// }
 //
-//using MusicRef = std::shared_ptr<Mix_Music>;
+// using MusicRef = std::shared_ptr<Mix_Music>;
 //
-//inline MusicRef CreateMusicRef(char const* assetPath) {
-//    return MusicRef(Mix_LoadMUS(assetPath), Mix_FreeMusic);
-//}
+// inline MusicRef CreateMusicRef(char const* assetPath) {
+//     return MusicRef(Mix_LoadMUS(assetPath), Mix_FreeMusic);
+// }
 //
 using FontRef = std::shared_ptr<TTF_Font>;
 

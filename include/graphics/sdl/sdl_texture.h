@@ -16,7 +16,7 @@ namespace graphics::sdl {
 
         SDLTextureRef GetSDLTexture() const { return m_texture; }
 
-        static std::unique_ptr<Texture> FromFile(graphics::sdl::Context const& context, std::filesystem::path const& path);
+        static std::unique_ptr<Texture> FromFile(graphics::sdl::Context& context, std::filesystem::path const& path);
 
     private:
         SDLTextureRef m_texture;

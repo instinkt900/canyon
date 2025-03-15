@@ -20,9 +20,10 @@ namespace graphics::sdl {
         return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
     }
 
-    std::unique_ptr<Image> Image::Load(graphics::Context const& context, std::filesystem::path const& path) {
-        if (auto texture = Texture::Load(context, path)) {
-            return std::make_unique<Image>(std::shared_ptr<Texture>(texture.release()));
+    std::unique_ptr<Image> Image::Load(graphics::Context& context, std::filesystem::path const& path) {
+        if (auto texture = context.TextureFromFile(path)) {
+            auto sdlTexture = std::unique_ptr<Texture>(static_cast<Texture*>(texture.release()));
+            return std::make_unique<Image>(std::move(sdlTexture));
         }
         return nullptr;
     }

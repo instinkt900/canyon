@@ -17,8 +17,8 @@ namespace graphics::sdl {
         return m_textureDimensions.y;
     }
 
-    std::unique_ptr<Texture> Texture::FromFile(graphics::sdl::Context const& context, std::filesystem::path const& path) {
-        if (auto texture = CreateTextureRef(&context.m_renderer, path)) {
+    std::unique_ptr<Texture> Texture::FromFile(graphics::sdl::Context& context, std::filesystem::path const& path) {
+        if (auto texture = CreateTextureRef(context.m_renderer, path)) {
             return std::make_unique<Texture>(texture);
         }
         return nullptr;

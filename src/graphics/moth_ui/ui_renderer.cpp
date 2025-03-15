@@ -3,7 +3,6 @@
 #include "graphics/igraphics.h"
 #include "graphics/moth_ui/moth_font.h"
 #include "graphics/moth_ui/moth_image.h"
-#include "utils/conversions.h"
 #include "graphics/moth_ui/utils.h"
 
 namespace graphics {
@@ -24,7 +23,7 @@ namespace graphics {
     }
 
     void UIRenderer::PushColor(moth_ui::Color const& color) {
-        auto const modColor = m_drawColor.top() * ::FromMothUI(color);
+        auto const modColor = m_drawColor.top() * FromMothUI(color);
         m_drawColor.push(modColor);
     }
 
