@@ -431,8 +431,7 @@ namespace graphics::vulkan {
             VkRect2D scissor;
             scissor.offset.x = 0;
             scissor.offset.y = 0;
-            scissor.extent.width = context->m_target->GetDimensions().x;
-            scissor.extent.height = context->m_target->GetDimensions().y;
+            scissor.extent = context->m_target->GetVkExtent();
             commandBuffer.SetScissor(scissor);
         }
     }
@@ -765,8 +764,7 @@ namespace graphics::vulkan {
         VkRect2D scissor;
         scissor.offset.x = 0;
         scissor.offset.y = 0;
-        scissor.extent.width = context->m_target->GetDimensions().x;
-        scissor.extent.height = context->m_target->GetDimensions().y;
+        scissor.extent = context->m_target->GetVkExtent();
         commandBuffer.SetScissor(scissor);
 
         PushConstants pushConstants;

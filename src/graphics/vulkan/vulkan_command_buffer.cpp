@@ -206,8 +206,7 @@ namespace graphics::vulkan {
         info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         info.renderPass = renderPass.GetRenderPass();
         info.framebuffer = framebuffer.GetVkFramebuffer();
-        info.renderArea.extent.width = framebuffer.GetDimensions().x;
-        info.renderArea.extent.height = framebuffer.GetDimensions().y;
+        info.renderArea.extent = framebuffer.GetVkExtent();
         info.clearValueCount = 1;
         info.pClearValues = &clearColor;
         vkCmdBeginRenderPass(m_vkCommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
