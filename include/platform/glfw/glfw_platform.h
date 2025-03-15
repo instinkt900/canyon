@@ -12,6 +12,9 @@ namespace platform::glfw {
         bool Startup() override;
         void Shutdown() override;
 
+        graphics::Context& GetGraphicsContext() override;
+        graphics::IGraphics& GetGraphics() override;
+
         std::unique_ptr<platform::Window> CreateWindow(char const* title, int width, int height) override;
 
     private:

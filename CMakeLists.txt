@@ -65,6 +65,7 @@ set(SOURCES ${SOURCES}
 	src/platform/sdl/sdl_window.cpp
 	src/platform/window.cpp
 	src/ui_button.cpp
+    src/graphics/sdl/SDL_FontCache.c
 )
 
 find_package(SDL2 REQUIRED)

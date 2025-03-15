@@ -9,7 +9,7 @@ namespace graphics::vulkan {
     class Context : public graphics::Context {
     public:
         Context();
-        ~Context();
+        virtual ~Context();
 
         std::unique_ptr<ITexture> TextureFromFile(std::filesystem::path const& path) override;
         std::unique_ptr<IImage> NewImage(std::shared_ptr<ITexture> texture) override;

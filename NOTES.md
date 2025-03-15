@@ -6,6 +6,8 @@
 - Context probably shouldnt be loading assets. another class that uses context as a dep?
 - Should sdl windows have their own renderer? yes. renderers are linked to windows
 
+- Graphics in vulkan needs to be associated to a window so platform cant store it.
+
 ## Older
 
 - Separate out moth_ui stuff some more. Focus on the graphics interface without moth_ui then add a layer that adds ui support

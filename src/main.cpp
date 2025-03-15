@@ -3,6 +3,7 @@
 #include "layers/layer.h"
 #include "platform/glfw/glfw_platform.h"
 #include "platform/sdl/sdl_platform.h"
+#include "platform/glfw/glfw_platform.h"
 #include "platform/application.h"
 #include "moth_ui/group.h"
 #include "moth_ui/events/event.h"
@@ -112,6 +113,7 @@ public:
 
 int main(int argc, char* argv[]) {
     auto platform = std::make_unique<platform::sdl::Platform>();
+    // auto platform = std::make_unique<platform::glfw::Platform>();
     platform->Startup();
     auto window = platform->CreateWindow("testing", 640, 480);
     auto& graphics = window->GetGraphics();
