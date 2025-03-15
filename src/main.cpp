@@ -112,14 +112,15 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    auto platform = std::make_unique<platform::sdl::Platform>();
-    // auto platform = std::make_unique<platform::glfw::Platform>();
+    // auto platform = std::make_unique<platform::sdl::Platform>();
+    auto platform = std::make_unique<platform::glfw::Platform>();
     platform->Startup();
     auto window = platform->CreateWindow("testing", 640, 480);
-    auto& graphics = window->GetGraphics();
-    auto texture = graphics.LoadImage("assets/images/playership.png");
-    auto font = graphics.LoadFont("assets/fonts/pilotcommand.ttf", 18);
+    auto& context = platform->GetGraphicsContext();
+    auto texture = context.ImageFromFile("assets/images/playership.png");
+    auto font = context.FontFromFile("assets/fonts/pilotcommand.ttf", 18);
 
+    auto& graphics = window->GetGraphics();
     while (true) {
         graphics.Begin();
         graphics.SetColor(graphics::BasicColors::Red);

@@ -12,6 +12,8 @@ Application::Application(platform::IPlatform& platform)
     auto& context = m_platform.GetGraphicsContext();
     m_imageFactory = std::make_unique<graphics::ImageFactory>(context);
     m_fontFactory = std::make_unique<graphics::FontFactory>(context);
+
+    auto& graphics = m_window->GetGraphics();
     m_uiRenderer = std::make_unique<graphics::UIRenderer>(graphics);
 
     m_mothImageFactory = std::make_unique<graphics::MothImageFactory>(m_imageFactory);

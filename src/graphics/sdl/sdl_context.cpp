@@ -4,6 +4,10 @@
 #include "graphics/sdl/sdl_texture.h"
 
 namespace graphics::sdl {
+    std::unique_ptr<IImage> Context::ImageFromFile(std::filesystem::path const& path) {
+        return Image::Load(*this, path);
+    }
+
     std::unique_ptr<ITexture> Context::TextureFromFile(std::filesystem::path const& path) {
         auto& sdlContext = static_cast<Context&>(*this);
         return Texture::FromFile(sdlContext, path);

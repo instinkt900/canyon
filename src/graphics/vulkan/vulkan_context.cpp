@@ -266,6 +266,10 @@ namespace graphics::vulkan {
         vkDestroyInstance(m_vkInstance, nullptr);
     }
 
+    std::unique_ptr<IImage> Context::ImageFromFile(std::filesystem::path const& path) {
+        return Image::Load(*this, path);
+    }
+
     std::unique_ptr<ITexture> Context::TextureFromFile(std::filesystem::path const& path) {
         auto& vulkanContext = static_cast<graphics::vulkan::Context&>(*this);
         return Texture::FromFile(vulkanContext, path);
