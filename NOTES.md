@@ -1,4 +1,10 @@
-# TODO
+## 15/03/25
+
+- Create moth factories in the applications.
+- Platform vs window? Platform seems to not be used currently?
+
+## Older
+
 - Separate out moth_ui stuff some more. Focus on the graphics interface without moth_ui then add a layer that adds ui support
 
 - Refactor image handling.
