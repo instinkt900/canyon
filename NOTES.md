@@ -2,6 +2,9 @@
 
 - Create moth factories in the applications.
 - Platform vs window? Platform seems to not be used currently?
+- Create a platform, create application (api agnostic), platform creates windows.
+- Context probably shouldnt be loading assets. another class that uses context as a dep?
+- Should sdl windows have their own renderer? yes. renderers are linked to windows
 
 ## Older
 

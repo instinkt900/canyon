@@ -4,8 +4,9 @@
 #include "graphics/sdl/sdl_graphics.h"
 
 namespace platform::sdl {
-    Window::Window(std::string const& title, int width, int height)
-        :platform::Window(title, width, height) {
+    Window::Window(platform::sdl::Platform& platform, std::string const& title, int width, int height)
+        : platform::Window(title, width, height)
+        , m_platform(platform) {
         CreateWindow();
     }
 
@@ -42,9 +43,13 @@ namespace platform::sdl {
             return false;
         }
 
-        m_graphics = std::make_unique<graphics::sdl::Graphics>(m_renderer);
+        // TODO: probably want to make this nicer.
+        auto& context = static_cast<graphics::sdl::Context&>(m_platform.GetGraphicsContext());
+        context.m_renderer = m_renderer;
+
+        m_graphics = std::make_unique<graphics::sdl::Graphics>(context);
         m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
-        
+
         return true;
     }
 
@@ -63,4 +68,3 @@ namespace platform::sdl {
         SDL_DestroyWindow(m_window);
     }
 }
-

@@ -1,12 +1,13 @@
 #pragma once
 
 #include "events/event_window.h"
+#include "platform/sdl/sdl_platform.h"
 #include "platform/window.h"
 
 namespace platform::sdl {
     class Window : public platform::Window {
     public:
-        Window(std::string const& applicationTitle, int width, int height);
+        Window(platform::sdl::Platform& platform, std::string const& applicationTitle, int width, int height);
         virtual ~Window();
 
         void SetWindowTitle(std::string const& title) override;
@@ -22,6 +23,7 @@ namespace platform::sdl {
         void DestroyWindow() override;
 
     private:
+        platform::sdl::Platform& m_platform;
         SDL_Window* m_window = nullptr;
         SDL_Renderer* m_renderer = nullptr;
 

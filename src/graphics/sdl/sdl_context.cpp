@@ -5,7 +5,7 @@
 
 namespace graphics::sdl {
     std::unique_ptr<ITexture> Context::TextureFromFile(std::filesystem::path const& path) {
-        auto const& sdlContext = static_cast<Context const&>(*this);
+        auto& sdlContext = static_cast<Context&>(*this);
         return Texture::FromFile(sdlContext, path);
     }
 
