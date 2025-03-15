@@ -102,14 +102,6 @@ namespace graphics::vulkan {
         vkDestroyPipelineCache(m_context.m_vkDevice, m_vkPipelineCache, nullptr);
     }
 
-    std::unique_ptr<IImage> Graphics::LoadImage(std::filesystem::path const& path) {
-        return graphics::vulkan::Image::Load(m_context, path);
-    }
-
-    std::unique_ptr<IFont> Graphics::LoadFont(std::filesystem::path const& path, int size) {
-        return graphics::vulkan::Font::Load(path, size, m_context, *this);
-    }
-
     void Graphics::Begin() {
         m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
         VkFence cmdFence = m_defaultContext.m_target->GetFence().GetVkFence();
@@ -412,7 +404,7 @@ namespace graphics::vulkan {
                 context->m_currentPipelineId = pipeline.m_hash;
             }
 
-            commandBuffer.BindDescriptorSet(*m_fontShader, vulkanFont.GetVKDescriptorSet(), 0);
+            commandBuffer.BindDescriptorSet(*m_fontShader, vulkanFont.GetVKDescriptorSetForShader(*m_fontShader), 0);
             commandBuffer.Draw(4, 0, glyphCount, glyphStart);
         }
     }

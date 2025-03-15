@@ -85,15 +85,16 @@ namespace {
 }
 
 namespace graphics::vulkan {
-    std::unique_ptr<Font> Font::Load(std::filesystem::path const& path, int size, Context& context, Graphics& graphics) {
+    std::unique_ptr<Font> Font::Load(std::filesystem::path const& path, int size, Context& context) {
         FT_Face face;
         if (FT_New_Face(context.m_ftLibrary, path.c_str(), 0, &face) != 0) {
             return nullptr;
         }
-        return std::unique_ptr<Font>(new Font(face, size, context, graphics));
+        return std::unique_ptr<Font>(new Font(face, size, context));
     }
 
-    Font::Font(FT_Face face, int size, Context& context, Graphics& graphics) {
+    Font::Font(FT_Face face, int size, Context& context)
+        : m_context(context) {
         FT_CHECK(FT_Set_Pixel_Sizes(face, 0, size));
 
         m_hbFont = hb_ft_font_create(face, nullptr);
@@ -195,60 +196,22 @@ namespace graphics::vulkan {
             m_codepointToAtlasIndex.insert(std::make_pair(rect.id, glyphIndex));
         }
 
-        //stbi_write_png("test.png", packDim.x, packDim.y, 4, packData.data(), packDim.x * 4);
+        // stbi_write_png("test.png", packDim.x, packDim.y, 4, packData.data(), packDim.x * 4);
 
-        m_glyphAtlas = Texture::FromRGBA(context, packDim.x, packDim.y, packData.data());
+        m_glyphAtlas = Texture::FromRGBA(m_context, packDim.x, packDim.y, packData.data());
         m_lineHeight = face->size->metrics.height / 64;
         m_ascent = face->size->metrics.ascender / 64;
         m_descent = face->size->metrics.descender / 64;
         m_underline = FT_MulFix(face->underline_position, face->size->metrics.y_scale) / 64;
 
         int const dataSize = static_cast<int>(m_shaderInfos.size() * sizeof(ShaderInfo));
-        m_glyphInfosBuffer = std::make_unique<Buffer>(context, dataSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-        std::unique_ptr<Buffer> staging = std::make_unique<Buffer>(context, dataSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        m_glyphInfosBuffer = std::make_unique<Buffer>(m_context, dataSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        std::unique_ptr<Buffer> staging = std::make_unique<Buffer>(m_context, dataSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
         unsigned char* stagingPtr = static_cast<unsigned char*>(staging->Map());
         memcpy(stagingPtr, m_shaderInfos.data(), dataSize);
         staging->Unmap();
         m_glyphInfosBuffer->Copy(*staging);
-
-        Shader& fontShader = graphics.GetFontShader();
-
-        VkDescriptorSetAllocateInfo alloc_info{};
-        alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        alloc_info.descriptorPool = fontShader.m_descriptorPool;
-        alloc_info.descriptorSetCount = 1;
-        alloc_info.pSetLayouts = &fontShader.m_descriptorSetLayout;
-        CHECK_VK_RESULT(vkAllocateDescriptorSets(context.m_vkDevice, &alloc_info, &m_vkDescriptorSet));
-
-        VkDescriptorBufferInfo glyph_info[1] = {};
-        glyph_info[0].buffer = m_glyphInfosBuffer->GetVKBuffer();
-        glyph_info[0].offset = 0;
-        glyph_info[0].range = m_shaderInfos.size() * sizeof(ShaderInfo);
-
-        VkDescriptorImageInfo desc_image[1] = {};
-        desc_image[0].sampler = m_glyphAtlas->GetVkSampler();
-        desc_image[0].imageView = m_glyphAtlas->GetVkView();
-        desc_image[0].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-        VkWriteDescriptorSet write_desc[3] = {};
-
-        write_desc[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        write_desc[0].dstSet = m_vkDescriptorSet;
-        write_desc[0].dstBinding = 0;
-        write_desc[0].dstArrayElement = 0;
-        write_desc[0].descriptorCount = 1;
-        write_desc[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        write_desc[0].pBufferInfo = glyph_info;
-
-        write_desc[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        write_desc[1].dstSet = m_vkDescriptorSet;
-        write_desc[1].dstBinding = 1;
-        write_desc[1].descriptorCount = 1;
-        write_desc[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        write_desc[1].pImageInfo = desc_image;
-
-        vkUpdateDescriptorSets(context.m_vkDevice, 2, write_desc, 0, nullptr);
     }
 
     Font::~Font() {
@@ -402,7 +365,54 @@ namespace graphics::vulkan {
 
         return lines;
     }
-    
+
+    VkDescriptorSet Font::GetVKDescriptorSetForShader(Shader const& shader) {
+        auto it = m_vkDescriptorSets.find(shader.m_hash);
+        if (std::end(m_vkDescriptorSets) == it) {
+            VkDescriptorSet vkDescriptorSet;
+
+            VkDescriptorSetAllocateInfo alloc_info{};
+            alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+            alloc_info.descriptorPool = shader.m_descriptorPool;
+            alloc_info.descriptorSetCount = 1;
+            alloc_info.pSetLayouts = &shader.m_descriptorSetLayout;
+            CHECK_VK_RESULT(vkAllocateDescriptorSets(m_context.m_vkDevice, &alloc_info, &vkDescriptorSet));
+
+            VkDescriptorBufferInfo glyph_info[1] = {};
+            glyph_info[0].buffer = m_glyphInfosBuffer->GetVKBuffer();
+            glyph_info[0].offset = 0;
+            glyph_info[0].range = m_shaderInfos.size() * sizeof(ShaderInfo);
+
+            VkDescriptorImageInfo desc_image[1] = {};
+            desc_image[0].sampler = m_glyphAtlas->GetVkSampler();
+            desc_image[0].imageView = m_glyphAtlas->GetVkView();
+            desc_image[0].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+            VkWriteDescriptorSet write_desc[3] = {};
+
+            write_desc[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            write_desc[0].dstSet = vkDescriptorSet;
+            write_desc[0].dstBinding = 0;
+            write_desc[0].dstArrayElement = 0;
+            write_desc[0].descriptorCount = 1;
+            write_desc[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            write_desc[0].pBufferInfo = glyph_info;
+
+            write_desc[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            write_desc[1].dstSet = vkDescriptorSet;
+            write_desc[1].dstBinding = 1;
+            write_desc[1].descriptorCount = 1;
+            write_desc[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            write_desc[1].pImageInfo = desc_image;
+
+            vkUpdateDescriptorSets(m_context.m_vkDevice, 2, write_desc, 0, nullptr);
+
+            auto result = m_vkDescriptorSets.insert(std::make_pair(shader.m_hash, vkDescriptorSet));
+            it = result.first;
+        }
+        return it->second;
+    }
+
     int Font::CodepointToIndex(int codepoint) const {
         auto const it = m_codepointToAtlasIndex.find(codepoint);
         if (std::end(m_codepointToAtlasIndex) == it) {

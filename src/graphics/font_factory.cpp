@@ -2,8 +2,8 @@
 #include "graphics/context.h"
 
 namespace graphics {
-    FontFactory::FontFactory(graphics::IGraphics& graphics)
-        : m_graphics(graphics) {
+    FontFactory::FontFactory(Context& context)
+        : m_context(context) {
     }
 
     void FontFactory::ClearFonts() {
@@ -19,7 +19,7 @@ namespace graphics {
                 return sizeIt->second;
             }
         }
-        std::shared_ptr<graphics::IFont> font = m_graphics.GetContext().FontFromFile(name, size, m_graphics);
+        std::shared_ptr<graphics::IFont> font = m_context.FontFromFile(name, size);
 
         auto sizeMap = m_fonts[name];
         sizeMap[size] = font;

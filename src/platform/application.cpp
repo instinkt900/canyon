@@ -10,9 +10,8 @@ Application::Application(platform::IPlatform& platform)
     m_window->GetLayerStack().AddEventListener(this);
     
     auto& context = m_platform.GetGraphicsContext();
-    auto& graphics = m_platform.GetGraphics();
     m_imageFactory = std::make_unique<graphics::ImageFactory>(context);
-    m_fontFactory = std::make_unique<graphics::FontFactory>(graphics);
+    m_fontFactory = std::make_unique<graphics::FontFactory>(context);
     m_uiRenderer = std::make_unique<graphics::UIRenderer>(graphics);
 
     m_mothImageFactory = std::make_unique<graphics::MothImageFactory>(m_imageFactory);

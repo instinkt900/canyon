@@ -281,9 +281,8 @@ namespace graphics::vulkan {
         return std::make_unique<Image>(vulkanTexture, sourceRect);
     }
 
-    std::unique_ptr<IFont> Context::FontFromFile(std::filesystem::path const& path, int size, IGraphics& graphics) {
-        auto& vulkanGraphics = static_cast<Graphics&>(graphics);
-        return Font::Load(path, size, *this, vulkanGraphics);
+    std::unique_ptr<IFont> Context::FontFromFile(std::filesystem::path const& path, int size) {
+        return Font::Load(path, size, *this);
     }
 
     VkCommandBuffer Context::beginSingleTimeCommands() {

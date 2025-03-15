@@ -5,14 +5,14 @@
 namespace graphics {
     class FontFactory {
     public:
-        FontFactory(graphics::IGraphics& graphics);
+        FontFactory(Context& context);
         virtual ~FontFactory() = default;
 
         void ClearFonts();
         std::shared_ptr<graphics::IFont> GetFont(char const* name, int size);
 
     private:
-        graphics::IGraphics& m_graphics;
+        Context& m_context;
         std::map<std::string, std::map<int, std::shared_ptr<graphics::IFont>>> m_fonts;
     };
 }

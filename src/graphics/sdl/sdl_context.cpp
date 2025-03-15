@@ -19,7 +19,7 @@ namespace graphics::sdl {
         return std::make_unique<Image>(sdlTexture, sourceRect);
     }
 
-    std::unique_ptr<IFont> Context::FontFromFile(std::filesystem::path const& path, int size, IGraphics& graphics) {
+    std::unique_ptr<IFont> Context::FontFromFile(std::filesystem::path const& path, int size) {
         return Font::Load(*m_renderer, path, size);
     }
 }

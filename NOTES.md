@@ -1,3 +1,12 @@
+## 16/03/25
+
+- SDL font creation needs SDL_Renderer
+- Vulkan font creation needs font shader which is on graphics
+- ui_renderer needs graphics but graphics needs to be related to windows. ui_renderer is setup in platform
+- need to change moth_ui interface. remove context and just have SetFontFactory, SetUIRender etc.
+- SDL_Renderer should be on graphics
+- will need to figure out font creation from that
+
 ## 15/03/25
 
 - Create moth factories in the applications.

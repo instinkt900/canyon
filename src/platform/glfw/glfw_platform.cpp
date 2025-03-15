@@ -19,9 +19,6 @@ namespace platform::glfw {
         return *m_context;
     }
 
-    graphics::IGraphics& Platform::GetGraphics() {
-    }
-
     std::unique_ptr<platform::Window> Platform::CreateWindow(char const* title, int width, int height) {
         return std::make_unique<platform::glfw::Window>(*m_context, "testing", 640, 480);
     }
