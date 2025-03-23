@@ -94,6 +94,9 @@ namespace graphics {
     }
 
     void MothRenderer::RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) {
+        m_graphics.SetBlendMode(m_blendMode.top());
+        m_graphics.SetColor(m_drawColor.top());
+
         auto& fcFont = static_cast<MothFont&>(font);
         auto& internalFont = *fcFont.GetInternalFont();
         m_graphics.DrawText(text, internalFont, FromMothUI(horizontalAlignment), FromMothUI(verticalAlignment), ::FromMothUI(destRect));

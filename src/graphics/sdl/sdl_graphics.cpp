@@ -45,20 +45,20 @@ namespace graphics::sdl {
     void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto& sdlImage = dynamic_cast<Image&>(image);
         auto sdlTexture = sdlImage.GetTexture();
-        auto const& textureSourceRect = sdlImage.GetSourceRect();
+        // auto const& textureSourceRect = sdlImage.GetSourceRect();
 
         ColorComponents const components{ m_drawColor };
         SDL_SetTextureBlendMode(sdlTexture->GetSDLTexture()->GetImpl(), ToSDL(m_blendMode));
         SDL_SetTextureColorMod(sdlTexture->GetSDLTexture()->GetImpl(), components.r, components.g, components.b);
         SDL_SetTextureAlphaMod(sdlTexture->GetSDLTexture()->GetImpl(), components.a);
 
-        SDL_Rect sdlSrcRect = ToSDL(textureSourceRect);
+        SDL_Rect sdlSrcRect = ToSDL(*sourceRect);
         SDL_Rect sdlDstRect = ToSDL(destRect);
 
-        if (sourceRect) {
-            sdlSrcRect.x += sourceRect->x();
-            sdlSrcRect.y += sourceRect->y();
-        }
+        // if (sourceRect) {
+        //     sdlSrcRect.x += sourceRect->x();
+        //     sdlSrcRect.y += sourceRect->y();
+        // }
 
         SDL_RenderCopy(m_renderer, sdlTexture->GetSDLTexture()->GetImpl(), &sdlSrcRect, &sdlDstRect);
     }
@@ -163,6 +163,7 @@ namespace graphics::sdl {
         FC_Effect effect;
         effect.alignment = ToSDL(horizontalAlignment);
         effect.color = ToSDL(m_drawColor);
+        // effect.color = { 0xff, 0xff, 0xff, 0xff };
         effect.scale.x = 1.0f;
         effect.scale.y = 1.0f;
 

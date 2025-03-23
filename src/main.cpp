@@ -112,8 +112,8 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    // auto platform = std::make_unique<platform::sdl::Platform>();
-    auto platform = std::make_unique<platform::glfw::Platform>();
+    auto platform = std::make_unique<platform::sdl::Platform>();
+    // auto platform = std::make_unique<platform::glfw::Platform>();
     platform->Startup();
     auto application = std::make_unique<Application>(*platform);
     moth_ui::Context::GetCurrentContext()->GetFontFactory().LoadProject("assets/fonts.json");
