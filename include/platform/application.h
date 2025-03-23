@@ -2,7 +2,7 @@
 
 #include "graphics/font_factory.h"
 #include "graphics/image_factory.h"
-#include "graphics/moth_ui/ui_renderer.h"
+#include "graphics/moth_ui/moth_renderer.h"
 #include "platform/iplatform.h"
 #include "utils/ticker.h"
 #include "moth_ui//event_listener.h"
@@ -36,5 +36,5 @@ private:
 
     std::unique_ptr<graphics::MothImageFactory> m_mothImageFactory;
     std::unique_ptr<graphics::MothFontFactory> m_mothFontFactory;
-    std::unique_ptr<graphics::UIRenderer> m_uiRenderer;
+    std::unique_ptr<graphics::MothRenderer> m_uiRenderer;
 };

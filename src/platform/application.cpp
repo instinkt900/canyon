@@ -14,7 +14,7 @@ Application::Application(platform::IPlatform& platform)
     m_fontFactory = std::make_unique<graphics::FontFactory>(context);
 
     auto& graphics = m_window->GetGraphics();
-    m_uiRenderer = std::make_unique<graphics::UIRenderer>(graphics);
+    m_uiRenderer = std::make_unique<graphics::MothRenderer>(graphics);
 
     m_mothImageFactory = std::make_unique<graphics::MothImageFactory>(m_imageFactory);
     m_mothFontFactory = std::make_unique<graphics::MothFontFactory>(m_fontFactory);

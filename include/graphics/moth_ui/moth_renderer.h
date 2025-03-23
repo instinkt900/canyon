@@ -4,10 +4,10 @@
 #include "moth_ui/irenderer.h"
 
 namespace graphics {
-    class UIRenderer : public moth_ui::IRenderer {
+    class MothRenderer : public moth_ui::IRenderer {
     public:
-        UIRenderer(IGraphics& graphics);
-        virtual ~UIRenderer() = default;
+        MothRenderer(IGraphics& graphics);
+        virtual ~MothRenderer() = default;
 
         void PushBlendMode(moth_ui::BlendMode mode) override;
         void PopBlendMode() override;

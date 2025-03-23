@@ -29,7 +29,7 @@ set(SOURCES ${SOURCES}
 	src/graphics/moth_ui/moth_font_factory.cpp
 	src/graphics/moth_ui/moth_image.cpp
 	src/graphics/moth_ui/moth_image_factory.cpp
-	src/graphics/moth_ui/ui_renderer.cpp
+	src/graphics/moth_ui/moth_renderer.cpp
 	src/graphics/sdl/sdl_context.cpp
 	src/graphics/sdl/sdl_font.cpp
 	src/graphics/sdl/sdl_graphics.cpp

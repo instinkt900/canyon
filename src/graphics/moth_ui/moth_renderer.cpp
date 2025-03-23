@@ -1,33 +1,33 @@
 #include "canyon.h"
-#include "graphics/moth_ui/ui_renderer.h"
+#include "graphics/moth_ui/moth_renderer.h"
 #include "graphics/igraphics.h"
 #include "graphics/moth_ui/moth_font.h"
 #include "graphics/moth_ui/moth_image.h"
 #include "graphics/moth_ui/utils.h"
 
 namespace graphics {
-    UIRenderer::UIRenderer(IGraphics& graphics)
+    MothRenderer::MothRenderer(IGraphics& graphics)
         : m_graphics(graphics) {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });
         m_blendMode.push(BlendMode::Replace);
     }
 
-    void UIRenderer::PushBlendMode(moth_ui::BlendMode mode) {
+    void MothRenderer::PushBlendMode(moth_ui::BlendMode mode) {
         m_blendMode.push(FromMothUI(mode));
     }
 
-    void UIRenderer::PopBlendMode() {
+    void MothRenderer::PopBlendMode() {
         if (m_blendMode.size() > 1) {
             m_blendMode.pop();
         }
     }
 
-    void UIRenderer::PushColor(moth_ui::Color const& color) {
+    void MothRenderer::PushColor(moth_ui::Color const& color) {
         auto const modColor = m_drawColor.top() * FromMothUI(color);
         m_drawColor.push(modColor);
     }
 
-    void UIRenderer::PopColor() {
+    void MothRenderer::PopColor() {
         if (m_drawColor.size() > 1) {
             m_drawColor.pop();
         }
@@ -42,7 +42,7 @@ namespace graphics {
         return result;
     }
 
-    void UIRenderer::PushClip(moth_ui::IntRect const& rect) {
+    void MothRenderer::PushClip(moth_ui::IntRect const& rect) {
         if (m_clip.empty()) {
             m_clip.push(::FromMothUI(rect));
         } else {
@@ -55,7 +55,7 @@ namespace graphics {
         m_graphics.SetClip(&m_clip.top());
     }
 
-    void UIRenderer::PopClip() {
+    void MothRenderer::PopClip() {
         m_clip.pop();
 
         if (m_clip.empty()) {
@@ -65,21 +65,21 @@ namespace graphics {
         }
     }
 
-    void UIRenderer::RenderRect(moth_ui::IntRect const& rect) {
+    void MothRenderer::RenderRect(moth_ui::IntRect const& rect) {
         auto const floatRect = static_cast<FloatRect>(::FromMothUI(rect));
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
         m_graphics.DrawRectF(floatRect);
     }
 
-    void UIRenderer::RenderFilledRect(moth_ui::IntRect const& rect) {
+    void MothRenderer::RenderFilledRect(moth_ui::IntRect const& rect) {
         auto const floatRect = static_cast<FloatRect>(::FromMothUI(rect));
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
         m_graphics.DrawFillRectF(floatRect);
     }
 
-    void UIRenderer::RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) {
+    void MothRenderer::RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) {
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
 
@@ -93,7 +93,7 @@ namespace graphics {
         }
     }
 
-    void UIRenderer::RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) {
+    void MothRenderer::RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) {
         auto& fcFont = static_cast<MothFont&>(font);
         auto& internalFont = *fcFont.GetInternalFont();
         m_graphics.DrawText(text, internalFont, FromMothUI(horizontalAlignment), FromMothUI(verticalAlignment), ::FromMothUI(destRect));
