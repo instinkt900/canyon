@@ -58,7 +58,7 @@ namespace graphics {
             return m_context.NewImage(imageDesc.m_texture, imageDesc.m_sourceRect);
         } else {
             if (std::shared_ptr<ITexture> texture = m_context.TextureFromFile(path)) {
-                IntVec2 textureDimensions{};
+                IntVec2 textureDimensions{ texture->GetWidth(), texture->GetHeight() };
                 IntRect sourceRect{ { 0, 0 }, textureDimensions };
                 ImageDesc cacheDesc;
                 cacheDesc.m_path = path.string();

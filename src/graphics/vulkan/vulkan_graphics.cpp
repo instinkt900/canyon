@@ -241,7 +241,7 @@ namespace graphics::vulkan {
 
         targetImage->Unmap();
 
-         m_contextStack.pop();
+        m_contextStack.pop();
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {
