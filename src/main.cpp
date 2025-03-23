@@ -115,27 +115,34 @@ int main(int argc, char* argv[]) {
     // auto platform = std::make_unique<platform::sdl::Platform>();
     auto platform = std::make_unique<platform::glfw::Platform>();
     platform->Startup();
-    auto window = platform->CreateWindow("testing", 640, 480);
-    auto& context = platform->GetGraphicsContext();
-    auto texture = context.ImageFromFile("assets/images/playership.png");
-    auto font = context.FontFromFile("assets/fonts/pilotcommand.ttf", 18);
+    auto application = std::make_unique<Application>(*platform);
+    moth_ui::Context::GetCurrentContext()->GetFontFactory().LoadProject("assets/fonts.json");
+    auto& window = application->GetWindow();
+    auto& graphics = window.GetGraphics();
+    window.GetLayerStack().PushLayer(std::make_unique<TestLayer>(graphics, "assets/layouts/basic.mothui"));
+    application->TickSync();
 
-    auto& graphics = window->GetGraphics();
-    while (true) {
-        graphics.Begin();
-        graphics.SetColor(graphics::BasicColors::Red);
-        graphics.DrawFillRectF(MakeRect(0.0f, 0.0f, 100.0f, 100.0f));
-        graphics.SetColor(graphics::BasicColors::White);
-        auto destRect = MakeRect(0, 0, 640, 480);
-        graphics.DrawImageTiled(*texture, destRect, nullptr, 1.0f);
-        graphics.SetColor(graphics::BasicColors::Green);
-        graphics.DrawText("hello", *font, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, 640, 480));
-        window->Update(30);
-        window->Draw();
-        graphics.End();
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(1ms);
-    }
+    // auto window = platform->CreateWindow("testing", 640, 480);
+    // auto& context = platform->GetGraphicsContext();
+    // auto texture = context.ImageFromFile("assets/images/playership.png");
+    // auto font = context.FontFromFile("assets/fonts/pilotcommand.ttf", 18);
+    //
+    // auto& graphics = window->GetGraphics();
+    // while (true) {
+    //     graphics.Begin();
+    //     graphics.SetColor(graphics::BasicColors::Red);
+    //     graphics.DrawFillRectF(MakeRect(0.0f, 0.0f, 100.0f, 100.0f));
+    //     graphics.SetColor(graphics::BasicColors::White);
+    //     auto destRect = MakeRect(0, 0, 640, 480);
+    //     graphics.DrawImageTiled(*texture, destRect, nullptr, 1.0f);
+    //     graphics.SetColor(graphics::BasicColors::Green);
+    //     graphics.DrawText("hello", *font, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, 640, 480));
+    //     window->Update(30);
+    //     window->Draw();
+    //     graphics.End();
+    //     using namespace std::chrono_literals;
+    //     std::this_thread::sleep_for(1ms);
+    // }
 
     platform->Shutdown();
     return 0;

@@ -20,7 +20,6 @@ namespace graphics {
             }
         }
         std::shared_ptr<graphics::IFont> font = m_context.FontFromFile(name, size);
-
         auto sizeMap = m_fonts[name];
         sizeMap[size] = font;
 

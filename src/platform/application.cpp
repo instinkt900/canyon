@@ -48,5 +48,7 @@ bool Application::OnQuitEvent(EventQuit const& event) {
 
 void Application::Tick(uint32_t ticks) {
     m_window->Update(ticks);
+    m_window->GetGraphics().Begin();
     m_window->Draw();
+    m_window->GetGraphics().End();
 }
