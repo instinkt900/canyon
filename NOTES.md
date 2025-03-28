@@ -1,3 +1,21 @@
+## 29/03/25
+
+- There should be an application context and a window context.
+- Application context is things that can be used across all windows
+- Window context is things like renderer for sdl.
+- The factories are the problem. They are application wide but create assets that might be window context bound
+Plan:
+- Context - Application context. Holds application wide context for graphics apis
+- SurfaceContext - Graphics context for a particular surface/window
+- AssetLoader - Comes from Surface context and is used to get assets from disk
+Each window will hold its own moth context that is set/unset on update/renders
+
+## 27/03/25
+
+- SDL context holds not much but vulkan context actually holds context
+- Maybe move the asset loading stuff to something else
+- set context? during window rendering?
+
 ## 16/03/25
 
 - SDL font creation needs SDL_Renderer

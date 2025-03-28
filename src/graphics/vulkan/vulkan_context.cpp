@@ -188,7 +188,7 @@ namespace graphics::vulkan {
             }
         }
 
-        // device
+        // create device
         {
             int deviceExtensionCount = 1;
             float const queuePriority[] = { 1.0f };
