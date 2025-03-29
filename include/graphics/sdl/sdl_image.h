@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/itarget.h"
+#include "graphics/sdl/sdl_surface_context.h"
 #include "graphics/sdl/sdl_texture.h"
 #include "graphics/iimage.h"
 #include "utils/rect.h"
@@ -23,7 +24,7 @@ namespace graphics::sdl {
             return m_sourceRect;
         }
 
-        static std::unique_ptr<Image> Load(graphics::Context& context, std::filesystem::path const& path);
+        static std::unique_ptr<Image> Load(SurfaceContext& context, std::filesystem::path const& path);
 
     private:
         std::shared_ptr<Texture> m_texture;

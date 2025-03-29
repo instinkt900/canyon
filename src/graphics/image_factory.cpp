@@ -3,7 +3,7 @@
 #include "utils/rect_serialization.h"
 
 namespace graphics {
-    ImageFactory::ImageFactory(graphics::Context& context)
+    ImageFactory::ImageFactory(graphics::SurfaceContext& context)
         : m_context(context) {
     }
 

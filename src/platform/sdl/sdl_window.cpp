@@ -1,13 +1,15 @@
 #include "canyon.h"
 #include "platform/sdl/sdl_window.h"
+#include "graphics/sdl/sdl_surface_context.h"
 #include "platform/sdl/sdl_events.h"
 #include "graphics/sdl/sdl_graphics.h"
 
 namespace platform::sdl {
-    Window::Window(platform::sdl::Platform& platform, std::string const& title, int width, int height)
+    Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
-        , m_platform(platform) {
+        , m_context(context) {
         CreateWindow();
+        Finalize();
     }
 
     Window::~Window() {
@@ -43,11 +45,9 @@ namespace platform::sdl {
             return false;
         }
 
-        // TODO: probably want to make this nicer.
-        auto& context = static_cast<graphics::sdl::Context&>(m_platform.GetGraphicsContext());
-        context.m_renderer = m_renderer;
+        m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_context);
 
-        m_graphics = std::make_unique<graphics::sdl::Graphics>(context);
+        m_graphics = std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext);
         m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
 
         return true;

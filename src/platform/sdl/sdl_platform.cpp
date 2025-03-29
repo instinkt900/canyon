@@ -13,7 +13,7 @@ namespace platform::sdl {
     }
 
     std::unique_ptr<platform::Window> Platform::CreateWindow(char const* title, int width, int height) {
-        return std::make_unique<platform::sdl::Window>(*this, title, width, height);
+        return std::make_unique<platform::sdl::Window>(*m_context, title, width, height);
     }
 
     bool Platform::Startup() {

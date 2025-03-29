@@ -27,7 +27,7 @@ namespace graphics::vulkan {
         return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
     }
 
-    std::unique_ptr<Image> Image::Load(Context& context, std::filesystem::path const& path) {
+    std::unique_ptr<Image> Image::Load(SurfaceContext& context, std::filesystem::path const& path) {
         if (auto texture = Texture::FromFile(context, path)) {
             return std::make_unique<Image>(std::move(texture), IntRect{ { 0, 0 }, { texture->GetWidth(), texture->GetHeight() }});
         }

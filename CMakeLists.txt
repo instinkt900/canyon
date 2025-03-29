@@ -35,6 +35,7 @@ set(SOURCES ${SOURCES}
 	src/graphics/sdl/sdl_graphics.cpp
 	src/graphics/sdl/sdl_image.cpp
 	src/graphics/sdl/sdl_texture.cpp
+	src/graphics/sdl/sdl_surface_context.cpp
 	src/graphics/stb_image.cpp
 	src/graphics/stb_image_write.cpp
 	src/graphics/stb_rect_pack.cpp
@@ -53,6 +54,7 @@ set(SOURCES ${SOURCES}
 	src/graphics/vulkan/vulkan_swapchain.cpp
 	src/graphics/vulkan/vulkan_texture.cpp
 	src/graphics/vulkan/vulkan_vma.cpp
+	src/graphics/vulkan/vulkan_surface_context.cpp
 	src/layers/layer.cpp
 	src/layers/layer_stack.cpp
 	src/main.cpp

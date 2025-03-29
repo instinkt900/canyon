@@ -13,10 +13,10 @@
 namespace graphics::vulkan {
     class Graphics : public IGraphics {
     public:
-        Graphics(Context& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
+        Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
         ~Graphics();
 
-        Context& GetContext() const override { return m_context; }
+        SurfaceContext& GetContext() const override { return m_context; }
 
         struct Vertex {
             FloatVec2 xy;
@@ -75,7 +75,7 @@ namespace graphics::vulkan {
 
         void OnResize(VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
     private:
-        Context& m_context;
+        SurfaceContext& m_context;
 
         struct PushConstants {
             FloatVec2 xyScale;

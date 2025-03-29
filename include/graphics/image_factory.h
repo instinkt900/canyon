@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphics/context.h"
+#include "graphics/surface_context.h"
 #include "graphics/iimage.h"
 #include "graphics/itexture.h"
 #include "utils/rect.h"
@@ -8,7 +8,7 @@
 namespace graphics {
     class ImageFactory {
     public:
-        ImageFactory(graphics::Context& context);
+        ImageFactory(graphics::SurfaceContext& context);
         virtual ~ImageFactory() = default;
 
         void FlushCache();
@@ -23,7 +23,7 @@ namespace graphics {
             std::string m_path;
         };
 
-        graphics::Context& m_context;
+        graphics::SurfaceContext& m_context;
         std::unordered_map<std::string, ImageDesc> m_cachedImages;
     };
 }

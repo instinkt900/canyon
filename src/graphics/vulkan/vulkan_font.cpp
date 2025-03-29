@@ -1,6 +1,7 @@
 #include "canyon.h"
 #include "graphics/vulkan/vulkan_font.h"
 #include "graphics/stb_rect_pack.h"
+#include "graphics/vulkan/vulkan_utils.h"
 #include "harfbuzz/hb-ft.h"
 #include "graphics/stb_image_write.h"
 
@@ -85,15 +86,15 @@ namespace {
 }
 
 namespace graphics::vulkan {
-    std::unique_ptr<Font> Font::Load(std::filesystem::path const& path, int size, Context& context) {
+    std::unique_ptr<Font> Font::Load(std::filesystem::path const& path, int size, SurfaceContext& context) {
         FT_Face face;
-        if (FT_New_Face(context.m_ftLibrary, path.c_str(), 0, &face) != 0) {
+        if (FT_New_Face(context.GetContext().GetFTLibrary(), path.c_str(), 0, &face) != 0) {
             return nullptr;
         }
         return std::unique_ptr<Font>(new Font(face, size, context));
     }
 
-    Font::Font(FT_Face face, int size, Context& context)
+    Font::Font(FT_Face face, int size, SurfaceContext& context)
         : m_context(context) {
         FT_CHECK(FT_Set_Pixel_Sizes(face, 0, size));
 
@@ -376,7 +377,7 @@ namespace graphics::vulkan {
             alloc_info.descriptorPool = shader.m_descriptorPool;
             alloc_info.descriptorSetCount = 1;
             alloc_info.pSetLayouts = &shader.m_descriptorSetLayout;
-            CHECK_VK_RESULT(vkAllocateDescriptorSets(m_context.m_vkDevice, &alloc_info, &vkDescriptorSet));
+            CHECK_VK_RESULT(vkAllocateDescriptorSets(m_context.GetVkDevice(), &alloc_info, &vkDescriptorSet));
 
             VkDescriptorBufferInfo glyph_info[1] = {};
             glyph_info[0].buffer = m_glyphInfosBuffer->GetVKBuffer();
@@ -405,7 +406,7 @@ namespace graphics::vulkan {
             write_desc[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             write_desc[1].pImageInfo = desc_image;
 
-            vkUpdateDescriptorSets(m_context.m_vkDevice, 2, write_desc, 0, nullptr);
+            vkUpdateDescriptorSets(m_context.GetVkDevice(), 2, write_desc, 0, nullptr);
 
             auto result = m_vkDescriptorSets.insert(std::make_pair(shader.m_hash, vkDescriptorSet));
             it = result.first;

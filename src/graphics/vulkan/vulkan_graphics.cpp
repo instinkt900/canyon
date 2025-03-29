@@ -75,7 +75,7 @@ namespace {
 }
 
 namespace graphics::vulkan {
-    Graphics::Graphics(Context& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
+    Graphics::Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
         : m_context(context) {
         CreateRenderPass();
         CreateShaders();
@@ -83,7 +83,7 @@ namespace graphics::vulkan {
 
         VkPipelineCacheCreateInfo cacheInfo{};
         cacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-        CHECK_VK_RESULT(vkCreatePipelineCache(m_context.m_vkDevice, &cacheInfo, nullptr, &m_vkPipelineCache));
+        CHECK_VK_RESULT(vkCreatePipelineCache(m_context.GetVkDevice(), &cacheInfo, nullptr, &m_vkPipelineCache));
 
         m_swapchain = std::make_unique<Swapchain>(m_context, *m_renderPass, surface, VkExtent2D{ surfaceWidth, surfaceHeight });
 
@@ -99,14 +99,14 @@ namespace graphics::vulkan {
             m_defaultContext.m_vertexBuffer->Unmap();
             m_defaultContext.m_vertexBufferData = nullptr;
         }
-        vkDestroyPipelineCache(m_context.m_vkDevice, m_vkPipelineCache, nullptr);
+        vkDestroyPipelineCache(m_context.GetVkDevice(), m_vkPipelineCache, nullptr);
     }
 
     void Graphics::Begin() {
         m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
         VkFence cmdFence = m_defaultContext.m_target->GetFence().GetVkFence();
-        vkWaitForFences(m_context.m_vkDevice, 1, &cmdFence, VK_TRUE, UINT64_MAX);
-        vkResetFences(m_context.m_vkDevice, 1, &cmdFence);
+        vkWaitForFences(m_context.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
+        vkResetFences(m_context.GetVkDevice(), 1, &cmdFence);
 
         BeginContext(&m_defaultContext);
     }
@@ -125,7 +125,7 @@ namespace graphics::vulkan {
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapChains;
         presentInfo.pImageIndices = swapchainIndices;
-        vkQueuePresentKHR(m_context.m_vkQueue, &presentInfo);
+        vkQueuePresentKHR(m_context.GetVkQueue(), &presentInfo);
     }
 
     void Graphics::SetBlendMode(BlendMode mode) {
@@ -448,7 +448,7 @@ namespace graphics::vulkan {
         if (target) {
             m_overrideContext.m_target = static_cast<Framebuffer*>(target);
             VkFence fence = m_overrideContext.m_target->GetFence().GetVkFence();
-            vkResetFences(m_context.m_vkDevice, 1, &fence);
+            vkResetFences(m_context.GetVkDevice(), 1, &fence);
             BeginContext(&m_overrideContext);
         }
     }
@@ -566,7 +566,7 @@ namespace graphics::vulkan {
             dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
             dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-            m_renderPass = RenderPassBuilder(m_context.m_vkDevice)
+            m_renderPass = RenderPassBuilder(m_context.GetVkDevice())
                                .AddAttachment(colorAttachment)
                                .AddSubpass(subpass)
                                .AddDependency(dependency)
@@ -601,7 +601,7 @@ namespace graphics::vulkan {
             dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
             dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-            m_rtRenderPass = RenderPassBuilder(m_context.m_vkDevice)
+            m_rtRenderPass = RenderPassBuilder(m_context.GetVkDevice())
                                  .AddAttachment(colorAttachment)
                                  .AddSubpass(subpass)
                                  .AddDependency(dependency)
@@ -610,14 +610,14 @@ namespace graphics::vulkan {
     }
 
     void Graphics::CreateShaders() {
-        m_drawingShader = ShaderBuilder(m_context.m_vkDevice, m_context.m_vkDescriptorPool)
+        m_drawingShader = ShaderBuilder(m_context.GetVkDevice(), m_context.GetVkDescriptorPool())
                               .AddPushConstant(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants))
                               .AddBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT)
                               .AddStage(VK_SHADER_STAGE_VERTEX_BIT, "main", drawing_shader_vert_spv, drawing_shader_vert_spv_len)
                               .AddStage(VK_SHADER_STAGE_FRAGMENT_BIT, "main", drawing_shader_frag_spv, drawing_shader_frag_spv_len)
                               .Build();
 
-        m_fontShader = ShaderBuilder(m_context.m_vkDevice, m_context.m_vkDescriptorPool)
+        m_fontShader = ShaderBuilder(m_context.GetVkDevice(), m_context.GetVkDescriptorPool())
                            .AddPushConstant(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants))
                            .AddBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
                            .AddBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT)
@@ -657,7 +657,7 @@ namespace graphics::vulkan {
         auto const vertexInputBinding = getVertexBindingDescription();
         auto const vertexAttributeBindings = getVertexAttributeDescriptions();
 
-        auto const builder = PipelineBuilder(m_context.m_vkDevice)
+        auto const builder = PipelineBuilder(m_context.GetVkDevice())
                                  .SetPipelineCache(m_vkPipelineCache)
                                  .SetRenderPass(GetCurrentRenderPass())
                                  .SetShader(m_drawingShader)
@@ -687,7 +687,7 @@ namespace graphics::vulkan {
         auto const vertexInputBinding = getFontVertexBindingDescription();
         auto const vertexAttributeBindings = getFontVertexAttributeDescriptions();
 
-        auto const builder = PipelineBuilder(m_context.m_vkDevice)
+        auto const builder = PipelineBuilder(m_context.GetVkDevice())
                                  .SetPipelineCache(m_vkPipelineCache)
                                  .SetRenderPass(GetCurrentRenderPass())
                                  .SetShader(m_fontShader)
@@ -808,7 +808,7 @@ namespace graphics::vulkan {
         }
 
         commandBuffer.Submit(cmdFence, context->m_target->GetAvailableSemaphore(), context->m_target->GetRenderFinishedSemaphore());
-        vkWaitForFences(m_context.m_vkDevice, 1, &cmdFence, VK_TRUE, UINT64_MAX);
+        vkWaitForFences(m_context.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
     }
 
     void Graphics::SubmitVertices(Vertex* vertices, uint32_t vertCount, ETopologyType topology, VkDescriptorSet descriptorSet) {
@@ -847,7 +847,7 @@ namespace graphics::vulkan {
     }
 
     void Graphics::OnResize(VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight) {
-        vkDeviceWaitIdle(m_context.m_vkDevice);
+        vkDeviceWaitIdle(m_context.GetVkDevice());
         m_swapchain.reset();
         m_swapchain = std::make_unique<Swapchain>(m_context, *m_renderPass, surface, VkExtent2D{ surfaceWidth, surfaceHeight });
     }

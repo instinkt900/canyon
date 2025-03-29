@@ -1,8 +1,5 @@
 #pragma once
 
-#include "graphics/font_factory.h"
-#include "graphics/image_factory.h"
-#include "graphics/moth_ui/moth_renderer.h"
 #include "platform/iplatform.h"
 #include "utils/ticker.h"
 #include "moth_ui//event_listener.h"
@@ -10,8 +7,6 @@
 #include <moth_ui/ifont_factory.h>
 #include <moth_ui/iimage_factory.h>
 #include <moth_ui/irenderer.h>
-#include "graphics/moth_ui/moth_image_factory.h"
-#include "graphics/moth_ui/moth_font_factory.h"
 
 class Application : public Ticker, public moth_ui::EventListener {
 public:
@@ -31,10 +26,4 @@ private:
 
     std::unique_ptr<platform::Window> m_window;
 
-    std::shared_ptr<graphics::ImageFactory> m_imageFactory;
-    std::shared_ptr<graphics::FontFactory> m_fontFactory;
-
-    std::unique_ptr<graphics::MothImageFactory> m_mothImageFactory;
-    std::unique_ptr<graphics::MothFontFactory> m_mothFontFactory;
-    std::unique_ptr<graphics::MothRenderer> m_uiRenderer;
 };

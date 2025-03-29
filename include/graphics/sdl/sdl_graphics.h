@@ -1,15 +1,14 @@
 #pragma once
 
-#include "graphics/context.h"
 #include "graphics/igraphics.h"
-#include "graphics/sdl/sdl_context.h"
+#include "graphics/sdl/sdl_surface_context.h"
 
 namespace graphics::sdl {
     class Graphics : public IGraphics {
     public:
-        Graphics(graphics::Context& context);
+        Graphics(SurfaceContext& context);
 
-        Context& GetContext() const override { return m_context; }
+        SurfaceContext& GetContext() const override { return m_surfaceContext; }
 
         void Begin() override {}
         void End() override {}
@@ -35,8 +34,7 @@ namespace graphics::sdl {
         void SetLogicalSize(IntVec2 const& logicalSize) override;
 
     private:
-        graphics::sdl::Context& m_context;
-        SDL_Renderer* m_renderer = nullptr;
+        graphics::sdl::SurfaceContext& m_surfaceContext;
         graphics::Color m_drawColor;
         graphics::BlendMode m_blendMode;
         graphics::ITarget* m_currentRenderTarget;

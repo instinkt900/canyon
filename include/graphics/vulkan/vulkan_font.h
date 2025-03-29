@@ -1,15 +1,15 @@
 #pragma once
 
 #include "graphics/ifont.h"
+#include "graphics/vulkan/vulkan_shader.h"
 #include "vulkan_buffer.h"
-#include "vulkan_graphics.h"
 
 #include "harfbuzz/hb.h"
 
 namespace graphics::vulkan {
     class Font : public IFont {
     public:
-        static std::unique_ptr<Font> Load(std::filesystem::path const& path, int size, Context& context);
+        static std::unique_ptr<Font> Load(std::filesystem::path const& path, int size, SurfaceContext& context);
         virtual ~Font();
 
         int32_t GetLineHeight() const { return m_lineHeight; }
@@ -39,11 +39,11 @@ namespace graphics::vulkan {
         // VkDescriptorSet GetVKDescriptorSet() const { return m_vkDescriptorSet; }
 
     private:
-        Font(FT_Face face, int size, Context& context);
+        Font(FT_Face face, int size, SurfaceContext& context);
 
         int CodepointToIndex(int codepoint) const;
 
-        Context& m_context;
+        SurfaceContext& m_context;
 
         // harfbuzz stuff. this should probably be wrapped
         hb_font_t* m_hbFont = nullptr;
@@ -65,9 +65,9 @@ namespace graphics::vulkan {
             FloatVec2 UV1;
         };
 
-        std::map<int, uint32_t> m_codepointToAtlasIndex;    //
-        std::vector<IntVec2> m_glyphBearings;      // glyph bearing values
-        std::vector<ShaderInfo> m_shaderInfos;              // glyph info specifically for the shader
+        std::map<int, uint32_t> m_codepointToAtlasIndex; //
+        std::vector<IntVec2> m_glyphBearings;            // glyph bearing values
+        std::vector<ShaderInfo> m_shaderInfos;           // glyph info specifically for the shader
 
         std::map<uint32_t, VkDescriptorSet> m_vkDescriptorSets;
         // VkDescriptorSet m_vkDescriptorSet;

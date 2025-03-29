@@ -7,14 +7,13 @@
 #include "../utils.h"
 
 namespace graphics::sdl {
-    Graphics::Graphics(graphics::Context& context)
-        : m_context(static_cast<Context&>(context))
+    Graphics::Graphics(SurfaceContext& context)
+        : m_surfaceContext(context)
         , m_drawColor(graphics::BasicColors::White) {
-        m_renderer = m_context.m_renderer;
     }
 
     void Graphics::SetBlendMode(graphics::BlendMode mode) {
-        SDL_SetRenderDrawBlendMode(m_renderer, ToSDL(mode));
+        SDL_SetRenderDrawBlendMode(m_surfaceContext.GetRenderer(), ToSDL(mode));
         m_blendMode = mode;
     }
 
@@ -34,12 +33,12 @@ namespace graphics::sdl {
 
     void Graphics::SetColor(graphics::Color const& color) {
         ColorComponents components(color);
-        SDL_SetRenderDrawColor(m_renderer, components.r, components.g, components.b, components.a);
+        SDL_SetRenderDrawColor(m_surfaceContext.GetRenderer(), components.r, components.g, components.b, components.a);
         m_drawColor = color;
     }
 
     void Graphics::Clear() {
-        SDL_RenderClear(m_renderer);
+        SDL_RenderClear(m_surfaceContext.GetRenderer());
     }
 
     void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
@@ -60,7 +59,7 @@ namespace graphics::sdl {
         //     sdlSrcRect.y += sourceRect->y();
         // }
 
-        SDL_RenderCopy(m_renderer, sdlTexture->GetSDLTexture()->GetImpl(), &sdlSrcRect, &sdlDstRect);
+        SDL_RenderCopy(m_surfaceContext.GetRenderer(), sdlTexture->GetSDLTexture()->GetImpl(), &sdlSrcRect, &sdlDstRect);
     }
 
     void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
@@ -82,14 +81,14 @@ namespace graphics::sdl {
         auto const imageWidth = static_cast<int>(image.GetWidth() * scale);
         auto const imageHeight = static_cast<int>(image.GetHeight() * scale);
         auto const sdlTotalDestRect{ ToSDL(destRect) };
-        SDL_RenderSetClipRect(m_renderer, &sdlTotalDestRect);
+        SDL_RenderSetClipRect(m_surfaceContext.GetRenderer(), &sdlTotalDestRect);
         for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
             for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
                 SDL_Rect sdlDstRect{ x, y, imageWidth, imageHeight };
-                SDL_RenderCopy(m_renderer, sdlTexture->GetSDLTexture()->GetImpl(), &sdlSrcRect, &sdlDstRect);
+                SDL_RenderCopy(m_surfaceContext.GetRenderer(), sdlTexture->GetSDLTexture()->GetImpl(), &sdlSrcRect, &sdlDstRect);
             }
         }
-        SDL_RenderSetClipRect(m_renderer, nullptr);
+        SDL_RenderSetClipRect(m_surfaceContext.GetRenderer(), nullptr);
     }
 
     void Graphics::DrawToPNG(std::filesystem::path const& path) {
@@ -108,25 +107,25 @@ namespace graphics::sdl {
 
         int width;
         int height;
-        SDL_GetRendererOutputSize(m_renderer, &width, &height);
+        SDL_GetRendererOutputSize(m_surfaceContext.GetRenderer(), &width, &height);
 
         SurfaceRef surface = CreateSurfaceRef(SDL_CreateRGBSurface(0, width, height, 32, rmask, gmask, bmask, amask));
-        SDL_RenderReadPixels(m_renderer, nullptr, surface->format->format, surface->pixels, surface->pitch);
+        SDL_RenderReadPixels(m_surfaceContext.GetRenderer(), nullptr, surface->format->format, surface->pixels, surface->pitch);
         IMG_SavePNG(surface.get(), path.string().c_str());
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {
         auto const sdlRectF = ToSDL(rect);
-        SDL_RenderDrawRectF(m_renderer, &sdlRectF);
+        SDL_RenderDrawRectF(m_surfaceContext.GetRenderer(), &sdlRectF);
     }
 
     void Graphics::DrawFillRectF(FloatRect const& rect) {
         auto const sdlRectF = ToSDL(rect);
-        SDL_RenderFillRectF(m_renderer, &sdlRectF);
+        SDL_RenderFillRectF(m_surfaceContext.GetRenderer(), &sdlRectF);
     }
 
     void Graphics::DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) {
-        SDL_RenderDrawLineF(m_renderer, p0.x, p0.y, p1.x, p1.y);
+        SDL_RenderDrawLineF(m_surfaceContext.GetRenderer(), p0.x, p0.y, p1.x, p1.y);
     }
 
     void Graphics::DrawText(std::string const& text, graphics::IFont& font, graphics::TextHorizAlignment horizontalAlignment, graphics::TextVertAlignment verticalAlignment, IntRect const& destRect) {
@@ -167,20 +166,20 @@ namespace graphics::sdl {
         effect.scale.x = 1.0f;
         effect.scale.y = 1.0f;
 
-        FC_DrawColumnEffect(fcFont.get(), m_renderer, x, y, destWidth, effect, "%s", text.c_str());
+        FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), x, y, destWidth, effect, "%s", text.c_str());
     }
 
     void Graphics::SetClip(IntRect const* rect) {
         if (rect) {
             auto const currentRect = ToSDL(*rect);
-            SDL_RenderSetClipRect(m_renderer, &currentRect);
+            SDL_RenderSetClipRect(m_surfaceContext.GetRenderer(), &currentRect);
         } else {
-            SDL_RenderSetClipRect(m_renderer, nullptr);
+            SDL_RenderSetClipRect(m_surfaceContext.GetRenderer(), nullptr);
         }
     }
 
     std::unique_ptr<graphics::ITarget> Graphics::CreateTarget(int width, int height) {
-        auto sdlTexture = CreateTextureRef(SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height));
+        auto sdlTexture = CreateTextureRef(SDL_CreateTexture(m_surfaceContext.GetRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height));
         auto texture = std::make_shared<Texture>(sdlTexture);
         IntRect const sourceRect{ { 0, 0 }, { width, height } };
         return std::make_unique<Image>(texture, sourceRect);
@@ -192,16 +191,16 @@ namespace graphics::sdl {
 
     void Graphics::SetTarget(graphics::ITarget* target) {
         if (!target) {
-            SDL_SetRenderTarget(m_renderer, nullptr);
+            SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), nullptr);
         } else {
             auto sdlImage = dynamic_cast<Texture*>(target);
             auto sdlTexture = sdlImage->GetSDLTexture();
-            SDL_SetRenderTarget(m_renderer, sdlTexture->GetImpl());
+            SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), sdlTexture->GetImpl());
         }
         m_currentRenderTarget = target;
     }
 
     void Graphics::SetLogicalSize(IntVec2 const& logicalSize) {
-        SDL_RenderSetLogicalSize(m_renderer, logicalSize.x, logicalSize.y);
+        SDL_RenderSetLogicalSize(m_surfaceContext.GetRenderer(), logicalSize.x, logicalSize.y);
     }
 }

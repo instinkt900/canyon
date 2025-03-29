@@ -9,7 +9,7 @@ namespace {
 }
 
 namespace graphics::vulkan {
-    std::unique_ptr<Texture> Texture::FromFile(Context& context, std::filesystem::path const& path) {
+    std::unique_ptr<Texture> Texture::FromFile(SurfaceContext& context, std::filesystem::path const& path) {
         if (std::filesystem::exists(path)) {
             int texWidth;
             int texHeight;
@@ -41,7 +41,7 @@ namespace graphics::vulkan {
         return nullptr;
     }
 
-    std::unique_ptr<Texture> Texture::FromRGBA(Context& context, int width, int height, unsigned char const* pixels) {
+    std::unique_ptr<Texture> Texture::FromRGBA(SurfaceContext& context, int width, int height, unsigned char const* pixels) {
         VkDeviceSize imageSize = width * height * 4;
         auto stagingBuffer = std::make_unique<Buffer>(context, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
         void* data = stagingBuffer->Map();
@@ -61,12 +61,12 @@ namespace graphics::vulkan {
         return newImage;
     }
 
-    Texture::Texture(Context& context)
+    Texture::Texture(SurfaceContext& context)
         : m_id(NextTextureId++)
         , m_context(context) {
     }
 
-    Texture::Texture(Context& context, VkImage image, VkImageView view, VkExtent2D extent, VkFormat format, bool owning)
+    Texture::Texture(SurfaceContext& context, VkImage image, VkImageView view, VkExtent2D extent, VkFormat format, bool owning)
         : m_id(NextTextureId++)
         , m_context(context)
         , m_vkExtent(extent)
@@ -76,7 +76,7 @@ namespace graphics::vulkan {
         , m_owningImage(owning) {
     }
 
-    Texture::Texture(Context& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, bool owning)
+    Texture::Texture(SurfaceContext& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, bool owning)
         : m_id(NextTextureId++)
         , m_context(context)
         , m_vkExtent{ width, height }
@@ -89,14 +89,14 @@ namespace graphics::vulkan {
 
     Texture::~Texture() {
         if (m_vkSampler != VK_NULL_HANDLE) {
-            vkDestroySampler(m_context.m_vkDevice, m_vkSampler, nullptr);
+            vkDestroySampler(m_context.GetVkDevice(), m_vkSampler, nullptr);
         }
         if (m_vkView != VK_NULL_HANDLE) {
-            vkDestroyImageView(m_context.m_vkDevice, m_vkView, nullptr);
+            vkDestroyImageView(m_context.GetVkDevice(), m_vkView, nullptr);
         }
         if (m_owningImage && m_vkImage != VK_NULL_HANDLE) {
-            vmaFreeMemory(m_context.m_vmaAllocator, m_vmaAllocation);
-            vkDestroyImage(m_context.m_vkDevice, m_vkImage, nullptr);
+            vmaFreeMemory(m_context.GetVmaAllocator(), m_vmaAllocation);
+            vkDestroyImage(m_context.GetVkDevice(), m_vkImage, nullptr);
         }
     }
 
@@ -122,12 +122,12 @@ namespace graphics::vulkan {
 
     void* Texture::Map() {
         void* data;
-        vmaMapMemory(m_context.m_vmaAllocator, m_vmaAllocation, &data);
+        vmaMapMemory(m_context.GetVmaAllocator(), m_vmaAllocation, &data);
         return data;
     }
 
     void Texture::Unmap() {
-        vmaUnmapMemory(m_context.m_vmaAllocator, m_vmaAllocation);
+        vmaUnmapMemory(m_context.GetVmaAllocator(), m_vmaAllocation);
     }
 
     void Texture::CreateResource(VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties) {
@@ -151,7 +151,7 @@ namespace graphics::vulkan {
         if (properties & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) {
             allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
         }
-        CHECK_VK_RESULT(vmaCreateImage(m_context.m_vmaAllocator, &info, &allocInfo, &m_vkImage, &m_vmaAllocation, nullptr));
+        CHECK_VK_RESULT(vmaCreateImage(m_context.GetVmaAllocator(), &info, &allocInfo, &m_vkImage, &m_vmaAllocation, nullptr));
     }
 
     void Texture::CreateView() {
@@ -166,7 +166,7 @@ namespace graphics::vulkan {
         info.subresourceRange.baseArrayLayer = 0;
         info.subresourceRange.layerCount = 1;
         info.image = m_vkImage;
-        CHECK_VK_RESULT(vkCreateImageView(m_context.m_vkDevice, &info, nullptr, &m_vkView));
+        CHECK_VK_RESULT(vkCreateImageView(m_context.GetVkDevice(), &info, nullptr, &m_vkView));
     }
 
     void Texture::CreateDefaultSampler() {
@@ -181,7 +181,7 @@ namespace graphics::vulkan {
 
         // todo can probably cache this
         VkPhysicalDeviceProperties properties{};
-        vkGetPhysicalDeviceProperties(m_context.m_vkPhysicalDevice, &properties);
+        vkGetPhysicalDeviceProperties(m_context.GetVkPhysicalDevice(), &properties);
 
         samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
         samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
@@ -193,6 +193,6 @@ namespace graphics::vulkan {
         samplerInfo.minLod = 0.0f;
         samplerInfo.maxLod = 0.0f;
 
-        CHECK_VK_RESULT(vkCreateSampler(m_context.m_vkDevice, &samplerInfo, nullptr, &m_vkSampler));
+        CHECK_VK_RESULT(vkCreateSampler(m_context.GetVkDevice(), &samplerInfo, nullptr, &m_vkSampler));
     }
 }

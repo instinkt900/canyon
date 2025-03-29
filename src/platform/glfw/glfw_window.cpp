@@ -1,6 +1,7 @@
 #include "canyon.h"
 #include "platform/glfw/glfw_window.h"
 #include "graphics/vulkan/vulkan_graphics.h"
+#include "graphics/vulkan/vulkan_surface_context.h"
 #include "platform/glfw/glfw_events.h"
 #include "moth_ui/events/event_mouse.h"
 #include "events/event_window.h"
@@ -9,8 +10,9 @@
 namespace platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
-        , m_vulkanContext(context) {
+        , m_context(context) {
             CreateWindow();
+            Finalize();
     }
 
     Window::~Window() {
@@ -98,9 +100,10 @@ namespace platform::glfw {
             glfwMaximizeWindow(m_glfwWindow);
         }
 
-        glfwCreateWindowSurface(m_vulkanContext.m_vkInstance, m_glfwWindow, nullptr, &m_customVkSurface);
-        m_graphics = std::make_unique<graphics::vulkan::Graphics>(m_vulkanContext, m_customVkSurface, m_windowWidth, m_windowHeight);
+        glfwCreateWindowSurface(m_context.GetInstance(), m_glfwWindow, nullptr, &m_customVkSurface);
+        m_surfaceContext = std::make_unique<graphics::vulkan::SurfaceContext>(m_context);
 
+        m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight);
         m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
 
         return true;

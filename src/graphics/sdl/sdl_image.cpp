@@ -1,4 +1,5 @@
 #include "canyon.h"
+#include "graphics/sdl/sdl_surface_context.h"
 #include "graphics/sdl/sdl_image.h"
 
 namespace graphics::sdl {
@@ -20,8 +21,8 @@ namespace graphics::sdl {
         return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
     }
 
-    std::unique_ptr<Image> Image::Load(graphics::Context& context, std::filesystem::path const& path) {
-        if (auto texture = context.TextureFromFile(path)) {
+    std::unique_ptr<Image> Image::Load(SurfaceContext& context, std::filesystem::path const& path) {
+        if (auto texture = Texture::FromFile(context.GetRenderer(), path)) {
             auto sdlTexture = std::unique_ptr<Texture>(static_cast<Texture*>(texture.release()));
             return std::make_unique<Image>(std::move(sdlTexture));
         }

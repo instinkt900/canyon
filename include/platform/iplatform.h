@@ -1,10 +1,9 @@
 #pragma once
 
 #include "graphics/context.h"
-#include "graphics/igraphics.h"
-#include "platform/window.h"
 
 namespace platform {
+    class Window;
     class IPlatform {
     public:
         virtual ~IPlatform() = default;

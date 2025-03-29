@@ -1,6 +1,6 @@
 #include "canyon.h"
 #include "platform/application.h"
-#include "moth_ui/context.h"
+#include "platform/window.h"
 
 Application::Application(platform::IPlatform& platform)
     : m_platform(platform) {
@@ -9,18 +9,6 @@ Application::Application(platform::IPlatform& platform)
     m_window->AddEventListener(this);
     m_window->GetLayerStack().AddEventListener(this);
     
-    auto& context = m_platform.GetGraphicsContext();
-    m_imageFactory = std::make_unique<graphics::ImageFactory>(context);
-    m_fontFactory = std::make_unique<graphics::FontFactory>(context);
-
-    auto& graphics = m_window->GetGraphics();
-    m_uiRenderer = std::make_unique<graphics::MothRenderer>(graphics);
-
-    m_mothImageFactory = std::make_unique<graphics::MothImageFactory>(m_imageFactory);
-    m_mothFontFactory = std::make_unique<graphics::MothFontFactory>(m_fontFactory);
-
-    auto uiContext = std::make_shared<moth_ui::Context>(m_mothImageFactory.get(), m_mothFontFactory.get(), m_uiRenderer.get());
-    moth_ui::Context::SetCurrentContext(uiContext);
 }
 
 bool Application::OnEvent(moth_ui::Event const& event) {

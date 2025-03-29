@@ -14,7 +14,7 @@ namespace graphics::vulkan {
         int GetWidth() const override;
         int GetHeight() const override;
 
-        static std::unique_ptr<Image> Load(Context& context, std::filesystem::path const& path);
+        static std::unique_ptr<Image> Load(SurfaceContext& context, std::filesystem::path const& path);
 
         std::shared_ptr<Texture> m_texture;
         IntRect m_sourceRect;

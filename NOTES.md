@@ -10,6 +10,9 @@ Plan:
 - AssetLoader - Comes from Surface context and is used to get assets from disk
 Each window will hold its own moth context that is set/unset on update/renders
 
+maybe surface context is just graphics? not done yet
+TODO: sort out setting of the moth contexts
+
 ## 27/03/25
 
 - SDL context holds not much but vulkan context actually holds context

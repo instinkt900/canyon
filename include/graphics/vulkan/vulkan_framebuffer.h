@@ -3,15 +3,15 @@
 #include "graphics/itarget.h"
 #include "vulkan_image.h"
 #include "vulkan_fence.h"
-#include "vulkan_renderpass.h"
+#include "graphics/vulkan/vulkan_surface_context.h"
 
 namespace graphics::vulkan {
     class CommandBuffer;
 
     class Framebuffer : public ITarget {
     public:
-        Framebuffer(Context& context, uint32_t width, uint32_t height, VkImage image, VkImageView view, VkFormat format, VkRenderPass renderPass, uint32_t swapchainIndex);
-        Framebuffer(Context& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkRenderPass renderPass);
+        Framebuffer(SurfaceContext& context, uint32_t width, uint32_t height, VkImage image, VkImageView view, VkFormat format, VkRenderPass renderPass, uint32_t swapchainIndex);
+        Framebuffer(SurfaceContext& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkRenderPass renderPass);
         virtual ~Framebuffer();
 
         //void BeginPass(RenderPass& renderPass);
@@ -30,7 +30,7 @@ namespace graphics::vulkan {
         Image& GetVkImage();
 
     protected:
-        Context& m_context;
+        SurfaceContext& m_context;
         VkFramebuffer m_vkFramebuffer = VK_NULL_HANDLE;
         std::unique_ptr<CommandBuffer> m_commandBuffer;
         std::unique_ptr<Image> m_image;
@@ -41,6 +41,6 @@ namespace graphics::vulkan {
 
         uint32_t m_swapchainIndex = 0;
 
-        void CreateFramebufferResource(Context& context, VkRenderPass renderPass);
+        void CreateFramebufferResource(VkRenderPass renderPass);
     };
 }

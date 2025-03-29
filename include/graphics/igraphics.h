@@ -9,12 +9,12 @@
 #include "graphics/ifont.h"
 
 namespace graphics {
-    class Context;
+    class SurfaceContext;
     class IGraphics {
     public:
 	virtual ~IGraphics() {}
 
-        virtual Context& GetContext() const = 0;
+        virtual SurfaceContext& GetContext() const = 0;
 
         virtual void Begin() = 0;
         virtual void End() = 0;

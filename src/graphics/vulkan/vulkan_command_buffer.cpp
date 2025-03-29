@@ -1,21 +1,20 @@
 #include "canyon.h"
 #include "graphics/vulkan/vulkan_command_buffer.h"
-#include "graphics/vulkan/vulkan_context.h"
 #include "graphics/vulkan/vulkan_utils.h"
 
 namespace graphics::vulkan {
-    CommandBuffer::CommandBuffer(Context& context)
+    CommandBuffer::CommandBuffer(SurfaceContext& context)
         : m_context(context) {
         VkCommandBufferAllocateInfo info{};
         info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        info.commandPool = m_context.m_vkCommandPool;
+        info.commandPool = m_context.GetVkCommandPool();
         info.commandBufferCount = 1;
-        CHECK_VK_RESULT(vkAllocateCommandBuffers(m_context.m_vkDevice, &info, &m_vkCommandBuffer));
+        CHECK_VK_RESULT(vkAllocateCommandBuffers(m_context.GetVkDevice(), &info, &m_vkCommandBuffer));
     }
 
     CommandBuffer::~CommandBuffer() {
-        vkFreeCommandBuffers(m_context.m_vkDevice, m_context.m_vkCommandPool, 1, &m_vkCommandBuffer);
+        vkFreeCommandBuffers(m_context.GetVkDevice(), m_context.GetVkCommandPool(), 1, &m_vkCommandBuffer);
     }
 
     void CommandBuffer::BeginRecord() {
@@ -59,12 +58,12 @@ namespace graphics::vulkan {
             info.pWaitDstStageMask = waitStageFlags;
         }
 
-        vkQueueSubmit(m_context.m_vkQueue, 1, &info, fence);
+        vkQueueSubmit(m_context.GetVkQueue(), 1, &info, fence);
     }
 
     void CommandBuffer::SubmitAndWait() {
         Submit(VK_NULL_HANDLE);
-        vkQueueWaitIdle(m_context.m_vkQueue);
+        vkQueueWaitIdle(m_context.GetVkQueue());
     }
 
     void CommandBuffer::Reset() {
