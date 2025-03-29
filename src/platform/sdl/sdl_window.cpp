@@ -3,6 +3,7 @@
 #include "graphics/sdl/sdl_surface_context.h"
 #include "platform/sdl/sdl_events.h"
 #include "graphics/sdl/sdl_graphics.h"
+#include <moth_ui/context.h>
 
 namespace platform::sdl {
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
@@ -45,7 +46,7 @@ namespace platform::sdl {
             return false;
         }
 
-        m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_context);
+        m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_context, m_renderer);
 
         m_graphics = std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext);
         m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);

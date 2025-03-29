@@ -11,7 +11,8 @@ Plan:
 Each window will hold its own moth context that is set/unset on update/renders
 
 maybe surface context is just graphics? not done yet
-TODO: sort out setting of the moth contexts
+moth_ui updated to take the context into the node tree.
+sdl working. vulkan working except fonts are weird.
 
 ## 27/03/25
 

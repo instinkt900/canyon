@@ -22,8 +22,6 @@ namespace platform {
         m_mothImageFactory = std::make_unique<graphics::MothImageFactory>(m_imageFactory);
         m_mothFontFactory = std::make_unique<graphics::MothFontFactory>(m_fontFactory);
 
-        // TODO: better context handling
-        // auto uiContext = std::make_shared<moth_ui::Context>(m_mothImageFactory.get(), m_mothFontFactory.get(), m_uiRenderer.get());
-        // moth_ui::Context::SetCurrentContext(uiContext);
+        m_mothContext = std::make_shared<moth_ui::Context>(m_mothImageFactory.get(), m_mothFontFactory.get(), m_uiRenderer.get());
     }
 }

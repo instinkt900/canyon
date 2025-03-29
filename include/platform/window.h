@@ -9,6 +9,7 @@
 #include "graphics/moth_ui/moth_font_factory.h"
 #include "graphics/moth_ui/moth_image_factory.h"
 #include "graphics/moth_ui/moth_renderer.h"
+#include <moth_ui/context.h>
 
 namespace platform {
     class Window : public EventEmitter {
@@ -24,6 +25,7 @@ namespace platform {
 
         int GetWidth() const { return m_windowWidth; }
         int GetHeight() const { return m_windowHeight; }
+        moth_ui::Context& GetMothContext() const { return *m_mothContext; }
         graphics::IGraphics& GetGraphics() const { return *m_graphics; }
         LayerStack& GetLayerStack() const { return *m_layerStack; }
 
@@ -47,5 +49,6 @@ namespace platform {
         std::unique_ptr<graphics::MothImageFactory> m_mothImageFactory;
         std::unique_ptr<graphics::MothFontFactory> m_mothFontFactory;
         std::unique_ptr<graphics::MothRenderer> m_uiRenderer;
+        std::shared_ptr<moth_ui::Context> m_mothContext;
     };
 }

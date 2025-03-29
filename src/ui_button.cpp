@@ -2,8 +2,8 @@
 
 #include "moth_ui/event_dispatch.h"
 
-UIButton::UIButton(std::shared_ptr<moth_ui::LayoutEntityGroup> entity)
-    : Widget<UIButton>(entity) {}
+UIButton::UIButton(moth_ui::Context& context, std::shared_ptr<moth_ui::LayoutEntityGroup> entity)
+    : Widget<UIButton>(context, entity) {}
 
 void UIButton::Update(uint32_t ticks) {
     Group::Update(ticks);

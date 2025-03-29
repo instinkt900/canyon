@@ -7,7 +7,7 @@
 namespace graphics::sdl {
     class SurfaceContext : public graphics::SurfaceContext {
     public:
-        SurfaceContext(Context& context);
+        SurfaceContext(Context& context, SDL_Renderer* renderer);
         virtual ~SurfaceContext() = default;
 
         Context& GetContext() const override { return m_context; }

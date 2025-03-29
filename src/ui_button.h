@@ -3,6 +3,7 @@
 #include "moth_ui/widget.h"
 #include "moth_ui/events/event_mouse.h"
 #include "moth_ui/events/event_animation.h"
+#include <moth_ui/context.h>
 
 class UIButton : public moth_ui::Widget<UIButton> {
 public:
@@ -15,7 +16,7 @@ public:
         Activated,
     };
 
-    UIButton(std::shared_ptr<moth_ui::LayoutEntityGroup> entity);
+    UIButton(moth_ui::Context& context, std::shared_ptr<moth_ui::LayoutEntityGroup> entity);
     virtual ~UIButton() = default;
 
     void Update(uint32_t ticks) override;

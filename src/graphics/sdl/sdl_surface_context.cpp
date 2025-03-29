@@ -5,8 +5,9 @@
 #include "graphics/sdl/sdl_texture.h"
 
 namespace graphics::sdl {
-    SurfaceContext::SurfaceContext(Context& context)
-        : m_context(context) {
+    SurfaceContext::SurfaceContext(Context& context, SDL_Renderer* renderer)
+        : m_context(context)
+        , m_renderer(renderer) {
     }
 
     std::unique_ptr<IImage> SurfaceContext::NewImage(std::shared_ptr<ITexture> texture) {

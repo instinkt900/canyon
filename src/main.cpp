@@ -21,8 +21,9 @@
 
 class TestLayer : public Layer {
 public:
-    TestLayer(graphics::IGraphics& graphics, std::filesystem::path const& layoutPath)
-        : m_graphics(graphics) {
+    TestLayer(moth_ui::Context& context, graphics::IGraphics& graphics, std::filesystem::path const& layoutPath)
+        : m_context(context)
+        , m_graphics(graphics) {
         LoadLayout(layoutPath);
 
         m_root->SetAnimation("ready");
@@ -75,7 +76,7 @@ public:
     }
 
     void LoadLayout(std::filesystem::path const& path) {
-        m_root = moth_ui::NodeFactory::Get().Create(path, GetWidth(), GetHeight());
+        m_root = moth_ui::NodeFactory::Get().Create(m_context, path, GetWidth(), GetHeight());
         m_root->SetEventHandler([this](moth_ui::Node*, moth_ui::Event const& event) { return OnUIEvent(event); });
     }
 
@@ -102,6 +103,7 @@ public:
     //     return true;
     // }
 
+    moth_ui::Context& m_context;
     graphics::IGraphics& m_graphics;
     std::unique_ptr<moth_ui::IImageFactory> m_imageFactory;
     std::unique_ptr<moth_ui::FontFactory> m_fontFactory;
@@ -116,10 +118,11 @@ int main(int argc, char* argv[]) {
     // auto platform = std::make_unique<platform::glfw::Platform>();
     platform->Startup();
     auto application = std::make_unique<Application>(*platform);
-    moth_ui::Context::GetCurrentContext()->GetFontFactory().LoadProject("assets/fonts.json");
     auto& window = application->GetWindow();
+    auto& mothContext = window.GetMothContext();
+    mothContext.GetFontFactory().LoadProject("assets/fonts.json");
     auto& graphics = window.GetGraphics();
-    window.GetLayerStack().PushLayer(std::make_unique<TestLayer>(graphics, "assets/layouts/basic.mothui"));
+    window.GetLayerStack().PushLayer(std::make_unique<TestLayer>(mothContext, graphics, "assets/layouts/basic.mothui"));
     application->TickSync();
 
     // auto window = platform->CreateWindow("testing", 640, 480);
