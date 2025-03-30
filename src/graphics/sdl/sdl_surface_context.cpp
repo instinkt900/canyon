@@ -27,4 +27,9 @@ namespace graphics::sdl {
     std::unique_ptr<ITexture> SurfaceContext::TextureFromFile(std::filesystem::path const& path) {
         return Texture::FromFile(m_renderer, path);
     }
+
+    std::unique_ptr<IImage> SurfaceContext::ImageFromFile(std::filesystem::path const& path) {
+        std::shared_ptr<Texture> texture(static_cast<Texture*>(TextureFromFile(path).release()));
+        return std::make_unique<Image>(texture);
+    }
 }

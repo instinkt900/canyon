@@ -18,6 +18,7 @@
 #include "graphics/sdl/sdl_graphics.h"
 #include "graphics/vulkan/vulkan_image.h"
 #include "graphics/vulkan/vulkan_font.h"
+#include <moth_ui/event_listener.h>
 
 class TestLayer : public Layer {
 public:
@@ -113,9 +114,26 @@ public:
     moth_ui::IntVec2 m_lastDrawnSize;
 };
 
+class QuitListener : public moth_ui::EventListener {
+public:
+    QuitListener(bool& signal)
+        : m_signal(signal) {}
+    bool OnEvent(moth_ui::Event const& event) {
+        moth_ui::EventDispatch dispatch(event);
+        dispatch.Dispatch<EventRequestQuit>([&](EventRequestQuit const& event) {
+            m_signal = false;
+            return true;
+        });
+        return dispatch.GetHandled();
+    }
+
+private:
+    bool& m_signal;
+};
+
 int main(int argc, char* argv[]) {
-    auto platform = std::make_unique<platform::sdl::Platform>();
-    // auto platform = std::make_unique<platform::glfw::Platform>();
+    // auto platform = std::make_unique<platform::sdl::Platform>();
+    auto platform = std::make_unique<platform::glfw::Platform>();
     platform->Startup();
     auto application = std::make_unique<Application>(*platform);
     auto& window = application->GetWindow();
@@ -126,22 +144,27 @@ int main(int argc, char* argv[]) {
     application->TickSync();
 
     // auto window = platform->CreateWindow("testing", 640, 480);
-    // auto& context = platform->GetGraphicsContext();
-    // auto texture = context.ImageFromFile("assets/images/playership.png");
-    // auto font = context.FontFromFile("assets/fonts/pilotcommand.ttf", 18);
+    // auto& surfaceContext = window->GetSurfaceContext();
+    // auto texture = surfaceContext.ImageFromFile("assets/images/playership.png");
+    // auto font = surfaceContext.FontFromFile("assets/fonts/pilotcommand.ttf", 38);
+    //
+    // bool running = true;
+    // QuitListener ql(running);
+    // window->AddEventListener(&ql);
     //
     // auto& graphics = window->GetGraphics();
-    // while (true) {
+    // while (running) {
     //     graphics.Begin();
     //     graphics.SetColor(graphics::BasicColors::Red);
     //     graphics.DrawFillRectF(MakeRect(0.0f, 0.0f, 100.0f, 100.0f));
     //     graphics.SetColor(graphics::BasicColors::White);
     //     auto destRect = MakeRect(0, 0, 640, 480);
     //     graphics.DrawImageTiled(*texture, destRect, nullptr, 1.0f);
+    //     graphics.SetBlendMode(graphics::BlendMode::Alpha);
     //     graphics.SetColor(graphics::BasicColors::Green);
     //     graphics.DrawText("hello", *font, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, 640, 480));
     //     window->Update(30);
-    //     window->Draw();
+    //     // window->Draw();
     //     graphics.End();
     //     using namespace std::chrono_literals;
     //     std::this_thread::sleep_for(1ms);

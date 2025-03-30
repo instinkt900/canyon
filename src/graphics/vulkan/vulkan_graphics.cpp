@@ -322,6 +322,7 @@ namespace graphics::vulkan {
 
     void Graphics::DrawText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) {
         auto context = m_contextStack.top();
+        context->m_currentBlendMode = BlendMode::Alpha; // force alpha blending for text
         Font& vulkanFont = static_cast<Font&>(font);
 
         uint32_t const glyphStart = context->m_glyphCount;

@@ -162,7 +162,6 @@ namespace graphics::sdl {
         FC_Effect effect;
         effect.alignment = ToSDL(horizontalAlignment);
         effect.color = ToSDL(m_drawColor);
-        // effect.color = { 0xff, 0xff, 0xff, 0xff };
         effect.scale.x = 1.0f;
         effect.scale.y = 1.0f;
 

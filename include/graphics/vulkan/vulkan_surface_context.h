@@ -18,6 +18,7 @@ namespace graphics::vulkan {
         std::unique_ptr<IImage> NewImage(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) override;
         std::unique_ptr<IFont> FontFromFile(std::filesystem::path const& path, uint32_t size) override;
         std::unique_ptr<ITexture> TextureFromFile(std::filesystem::path const& path) override;
+        std::unique_ptr<IImage> ImageFromFile(std::filesystem::path const& path) override;
 
         VkPhysicalDevice const& GetVkPhysicalDevice() const { return m_vkPhysicalDevice; }
         uint32_t GetVkQueueFamily() const { return m_vkQueueFamily; }

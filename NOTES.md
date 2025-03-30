@@ -1,3 +1,9 @@
+## 30/03/25
+
+- Fixed font rendering on vulkan. was just blend modes. forced alpha in graphics.
+- Need to fix vulkan exit cleanup. it crashes.
+- Surface context can probably be something better
+
 ## 29/03/25
 
 - There should be an application context and a window context.
