@@ -9,4 +9,3 @@ namespace graphics {
         virtual int GetHeight() const = 0;
     };
 }
-

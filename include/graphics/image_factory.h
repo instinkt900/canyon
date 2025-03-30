@@ -27,4 +27,3 @@ namespace graphics {
         std::unordered_map<std::string, ImageDesc> m_cachedImages;
     };
 }
-

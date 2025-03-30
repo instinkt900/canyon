@@ -22,4 +22,3 @@ namespace graphics::sdl {
         IntVec2 m_textureDimensions;
     };
 }
-

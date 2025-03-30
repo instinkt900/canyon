@@ -12,15 +12,15 @@ namespace graphics {
     class SurfaceContext;
     class IGraphics {
     public:
-	virtual ~IGraphics() {}
+        virtual ~IGraphics() {}
 
         virtual SurfaceContext& GetContext() const = 0;
 
         virtual void Begin() = 0;
         virtual void End() = 0;
         virtual void SetBlendMode(BlendMode mode) = 0;
-        //virtual void SetBlendMode(std::shared_ptr<IImage> target, EBlendMode mode) = 0;
-        //virtual void SetColorMod(std::shared_ptr<IImage> target, Color const& color) = 0;
+        // virtual void SetBlendMode(std::shared_ptr<IImage> target, EBlendMode mode) = 0;
+        // virtual void SetColorMod(std::shared_ptr<IImage> target, Color const& color) = 0;
         virtual void SetColor(Color const& color) = 0;
         virtual void Clear() = 0;
         virtual void DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect) = 0;
@@ -39,4 +39,3 @@ namespace graphics {
         virtual void SetLogicalSize(IntVec2 const& logicalSize) = 0;
     };
 }
-

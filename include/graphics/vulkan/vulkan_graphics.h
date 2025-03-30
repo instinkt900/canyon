@@ -41,8 +41,8 @@ namespace graphics::vulkan {
         void End() override;
 
         void SetBlendMode(BlendMode mode) override;
-        //void SetBlendMode(std::shared_ptr<IImage> target, EBlendMode mode) override;
-        //void SetColorMod(std::shared_ptr<IImage> target, Color const& color) override;
+        // void SetBlendMode(std::shared_ptr<IImage> target, EBlendMode mode) override;
+        // void SetColorMod(std::shared_ptr<IImage> target, Color const& color) override;
         void SetColor(Color const& color) override;
         void Clear() override;
         void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) override;
@@ -74,6 +74,7 @@ namespace graphics::vulkan {
         Shader& GetFontShader() { return *m_fontShader; }
 
         void OnResize(VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
+
     private:
         SurfaceContext& m_context;
 

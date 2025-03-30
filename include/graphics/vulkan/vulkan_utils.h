@@ -2,19 +2,19 @@
 
 #include "murmurhash.h"
 
-#define CHECK_VK_RESULT(expr)                                                                                   \
-    {                                                                                                           \
-        VkResult result_ = expr;                                                                                \
-        if (result_ != VK_SUCCESS) {                                                                            \
-            spdlog::error("File: {} Line: {} {} = {}", __FILE__, __LINE__, #expr, static_cast<int>(result_));   \
-            abort();                                                                                            \
-        }                                                                                                       \
+#define CHECK_VK_RESULT(expr)                                                                                 \
+    {                                                                                                         \
+        VkResult result_ = expr;                                                                              \
+        if (result_ != VK_SUCCESS) {                                                                          \
+            spdlog::error("File: {} Line: {} {} = {}", __FILE__, __LINE__, #expr, static_cast<int>(result_)); \
+            abort();                                                                                          \
+        }                                                                                                     \
     }
 
 namespace graphics::vulkan {
     static constexpr uint32_t HashSeed = 0xc00db11c;
 
-    template<typename T>
+    template <typename T>
     inline uint32_t CalcHash(T const& source) {
         return murmurhash(reinterpret_cast<char const*>(&source), sizeof(T), HashSeed);
     }

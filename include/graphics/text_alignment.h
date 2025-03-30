@@ -13,4 +13,3 @@ namespace graphics {
         Bottom
     };
 }
-

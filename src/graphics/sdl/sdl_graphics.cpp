@@ -3,7 +3,7 @@
 #include "graphics/sdl/sdl_context.h"
 #include "graphics/sdl/sdl_font.h"
 #include "graphics/sdl/sdl_image.h"
-#include "graphics/sdl/sdl_utils.h"
+#include "graphics/sdl/sdl_utils.hpp"
 #include "../utils.h"
 
 namespace graphics::sdl {

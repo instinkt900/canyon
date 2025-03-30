@@ -6,4 +6,3 @@ namespace graphics {
         virtual ~IFont() = default;
     };
 }
-

@@ -1,5 +1,5 @@
 #include "graphics/image_factory.h"
-#include "moth_ui/iimage_factory.h"
+#include <moth_ui/iimage_factory.h>
 
 namespace graphics {
     class MothImageFactory : public moth_ui::IImageFactory {

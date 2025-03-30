@@ -24,4 +24,3 @@ namespace graphics::sdl {
         SDL_Renderer* m_renderer = nullptr;
     };
 }
-

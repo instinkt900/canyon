@@ -14,9 +14,9 @@ namespace graphics::vulkan {
         Framebuffer(SurfaceContext& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkRenderPass renderPass);
         virtual ~Framebuffer();
 
-        //void BeginPass(RenderPass& renderPass);
-        //void EndPass();
-        //void Submit();
+        // void BeginPass(RenderPass& renderPass);
+        // void EndPass();
+        // void Submit();
 
         VkFramebuffer GetVkFramebuffer() const { return m_vkFramebuffer; }
         CommandBuffer& GetCommandBuffer() { return *m_commandBuffer; }

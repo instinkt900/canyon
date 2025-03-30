@@ -16,4 +16,3 @@ namespace graphics {
         std::shared_ptr<graphics::FontFactory> m_factoryImpl;
     };
 }
-

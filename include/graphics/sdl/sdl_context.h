@@ -9,4 +9,3 @@ namespace graphics::sdl {
         virtual ~Context() = default;
     };
 }
-

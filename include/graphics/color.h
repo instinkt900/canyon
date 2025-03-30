@@ -113,7 +113,6 @@ namespace graphics {
             srcAlphaFactor = dstColor.a;
             dstAlphaFactor = 1.0f - srcColor.a;
             break;
-
         }
         float const finalAlpha = (srcColor.a * srcAlphaFactor) + (dstColor.a * dstAlphaFactor);
         Color finalColor = (srcColor * srcColorFactor) + (dstColor * dstColorFactor);
@@ -121,4 +120,3 @@ namespace graphics {
         return finalColor;
     }
 }
-

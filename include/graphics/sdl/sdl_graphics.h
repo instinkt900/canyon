@@ -15,7 +15,7 @@ namespace graphics::sdl {
 
         void SetBlendMode(graphics::BlendMode mode) override;
         // void SetBlendMode(std::shared_ptr<graphics::IImage> target, graphics::BlendMode mode);
-        //void SetColorMod(std::shared_ptr<graphics::IImage> target, graphics::Color const& color) override;
+        // void SetColorMod(std::shared_ptr<graphics::IImage> target, graphics::Color const& color) override;
         void SetColor(graphics::Color const& color) override;
         void Clear() override;
         void DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect) override;

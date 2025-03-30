@@ -1,7 +1,7 @@
 #pragma once
 
 #include "graphics/igraphics.h"
-#include "moth_ui/irenderer.h"
+#include <moth_ui/irenderer.h>
 
 namespace graphics {
     class MothRenderer : public moth_ui::IRenderer {

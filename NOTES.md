@@ -3,6 +3,7 @@
 - Fixed font rendering on vulkan. was just blend modes. forced alpha in graphics.
 - Need to fix vulkan exit cleanup. it crashes.
 - Surface context can probably be something better
+- sdl_utils.h shows errors because clangd is using SDL_FontCache.c as the compile target which is c. renaming it to hpp fixes it
 
 ## 29/03/25
 
