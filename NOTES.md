@@ -1,6 +1,7 @@
 ## 05/04/25
 
 - need to look into crashes on exit with vulkan.
+- lamdas for event handlers, not just on dispatch
 
 ## 04/04/25
 

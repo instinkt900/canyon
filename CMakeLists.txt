@@ -66,7 +66,7 @@ set(SOURCES ${SOURCES}
 	src/platform/sdl/sdl_platform.cpp
 	src/platform/sdl/sdl_window.cpp
 	src/platform/window.cpp
-	src/ui_button.cpp
+	src/widgets/ui_button.cpp
 	src/example/example.cpp
 	src/example/example_layer.cpp
     src/graphics/sdl/SDL_FontCache.c
