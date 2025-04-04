@@ -115,7 +115,10 @@ namespace platform::glfw {
     }
 
     void Window::DestroyWindow() {
+        // TODO: why do we do this in destroy?
         m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
+        m_graphics = nullptr;
+        m_surfaceContext = nullptr;
         glfwDestroyWindow(m_glfwWindow);
     }
 

@@ -20,7 +20,7 @@ namespace platform::glfw {
     }
 
     std::unique_ptr<platform::Window> Platform::CreateWindow(char const* title, int width, int height) {
-        return std::make_unique<platform::glfw::Window>(*m_context, "testing", 640, 480);
+        return std::make_unique<platform::glfw::Window>(*m_context, title, width, height);
     }
 }
 

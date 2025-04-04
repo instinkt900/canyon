@@ -1,7 +1,12 @@
 ## 05/04/25
 
-- need to look into crashes on exit with vulkan.
 - lamdas for event handlers, not just on dispatch
+- SDL is not working with multi windows. Creating two windows means nothing draws at all
+- vulkan will crash on window close unless all resources related to that context are destroyed first
+  - images, fonts, etc.
+  - should be able to invalidate assets linked to that context?
+  - this also means fonts/images etc. all need to be on a per window basis.
+    - images and fonts created for one window will not work on another. can we fix this?
 
 ## 04/04/25
 
