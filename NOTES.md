@@ -1,3 +1,11 @@
+## 05/04/25
+
+- need to look into crashes on exit with vulkan.
+
+## 04/04/25
+
+- https://github.com/NVIDIA-RTX/NVRHI possible?
+
 ## 30/03/25
 
 - Fixed font rendering on vulkan. was just blend modes. forced alpha in graphics.
