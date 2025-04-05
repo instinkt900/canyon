@@ -3,27 +3,25 @@
 #include "graphics/sdl/sdl_surface_context.h"
 #include "platform/sdl/sdl_events.h"
 #include "graphics/sdl/sdl_graphics.h"
-#include <SDL_events.h>
-#include <SDL_video.h>
-#include <moth_ui/context.h>
 
-namespace platform::sdl {
+namespace {
+    std::mutex EventFetchMutex;
+    std::list<SDL_Event> PendingEvents;
+
     bool CollectSDLEventsForWindow(uint32_t windowId, std::vector<SDL_Event>* outEvents) {
-        static std::mutex mutex;
-        std::lock_guard lock(mutex);
+        std::lock_guard lock(EventFetchMutex);
 
-        static std::list<SDL_Event> events;
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            events.push_back(event);
+            PendingEvents.push_back(event);
         }
 
         bool found_event = false;
-        for (auto it = events.begin(); it != events.end(); /* manually iterate */) {
+        for (auto it = PendingEvents.begin(); it != PendingEvents.end(); /* manually iterate */) {
             if (it->window.windowID == windowId) {
                 outEvents->push_back(*it);
                 found_event = true;
-                it = events.erase(it);
+                it = PendingEvents.erase(it);
             } else {
                 ++it;
             }
@@ -31,7 +29,9 @@ namespace platform::sdl {
 
         return found_event;
     }
+}
 
+namespace platform::sdl {
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {
