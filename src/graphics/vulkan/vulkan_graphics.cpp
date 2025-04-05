@@ -1,5 +1,6 @@
 #include "canyon.h"
 #include "graphics/vulkan/vulkan_graphics.h"
+#include "graphics/color.h"
 #include "graphics/vulkan/vulkan_command_buffer.h"
 #include "graphics/vulkan/vulkan_texture.h"
 #include "graphics/vulkan/vulkan_font.h"
@@ -154,8 +155,6 @@ namespace graphics::vulkan {
         auto& vulkanImage = dynamic_cast<Image&>(image);
         auto texture = vulkanImage.m_texture;
 
-        // FloatRect const targetRect = MakeRect(0.0f, 0.0f, static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height));
-
         FloatRect fDestRect = static_cast<FloatRect>(destRect);
 
         FloatRect imageRect;
@@ -196,8 +195,25 @@ namespace graphics::vulkan {
     }
 
     void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
-        // TODO
-        DrawImage(image, destRect, sourceRect);
+        // TODO:
+        // DrawImage(image, destRect, sourceRect);
+        IntRect imageRect = MakeRect(0, 0, image.GetWidth(), image.GetHeight());
+        if (!sourceRect) {
+            sourceRect = &imageRect;
+        }
+        auto const imageWidth = static_cast<int>(sourceRect->w() * scale);
+        auto const imageHeight = static_cast<int>(sourceRect->h() * scale);
+        int t = 0;
+        for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
+            for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
+                    // printf("{ %d, %d, %d, %d }\n", x, y, imageWidth, imageHeight);
+                IntRect tiledDstRect{ { x, y }, { x + imageWidth, y + imageHeight } };
+                DrawImage(image, tiledDstRect, sourceRect);
+                // SetColor(FromARGB(rand()));
+                // DrawFillRectF(static_cast<FloatRect>(tiledDstRect));
+                t++;
+            }
+        }
     }
 
     void Graphics::DrawToPNG(std::filesystem::path const& path) {

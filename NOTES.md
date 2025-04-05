@@ -5,6 +5,8 @@
   - should be able to invalidate assets linked to that context?
   - this also means fonts/images etc. all need to be on a per window basis.
     - images and fonts created for one window will not work on another. can we fix this?
+- SDL events will need to be handled properly with mutli windows
+- Vulkan tiled rendering might need a review
 
 ## 04/04/25
 

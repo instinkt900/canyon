@@ -3,12 +3,14 @@
 #include "platform/window.h"
 
 void exampleMain(platform::IPlatform& platform) {
-    auto window1 = platform.CreateWindow("Window 1", 640, 480);
+    auto window1 = platform.CreateWindow("Window 1", 300, 200);
     auto window2 = platform.CreateWindow("Window 2", 300, 200);
 
-    auto& surfaceContext = window1->GetSurfaceContext();
-    auto texture = surfaceContext.ImageFromFile("assets/images/playership.png");
-    auto font = surfaceContext.FontFromFile("assets/fonts/pilotcommand.ttf", 38);
+    auto& surfaceContext1 = window1->GetSurfaceContext();
+    auto& surfaceContext2 = window2->GetSurfaceContext();
+    auto texture = surfaceContext1.ImageFromFile("assets/images/playership.png");
+    auto font1 = surfaceContext1.FontFromFile("assets/fonts/pilotcommand.ttf", 38);
+    auto font2 = surfaceContext2.FontFromFile("assets/fonts/pilotcommand.ttf", 38);
 
     bool closeWindow1 = false;
     bool closeWindow2 = false;
@@ -33,14 +35,13 @@ void exampleMain(platform::IPlatform& platform) {
         if (window1) {
             auto& graphics = window1->GetGraphics();
             graphics.Begin();
-            graphics.SetColor(graphics::BasicColors::Red);
-            graphics.DrawFillRectF(MakeRect(0.0f, 0.0f, 100.0f, 100.0f));
             graphics.SetColor(graphics::BasicColors::White);
-            auto destRect = MakeRect(0, 0, 640, 480);
+            graphics.Clear();
+            auto const destRect = MakeRect(0, 0, window1->GetWidth(), window1->GetHeight());
             graphics.DrawImageTiled(*texture, destRect, nullptr, 1.0f);
             graphics.SetBlendMode(graphics::BlendMode::Alpha);
-            graphics.SetColor(graphics::BasicColors::Green);
-            graphics.DrawText("hello", *font, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, 640, 480));
+            graphics.SetColor(graphics::BasicColors::Blue);
+            graphics.DrawText("hello", *font1, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, window1->GetWidth(), window1->GetHeight()));
             window1->Update(30);
             window1->Draw();
             graphics.End();
@@ -50,16 +51,19 @@ void exampleMain(platform::IPlatform& platform) {
             graphics.Begin();
             graphics.SetColor(graphics::BasicColors::Blue);
             graphics.Clear();
+            graphics.SetColor(graphics::BasicColors::White);
+            graphics.DrawText("world", *font2, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, window2->GetWidth(), window2->GetHeight()));
             window2->Update(30);
             window2->Draw();
             graphics.End();
         }
         if (closeWindow1) {
             texture = nullptr;
-            font = nullptr;
+            font1 = nullptr;
             window1 = nullptr;
         }
         if (closeWindow2) {
+            font2 = nullptr;
             window2 = nullptr;
         }
         using namespace std::chrono_literals;
