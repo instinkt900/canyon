@@ -3,7 +3,7 @@
 #include "graphics/vulkan/vulkan_utils.h"
 
 namespace graphics::vulkan {
-    Buffer::Buffer(Context& context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
+    Buffer::Buffer(SurfaceContext& context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
         : m_context(context)
         , m_size(size) {
         VkBufferCreateInfo bufferInfo{};
@@ -19,21 +19,21 @@ namespace graphics::vulkan {
             allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
         }
 
-        CHECK_VK_RESULT(vmaCreateBuffer(m_context.m_vmaAllocator, &bufferInfo, &allocInfo, &m_vkBuffer, &m_vmaAllocation, nullptr));
+        CHECK_VK_RESULT(vmaCreateBuffer(m_context.GetVmaAllocator(), &bufferInfo, &allocInfo, &m_vkBuffer, &m_vmaAllocation, nullptr));
     }
 
     Buffer::~Buffer() {
-        vmaDestroyBuffer(m_context.m_vmaAllocator, m_vkBuffer, m_vmaAllocation);
+        vmaDestroyBuffer(m_context.GetVmaAllocator(), m_vkBuffer, m_vmaAllocation);
     }
 
     void* Buffer::Map() {
         void* data;
-        vmaMapMemory(m_context.m_vmaAllocator, m_vmaAllocation, &data);
+        vmaMapMemory(m_context.GetVmaAllocator(), m_vmaAllocation, &data);
         return data;
     }
 
     void Buffer::Unmap() {
-        vmaUnmapMemory(m_context.m_vmaAllocator, m_vmaAllocation);
+        vmaUnmapMemory(m_context.GetVmaAllocator(), m_vmaAllocation);
     }
 
     void Buffer::Copy(Buffer& sourceBuffer) {

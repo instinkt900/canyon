@@ -2,13 +2,15 @@
 
 #include "events/event_window.h"
 #include "platform/window.h"
+#include "graphics/sdl/sdl_surface_context.h"
 
 namespace platform::sdl {
     class Window : public platform::Window {
     public:
-        Window(std::string const& applicationTitle, int width, int height);
+        Window(graphics::sdl::Context& context, std::string const& applicationTitle, int width, int height);
         virtual ~Window();
 
+        graphics::SurfaceContext & GetSurfaceContext() const override { return *m_surfaceContext; }
         void SetWindowTitle(std::string const& title) override;
 
         SDL_Window* GetSDLWindow() const { return m_window; }
@@ -22,6 +24,9 @@ namespace platform::sdl {
         void DestroyWindow() override;
 
     private:
+        graphics::sdl::Context& m_context;
+        std::unique_ptr<graphics::sdl::SurfaceContext> m_surfaceContext;
+
         SDL_Window* m_window = nullptr;
         SDL_Renderer* m_renderer = nullptr;
 

@@ -1,7 +1,8 @@
 #include "canyon.h"
 #include "graphics/vulkan/vulkan_graphics.h"
+#include "graphics/color.h"
 #include "graphics/vulkan/vulkan_command_buffer.h"
-#include "graphics/vulkan/vulkan_subimage.h"
+#include "graphics/vulkan/vulkan_texture.h"
 #include "graphics/vulkan/vulkan_font.h"
 #include "graphics/vulkan/shaders/vulkan_shaders.h"
 
@@ -75,7 +76,7 @@ namespace {
 }
 
 namespace graphics::vulkan {
-    Graphics::Graphics(Context& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
+    Graphics::Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
         : m_context(context) {
         CreateRenderPass();
         CreateShaders();
@@ -83,7 +84,7 @@ namespace graphics::vulkan {
 
         VkPipelineCacheCreateInfo cacheInfo{};
         cacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-        CHECK_VK_RESULT(vkCreatePipelineCache(m_context.m_vkDevice, &cacheInfo, nullptr, &m_vkPipelineCache));
+        CHECK_VK_RESULT(vkCreatePipelineCache(m_context.GetVkDevice(), &cacheInfo, nullptr, &m_vkPipelineCache));
 
         m_swapchain = std::make_unique<Swapchain>(m_context, *m_renderPass, surface, VkExtent2D{ surfaceWidth, surfaceHeight });
 
@@ -99,14 +100,14 @@ namespace graphics::vulkan {
             m_defaultContext.m_vertexBuffer->Unmap();
             m_defaultContext.m_vertexBufferData = nullptr;
         }
-        vkDestroyPipelineCache(m_context.m_vkDevice, m_vkPipelineCache, nullptr);
+        vkDestroyPipelineCache(m_context.GetVkDevice(), m_vkPipelineCache, nullptr);
     }
 
     void Graphics::Begin() {
         m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
         VkFence cmdFence = m_defaultContext.m_target->GetFence().GetVkFence();
-        vkWaitForFences(m_context.m_vkDevice, 1, &cmdFence, VK_TRUE, UINT64_MAX);
-        vkResetFences(m_context.m_vkDevice, 1, &cmdFence);
+        vkWaitForFences(m_context.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
+        vkResetFences(m_context.GetVkDevice(), 1, &cmdFence);
 
         BeginContext(&m_defaultContext);
     }
@@ -125,7 +126,7 @@ namespace graphics::vulkan {
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapChains;
         presentInfo.pImageIndices = swapchainIndices;
-        vkQueuePresentKHR(m_context.m_vkQueue, &presentInfo);
+        vkQueuePresentKHR(m_context.GetVkQueue(), &presentInfo);
     }
 
     void Graphics::SetBlendMode(BlendMode mode) {
@@ -149,19 +150,12 @@ namespace graphics::vulkan {
         DrawFillRectF({ { 0, 0 }, { static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height) } });
     }
 
-    void Graphics::DrawImage(IImage& image, IntRect const* sourceRect, IntRect const* destRect) {
+    void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto context = m_contextStack.top();
-        auto& vulkanImage = dynamic_cast<SubImage&>(image);
+        auto& vulkanImage = dynamic_cast<Image&>(image);
         auto texture = vulkanImage.m_texture;
 
-        FloatRect const targetRect = MakeRect(0.0f, 0.0f, static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height));
-
-        FloatRect fDestRect;
-        if (destRect) {
-            fDestRect = static_cast<FloatRect>(*destRect);
-        } else {
-            fDestRect = targetRect;
-        }
+        FloatRect fDestRect = static_cast<FloatRect>(destRect);
 
         FloatRect imageRect;
         if (sourceRect) {
@@ -200,6 +194,28 @@ namespace graphics::vulkan {
         SubmitVertices(vertices, 6, ETopologyType::Triangles, descriptorSet);
     }
 
+    void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
+        // TODO:
+        // DrawImage(image, destRect, sourceRect);
+        IntRect imageRect = MakeRect(0, 0, image.GetWidth(), image.GetHeight());
+        if (!sourceRect) {
+            sourceRect = &imageRect;
+        }
+        auto const imageWidth = static_cast<int>(sourceRect->w() * scale);
+        auto const imageHeight = static_cast<int>(sourceRect->h() * scale);
+        int t = 0;
+        for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
+            for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
+                    // printf("{ %d, %d, %d, %d }\n", x, y, imageWidth, imageHeight);
+                IntRect tiledDstRect{ { x, y }, { x + imageWidth, y + imageHeight } };
+                DrawImage(image, tiledDstRect, sourceRect);
+                // SetColor(FromARGB(rand()));
+                // DrawFillRectF(static_cast<FloatRect>(tiledDstRect));
+                t++;
+            }
+        }
+    }
+
     void Graphics::DrawToPNG(std::filesystem::path const& path) {
         FlushCommands();
 
@@ -207,9 +223,9 @@ namespace graphics::vulkan {
         auto drawContext = m_contextStack.top();
 
         auto const targetFormat = VK_FORMAT_R8G8B8A8_UNORM;
-        auto targetImage = std::make_unique<Image>(context, drawContext->m_logicalExtent.width, drawContext->m_logicalExtent.height, targetFormat, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        auto targetImage = std::make_unique<Texture>(context, drawContext->m_logicalExtent.width, drawContext->m_logicalExtent.height, targetFormat, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        auto renderedSubImage = static_cast<SubImage*>(drawContext->m_target->GetImage());
+        auto renderedSubImage = static_cast<Image*>(drawContext->m_target->GetImage());
         auto srcImage = renderedSubImage->m_texture;
         auto srcFormat = srcImage->GetVkFormat();
 
@@ -241,7 +257,7 @@ namespace graphics::vulkan {
 
         targetImage->Unmap();
 
-         m_contextStack.pop();
+        m_contextStack.pop();
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {
@@ -322,6 +338,7 @@ namespace graphics::vulkan {
 
     void Graphics::DrawText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) {
         auto context = m_contextStack.top();
+        context->m_currentBlendMode = BlendMode::Alpha; // force alpha blending for text
         Font& vulkanFont = static_cast<Font&>(font);
 
         uint32_t const glyphStart = context->m_glyphCount;
@@ -404,12 +421,12 @@ namespace graphics::vulkan {
                 context->m_currentPipelineId = pipeline.m_hash;
             }
 
-            commandBuffer.BindDescriptorSet(*m_fontShader, vulkanFont.GetVKDescriptorSet(), 0);
+            commandBuffer.BindDescriptorSet(*m_fontShader, vulkanFont.GetVKDescriptorSetForShader(*m_fontShader), 0);
             commandBuffer.Draw(4, 0, glyphCount, glyphStart);
         }
     }
 
-    void Graphics::SetClipRect(IntRect const* clipRect) {
+    void Graphics::SetClip(IntRect const* clipRect) {
         auto context = m_contextStack.top();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         if (clipRect) {
@@ -423,8 +440,7 @@ namespace graphics::vulkan {
             VkRect2D scissor;
             scissor.offset.x = 0;
             scissor.offset.y = 0;
-            scissor.extent.width = context->m_target->GetDimensions().x;
-            scissor.extent.height = context->m_target->GetDimensions().y;
+            scissor.extent = context->m_target->GetVkExtent();
             commandBuffer.SetScissor(scissor);
         }
     }
@@ -449,7 +465,7 @@ namespace graphics::vulkan {
         if (target) {
             m_overrideContext.m_target = static_cast<Framebuffer*>(target);
             VkFence fence = m_overrideContext.m_target->GetFence().GetVkFence();
-            vkResetFences(m_context.m_vkDevice, 1, &fence);
+            vkResetFences(m_context.GetVkDevice(), 1, &fence);
             BeginContext(&m_overrideContext);
         }
     }
@@ -464,7 +480,7 @@ namespace graphics::vulkan {
         commandBuffer.PushConstants(*m_fontShader, VK_SHADER_STAGE_VERTEX_BIT, sizeof(PushConstants), &constants);
     }
 
-    VkDescriptorSet Graphics::GetDescriptorSet(Image& image) {
+    VkDescriptorSet Graphics::GetDescriptorSet(Texture& image) {
         return m_drawingShader->GetDescriptorSet(image);
     }
 
@@ -567,7 +583,7 @@ namespace graphics::vulkan {
             dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
             dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-            m_renderPass = RenderPassBuilder(m_context.m_vkDevice)
+            m_renderPass = RenderPassBuilder(m_context.GetVkDevice())
                                .AddAttachment(colorAttachment)
                                .AddSubpass(subpass)
                                .AddDependency(dependency)
@@ -602,7 +618,7 @@ namespace graphics::vulkan {
             dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
             dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-            m_rtRenderPass = RenderPassBuilder(m_context.m_vkDevice)
+            m_rtRenderPass = RenderPassBuilder(m_context.GetVkDevice())
                                  .AddAttachment(colorAttachment)
                                  .AddSubpass(subpass)
                                  .AddDependency(dependency)
@@ -611,14 +627,14 @@ namespace graphics::vulkan {
     }
 
     void Graphics::CreateShaders() {
-        m_drawingShader = ShaderBuilder(m_context.m_vkDevice, m_context.m_vkDescriptorPool)
+        m_drawingShader = ShaderBuilder(m_context.GetVkDevice(), m_context.GetVkDescriptorPool())
                               .AddPushConstant(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants))
                               .AddBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT)
                               .AddStage(VK_SHADER_STAGE_VERTEX_BIT, "main", drawing_shader_vert_spv, drawing_shader_vert_spv_len)
                               .AddStage(VK_SHADER_STAGE_FRAGMENT_BIT, "main", drawing_shader_frag_spv, drawing_shader_frag_spv_len)
                               .Build();
 
-        m_fontShader = ShaderBuilder(m_context.m_vkDevice, m_context.m_vkDescriptorPool)
+        m_fontShader = ShaderBuilder(m_context.GetVkDevice(), m_context.GetVkDescriptorPool())
                            .AddPushConstant(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants))
                            .AddBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
                            .AddBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT)
@@ -637,7 +653,7 @@ namespace graphics::vulkan {
 
         const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 
-        m_defaultImage = std::make_unique<Image>(m_context, 1, 1, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+        m_defaultImage = std::make_unique<Texture>(m_context, 1, 1, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 
         auto commandBuffer = std::make_unique<CommandBuffer>(m_context);
         commandBuffer->BeginRecord();
@@ -658,7 +674,7 @@ namespace graphics::vulkan {
         auto const vertexInputBinding = getVertexBindingDescription();
         auto const vertexAttributeBindings = getVertexAttributeDescriptions();
 
-        auto const builder = PipelineBuilder(m_context.m_vkDevice)
+        auto const builder = PipelineBuilder(m_context.GetVkDevice())
                                  .SetPipelineCache(m_vkPipelineCache)
                                  .SetRenderPass(GetCurrentRenderPass())
                                  .SetShader(m_drawingShader)
@@ -688,7 +704,7 @@ namespace graphics::vulkan {
         auto const vertexInputBinding = getFontVertexBindingDescription();
         auto const vertexAttributeBindings = getFontVertexAttributeDescriptions();
 
-        auto const builder = PipelineBuilder(m_context.m_vkDevice)
+        auto const builder = PipelineBuilder(m_context.GetVkDevice())
                                  .SetPipelineCache(m_vkPipelineCache)
                                  .SetRenderPass(GetCurrentRenderPass())
                                  .SetShader(m_fontShader)
@@ -757,8 +773,7 @@ namespace graphics::vulkan {
         VkRect2D scissor;
         scissor.offset.x = 0;
         scissor.offset.y = 0;
-        scissor.extent.width = context->m_target->GetDimensions().x;
-        scissor.extent.height = context->m_target->GetDimensions().y;
+        scissor.extent = context->m_target->GetVkExtent();
         commandBuffer.SetScissor(scissor);
 
         PushConstants pushConstants;
@@ -810,7 +825,7 @@ namespace graphics::vulkan {
         }
 
         commandBuffer.Submit(cmdFence, context->m_target->GetAvailableSemaphore(), context->m_target->GetRenderFinishedSemaphore());
-        vkWaitForFences(m_context.m_vkDevice, 1, &cmdFence, VK_TRUE, UINT64_MAX);
+        vkWaitForFences(m_context.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
     }
 
     void Graphics::SubmitVertices(Vertex* vertices, uint32_t vertCount, ETopologyType topology, VkDescriptorSet descriptorSet) {
@@ -849,7 +864,7 @@ namespace graphics::vulkan {
     }
 
     void Graphics::OnResize(VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight) {
-        vkDeviceWaitIdle(m_context.m_vkDevice);
+        vkDeviceWaitIdle(m_context.GetVkDevice());
         m_swapchain.reset();
         m_swapchain = std::make_unique<Swapchain>(m_context, *m_renderPass, surface, VkExtent2D{ surfaceWidth, surfaceHeight });
     }

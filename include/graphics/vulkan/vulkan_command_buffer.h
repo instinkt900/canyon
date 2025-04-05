@@ -1,7 +1,6 @@
 #pragma once
 
-#include "vulkan_context.h"
-#include "vulkan_image.h"
+#include "vulkan_surface_context.h"
 #include "vulkan_buffer.h"
 #include "vulkan_shader.h"
 #include "vulkan_pipeline.h"
@@ -10,7 +9,7 @@
 namespace graphics::vulkan {
     class CommandBuffer {
     public:
-        CommandBuffer(Context& context);
+        CommandBuffer(SurfaceContext& context);
         ~CommandBuffer();
 
         void BeginRecord();
@@ -19,10 +18,10 @@ namespace graphics::vulkan {
         void SubmitAndWait();
         void Reset();
 
-        void TransitionImageLayout(Image& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-        void CopyBufferToImage(Image& image, Buffer& buffer);
-        void CopyImageToBuffer(Buffer& buffer, Image& image);
-        void CopyImageToImage(Image& srcImage, Image& dstImage);
+        void TransitionImageLayout(Texture& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+        void CopyBufferToImage(Texture& image, Buffer& buffer);
+        void CopyImageToBuffer(Buffer& buffer, Texture& image);
+        void CopyImageToImage(Texture& srcImage, Texture& dstImage);
 
         void BeginRenderPass(RenderPass& renderPass, Framebuffer& frameBuffer);
         void EndRenderPass();
@@ -41,7 +40,7 @@ namespace graphics::vulkan {
         VkCommandBuffer GetVkCommandBuffer() { return m_vkCommandBuffer; }
 
     private:
-        Context& m_context;
+        SurfaceContext& m_context;
         VkCommandBuffer m_vkCommandBuffer;
         bool m_recording = false;
     };

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "vulkan_context.h"
+#include "vulkan_surface_context.h"
 
 namespace graphics::vulkan {
     class Buffer {
     public:
-        Buffer(Context& context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
+        Buffer(SurfaceContext& context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
         ~Buffer();
 
         size_t GetSize() const { return m_size; }
@@ -18,7 +18,7 @@ namespace graphics::vulkan {
         VkBuffer GetVKBuffer() const { return m_vkBuffer; }
 
     private:
-        Context& m_context;
+        SurfaceContext& m_context;
         VkBuffer m_vkBuffer;
         VmaAllocation m_vmaAllocation;
         size_t m_size;

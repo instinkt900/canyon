@@ -1,16 +1,18 @@
 #include "canyon.h"
 #include "platform/glfw/glfw_window.h"
 #include "graphics/vulkan/vulkan_graphics.h"
+#include "graphics/vulkan/vulkan_surface_context.h"
 #include "platform/glfw/glfw_events.h"
 #include "moth_ui/events/event_mouse.h"
 #include "events/event_window.h"
-#include "utils/conversions.h"
+#include "graphics/moth_ui/utils.h"
 
 namespace platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
-        , m_vulkanContext(context) {
+        , m_context(context) {
             CreateWindow();
+            Finalize();
     }
 
     Window::~Window() {
@@ -30,17 +32,10 @@ namespace platform::glfw {
     }
 
     void Window::Draw() {
-        graphics::vulkan::Graphics* graphics = static_cast<graphics::vulkan::Graphics*>(m_graphics.get());
-        graphics->Begin();
         m_layerStack->Draw();
-        graphics->End();
     }
 
     bool Window::CreateWindow() {
-        if (!glfwInit()) {
-            return false;
-        }
-
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         m_glfwWindow = glfwCreateWindow(m_windowWidth, m_windowHeight, m_title.c_str(), nullptr, nullptr);
         glfwSetWindowUserPointer(m_glfwWindow, this);
@@ -105,9 +100,10 @@ namespace platform::glfw {
             glfwMaximizeWindow(m_glfwWindow);
         }
 
-        glfwCreateWindowSurface(m_vulkanContext.m_vkInstance, m_glfwWindow, nullptr, &m_customVkSurface);
-        m_graphics = std::make_unique<graphics::vulkan::Graphics>(m_vulkanContext, m_customVkSurface, m_windowWidth, m_windowHeight);
+        glfwCreateWindowSurface(m_context.GetInstance(), m_glfwWindow, nullptr, &m_customVkSurface);
+        m_surfaceContext = std::make_unique<graphics::vulkan::SurfaceContext>(m_context);
 
+        m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight);
         m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
 
         return true;
@@ -119,9 +115,11 @@ namespace platform::glfw {
     }
 
     void Window::DestroyWindow() {
+        // TODO: why do we do this in destroy?
         m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
+        m_graphics = nullptr;
+        m_surfaceContext = nullptr;
         glfwDestroyWindow(m_glfwWindow);
-        glfwTerminate();
     }
 
     void Window::OnResize() {

@@ -13,7 +13,7 @@ namespace graphics::sdl {
             return m_fontObj;
         }
 
-        static std::unique_ptr<IFont> LoadFont(SDL_Renderer& renderer, const std::filesystem::path &path, int size);
+        static std::unique_ptr<IFont> Load(SDL_Renderer& renderer, const std::filesystem::path& path, int size);
 
     private:
         CachedFontRef m_fontObj;

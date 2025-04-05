@@ -21,22 +21,22 @@ namespace {
 }
 
 namespace graphics::vulkan {
-    Swapchain::Swapchain(Context& context, RenderPass& renderPass, VkSurfaceKHR surface, VkExtent2D extent)
+    Swapchain::Swapchain(SurfaceContext& context, RenderPass& renderPass, VkSurfaceKHR surface, VkExtent2D extent)
         : m_context(context)
         , m_extent(extent) {
         VkSurfaceCapabilitiesKHR capabilities;
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_context.m_vkPhysicalDevice, surface, &capabilities);
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_context.GetVkPhysicalDevice(), surface, &capabilities);
         extent = chooseSwapExtent(extent.width, extent.height, capabilities);
 
         const VkFormat requestSurfaceImageFormat[] = { VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM };
         const VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-        VkSurfaceFormatKHR surfaceFormat = Context::selectSurfaceFormat(m_context.m_vkPhysicalDevice, surface, requestSurfaceImageFormat, 4, requestSurfaceColorSpace);
+        VkSurfaceFormatKHR surfaceFormat = SurfaceContext::selectSurfaceFormat(m_context.GetVkPhysicalDevice(), surface, requestSurfaceImageFormat, 4, requestSurfaceColorSpace);
         VkPresentModeKHR presentModes[] = { VK_PRESENT_MODE_MAILBOX_KHR, /*VK_PRESENT_MODE_IMMEDIATE_KHR, */VK_PRESENT_MODE_FIFO_KHR };
-        VkPresentModeKHR presentMode = Context::selectPresentMode(m_context.m_vkPhysicalDevice, surface, presentModes, 3);
+        VkPresentModeKHR presentMode = SurfaceContext::selectPresentMode(m_context.GetVkPhysicalDevice(), surface, presentModes, 3);
         VkSwapchainCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
         createInfo.surface = surface;
-        createInfo.minImageCount = Context::getMinImageCountFromPresentMode(presentMode);
+        createInfo.minImageCount = SurfaceContext::getMinImageCountFromPresentMode(presentMode);
         createInfo.imageFormat = surfaceFormat.format;
         createInfo.imageColorSpace = surfaceFormat.colorSpace;
         createInfo.imageExtent = extent;
@@ -48,15 +48,15 @@ namespace graphics::vulkan {
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
         createInfo.oldSwapchain = VK_NULL_HANDLE;
-        CHECK_VK_RESULT(vkCreateSwapchainKHR(m_context.m_vkDevice, &createInfo, nullptr, &m_vkSwapchain));
+        CHECK_VK_RESULT(vkCreateSwapchainKHR(m_context.GetVkDevice(), &createInfo, nullptr, &m_vkSwapchain));
 
         uint32_t imageCount;
         std::vector<VkImage> swapchainImages;
         std::vector<VkImageView> swapchainImageViews;
-        vkGetSwapchainImagesKHR(m_context.m_vkDevice, m_vkSwapchain, &imageCount, nullptr);
+        vkGetSwapchainImagesKHR(m_context.GetVkDevice(), m_vkSwapchain, &imageCount, nullptr);
         swapchainImages.resize(imageCount);
         swapchainImageViews.resize(imageCount);
-        vkGetSwapchainImagesKHR(m_context.m_vkDevice, m_vkSwapchain, &imageCount, swapchainImages.data());
+        vkGetSwapchainImagesKHR(m_context.GetVkDevice(), m_vkSwapchain, &imageCount, swapchainImages.data());
 
         for (size_t i = 0; i < swapchainImages.size(); ++i) {
             VkImageViewCreateInfo createInfo{};
@@ -69,7 +69,7 @@ namespace graphics::vulkan {
             createInfo.subresourceRange.levelCount = 1;
             createInfo.subresourceRange.baseArrayLayer = 0;
             createInfo.subresourceRange.layerCount = 1;
-            CHECK_VK_RESULT(vkCreateImageView(m_context.m_vkDevice, &createInfo, nullptr, &swapchainImageViews[i]));
+            CHECK_VK_RESULT(vkCreateImageView(m_context.GetVkDevice(), &createInfo, nullptr, &swapchainImageViews[i]));
         }
 
         for (uint32_t i = 0; i < imageCount; ++i) {
@@ -80,12 +80,12 @@ namespace graphics::vulkan {
     }
 
     Swapchain::~Swapchain() {
-        vkDestroySwapchainKHR(m_context.m_vkDevice, m_vkSwapchain, nullptr);
+        vkDestroySwapchainKHR(m_context.GetVkDevice(), m_vkSwapchain, nullptr);
     }
 
     Framebuffer* Swapchain::GetNextFramebuffer() {
         uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(m_context.m_vkDevice, m_vkSwapchain, UINT64_MAX, m_framebuffers[m_currentFrame]->GetAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+        VkResult result = vkAcquireNextImageKHR(m_context.GetVkDevice(), m_vkSwapchain, UINT64_MAX, m_framebuffers[m_currentFrame]->GetAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
             return nullptr;
         }

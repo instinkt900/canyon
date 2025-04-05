@@ -24,46 +24,53 @@ set(SOURCES ${SOURCES}
 	external/imgui/backends/imgui_impl_sdl2.cpp
 	external/imgui/backends/imgui_impl_vulkan.cpp
 	external/imgui/backends/imgui_impl_glfw.cpp
-    src/graphics/sdl/SDL_FontCache.c
-    src/graphics/sdl/sdl_font.cpp
-    src/graphics/sdl/sdl_font_factory.cpp
-    src/graphics/sdl/sdl_graphics.cpp
-    src/graphics/sdl/sdl_image.cpp
-    src/graphics/sdl/sdl_image_factory.cpp
-    src/graphics/sdl/sdl_ui_renderer.cpp
-	src/graphics/vulkan/vulkan_buffer.cpp
-	src/graphics/vulkan/vulkan_command_buffer.cpp
-	src/graphics/vulkan/vulkan_context.cpp
-	src/graphics/vulkan/vulkan_fence.cpp
-	src/graphics/vulkan/vulkan_font.cpp
-	src/graphics/vulkan/vulkan_font_cache.cpp
-	src/graphics/vulkan/vulkan_font_factory.cpp
-	src/graphics/vulkan/vulkan_framebuffer.cpp
-	src/graphics/vulkan/vulkan_graphics.cpp
-	src/graphics/vulkan/vulkan_image.cpp
-	src/graphics/vulkan/vulkan_image_factory.cpp
-	src/graphics/vulkan/vulkan_pipeline.cpp
-	src/graphics/vulkan/vulkan_renderpass.cpp
-	src/graphics/vulkan/vulkan_shader.cpp
-	src/graphics/vulkan/vulkan_subimage.cpp
-	src/graphics/vulkan/vulkan_swapchain.cpp
-	src/graphics/vulkan/vulkan_ui_renderer.cpp
-	src/graphics/vulkan/vulkan_vma.cpp
-	src/graphics/vulkan/shaders/vulkan_shaders.cpp
+	src/graphics/font_factory.cpp
+	src/graphics/image_factory.cpp
+	src/graphics/moth_ui/moth_font_factory.cpp
+	src/graphics/moth_ui/moth_image.cpp
+	src/graphics/moth_ui/moth_image_factory.cpp
+	src/graphics/moth_ui/moth_renderer.cpp
+	src/graphics/sdl/sdl_context.cpp
+	src/graphics/sdl/sdl_font.cpp
+	src/graphics/sdl/sdl_graphics.cpp
+	src/graphics/sdl/sdl_image.cpp
+	src/graphics/sdl/sdl_texture.cpp
+	src/graphics/sdl/sdl_surface_context.cpp
 	src/graphics/stb_image.cpp
 	src/graphics/stb_image_write.cpp
 	src/graphics/stb_rect_pack.cpp
+	src/graphics/vulkan/shaders/vulkan_shaders.cpp
+	src/graphics/vulkan/vulkan_buffer.cpp
+	src/graphics/vulkan/vulkan_command_buffer.cpp 
+	src/graphics/vulkan/vulkan_context.cpp
+	src/graphics/vulkan/vulkan_fence.cpp
+	src/graphics/vulkan/vulkan_font.cpp
+	src/graphics/vulkan/vulkan_framebuffer.cpp
+	src/graphics/vulkan/vulkan_graphics.cpp
+	src/graphics/vulkan/vulkan_image.cpp
+	src/graphics/vulkan/vulkan_pipeline.cpp
+	src/graphics/vulkan/vulkan_renderpass.cpp
+	src/graphics/vulkan/vulkan_shader.cpp
+	src/graphics/vulkan/vulkan_swapchain.cpp
+	src/graphics/vulkan/vulkan_texture.cpp
+	src/graphics/vulkan/vulkan_vma.cpp
+	src/graphics/vulkan/vulkan_surface_context.cpp
 	src/layers/layer.cpp
 	src/layers/layer_stack.cpp
-	src/platform/glfw/glfw_window.cpp
-	src/platform/glfw/glfw_events.cpp
-	src/platform/sdl/sdl_window.cpp
-	src/platform/sdl/sdl_events.cpp
-	src/platform/window.cpp
-	src/platform/vulkan_application.cpp
-	src/platform/sdl_application.cpp
-    src/ui_button.cpp
 	src/main.cpp
+	src/platform/glfw/glfw_events.cpp
+	src/platform/glfw/glfw_platform.cpp
+	src/platform/glfw/glfw_window.cpp
+	src/platform/application.cpp
+	src/platform/sdl/sdl_events.cpp
+	src/platform/sdl/sdl_platform.cpp
+	src/platform/sdl/sdl_window.cpp
+	src/platform/window.cpp
+	src/widgets/ui_button.cpp
+	src/example/example_app.cpp
+	src/example/example_main.cpp
+	src/example/example_layer.cpp
+    src/graphics/sdl/SDL_FontCache.c
 )
 
 find_package(SDL2 REQUIRED)

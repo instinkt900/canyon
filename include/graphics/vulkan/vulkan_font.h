@@ -1,15 +1,15 @@
 #pragma once
 
 #include "graphics/ifont.h"
+#include "graphics/vulkan/vulkan_shader.h"
 #include "vulkan_buffer.h"
-#include "vulkan_graphics.h"
 
 #include "harfbuzz/hb.h"
 
 namespace graphics::vulkan {
     class Font : public IFont {
     public:
-        static std::shared_ptr<Font> Load(char const* path, int size, Context& context, Graphics& graphics);
+        static std::unique_ptr<Font> Load(std::filesystem::path const& path, int size, SurfaceContext& context);
         virtual ~Font();
 
         int32_t GetLineHeight() const { return m_lineHeight; }
@@ -35,19 +35,22 @@ namespace graphics::vulkan {
         };
         std::vector<LineDesc> WrapString(std::string const& str, int32_t width) const;
 
-        VkDescriptorSet GetVKDescriptorSet() const { return m_vkDescriptorSet; }
+        VkDescriptorSet GetVKDescriptorSetForShader(Shader const& shader);
+        // VkDescriptorSet GetVKDescriptorSet() const { return m_vkDescriptorSet; }
 
     private:
-        Font(FT_Face face, int size, Context& context, Graphics& graphics);
+        Font(FT_Face face, int size, SurfaceContext& context);
 
         int CodepointToIndex(int codepoint) const;
+
+        SurfaceContext& m_context;
 
         // harfbuzz stuff. this should probably be wrapped
         hb_font_t* m_hbFont = nullptr;
         mutable hb_buffer_t* m_hbBuffer = nullptr;
 
         // texture containing all glyphs
-        std::unique_ptr<Image> m_glyphAtlas;
+        std::unique_ptr<Texture> m_glyphAtlas;
 
         // global font measurements
         int32_t m_lineHeight;
@@ -62,11 +65,12 @@ namespace graphics::vulkan {
             FloatVec2 UV1;
         };
 
-        std::map<int, uint32_t> m_codepointToAtlasIndex;    //
-        std::vector<IntVec2> m_glyphBearings;      // glyph bearing values
-        std::vector<ShaderInfo> m_shaderInfos;              // glyph info specifically for the shader
+        std::map<int, uint32_t> m_codepointToAtlasIndex; //
+        std::vector<IntVec2> m_glyphBearings;            // glyph bearing values
+        std::vector<ShaderInfo> m_shaderInfos;           // glyph info specifically for the shader
 
-        VkDescriptorSet m_vkDescriptorSet;
+        std::map<uint32_t, VkDescriptorSet> m_vkDescriptorSets;
+        // VkDescriptorSet m_vkDescriptorSet;
         std::unique_ptr<Buffer> m_glyphInfosBuffer; // the buffer that stores the glyph infos
     };
 }

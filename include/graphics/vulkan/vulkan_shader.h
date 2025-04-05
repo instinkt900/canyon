@@ -20,8 +20,8 @@ namespace graphics::vulkan {
         VkDescriptorSetLayout m_descriptorSetLayout;
         VkPipelineLayout m_pipelineLayout;
 
-        VkDescriptorSet GetDescriptorSet(Image& image);
-        VkDescriptorSet CreateDescriptorSet(Image& image);
+        VkDescriptorSet GetDescriptorSet(Texture& image);
+        VkDescriptorSet CreateDescriptorSet(Texture& image);
 
         std::map<uint32_t, VkDescriptorSet> m_descriptorSets;
     };

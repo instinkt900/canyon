@@ -1,21 +1,20 @@
 #include "canyon.h"
 #include "graphics/vulkan/vulkan_command_buffer.h"
-#include "graphics/vulkan/vulkan_context.h"
 #include "graphics/vulkan/vulkan_utils.h"
 
 namespace graphics::vulkan {
-    CommandBuffer::CommandBuffer(Context& context)
+    CommandBuffer::CommandBuffer(SurfaceContext& context)
         : m_context(context) {
         VkCommandBufferAllocateInfo info{};
         info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        info.commandPool = m_context.m_vkCommandPool;
+        info.commandPool = m_context.GetVkCommandPool();
         info.commandBufferCount = 1;
-        CHECK_VK_RESULT(vkAllocateCommandBuffers(m_context.m_vkDevice, &info, &m_vkCommandBuffer));
+        CHECK_VK_RESULT(vkAllocateCommandBuffers(m_context.GetVkDevice(), &info, &m_vkCommandBuffer));
     }
 
     CommandBuffer::~CommandBuffer() {
-        vkFreeCommandBuffers(m_context.m_vkDevice, m_context.m_vkCommandPool, 1, &m_vkCommandBuffer);
+        vkFreeCommandBuffers(m_context.GetVkDevice(), m_context.GetVkCommandPool(), 1, &m_vkCommandBuffer);
     }
 
     void CommandBuffer::BeginRecord() {
@@ -59,19 +58,19 @@ namespace graphics::vulkan {
             info.pWaitDstStageMask = waitStageFlags;
         }
 
-        vkQueueSubmit(m_context.m_vkQueue, 1, &info, fence);
+        vkQueueSubmit(m_context.GetVkQueue(), 1, &info, fence);
     }
 
     void CommandBuffer::SubmitAndWait() {
         Submit(VK_NULL_HANDLE);
-        vkQueueWaitIdle(m_context.m_vkQueue);
+        vkQueueWaitIdle(m_context.GetVkQueue());
     }
 
     void CommandBuffer::Reset() {
         vkResetCommandBuffer(m_vkCommandBuffer, 0);
     }
 
-    void CommandBuffer::TransitionImageLayout(Image& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+    void CommandBuffer::TransitionImageLayout(Texture& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
         assert(m_recording);
 
         VkImageMemoryBarrier barrier{};
@@ -151,7 +150,7 @@ namespace graphics::vulkan {
         vkCmdPipelineBarrier(m_vkCommandBuffer, source_stage, destination_stage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
     }
 
-    void CommandBuffer::CopyBufferToImage(Image& image, Buffer& buffer) {
+    void CommandBuffer::CopyBufferToImage(Texture& image, Buffer& buffer) {
         assert(m_recording);
 
         VkBufferImageCopy region{};
@@ -168,7 +167,7 @@ namespace graphics::vulkan {
         vkCmdCopyBufferToImage(m_vkCommandBuffer, buffer.GetVKBuffer(), image.GetVkImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
     }
 
-    void CommandBuffer::CopyImageToBuffer(Buffer& buffer, Image& image) {
+    void CommandBuffer::CopyImageToBuffer(Buffer& buffer, Texture& image) {
         assert(m_recording);
 
         VkBufferImageCopy region{};
@@ -185,7 +184,7 @@ namespace graphics::vulkan {
         vkCmdCopyImageToBuffer(m_vkCommandBuffer, image.GetVkImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer.GetVKBuffer(), 1, &region);
     }
 
-    void CommandBuffer::CopyImageToImage(Image& srcImage, Image& dstImage) {
+    void CommandBuffer::CopyImageToImage(Texture& srcImage, Texture& dstImage) {
         assert(m_recording);
 
         VkImageCopy region{};
@@ -206,8 +205,7 @@ namespace graphics::vulkan {
         info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         info.renderPass = renderPass.GetRenderPass();
         info.framebuffer = framebuffer.GetVkFramebuffer();
-        info.renderArea.extent.width = framebuffer.GetDimensions().x;
-        info.renderArea.extent.height = framebuffer.GetDimensions().y;
+        info.renderArea.extent = framebuffer.GetVkExtent();
         info.clearValueCount = 1;
         info.pClearValues = &clearColor;
         vkCmdBeginRenderPass(m_vkCommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);

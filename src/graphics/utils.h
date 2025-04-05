@@ -2,10 +2,11 @@
 
 #include "graphics/color.h"
 #include "moth_ui/utils/color.h"
+#include "utils/rect.h"
 
 // returns a rect with the coordinates of b within a
-inline moth_ui::IntRect MergeRects(moth_ui::IntRect const& a, moth_ui::IntRect const& b) {
-    moth_ui::IntRect c;
+inline IntRect MergeRects(IntRect const& a, IntRect const& b) {
+    IntRect c;
     c.topLeft = a.topLeft + b.topLeft;
     c.bottomRight = b.bottomRight + a.topLeft;
     // contain c within a

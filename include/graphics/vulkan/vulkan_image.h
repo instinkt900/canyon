@@ -1,48 +1,24 @@
 #pragma once
 
-#include "vulkan_context.h"
+#include "graphics/vulkan/vulkan_texture.h"
+#include "graphics/iimage.h"
+#include "utils/rect.h"
 
 namespace graphics::vulkan {
-    class Image {
+    class Image : public graphics::IImage {
     public:
-        static std::unique_ptr<Image> FromFile(Context& context, std::filesystem::path const& path);
-        static std::unique_ptr<Image> FromRGBA(Context& context, int width, int height, unsigned char const* pixels);
-        Image(Context& context);
-        Image(Context& context, VkImage image, VkImageView view, VkExtent2D extent, VkFormat format, bool owning = true);
-        Image(Context& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties = 0, bool owning = true);
-        ~Image();
+        explicit Image(std::shared_ptr<Texture> texture);
+        Image(std::shared_ptr<Texture> texture, IntRect const& sourceRect);
+        virtual ~Image();
 
-        uint32_t GetId() const { return m_id; }
+        int GetWidth() const override;
+        int GetHeight() const override;
 
-        VkImage GetVkImage() const { return m_vkImage; }
-        VkExtent2D GetVkExtent() const { return m_vkExtent; }
-        VkFormat GetVkFormat() const { return m_vkFormat; }
-        VkImageView GetVkView();
-        VkSampler GetVkSampler();
-        VkDescriptorSet GetDescriptorSet();
+        static std::unique_ptr<Image> Load(SurfaceContext& context, std::filesystem::path const& path);
 
-        void* Map();
-        void Unmap();
+        std::shared_ptr<Texture> m_texture;
+        IntRect m_sourceRect;
 
-        Image(Image const&) = delete;
-        Image& operator=(Image const&) = delete;
-
-    protected:
-        uint32_t m_id;
-        Context& m_context;
-        VkExtent2D m_vkExtent;
-        VkFormat m_vkFormat;
-
-        VkImage m_vkImage = VK_NULL_HANDLE;
-        VmaAllocation m_vmaAllocation = VK_NULL_HANDLE;
-        VkImageView m_vkView = VK_NULL_HANDLE;
-        VkSampler m_vkSampler = VK_NULL_HANDLE;
-        VkDescriptorSet m_vkDescriptorSet = VK_NULL_HANDLE;
-
-        bool m_owningImage = true;
-
-        void CreateResource(VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties);
-        void CreateView();
-        void CreateDefaultSampler();
+        static class Graphics* s_graphicsContext;
     };
 }

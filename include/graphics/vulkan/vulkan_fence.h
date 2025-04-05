@@ -1,17 +1,17 @@
 #pragma once
 
-#include "vulkan_context.h"
+#include "vulkan_surface_context.h"
 
 namespace graphics::vulkan {
     class Fence {
     public:
-        Fence(Context& context);
+        Fence(SurfaceContext& context);
         ~Fence();
 
         VkFence GetVkFence() const { return m_vkFence; }
 
     private:
-        Context& m_context;
+        SurfaceContext& m_context;
         VkFence m_vkFence;
     };
 }
