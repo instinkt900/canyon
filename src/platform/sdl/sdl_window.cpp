@@ -8,22 +8,28 @@
 #include <moth_ui/context.h>
 
 namespace platform::sdl {
-    bool GetSDLEventForWindow(uint32_t windowId, SDL_Event* outEvent) {
+    bool CollectSDLEventsForWindow(uint32_t windowId, std::vector<SDL_Event>* outEvents) {
+        static std::mutex mutex;
+        std::lock_guard lock(mutex);
+
         static std::list<SDL_Event> events;
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             events.push_back(event);
         }
 
-        for (auto it = events.begin(); it != events.end(); ++it) {
+        bool found_event = false;
+        for (auto it = events.begin(); it != events.end(); /* manually iterate */) {
             if (it->window.windowID == windowId) {
-                *outEvent = *it;
-                events.erase(it);
-                return true;
+                outEvents->push_back(*it);
+                found_event = true;
+                it = events.erase(it);
+            } else {
+                ++it;
             }
         }
 
-        return false;
+        return found_event;
     }
 
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
@@ -38,8 +44,9 @@ namespace platform::sdl {
     }
 
     void Window::Update(uint32_t ticks) {
-        SDL_Event event;
-        while (GetSDLEventForWindow(m_windowId, &event)) {
+        std::vector<SDL_Event> events;
+        CollectSDLEventsForWindow(m_windowId, &events);
+        for (auto event : events) {
             if (auto const translatedEvent = FromSDL(event)) {
                 moth_ui::EventDispatch dispatch(*translatedEvent);
                 dispatch.Dispatch(this, &Window::OnResizeEvent);
