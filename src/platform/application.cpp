@@ -7,7 +7,6 @@ Application::Application(platform::IPlatform& platform)
 
     m_window = m_platform.CreateWindow("testing", 640, 480);
     m_window->AddEventListener(this);
-    m_window->GetLayerStack().AddEventListener(this);
     
 }
 

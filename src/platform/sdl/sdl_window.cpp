@@ -3,9 +3,29 @@
 #include "graphics/sdl/sdl_surface_context.h"
 #include "platform/sdl/sdl_events.h"
 #include "graphics/sdl/sdl_graphics.h"
+#include <SDL_events.h>
+#include <SDL_video.h>
 #include <moth_ui/context.h>
 
 namespace platform::sdl {
+    bool GetSDLEventForWindow(uint32_t windowId, SDL_Event* outEvent) {
+        static std::list<SDL_Event> events;
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            events.push_back(event);
+        }
+
+        for (auto it = events.begin(); it != events.end(); ++it) {
+            if (it->window.windowID == windowId) {
+                *outEvent = *it;
+                events.erase(it);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {
@@ -19,7 +39,7 @@ namespace platform::sdl {
 
     void Window::Update(uint32_t ticks) {
         SDL_Event event;
-        while (SDL_PollEvent(&event)) {
+        while (GetSDLEventForWindow(m_windowId, &event)) {
             if (auto const translatedEvent = FromSDL(event)) {
                 moth_ui::EventDispatch dispatch(*translatedEvent);
                 dispatch.Dispatch(this, &Window::OnResizeEvent);
@@ -49,6 +69,8 @@ namespace platform::sdl {
 
         m_graphics = std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext);
         m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
+
+        m_windowId = SDL_GetWindowID(m_window);
 
         return true;
     }
