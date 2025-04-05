@@ -3,9 +3,13 @@ from conan.tools.cmake import cmake_layout
 
 class canyon(ConanFile):
     name = "canyon"
-    version = "0.1"
     settings = "os", "compiler", "build_type", "arch"
     generators = "CMakeToolchain", "CMakeDeps", "MSBuildToolchain", "MSBuildDeps"
+
+    @property
+    def version(self):
+        with open("version.txt", "r") as f:
+            return f.read().strip()
 
     def requirements(self):
         self.requires("sdl/2.28.3")

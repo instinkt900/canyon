@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(canyon VERSION 1.0 DESCRIPTION "Raw Baby!")
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" VERSION_STR)
+string(STRIP "${VERSION_STR}" PROJECT_VERSION)
+
+project(canyon VERSION ${PROJECT_VERSION} DESCRIPTION "A basic graphical framework.")
 
 message("Building with CMake version: ${CMAKE_VERSION}")
 
@@ -15,15 +18,14 @@ include_directories(external/imgui)
 include_directories(external/murmurhash.c)
 
 set(SOURCES ${SOURCES}
-    external/murmurhash.c/murmurhash.c
+	external/imgui/backends/imgui_impl_glfw.cpp
+	external/imgui/backends/imgui_impl_sdl2.cpp
+	external/imgui/backends/imgui_impl_sdlrenderer2.cpp
+	external/imgui/backends/imgui_impl_vulkan.cpp
 	external/imgui/imgui.cpp
 	external/imgui/imgui_draw.cpp
 	external/imgui/imgui_tables.cpp
 	external/imgui/imgui_widgets.cpp
-	external/imgui/backends/imgui_impl_sdlrenderer2.cpp
-	external/imgui/backends/imgui_impl_sdl2.cpp
-	external/imgui/backends/imgui_impl_vulkan.cpp
-	external/imgui/backends/imgui_impl_glfw.cpp
 	src/graphics/font_factory.cpp
 	src/graphics/image_factory.cpp
 	src/graphics/moth_ui/moth_font_factory.cpp
@@ -34,8 +36,8 @@ set(SOURCES ${SOURCES}
 	src/graphics/sdl/sdl_font.cpp
 	src/graphics/sdl/sdl_graphics.cpp
 	src/graphics/sdl/sdl_image.cpp
-	src/graphics/sdl/sdl_texture.cpp
 	src/graphics/sdl/sdl_surface_context.cpp
+	src/graphics/sdl/sdl_texture.cpp
 	src/graphics/stb_image.cpp
 	src/graphics/stb_image_write.cpp
 	src/graphics/stb_rect_pack.cpp
@@ -51,25 +53,22 @@ set(SOURCES ${SOURCES}
 	src/graphics/vulkan/vulkan_pipeline.cpp
 	src/graphics/vulkan/vulkan_renderpass.cpp
 	src/graphics/vulkan/vulkan_shader.cpp
+	src/graphics/vulkan/vulkan_surface_context.cpp
 	src/graphics/vulkan/vulkan_swapchain.cpp
 	src/graphics/vulkan/vulkan_texture.cpp
 	src/graphics/vulkan/vulkan_vma.cpp
-	src/graphics/vulkan/vulkan_surface_context.cpp
 	src/layers/layer.cpp
 	src/layers/layer_stack.cpp
-	src/main.cpp
+	src/platform/application.cpp
 	src/platform/glfw/glfw_events.cpp
 	src/platform/glfw/glfw_platform.cpp
 	src/platform/glfw/glfw_window.cpp
-	src/platform/application.cpp
 	src/platform/sdl/sdl_events.cpp
 	src/platform/sdl/sdl_platform.cpp
 	src/platform/sdl/sdl_window.cpp
 	src/platform/window.cpp
 	src/widgets/ui_button.cpp
-	src/example/example_app.cpp
-	src/example/example_main.cpp
-	src/example/example_layer.cpp
+    external/murmurhash.c/murmurhash.c
     src/graphics/sdl/SDL_FontCache.c
 )
 
@@ -85,7 +84,8 @@ find_package(spdlog REQUIRED)
 find_package(harfbuzz REQUIRED)
 find_package(moth_ui REQUIRED)
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES})
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_include_directories(${PROJECT_NAME} PRIVATE src)
@@ -112,4 +112,10 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE include/canyon.h)
 set_source_files_properties(external/murmurhash.c/murmurhash.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+install(DIRECTORY "include/" # source directory
+        DESTINATION "include" # target directory
+        FILES_MATCHING # install only matched files
+        PATTERN "*.h" # select header files
+        PATTERN "*.hpp" # select header files
+)
