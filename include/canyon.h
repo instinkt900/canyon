@@ -13,6 +13,7 @@
 #include <array>
 #include <cassert>
 #include <fstream>
+#include <list>
 
 #include <vulkan/vulkan.hpp>
 #include <vk_mem_alloc.h>

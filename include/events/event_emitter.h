@@ -10,7 +10,7 @@ class LambdaWrapper : public moth_ui::EventListener {
             :m_lambda(lambda) {
             }
 
-        bool OnEvent(moth_ui::Event const& event) {
+        bool OnEvent(moth_ui::Event const& event) override {
             return m_lambda(event);
         }
 

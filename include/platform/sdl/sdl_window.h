@@ -27,6 +27,7 @@ namespace platform::sdl {
         graphics::sdl::Context& m_context;
         std::unique_ptr<graphics::sdl::SurfaceContext> m_surfaceContext;
 
+        uint32_t m_windowId = 0;
         SDL_Window* m_window = nullptr;
         SDL_Renderer* m_renderer = nullptr;
 
