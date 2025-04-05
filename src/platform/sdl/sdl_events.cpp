@@ -277,11 +277,14 @@ std::unique_ptr<moth_ui::Event> FromSDL(SDL_Event const& event) {
     switch (event.type) {
     case SDL_WINDOWEVENT: {
         switch (event.window.event) {
+        case SDL_WINDOWEVENT_CLOSE: {
+            return std::make_unique<EventRequestQuit>();
+        }
         case SDL_WINDOWEVENT_SIZE_CHANGED: {
             return std::make_unique<EventWindowSize>(event.window.data1, event.window.data2);
+        }
         default:
             return nullptr;
-        }
         }
     }
     case SDL_QUIT: {

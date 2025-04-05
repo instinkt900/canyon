@@ -1,7 +1,5 @@
 ## 05/04/25
 
-- lamdas for event handlers, not just on dispatch
-- SDL is not working with multi windows. Creating two windows means nothing draws at all
 - vulkan will crash on window close unless all resources related to that context are destroyed first
   - images, fonts, etc.
   - should be able to invalidate assets linked to that context?

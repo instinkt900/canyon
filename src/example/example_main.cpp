@@ -42,7 +42,7 @@ void exampleMain(platform::IPlatform& platform) {
             graphics.SetColor(graphics::BasicColors::Green);
             graphics.DrawText("hello", *font, graphics::TextHorizAlignment::Center, graphics::TextVertAlignment::Middle, MakeRect(0, 0, 640, 480));
             window1->Update(30);
-            // window->Draw();
+            window1->Draw();
             graphics.End();
         }
         if (window2) {
@@ -51,6 +51,7 @@ void exampleMain(platform::IPlatform& platform) {
             graphics.SetColor(graphics::BasicColors::Blue);
             graphics.Clear();
             window2->Update(30);
+            window2->Draw();
             graphics.End();
         }
         if (closeWindow1) {

@@ -36,7 +36,6 @@ namespace platform::sdl {
         return false;
     }
 
-
     bool Window::CreateWindow() {
         if (nullptr == (m_window = SDL_CreateWindow(m_title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_windowWidth, m_windowHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE))) {
             return false;
