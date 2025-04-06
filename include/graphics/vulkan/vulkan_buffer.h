@@ -2,7 +2,9 @@
 
 #include "vulkan_surface_context.h"
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
+
+#include <stddef.h>
 
 namespace graphics::vulkan {
     class Buffer {

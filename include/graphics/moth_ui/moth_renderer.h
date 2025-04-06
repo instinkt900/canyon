@@ -1,8 +1,14 @@
 #pragma once
 
 #include "graphics/igraphics.h"
+#include "graphics/color.h"
+#include "graphics/blend_mode.h"
+#include "utils/rect.h"
 
 #include <moth_ui/irenderer.h>
+#include <moth_ui/blend_mode.h>
+#include <moth_ui/utils/color.h>
+#include <moth_ui/utils/rect.h>
 
 #include <stack>
 

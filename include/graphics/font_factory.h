@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/igraphics.h"
+#include "graphics/ifont.h"
 
 #include <map>
 #include <string>

@@ -3,6 +3,7 @@
 #include "graphics/font_factory.h"
 
 #include <moth_ui/font_factory.h>
+#include <moth_ui/ifont.h>
 
 #include <memory>
 

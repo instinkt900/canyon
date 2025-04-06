@@ -3,6 +3,9 @@
 #include "layers/layer_stack.h"
 
 #include <moth_ui/event_listener.h>
+#include <moth_ui/events/event.h>
+
+#include <cstdint>
 
 class Layer : public moth_ui::EventListener {
 public:

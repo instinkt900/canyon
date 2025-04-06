@@ -2,6 +2,8 @@
 
 #include "events/canyon_events.h"
 
+#include <moth_ui/events/event.h>
+
 #include <memory>
 
 class EventRenderDeviceReset : public moth_ui::Event {

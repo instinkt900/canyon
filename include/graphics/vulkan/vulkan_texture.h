@@ -3,10 +3,11 @@
 #include "graphics/itexture.h"
 #include "vulkan_surface_context.h"
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 
 #include <memory>
 #include <filesystem>
+#include <cstdint>
 
 namespace graphics::vulkan {
     class Texture : public ITexture {

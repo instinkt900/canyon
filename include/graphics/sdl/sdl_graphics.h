@@ -1,7 +1,19 @@
 #pragma once
 
+#include "graphics/blend_mode.h"
+#include "graphics/color.h"
+#include "graphics/ifont.h"
 #include "graphics/igraphics.h"
+#include "graphics/iimage.h"
+#include "graphics/itarget.h"
 #include "graphics/sdl/sdl_surface_context.h"
+#include "graphics/text_alignment.h"
+#include "utils/rect.h"
+#include "utils/vector.h"
+
+#include <filesystem>
+#include <memory>
+#include <string>
 
 namespace graphics::sdl {
     class Graphics : public IGraphics {

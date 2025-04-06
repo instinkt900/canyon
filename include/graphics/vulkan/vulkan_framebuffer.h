@@ -1,13 +1,15 @@
 #pragma once
 
+#include "graphics/iimage.h"
 #include "graphics/itarget.h"
-#include "vulkan_image.h"
-#include "vulkan_fence.h"
+#include "graphics/vulkan/vulkan_fence.h"
+#include "graphics/vulkan/vulkan_image.h"
 #include "graphics/vulkan/vulkan_surface_context.h"
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 
 #include <memory>
+#include <cstdint>
 
 namespace graphics::vulkan {
     class CommandBuffer;

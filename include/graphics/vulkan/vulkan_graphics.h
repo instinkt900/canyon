@@ -1,19 +1,32 @@
 #pragma once
 
+#include "graphics/blend_mode.h"
+#include "graphics/color.h"
+#include "graphics/ifont.h"
 #include "graphics/igraphics.h"
-#include "vulkan_image.h"
-#include "vulkan_shader.h"
-#include "vulkan_pipeline.h"
-#include "vulkan_buffer.h"
-#include "vulkan_command_buffer.h"
-#include "vulkan_swapchain.h"
+#include "graphics/iimage.h"
+#include "graphics/itarget.h"
+#include "graphics/text_alignment.h"
+#include "graphics/vulkan/vulkan_buffer.h"
+#include "graphics/vulkan/vulkan_command_buffer.h"
+#include "graphics/vulkan/vulkan_image.h"
+#include "graphics/vulkan/vulkan_pipeline.h"
+#include "graphics/vulkan/vulkan_renderpass.h"
+#include "graphics/vulkan/vulkan_shader.h"
+#include "graphics/vulkan/vulkan_surface_context.h"
+#include "graphics/vulkan/vulkan_swapchain.h"
+#include "graphics/vulkan/vulkan_texture.h"
+#include "utils/rect.h"
+#include "utils/vector.h"
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 
+#include <cstdint>
 #include <filesystem>
-#include <memory>
 #include <map>
+#include <memory>
 #include <stack>
+#include <string>
 
 namespace graphics::vulkan {
     class Graphics : public IGraphics {

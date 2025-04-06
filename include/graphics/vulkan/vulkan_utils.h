@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 #include <string_view>
+#include <cstdint>
+#include <stddef.h>
 
 #define CHECK_VK_RESULT(expr)                                                                                 \
     {                                                                                                         \

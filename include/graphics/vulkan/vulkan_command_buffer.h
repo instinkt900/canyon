@@ -5,8 +5,13 @@
 #include "vulkan_shader.h"
 #include "vulkan_pipeline.h"
 #include "vulkan_framebuffer.h"
+#include "vulkan_texture.h"
+#include "vulkan_renderpass.h"
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
+
+#include <cstdint>
+#include <stddef.h>
 
 namespace graphics::vulkan {
     class CommandBuffer {

@@ -6,13 +6,16 @@
 
 #include <functional>
 #include <vector>
-#include <vector>
+#include <algorithm>
+#include <memory>
 
 class LambdaWrapper : public moth_ui::EventListener {
     public:
         LambdaWrapper(std::function<bool(moth_ui::Event const&)> const& lambda)
             :m_lambda(lambda) {
             }
+
+        virtual ~LambdaWrapper() = default;
 
         bool OnEvent(moth_ui::Event const& event) override {
             return m_lambda(event);

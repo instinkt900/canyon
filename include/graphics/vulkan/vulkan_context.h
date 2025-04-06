@@ -2,7 +2,7 @@
 
 #include "graphics/context.h"
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 

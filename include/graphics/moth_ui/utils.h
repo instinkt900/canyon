@@ -1,3 +1,5 @@
+#pragma once
+
 #include "graphics/blend_mode.h"
 #include "graphics/text_alignment.h"
 #include "utils/rect.h"

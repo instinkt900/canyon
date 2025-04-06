@@ -2,14 +2,21 @@
 
 #include "graphics/ifont.h"
 #include "graphics/vulkan/vulkan_shader.h"
-#include "vulkan_buffer.h"
+#include "graphics/vulkan/vulkan_surface_context.h"
+#include "graphics/vulkan/vulkan_buffer.h"
+#include "graphics/vulkan/vulkan_texture.h"
+#include "utils/vector.h"
 
 #include <harfbuzz/hb.h>
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 
-#include <vector>
+#include <cstdint>
 #include <filesystem>
+#include <map>
 #include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
 
 namespace graphics::vulkan {
     class Font : public IFont {

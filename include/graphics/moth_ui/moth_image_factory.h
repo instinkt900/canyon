@@ -3,6 +3,7 @@
 #include "graphics/image_factory.h"
 
 #include <moth_ui/iimage_factory.h>
+#include <moth_ui/iimage.h>
 
 #include <memory>
 #include <filesystem>

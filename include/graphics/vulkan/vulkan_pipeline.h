@@ -3,10 +3,11 @@
 #include "vulkan_shader.h"
 #include "vulkan_renderpass.h"
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 
 #include <memory>
 #include <vector>
+#include <cstdint>
 
 namespace graphics::vulkan {
     class Pipeline {

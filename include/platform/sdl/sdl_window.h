@@ -1,10 +1,17 @@
 #pragma once
 
 #include "events/event_window.h"
-#include "platform/window.h"
+#include "graphics/sdl/sdl_context.h"
 #include "graphics/sdl/sdl_surface_context.h"
+#include "graphics/surface_context.h"
+#include "platform/window.h"
+
+#include <SDL_video.h>
+#include <SDL_render.h>
 
 #include <memory>
+#include <string>
+#include <cstdint>
 
 namespace platform::sdl {
     class Window : public platform::Window {

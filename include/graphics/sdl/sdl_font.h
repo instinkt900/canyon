@@ -3,6 +3,7 @@
 #include "graphics/ifont.h"
 #include "smart_sdl.hpp"
 
+#include <SDL_render.h>
 #include <memory>
 #include <filesystem>
 

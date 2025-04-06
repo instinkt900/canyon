@@ -2,6 +2,7 @@
 
 #include "graphics/sdl/sdl_context.h"
 #include "platform/iplatform.h"
+#include "graphics/context.h"
 
 #include <memory>
 

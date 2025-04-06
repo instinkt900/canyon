@@ -1,12 +1,17 @@
 #pragma once
 
-#include "graphics/surface_context.h"
+#include "graphics/ifont.h"
+#include "graphics/iimage.h"
+#include "graphics/itexture.h"
 #include "graphics/sdl/sdl_context.h"
+#include "graphics/surface_context.h"
+#include "utils/rect.h"
 
 #include <SDL_render.h>
 
 #include <memory>
 #include <filesystem>
+#include <cstdint>
 
 namespace graphics::sdl {
     class SurfaceContext : public graphics::SurfaceContext {

@@ -1,10 +1,9 @@
 #pragma once
 
 #include "graphics/vulkan/vulkan_texture.h"
+#include "graphics/vulkan/vulkan_surface_context.h"
 #include "graphics/iimage.h"
 #include "utils/rect.h"
-
-#include <vulkan/vulkan.hpp>
 
 #include <memory>
 #include <filesystem>

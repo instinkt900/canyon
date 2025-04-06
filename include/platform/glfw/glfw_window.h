@@ -2,11 +2,16 @@
 
 #include "graphics/vulkan/vulkan_context.h"
 #include "graphics/vulkan/vulkan_surface_context.h"
+#include "graphics/surface_context.h"
 #include "platform/window.h"
+#include "utils/vector.h"
 
 #include <GLFW/glfw3.h>
+#include <vulkan/vulkan_core.h>
 
 #include <memory>
+#include <string>
+#include <cstdint>
 
 namespace platform::glfw {
     class Window : public platform::Window {

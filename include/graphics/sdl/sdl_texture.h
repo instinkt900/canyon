@@ -4,7 +4,10 @@
 #include "utils/vector.h"
 #include "graphics/sdl/smart_sdl.hpp"
 
+#include <SDL_render.h>
+
 #include <filesystem>
+#include <memory>
 
 namespace graphics::sdl {
     class Texture : public graphics::ITexture {

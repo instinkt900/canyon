@@ -3,9 +3,11 @@
 #include "utils/vector.h"
 
 #include <moth_ui/event_listener.h>
+#include <moth_ui/events/event.h>
 
 #include <memory>
 #include <vector>
+#include <cstdint>
 
 class Layer;
 

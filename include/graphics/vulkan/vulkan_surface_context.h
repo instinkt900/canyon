@@ -2,13 +2,17 @@
 
 #include "graphics/surface_context.h"
 #include "graphics/vulkan/vulkan_context.h"
+#include "graphics/itexture.h"
+#include "graphics/iimage.h"
+#include "graphics/ifont.h"
+#include "utils/rect.h"
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 #include <vk_mem_alloc.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 #include <memory>
+#include <cstdint>
+#include <filesystem>
 
 namespace graphics::vulkan {
     class SurfaceContext : public graphics::SurfaceContext {

@@ -3,6 +3,10 @@
 #include "SDL_FontCache.h"
 
 #include <SDL_image.h>
+#include <SDL_pixels.h>
+#include <SDL_render.h>
+#include <SDL_surface.h>
+#include <SDL_ttf.h>
 
 #include <memory>
 #include <filesystem>

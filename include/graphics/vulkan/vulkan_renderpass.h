@@ -1,9 +1,10 @@
 #pragma once
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 
 #include <vector>
 #include <memory>
+#include <cstdint>
 
 namespace graphics::vulkan {
     class RenderPass {

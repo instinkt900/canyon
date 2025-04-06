@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/vulkan/vulkan_context.h"
+#include "graphics/context.h"
 #include "platform/iplatform.h"
 #include "platform/window.h"
 

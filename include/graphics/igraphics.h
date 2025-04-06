@@ -1,12 +1,13 @@
 #pragma once
 
-#include "graphics/iimage.h"
 #include "graphics/blend_mode.h"
 #include "graphics/color.h"
-#include "utils/rect.h"
-#include "graphics/text_alignment.h"
-#include "graphics/itarget.h"
 #include "graphics/ifont.h"
+#include "graphics/iimage.h"
+#include "graphics/itarget.h"
+#include "graphics/text_alignment.h"
+#include "utils/rect.h"
+#include "utils/vector.h"
 
 #include <filesystem>
 #include <memory>

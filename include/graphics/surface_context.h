@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <filesystem>
+#include <cstdint>
 
 namespace graphics {
     class SurfaceContext {

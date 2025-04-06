@@ -13,6 +13,8 @@
 #include <moth_ui/context.h>
 
 #include <memory>
+#include <string>
+#include <cstdint>
 
 namespace platform {
     class Window : public EventEmitter {
