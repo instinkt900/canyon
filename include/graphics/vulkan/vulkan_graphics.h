@@ -2,8 +2,6 @@
 
 #include "graphics/igraphics.h"
 #include "vulkan_image.h"
-#include "vulkan_context.h"
-#include "vulkan_utils.h"
 #include "vulkan_shader.h"
 #include "vulkan_pipeline.h"
 #include "vulkan_buffer.h"
@@ -11,6 +9,11 @@
 #include "vulkan_swapchain.h"
 
 #include <vulkan/vulkan.hpp>
+
+#include <filesystem>
+#include <memory>
+#include <map>
+#include <stack>
 
 namespace graphics::vulkan {
     class Graphics : public IGraphics {

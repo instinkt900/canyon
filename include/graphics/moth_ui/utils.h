@@ -2,6 +2,7 @@
 #include "graphics/text_alignment.h"
 #include "utils/rect.h"
 #include "utils/vector.h"
+
 #include <moth_ui/blend_mode.h>
 #include <moth_ui/text_alignment.h>
 #include <moth_ui/utils/rect.h>

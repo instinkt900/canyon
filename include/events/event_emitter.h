@@ -1,8 +1,12 @@
 #pragma once
 
-#include "moth_ui/event_listener.h"
-#include "moth_ui/event_dispatch.h"
+#include <moth_ui/event_listener.h>
+#include <moth_ui/event_dispatch.h>
 #include <moth_ui/events/event.h>
+
+#include <functional>
+#include <vector>
+#include <vector>
 
 class LambdaWrapper : public moth_ui::EventListener {
     public:

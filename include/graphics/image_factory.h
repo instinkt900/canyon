@@ -5,6 +5,11 @@
 #include "graphics/itexture.h"
 #include "utils/rect.h"
 
+#include <unordered_map>
+#include <string>
+#include <memory>
+#include <filesystem>
+
 namespace graphics {
     class ImageFactory {
     public:

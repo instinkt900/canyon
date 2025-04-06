@@ -1,8 +1,9 @@
 #pragma once
 
-#include "graphics/igraphics.h"
 #include "graphics/sdl/sdl_context.h"
 #include "platform/iplatform.h"
+
+#include <memory>
 
 namespace platform::sdl {
     class Platform : public IPlatform {

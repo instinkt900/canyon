@@ -1,7 +1,10 @@
 #pragma once
 
 #include "graphics/ifont.h"
+
 #include <moth_ui/ifont.h>
+
+#include <memory>
 
 namespace graphics {
     class MothFont : public moth_ui::IFont {

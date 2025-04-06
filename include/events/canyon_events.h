@@ -1,6 +1,6 @@
 #pragma once
 
-#include "moth_ui/events/event.h"
+#include <moth_ui/events/event.h>
 
 enum CanyonEventType : int {
     EVENTTYPE_RENDERDEVICERESET = moth_ui::EVENTTYPE_USER0,

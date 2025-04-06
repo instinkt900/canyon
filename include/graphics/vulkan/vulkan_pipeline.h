@@ -1,10 +1,12 @@
 #pragma once
 
-#include "vulkan_utils.h"
 #include "vulkan_shader.h"
 #include "vulkan_renderpass.h"
 
 #include <vulkan/vulkan.hpp>
+
+#include <memory>
+#include <vector>
 
 namespace graphics::vulkan {
     class Pipeline {

@@ -6,6 +6,9 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <memory>
+#include <filesystem>
+
 namespace graphics::vulkan {
     class Image : public graphics::IImage {
     public:

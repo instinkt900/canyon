@@ -2,9 +2,11 @@
 
 #include "murmurhash.h"
 
+#include <spdlog/spdlog.h>
+
 #include <string>
 #include <vector>
-#include <spdlog/spdlog.h>
+#include <string_view>
 
 #define CHECK_VK_RESULT(expr)                                                                                 \
     {                                                                                                         \

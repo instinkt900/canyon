@@ -4,6 +4,10 @@
 #include "graphics/vulkan/vulkan_surface_context.h"
 #include "platform/window.h"
 
+#include <GLFW/glfw3.h>
+
+#include <memory>
+
 namespace platform::glfw {
     class Window : public platform::Window {
     public:

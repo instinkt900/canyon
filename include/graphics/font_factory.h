@@ -3,6 +3,8 @@
 #include "graphics/igraphics.h"
 
 #include <map>
+#include <string>
+#include <memory>
 
 namespace graphics {
     class FontFactory {

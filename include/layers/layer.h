@@ -1,7 +1,8 @@
 #pragma once
 
-#include "moth_ui/event_listener.h"
 #include "layers/layer_stack.h"
+
+#include <moth_ui/event_listener.h>
 
 class Layer : public moth_ui::EventListener {
 public:

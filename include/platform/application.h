@@ -2,11 +2,14 @@
 
 #include "platform/iplatform.h"
 #include "utils/ticker.h"
-#include "moth_ui//event_listener.h"
 #include "events/event_window.h"
+
+#include <moth_ui//event_listener.h>
 #include <moth_ui/ifont_factory.h>
 #include <moth_ui/iimage_factory.h>
 #include <moth_ui/irenderer.h>
+
+#include <memory>
 
 class Application : public Ticker, public moth_ui::EventListener {
 public:

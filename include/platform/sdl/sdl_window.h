@@ -4,6 +4,8 @@
 #include "platform/window.h"
 #include "graphics/sdl/sdl_surface_context.h"
 
+#include <memory>
+
 namespace platform::sdl {
     class Window : public platform::Window {
     public:

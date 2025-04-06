@@ -6,6 +6,9 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <memory>
+#include <vector>
+
 namespace graphics::vulkan {
     class Swapchain {
     public:

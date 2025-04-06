@@ -7,6 +7,8 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <memory>
+
 namespace graphics::vulkan {
     class CommandBuffer;
 

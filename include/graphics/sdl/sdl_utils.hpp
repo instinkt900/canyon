@@ -1,13 +1,16 @@
 #pragma once
 
-#include <moth_ui/blend_mode.h>
-#include <moth_ui/utils/color.h>
-#include <moth_ui/utils/rect.h>
-#include <moth_ui/text_alignment.h>
+#include "graphics/sdl/SDL_FontCache.h"
 #include "utils/rect.h"
 #include "graphics/blend_mode.h"
 #include "graphics/text_alignment.h"
 #include "graphics/color.h"
+
+#include <SDL_rect.h>
+#include <moth_ui/blend_mode.h>
+#include <moth_ui/utils/color.h>
+#include <moth_ui/utils/rect.h>
+#include <moth_ui/text_alignment.h>
 
 inline SDL_Rect ToSDL(moth_ui::IntRect const& rect) {
     return { rect.topLeft.x, rect.topLeft.y, rect.bottomRight.x - rect.topLeft.x, rect.bottomRight.y - rect.topLeft.y };

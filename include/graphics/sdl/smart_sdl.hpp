@@ -1,7 +1,11 @@
 #pragma once
 
 #include "SDL_FontCache.h"
+
 #include <SDL_image.h>
+
+#include <memory>
+#include <filesystem>
 
 using SurfaceRef = std::shared_ptr<SDL_Surface>;
 

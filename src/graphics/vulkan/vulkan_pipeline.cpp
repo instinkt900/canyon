@@ -1,5 +1,6 @@
 #include "common.h"
 #include "graphics/vulkan/vulkan_pipeline.h"
+#include "graphics/vulkan/vulkan_utils.h"
 
 namespace graphics::vulkan {
     Pipeline::Pipeline(uint32_t hash, VkDevice device, VkPipeline pipeline, std::shared_ptr<Shader> shader)

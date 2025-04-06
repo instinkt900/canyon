@@ -1,7 +1,10 @@
 #pragma once
 
 #include "graphics/ifont.h"
-#include "smart_sdl.h"
+#include "smart_sdl.hpp"
+
+#include <memory>
+#include <filesystem>
 
 namespace graphics::sdl {
     class Font : public IFont {

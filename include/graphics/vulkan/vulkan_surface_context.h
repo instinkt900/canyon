@@ -8,6 +8,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include <memory>
+
 namespace graphics::vulkan {
     class SurfaceContext : public graphics::SurfaceContext {
     public:

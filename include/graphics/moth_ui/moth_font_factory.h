@@ -1,7 +1,10 @@
 #pragma once
 
 #include "graphics/font_factory.h"
+
 #include <moth_ui/font_factory.h>
+
+#include <memory>
 
 namespace graphics {
     class MothFontFactory : public moth_ui::FontFactory {

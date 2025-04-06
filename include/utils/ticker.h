@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 class Ticker {
 public:
     Ticker(int ticksPerSecond = 60) {

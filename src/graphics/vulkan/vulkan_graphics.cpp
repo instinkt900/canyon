@@ -5,10 +5,7 @@
 #include "graphics/vulkan/vulkan_texture.h"
 #include "graphics/vulkan/vulkan_font.h"
 #include "graphics/vulkan/shaders/vulkan_shaders.h"
-
-#include "harfbuzz/hb.h"
-#include "harfbuzz/hb-ft.h"
-
+#include "graphics/vulkan/vulkan_utils.h"
 #include "graphics/stb_image_write.h"
 
 namespace {
@@ -195,23 +192,16 @@ namespace graphics::vulkan {
     }
 
     void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
-        // TODO:
-        // DrawImage(image, destRect, sourceRect);
-        IntRect imageRect = MakeRect(0, 0, image.GetWidth(), image.GetHeight());
+        IntRect const imageRect = MakeRect(0, 0, image.GetWidth(), image.GetHeight());
         if (!sourceRect) {
             sourceRect = &imageRect;
         }
         auto const imageWidth = static_cast<int>(sourceRect->w() * scale);
         auto const imageHeight = static_cast<int>(sourceRect->h() * scale);
-        int t = 0;
         for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
             for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
-                    // printf("{ %d, %d, %d, %d }\n", x, y, imageWidth, imageHeight);
-                IntRect tiledDstRect{ { x, y }, { x + imageWidth, y + imageHeight } };
+                IntRect const tiledDstRect{ { x, y }, { x + imageWidth, y + imageHeight } };
                 DrawImage(image, tiledDstRect, sourceRect);
-                // SetColor(FromARGB(rand()));
-                // DrawFillRectF(static_cast<FloatRect>(tiledDstRect));
-                t++;
             }
         }
     }

@@ -2,7 +2,11 @@
 
 #include "graphics/surface_context.h"
 #include "graphics/sdl/sdl_context.h"
+
 #include <SDL_render.h>
+
+#include <memory>
+#include <filesystem>
 
 namespace graphics::sdl {
     class SurfaceContext : public graphics::SurfaceContext {

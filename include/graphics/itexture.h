@@ -1,7 +1,5 @@
 #pragma once
 
-#include "utils/vector.h"
-
 namespace graphics {
     class ITexture {
     public:

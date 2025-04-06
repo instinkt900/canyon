@@ -4,9 +4,12 @@
 #include "graphics/vulkan/vulkan_shader.h"
 #include "vulkan_buffer.h"
 
-#include "harfbuzz/hb.h"
-
+#include <harfbuzz/hb.h>
 #include <vulkan/vulkan.hpp>
+
+#include <vector>
+#include <filesystem>
+#include <memory>
 
 namespace graphics::vulkan {
     class Font : public IFont {

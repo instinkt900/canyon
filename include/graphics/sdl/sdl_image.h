@@ -6,6 +6,9 @@
 #include "graphics/iimage.h"
 #include "utils/rect.h"
 
+#include <memory>
+#include <filesystem>
+
 namespace graphics::sdl {
     class Image : public graphics::IImage, public graphics::ITarget {
     public:

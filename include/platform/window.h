@@ -4,12 +4,15 @@
 #include "graphics/font_factory.h"
 #include "graphics/igraphics.h"
 #include "graphics/image_factory.h"
-#include "layers/layer_stack.h"
-#include "utils/vector.h"
 #include "graphics/moth_ui/moth_font_factory.h"
 #include "graphics/moth_ui/moth_image_factory.h"
 #include "graphics/moth_ui/moth_renderer.h"
+#include "layers/layer_stack.h"
+#include "utils/vector.h"
+
 #include <moth_ui/context.h>
+
+#include <memory>
 
 namespace platform {
     class Window : public EventEmitter {

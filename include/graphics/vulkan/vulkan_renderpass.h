@@ -2,6 +2,9 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <vector>
+#include <memory>
+
 namespace graphics::vulkan {
     class RenderPass {
     public:

@@ -4,6 +4,8 @@
 #include "platform/iplatform.h"
 #include "platform/window.h"
 
+#include <memory>
+
 namespace platform::glfw {
     class Platform : public IPlatform {
     public:

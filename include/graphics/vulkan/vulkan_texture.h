@@ -5,6 +5,9 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <memory>
+#include <filesystem>
+
 namespace graphics::vulkan {
     class Texture : public ITexture {
     public:

@@ -9,6 +9,7 @@
 #include "graphics/ifont.h"
 
 #include <filesystem>
+#include <memory>
 
 namespace graphics {
     class SurfaceContext;

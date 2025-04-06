@@ -1,8 +1,11 @@
 #pragma once
 
-#include "vulkan_image.h"
-
+#include "graphics/vulkan/vulkan_texture.h"
 #include <vulkan/vulkan.hpp>
+
+#include <memory>
+#include <map>
+#include <vector>
 
 namespace graphics::vulkan {
     struct Shader {

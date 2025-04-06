@@ -1,5 +1,11 @@
+#pragma once
+
 #include "graphics/image_factory.h"
+
 #include <moth_ui/iimage_factory.h>
+
+#include <memory>
+#include <filesystem>
 
 namespace graphics {
     class MothImageFactory : public moth_ui::IImageFactory {

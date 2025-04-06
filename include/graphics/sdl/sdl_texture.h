@@ -2,7 +2,9 @@
 
 #include "graphics/itexture.h"
 #include "utils/vector.h"
-#include "graphics/sdl/smart_sdl.h"
+#include "graphics/sdl/smart_sdl.hpp"
+
+#include <filesystem>
 
 namespace graphics::sdl {
     class Texture : public graphics::ITexture {
