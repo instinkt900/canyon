@@ -1,6 +1,6 @@
 #include "canyon.h"
-#include "example/example_app.h"
-#include "example/example_main.h"
+#include "example_app.h"
+#include "example_main.h"
 #include "platform/glfw/glfw_platform.h"
 #include "platform/sdl/sdl_platform.h"
 

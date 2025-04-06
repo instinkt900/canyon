@@ -1,5 +1,5 @@
 #include "canyon.h"
-#include "example/example_layer.h"
+#include "example_layer.h"
 #include "platform/application.h"
 #include "platform/window.h"
 #include <moth_ui/event_listener.h>

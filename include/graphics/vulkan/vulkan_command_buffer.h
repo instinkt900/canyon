@@ -6,6 +6,8 @@
 #include "vulkan_pipeline.h"
 #include "vulkan_framebuffer.h"
 
+#include <vulkan/vulkan.hpp>
+
 namespace graphics::vulkan {
     class CommandBuffer {
     public:

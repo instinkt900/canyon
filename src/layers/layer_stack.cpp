@@ -1,4 +1,4 @@
-#include "canyon.h"
+#include "common.h"
 #include "layers/layer_stack.h"
 #include "layers/layer.h"
 

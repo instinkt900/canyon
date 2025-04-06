@@ -1,6 +1,5 @@
-#include "canyon.h"
+#include "common.h"
 #include "graphics/sdl/sdl_graphics.h"
-#include "graphics/sdl/sdl_context.h"
 #include "graphics/sdl/sdl_font.h"
 #include "graphics/sdl/sdl_image.h"
 #include "graphics/sdl/sdl_utils.hpp"

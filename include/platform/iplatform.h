@@ -2,6 +2,8 @@
 
 #include "graphics/context.h"
 
+#include <memory>
+
 namespace platform {
     class Window;
     class IPlatform {

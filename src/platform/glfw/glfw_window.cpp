@@ -1,4 +1,4 @@
-#include "canyon.h"
+#include "common.h"
 #include "platform/glfw/glfw_window.h"
 #include "graphics/vulkan/vulkan_graphics.h"
 #include "graphics/vulkan/vulkan_surface_context.h"

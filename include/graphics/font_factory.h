@@ -2,6 +2,8 @@
 
 #include "graphics/igraphics.h"
 
+#include <map>
+
 namespace graphics {
     class FontFactory {
     public:

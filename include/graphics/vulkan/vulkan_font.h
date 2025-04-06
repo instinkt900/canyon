@@ -6,6 +6,8 @@
 
 #include "harfbuzz/hb.h"
 
+#include <vulkan/vulkan.hpp>
+
 namespace graphics::vulkan {
     class Font : public IFont {
     public:

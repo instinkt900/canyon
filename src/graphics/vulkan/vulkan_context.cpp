@@ -1,6 +1,8 @@
-#include "canyon.h"
+#include "common.h"
 #include "graphics/vulkan/vulkan_context.h"
 #include "graphics/vulkan/vulkan_utils.h"
+
+#include <spdlog/spdlog.h>
 
 namespace {
     std::vector<char const*> validationLayers = {

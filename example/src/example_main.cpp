@@ -1,6 +1,9 @@
+#include <memory>
 #include "events/event_window.h"
 #include "platform/iplatform.h"
 #include "platform/window.h"
+
+#include <thread>
 
 void exampleMain(platform::IPlatform& platform) {
     auto window1 = platform.CreateWindow("Window 1", 300, 200);

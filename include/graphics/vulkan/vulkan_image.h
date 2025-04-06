@@ -4,6 +4,8 @@
 #include "graphics/iimage.h"
 #include "utils/rect.h"
 
+#include <vulkan/vulkan.hpp>
+
 namespace graphics::vulkan {
     class Image : public graphics::IImage {
     public:

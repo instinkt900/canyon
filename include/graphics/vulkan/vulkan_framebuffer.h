@@ -5,6 +5,8 @@
 #include "vulkan_fence.h"
 #include "graphics/vulkan/vulkan_surface_context.h"
 
+#include <vulkan/vulkan.hpp>
+
 namespace graphics::vulkan {
     class CommandBuffer;
 

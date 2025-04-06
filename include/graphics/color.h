@@ -3,6 +3,10 @@
 #include "utils/vector.h"
 #include "graphics/blend_mode.h"
 
+#include <algorithm>
+#include <cstdint>
+#include <cmath>
+
 namespace graphics {
     using Color = Vector<float, 4>;
 

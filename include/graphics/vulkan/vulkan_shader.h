@@ -2,6 +2,8 @@
 
 #include "vulkan_image.h"
 
+#include <vulkan/vulkan.hpp>
+
 namespace graphics::vulkan {
     struct Shader {
         Shader(uint32_t hash);

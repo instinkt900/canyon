@@ -1,3 +1,4 @@
+#include "common.h"
 #include "graphics/moth_ui/moth_font_factory.h"
 #include "graphics/font_factory.h"
 #include "graphics/moth_ui/moth_font.h"

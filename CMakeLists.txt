@@ -67,7 +67,6 @@ set(SOURCES ${SOURCES}
 	src/platform/sdl/sdl_platform.cpp
 	src/platform/sdl/sdl_window.cpp
 	src/platform/window.cpp
-	src/widgets/ui_button.cpp
     external/murmurhash.c/murmurhash.c
     src/graphics/sdl/SDL_FontCache.c
 )
@@ -108,7 +107,7 @@ else()
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall -Werror")
 endif()
 
-target_precompile_headers(${PROJECT_NAME} PRIVATE include/canyon.h)
+# target_precompile_headers(${PROJECT_NAME} PRIVATE include/canyon.h)
 set_source_files_properties(external/murmurhash.c/murmurhash.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 

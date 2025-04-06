@@ -1,4 +1,4 @@
-#include "canyon.h"
+#include "common.h"
 #include "graphics/sdl/sdl_texture.h"
 #include "graphics/sdl/smart_sdl.h"
 

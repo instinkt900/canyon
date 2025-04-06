@@ -1,4 +1,4 @@
-#include "canyon.h"
+#include "common.h"
 #include "platform/sdl/sdl_events.h"
 #include "moth_ui/events/event_key.h"
 #include "moth_ui/events/event_mouse.h"

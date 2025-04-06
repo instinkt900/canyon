@@ -1,3 +1,4 @@
+#include "common.h"
 #include "graphics/moth_ui/moth_image_factory.h"
 #include "graphics/moth_ui/moth_image.h"
 

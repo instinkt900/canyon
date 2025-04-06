@@ -8,6 +8,8 @@
 #include "graphics/itarget.h"
 #include "graphics/ifont.h"
 
+#include <filesystem>
+
 namespace graphics {
     class SurfaceContext;
     class IGraphics {

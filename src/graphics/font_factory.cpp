@@ -1,3 +1,4 @@
+#include "common.h"
 #include "graphics/font_factory.h"
 #include "graphics/surface_context.h"
 

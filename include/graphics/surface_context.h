@@ -6,6 +6,9 @@
 #include "graphics/itexture.h"
 #include "utils/rect.h"
 
+#include <memory>
+#include <filesystem>
+
 namespace graphics {
     class SurfaceContext {
     public:

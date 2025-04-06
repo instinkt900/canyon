@@ -1,5 +1,5 @@
 #include "example_layer.h"
-#include "widgets/ui_button.h"
+#include "ui_button.h"
 #include <moth_ui/group.h>
 
 TestLayer::TestLayer(moth_ui::Context& context, graphics::IGraphics& graphics, std::filesystem::path const& layoutPath)

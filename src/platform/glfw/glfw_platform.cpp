@@ -1,4 +1,4 @@
-#include "canyon.h"
+#include "common.h"
 #include "platform/glfw/glfw_platform.h"
 #include "platform/glfw/glfw_window.h"
 

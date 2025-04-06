@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vector.h"
+#include <nlohmann/json.hpp>
 
 template <typename T>
 inline void to_json(nlohmann::json& j, Vector<T, 2> const& vec) {

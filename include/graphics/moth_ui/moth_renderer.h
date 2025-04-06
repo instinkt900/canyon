@@ -3,6 +3,8 @@
 #include "graphics/igraphics.h"
 #include <moth_ui/irenderer.h>
 
+#include <stack>
+
 namespace graphics {
     class MothRenderer : public moth_ui::IRenderer {
     public:

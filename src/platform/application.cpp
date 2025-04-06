@@ -1,4 +1,4 @@
-#include "canyon.h"
+#include "common.h"
 #include "platform/application.h"
 #include "platform/window.h"
 

@@ -1,4 +1,4 @@
-#include <canyon.h>
+#include "common.h"
 #include "graphics/sdl/sdl_surface_context.h"
 #include "graphics/sdl/sdl_font.h"
 #include "graphics/sdl/sdl_image.h"

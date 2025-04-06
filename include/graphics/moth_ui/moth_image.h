@@ -4,6 +4,8 @@
 #include <moth_ui/utils/vector.h>
 #include <moth_ui/iimage.h>
 
+#include <memory>
+
 namespace graphics {
     class MothImage : public moth_ui::IImage {
     public:

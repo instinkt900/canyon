@@ -2,6 +2,8 @@
 
 #include "vulkan_surface_context.h"
 
+#include <vulkan/vulkan.hpp>
+
 namespace graphics::vulkan {
     class Fence {
     public:

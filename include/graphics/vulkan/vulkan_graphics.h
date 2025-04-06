@@ -10,6 +10,8 @@
 #include "vulkan_command_buffer.h"
 #include "vulkan_swapchain.h"
 
+#include <vulkan/vulkan.hpp>
+
 namespace graphics::vulkan {
     class Graphics : public IGraphics {
     public:

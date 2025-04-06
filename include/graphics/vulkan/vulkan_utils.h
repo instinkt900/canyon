@@ -2,6 +2,10 @@
 
 #include "murmurhash.h"
 
+#include <string>
+#include <vector>
+#include <spdlog/spdlog.h>
+
 #define CHECK_VK_RESULT(expr)                                                                                 \
     {                                                                                                         \
         VkResult result_ = expr;                                                                              \

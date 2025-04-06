@@ -1,3 +1,4 @@
+#include "common.h"
 #include "graphics/image_factory.h"
 #include "graphics/itexture.h"
 #include "utils/rect_serialization.h"

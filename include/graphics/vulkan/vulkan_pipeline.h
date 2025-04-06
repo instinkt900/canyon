@@ -4,6 +4,8 @@
 #include "vulkan_shader.h"
 #include "vulkan_renderpass.h"
 
+#include <vulkan/vulkan.hpp>
+
 namespace graphics::vulkan {
     class Pipeline {
     public:
