@@ -1,8 +1,8 @@
 #include "common.h"
-#include "graphics/sdl/sdl_surface_context.h"
-#include "graphics/sdl/sdl_font.h"
-#include "graphics/sdl/sdl_image.h"
-#include "graphics/sdl/sdl_texture.h"
+#include "canyon/graphics/sdl/sdl_surface_context.h"
+#include "canyon/graphics/sdl/sdl_font.h"
+#include "canyon/graphics/sdl/sdl_image.h"
+#include "canyon/graphics/sdl/sdl_texture.h"
 
 namespace graphics::sdl {
     SurfaceContext::SurfaceContext(Context& context, SDL_Renderer* renderer)

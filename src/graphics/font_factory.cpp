@@ -1,6 +1,6 @@
 #include "common.h"
-#include "graphics/font_factory.h"
-#include "graphics/surface_context.h"
+#include "canyon/graphics/font_factory.h"
+#include "canyon/graphics/surface_context.h"
 
 namespace graphics {
     FontFactory::FontFactory(SurfaceContext& context)

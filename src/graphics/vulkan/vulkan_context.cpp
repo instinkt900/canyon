@@ -1,6 +1,6 @@
 #include "common.h"
-#include "graphics/vulkan/vulkan_context.h"
-#include "graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/vulkan/vulkan_context.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
 
 #include <spdlog/spdlog.h>
 

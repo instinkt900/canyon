@@ -1,6 +1,6 @@
 #include "common.h"
-#include "graphics/vulkan/vulkan_swapchain.h"
-#include "graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/vulkan/vulkan_swapchain.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
 
 namespace {
     VkExtent2D chooseSwapExtent(uint32_t width, uint32_t height, const VkSurfaceCapabilitiesKHR& capabilities) {

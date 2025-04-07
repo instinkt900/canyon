@@ -1,12 +1,12 @@
 #include "common.h"
-#include "graphics/vulkan/vulkan_graphics.h"
-#include "graphics/color.h"
-#include "graphics/vulkan/vulkan_command_buffer.h"
-#include "graphics/vulkan/vulkan_texture.h"
-#include "graphics/vulkan/vulkan_font.h"
-#include "graphics/vulkan/shaders/vulkan_shaders.h"
-#include "graphics/vulkan/vulkan_utils.h"
-#include "graphics/stb_image_write.h"
+#include "canyon/graphics/vulkan/vulkan_graphics.h"
+#include "canyon/graphics/color.h"
+#include "canyon/graphics/vulkan/vulkan_command_buffer.h"
+#include "canyon/graphics/vulkan/vulkan_texture.h"
+#include "canyon/graphics/vulkan/vulkan_font.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/stb_image_write.h"
+#include "shaders/vulkan_shaders.h"
 
 namespace {
     VkVertexInputBindingDescription getVertexBindingDescription() {

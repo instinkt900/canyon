@@ -1,6 +1,6 @@
 #include "common.h"
-#include "graphics/moth_ui/moth_image.h"
-#include "graphics/iimage.h"
+#include "canyon/graphics/moth_ui/moth_image.h"
+#include "canyon/graphics/iimage.h"
 
 namespace graphics {
     MothImage::MothImage(std::shared_ptr<graphics::IImage> baseImage)

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "graphics/color.h"
-#include "moth_ui/utils/color.h"
-#include "utils/rect.h"
+#include "canyon/graphics/color.h"
+#include <moth_ui/utils/color.h>
+#include "canyon/utils/rect.h"
 
 // returns a rect with the coordinates of b within a
 inline IntRect MergeRects(IntRect const& a, IntRect const& b) {

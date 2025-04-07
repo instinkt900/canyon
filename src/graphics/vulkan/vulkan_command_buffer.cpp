@@ -1,6 +1,6 @@
 #include "common.h"
-#include "graphics/vulkan/vulkan_command_buffer.h"
-#include "graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/vulkan/vulkan_command_buffer.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
 
 namespace graphics::vulkan {
     CommandBuffer::CommandBuffer(SurfaceContext& context)

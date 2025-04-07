@@ -1,9 +1,9 @@
 #include "common.h"
-#include "graphics/moth_ui/moth_renderer.h"
-#include "graphics/igraphics.h"
-#include "graphics/moth_ui/moth_font.h"
-#include "graphics/moth_ui/moth_image.h"
-#include "graphics/moth_ui/utils.h"
+#include "canyon/graphics/moth_ui/moth_renderer.h"
+#include "canyon/graphics/igraphics.h"
+#include "canyon/graphics/moth_ui/moth_font.h"
+#include "canyon/graphics/moth_ui/moth_image.h"
+#include "canyon/graphics/moth_ui/utils.h"
 
 namespace graphics {
     MothRenderer::MothRenderer(IGraphics& graphics)

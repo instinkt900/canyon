@@ -1,5 +1,5 @@
 #include "common.h"
-#include "graphics/vulkan/vulkan_fence.h"
+#include "canyon/graphics/vulkan/vulkan_fence.h"
 
 namespace graphics::vulkan {
     Fence::Fence(SurfaceContext& context)

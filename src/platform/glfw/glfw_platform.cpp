@@ -1,6 +1,6 @@
 #include "common.h"
-#include "platform/glfw/glfw_platform.h"
-#include "platform/glfw/glfw_window.h"
+#include "canyon/platform/glfw/glfw_platform.h"
+#include "canyon/platform/glfw/glfw_window.h"
 
 namespace platform::glfw {
     bool Platform::Startup() {

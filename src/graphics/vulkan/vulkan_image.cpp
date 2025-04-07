@@ -1,6 +1,6 @@
 #include "common.h"
-#include "graphics/vulkan/vulkan_image.h"
-#include "graphics/vulkan/vulkan_graphics.h"
+#include "canyon/graphics/vulkan/vulkan_image.h"
+#include "canyon/graphics/vulkan/vulkan_graphics.h"
 
 namespace graphics::vulkan {
     Graphics* Image::s_graphicsContext = nullptr;

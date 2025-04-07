@@ -1,8 +1,8 @@
 #include "common.h"
-#include "platform/glfw/glfw_events.h"
-#include "moth_ui/events/event_key.h"
-#include "moth_ui/events/event_mouse.h"
-#include "moth_ui/events/event.h"
+#include "canyon/platform/glfw/glfw_events.h"
+#include <moth_ui/events/event_key.h>
+#include <moth_ui/events/event_mouse.h>
+#include <moth_ui/events/event.h>
 
 namespace {
     moth_ui::Key FromGLFWKey(int key) {

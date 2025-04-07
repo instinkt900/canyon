@@ -1,6 +1,6 @@
 #include "common.h"
-#include "graphics/sdl/sdl_texture.h"
-#include "graphics/sdl/smart_sdl.hpp"
+#include "canyon/graphics/sdl/sdl_texture.h"
+#include "canyon/graphics/sdl/smart_sdl.hpp"
 
 namespace graphics::sdl {
     Texture::Texture(SDLTextureRef texture)

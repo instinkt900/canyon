@@ -1,8 +1,8 @@
 #include "common.h"
-#include "platform/sdl/sdl_window.h"
-#include "graphics/sdl/sdl_surface_context.h"
-#include "platform/sdl/sdl_events.h"
-#include "graphics/sdl/sdl_graphics.h"
+#include "canyon/platform/sdl/sdl_window.h"
+#include "canyon/graphics/sdl/sdl_surface_context.h"
+#include "canyon/platform/sdl/sdl_events.h"
+#include "canyon/graphics/sdl/sdl_graphics.h"
 
 namespace {
     std::mutex EventFetchMutex;

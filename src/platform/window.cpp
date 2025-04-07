@@ -1,6 +1,6 @@
 #include "common.h"
 #include <moth_ui/context.h>
-#include "platform/window.h"
+#include "canyon/platform/window.h"
 
 namespace platform {
     Window::Window(std::string const& title, int width, int height)

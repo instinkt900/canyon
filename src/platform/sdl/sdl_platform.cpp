@@ -1,7 +1,7 @@
 #include "common.h"
-#include "graphics/sdl/sdl_context.h"
-#include "platform/sdl/sdl_window.h"
-#include "platform/sdl/sdl_platform.h"
+#include "canyon/graphics/sdl/sdl_context.h"
+#include "canyon/platform/sdl/sdl_window.h"
+#include "canyon/platform/sdl/sdl_platform.h"
 
 namespace platform::sdl {
     graphics::Context& Platform::GetGraphicsContext() {

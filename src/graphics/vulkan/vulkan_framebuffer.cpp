@@ -1,7 +1,7 @@
 #include "common.h"
-#include "graphics/vulkan/vulkan_framebuffer.h"
-#include "graphics/vulkan/vulkan_utils.h"
-#include "graphics/vulkan/vulkan_command_buffer.h"
+#include "canyon/graphics/vulkan/vulkan_framebuffer.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/vulkan/vulkan_command_buffer.h"
 
 namespace graphics::vulkan {
     Framebuffer::Framebuffer(SurfaceContext& context, uint32_t width, uint32_t height, VkImage image, VkImageView view, VkFormat format, VkRenderPass renderPass, uint32_t swapchainIndex)

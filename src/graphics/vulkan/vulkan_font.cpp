@@ -1,9 +1,9 @@
 #include "common.h"
-#include "graphics/vulkan/vulkan_font.h"
-#include "graphics/stb_rect_pack.h"
-#include "graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/vulkan/vulkan_font.h"
+#include "canyon/graphics/stb_rect_pack.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/stb_image_write.h"
 #include "harfbuzz/hb-ft.h"
-#include "graphics/stb_image_write.h"
 
 #define _unused(x) ((void)(x))
 #define FT_CHECK(r)         \

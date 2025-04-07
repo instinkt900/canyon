@@ -1,6 +1,6 @@
 #include "common.h"
-#include "graphics/vulkan/vulkan_shader.h"
-#include "graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/vulkan/vulkan_shader.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
 
 namespace graphics::vulkan {
     Shader::Shader(uint32_t hash)

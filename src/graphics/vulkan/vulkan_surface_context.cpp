@@ -1,10 +1,10 @@
 #include "common.h"
-#include "graphics/vulkan/vulkan_surface_context.h"
-#include "graphics/vulkan/vulkan_context.h"
-#include "graphics/vulkan/vulkan_font.h"
-#include "graphics/vulkan/vulkan_image.h"
-#include "graphics/vulkan/vulkan_texture.h"
-#include "graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/vulkan/vulkan_surface_context.h"
+#include "canyon/graphics/vulkan/vulkan_context.h"
+#include "canyon/graphics/vulkan/vulkan_font.h"
+#include "canyon/graphics/vulkan/vulkan_image.h"
+#include "canyon/graphics/vulkan/vulkan_texture.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
 
 namespace {
     char const* deviceExtensions[] = {

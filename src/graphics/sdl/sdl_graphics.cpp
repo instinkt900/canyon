@@ -1,8 +1,8 @@
 #include "common.h"
-#include "graphics/sdl/sdl_graphics.h"
-#include "graphics/sdl/sdl_font.h"
-#include "graphics/sdl/sdl_image.h"
-#include "graphics/sdl/sdl_utils.hpp"
+#include "canyon/graphics/sdl/sdl_graphics.h"
+#include "canyon/graphics/sdl/sdl_font.h"
+#include "canyon/graphics/sdl/sdl_image.h"
+#include "canyon/graphics/sdl/sdl_utils.hpp"
 #include "../utils.h"
 
 namespace graphics::sdl {

@@ -22,7 +22,7 @@
 #include <SDL.h>
 #include <SDL_rect.h>
 #include <SDL_image.h>
-#include "graphics/sdl/smart_sdl.hpp"
+#include "canyon/graphics/sdl/smart_sdl.hpp"
 
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>

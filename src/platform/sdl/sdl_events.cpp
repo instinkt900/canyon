@@ -1,12 +1,12 @@
 #include "common.h"
-#include "platform/sdl/sdl_events.h"
-#include "moth_ui/events/event_key.h"
-#include "moth_ui/events/event_mouse.h"
-#include "moth_ui/events/event.h"
-#include "events/event_window.h"
+#include "canyon/platform/sdl/sdl_events.h"
+#include "canyon/events/event_window.h"
 
-#include "moth_ui/events/event_mouse.h"
-#include "moth_ui/events/event_key.h"
+#include <moth_ui/events/event_key.h>
+#include <moth_ui/events/event_mouse.h>
+#include <moth_ui/events/event.h>
+#include <moth_ui/events/event_mouse.h>
+#include <moth_ui/events/event_key.h>
 
 namespace {
     moth_ui::MouseButton FromSDLMouse(uint8_t button) {

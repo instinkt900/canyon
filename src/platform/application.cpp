@@ -1,6 +1,6 @@
 #include "common.h"
-#include "platform/application.h"
-#include "platform/window.h"
+#include "canyon/platform/application.h"
+#include "canyon/platform/window.h"
 
 Application::Application(platform::IPlatform& platform)
     : m_platform(platform) {
