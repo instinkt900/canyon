@@ -1,15 +1,14 @@
 from conan import ConanFile
 from conan.tools.cmake import cmake_layout
+from conan.tools.files import load
 
 class canyon(ConanFile):
     name = "canyon"
     settings = "os", "compiler", "build_type", "arch"
     generators = "CMakeToolchain", "CMakeDeps", "MSBuildToolchain", "MSBuildDeps"
 
-    @property
-    def version(self):
-        with open("version.txt", "r") as f:
-            return f.read().strip()
+    def set_version(self):
+        self.version = load(self, "version.txt")
 
     def requirements(self):
         self.requires("sdl/2.28.3")
