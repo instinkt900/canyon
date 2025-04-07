@@ -1,6 +1,6 @@
 #pragma once
 
-namespace graphics {
+namespace canyon::graphics {
     enum class ImageScaleType {
         Stretch,
         Tile,

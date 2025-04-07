@@ -8,7 +8,7 @@
 #include <memory>
 #include <filesystem>
 
-namespace graphics {
+namespace canyon::graphics {
     class MothImageFactory : public moth_ui::IImageFactory {
     public:
         MothImageFactory(std::shared_ptr<graphics::ImageFactory> factoryImpl);
@@ -19,7 +19,7 @@ namespace graphics {
         std::unique_ptr<moth_ui::IImage> GetImage(std::filesystem::path const& path) override;
 
     private:
-        std::shared_ptr<ImageFactory> m_factoryImpl;
+        std::shared_ptr<graphics::ImageFactory> m_factoryImpl;
     };
 }
 

@@ -2,7 +2,7 @@
 #include "canyon/graphics/vulkan/vulkan_shader.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     Shader::Shader(uint32_t hash)
         : m_hash(hash) {
     }

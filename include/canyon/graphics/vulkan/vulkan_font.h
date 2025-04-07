@@ -18,7 +18,7 @@
 #include <string_view>
 #include <vector>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class Font : public IFont {
     public:
         static std::unique_ptr<Font> Load(std::filesystem::path const& path, int size, SurfaceContext& context);

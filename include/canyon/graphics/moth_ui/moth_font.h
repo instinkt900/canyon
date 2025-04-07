@@ -6,7 +6,7 @@
 
 #include <memory>
 
-namespace graphics {
+namespace canyon::graphics {
     class MothFont : public moth_ui::IFont {
     public:
         MothFont(std::shared_ptr<graphics::IFont> internalFont)

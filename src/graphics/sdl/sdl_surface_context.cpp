@@ -4,7 +4,7 @@
 #include "canyon/graphics/sdl/sdl_image.h"
 #include "canyon/graphics/sdl/sdl_texture.h"
 
-namespace graphics::sdl {
+namespace canyon::graphics::sdl {
     SurfaceContext::SurfaceContext(Context& context, SDL_Renderer* renderer)
         : m_context(context)
         , m_renderer(renderer) {

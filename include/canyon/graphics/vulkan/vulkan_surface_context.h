@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <filesystem>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class SurfaceContext : public graphics::SurfaceContext {
     public:
         SurfaceContext(Context& context);

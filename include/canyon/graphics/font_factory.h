@@ -7,7 +7,7 @@
 #include <string>
 #include <memory>
 
-namespace graphics {
+namespace canyon::graphics {
     class FontFactory {
     public:
         FontFactory(SurfaceContext& context);
@@ -18,6 +18,6 @@ namespace graphics {
 
     private:
         SurfaceContext& m_context;
-        std::map<std::string, std::map<int, std::shared_ptr<graphics::IFont>>> m_fonts;
+        std::map<std::string, std::map<int, std::shared_ptr<IFont>>> m_fonts;
     };
 }

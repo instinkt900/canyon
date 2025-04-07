@@ -10,7 +10,7 @@
 #include <vector>
 #include <cstdint>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class Swapchain {
     public:
         Swapchain(SurfaceContext& context, RenderPass& renderPass, VkSurfaceKHR surface, VkExtent2D extent);

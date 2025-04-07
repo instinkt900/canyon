@@ -1,6 +1,6 @@
 #pragma once
 
-namespace graphics {
+namespace canyon::graphics {
     class ITarget {
     public:
         virtual ~ITarget() = default;

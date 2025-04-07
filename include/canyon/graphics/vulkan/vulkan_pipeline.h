@@ -9,7 +9,7 @@
 #include <vector>
 #include <cstdint>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class Pipeline {
     public:
         Pipeline(uint32_t hash, VkDevice device, VkPipeline pipeline, std::shared_ptr<Shader> shader);

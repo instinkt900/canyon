@@ -7,7 +7,7 @@
 
 #include <memory>
 
-namespace graphics {
+namespace canyon::graphics {
     class MothFontFactory : public moth_ui::FontFactory {
     public:
         MothFontFactory(std::shared_ptr<graphics::FontFactory> factoryImpl);

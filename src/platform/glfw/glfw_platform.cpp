@@ -2,7 +2,7 @@
 #include "canyon/platform/glfw/glfw_platform.h"
 #include "canyon/platform/glfw/glfw_window.h"
 
-namespace platform::glfw {
+namespace canyon::platform::glfw {
     bool Platform::Startup() {
         if (!glfwInit()) {
             return false;

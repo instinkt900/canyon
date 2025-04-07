@@ -12,7 +12,7 @@
 #include <filesystem>
 #include <memory>
 
-namespace graphics {
+namespace canyon::graphics {
     class SurfaceContext;
     class IGraphics {
     public:

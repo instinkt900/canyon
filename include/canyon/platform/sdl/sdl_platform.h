@@ -6,7 +6,7 @@
 
 #include <memory>
 
-namespace platform::sdl {
+namespace canyon::platform::sdl {
     class Platform : public IPlatform {
     public:
         virtual ~Platform() = default;

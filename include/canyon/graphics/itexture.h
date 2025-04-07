@@ -1,6 +1,6 @@
 #pragma once
 
-namespace graphics {
+namespace canyon::graphics {
     class ITexture {
     public:
         virtual ~ITexture() = default;

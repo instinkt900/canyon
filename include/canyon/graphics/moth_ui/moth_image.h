@@ -7,7 +7,7 @@
 
 #include <memory>
 
-namespace graphics {
+namespace canyon::graphics {
     class MothImage : public moth_ui::IImage {
     public:
         MothImage(std::shared_ptr<graphics::IImage> baseImage);

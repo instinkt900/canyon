@@ -28,7 +28,7 @@
 #include <stack>
 #include <string>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class Graphics : public IGraphics {
     public:
         Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);

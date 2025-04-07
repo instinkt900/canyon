@@ -3,7 +3,7 @@
 #include "canyon/platform/sdl/sdl_window.h"
 #include "canyon/platform/sdl/sdl_platform.h"
 
-namespace platform::sdl {
+namespace canyon::platform::sdl {
     graphics::Context& Platform::GetGraphicsContext() {
         // lazy init this will mean the first window created is linked to this context
         if (!m_context) {

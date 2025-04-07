@@ -8,8 +8,8 @@
 #include <memory>
 #include <filesystem>
 
-namespace graphics::vulkan {
-    class Image : public graphics::IImage {
+namespace canyon::graphics::vulkan {
+    class Image : public IImage {
     public:
         explicit Image(std::shared_ptr<Texture> texture);
         Image(std::shared_ptr<Texture> texture, IntRect const& sourceRect);

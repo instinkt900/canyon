@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <cmath>
 
-namespace graphics {
+namespace canyon::graphics {
     using Color = Vector<float, 4>;
 
     namespace BasicColors {

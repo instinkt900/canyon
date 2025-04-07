@@ -9,7 +9,7 @@
 #include <filesystem>
 #include <cstdint>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class Texture : public ITexture {
     public:
         static std::unique_ptr<Texture> FromFile(SurfaceContext& context, std::filesystem::path const& path);

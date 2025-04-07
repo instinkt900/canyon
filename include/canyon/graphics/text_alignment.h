@@ -1,6 +1,6 @@
 #pragma once
 
-namespace graphics {
+namespace canyon::graphics {
     enum class TextHorizAlignment {
         Left,
         Center,

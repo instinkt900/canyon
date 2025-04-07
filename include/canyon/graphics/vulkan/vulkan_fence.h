@@ -4,7 +4,7 @@
 
 #include <vulkan/vulkan_core.h>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class Fence {
     public:
         Fence(SurfaceContext& context);

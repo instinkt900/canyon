@@ -2,7 +2,7 @@
 #include "canyon/graphics/moth_ui/moth_image.h"
 #include "canyon/graphics/iimage.h"
 
-namespace graphics {
+namespace canyon::graphics {
     MothImage::MothImage(std::shared_ptr<graphics::IImage> baseImage)
         : m_baseImage(baseImage) {
     }

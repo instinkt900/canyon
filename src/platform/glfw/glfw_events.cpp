@@ -229,23 +229,25 @@ namespace {
     }
 }
 
-std::unique_ptr<moth_ui::Event> FromGLFW(int key, int scancode, int action, int mods) {
-    moth_ui::KeyAction keyAction = action == GLFW_RELEASE ? moth_ui::KeyAction::Up : moth_ui::KeyAction::Down;
-    int keyMods = 0;
-    if ((mods & GLFW_MOD_SHIFT) != 0)
-        keyMods |= moth_ui::KeyMod_LeftShift;
-    if ((mods & GLFW_MOD_ALT) != 0)
-        keyMods |= moth_ui::KeyMod_LeftAlt;
-    if ((mods & GLFW_MOD_CONTROL) != 0)
-        keyMods |= moth_ui::KeyMod_LeftCtrl;
-    return std::make_unique<moth_ui::EventKey>(keyAction, FromGLFWKey(key), keyMods);
-}
-
-std::unique_ptr<moth_ui::Event> FromGLFW(int button, int action, int mods, moth_ui::IntVec2 const& pos) {
-    if (action == GLFW_PRESS) {
-        return std::make_unique<moth_ui::EventMouseDown>(FromGLFWButton(button), pos);
-    } else if (action == GLFW_RELEASE) {
-        return std::make_unique<moth_ui::EventMouseUp>(FromGLFWButton(button), pos);
+namespace canyon::platform::glfw {
+    std::unique_ptr<moth_ui::Event> FromGLFW(int key, int scancode, int action, int mods) {
+        moth_ui::KeyAction keyAction = action == GLFW_RELEASE ? moth_ui::KeyAction::Up : moth_ui::KeyAction::Down;
+        int keyMods = 0;
+        if ((mods & GLFW_MOD_SHIFT) != 0)
+            keyMods |= moth_ui::KeyMod_LeftShift;
+        if ((mods & GLFW_MOD_ALT) != 0)
+            keyMods |= moth_ui::KeyMod_LeftAlt;
+        if ((mods & GLFW_MOD_CONTROL) != 0)
+            keyMods |= moth_ui::KeyMod_LeftCtrl;
+        return std::make_unique<moth_ui::EventKey>(keyAction, FromGLFWKey(key), keyMods);
     }
-    return nullptr;
+
+    std::unique_ptr<moth_ui::Event> FromGLFW(int button, int action, int mods, moth_ui::IntVec2 const& pos) {
+        if (action == GLFW_PRESS) {
+            return std::make_unique<moth_ui::EventMouseDown>(FromGLFWButton(button), pos);
+        } else if (action == GLFW_RELEASE) {
+            return std::make_unique<moth_ui::EventMouseUp>(FromGLFWButton(button), pos);
+        }
+        return nullptr;
+    }
 }

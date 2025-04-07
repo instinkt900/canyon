@@ -1,7 +1,7 @@
 #include "common.h"
 #include "canyon/graphics/sdl/sdl_font.h"
 
-namespace graphics::sdl {
+namespace canyon::graphics::sdl {
     Font::Font(CachedFontRef fontObj)
         : m_fontObj(fontObj) {
     }

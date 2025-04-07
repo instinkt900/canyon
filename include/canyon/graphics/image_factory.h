@@ -10,10 +10,10 @@
 #include <memory>
 #include <filesystem>
 
-namespace graphics {
+namespace canyon::graphics {
     class ImageFactory {
     public:
-        ImageFactory(graphics::SurfaceContext& context);
+        ImageFactory(SurfaceContext& context);
         virtual ~ImageFactory() = default;
 
         void FlushCache();
@@ -28,7 +28,7 @@ namespace graphics {
             std::string m_path;
         };
 
-        graphics::SurfaceContext& m_context;
+        SurfaceContext& m_context;
         std::unordered_map<std::string, ImageDesc> m_cachedImages;
     };
 }

@@ -2,7 +2,7 @@
 
 #include "canyon/graphics/context.h"
 
-namespace graphics::sdl {
+namespace canyon::graphics::sdl {
     class Context : public graphics::Context {
     public:
         Context() = default;

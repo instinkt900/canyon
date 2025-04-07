@@ -9,8 +9,8 @@
 #include <memory>
 #include <filesystem>
 
-namespace graphics::sdl {
-    class Image : public graphics::IImage, public graphics::ITarget {
+namespace canyon::graphics::sdl {
+    class Image : public IImage, public ITarget {
     public:
         explicit Image(std::shared_ptr<Texture> texture);
         Image(std::shared_ptr<Texture> texture, IntRect const& sourceRect);

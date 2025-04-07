@@ -13,7 +13,7 @@
 #include <string>
 #include <cstdint>
 
-namespace platform::sdl {
+namespace canyon::platform::sdl {
     class Window : public platform::Window {
     public:
         Window(graphics::sdl::Context& context, std::string const& applicationTitle, int width, int height);

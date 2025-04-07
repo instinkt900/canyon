@@ -12,7 +12,7 @@ namespace {
     };
 }
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     SurfaceContext::SurfaceContext(Context& context)
         : m_context(context) {
 

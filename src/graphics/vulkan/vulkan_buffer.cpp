@@ -2,7 +2,7 @@
 #include "canyon/graphics/vulkan/vulkan_buffer.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     Buffer::Buffer(SurfaceContext& context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
         : m_context(context)
         , m_size(size) {

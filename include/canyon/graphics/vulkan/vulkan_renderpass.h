@@ -6,7 +6,7 @@
 #include <memory>
 #include <cstdint>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class RenderPass {
     public:
         RenderPass(uint32_t hash, VkDevice device, VkRenderPass renderPass);

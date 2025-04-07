@@ -2,7 +2,7 @@
 #include "canyon/graphics/moth_ui/moth_image_factory.h"
 #include "canyon/graphics/moth_ui/moth_image.h"
 
-namespace graphics {
+namespace canyon::graphics {
     MothImageFactory::MothImageFactory(std::shared_ptr<graphics::ImageFactory> factoryImpl)
         : m_factoryImpl(factoryImpl) {
     }

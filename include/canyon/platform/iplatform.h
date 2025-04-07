@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace platform {
+namespace canyon::platform {
     class Window;
     class IPlatform {
     public:

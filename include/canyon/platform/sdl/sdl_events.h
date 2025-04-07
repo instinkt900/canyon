@@ -5,5 +5,6 @@
 
 #include <memory>
 
-std::unique_ptr<moth_ui::Event> FromSDL(SDL_Event const& event);
-
+namespace canyon::platform::sdl {
+    std::unique_ptr<moth_ui::Event> FromSDL(SDL_Event const& event);
+}

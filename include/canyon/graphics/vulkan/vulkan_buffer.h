@@ -6,7 +6,7 @@
 
 #include <stddef.h>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class Buffer {
     public:
         Buffer(SurfaceContext& context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);

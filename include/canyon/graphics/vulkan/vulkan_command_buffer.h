@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <stddef.h>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class CommandBuffer {
     public:
         CommandBuffer(SurfaceContext& context);

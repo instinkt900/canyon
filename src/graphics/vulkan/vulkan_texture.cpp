@@ -8,7 +8,7 @@ namespace {
     static uint32_t NextTextureId = 1;
 }
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     std::unique_ptr<Texture> Texture::FromFile(SurfaceContext& context, std::filesystem::path const& path) {
         if (std::filesystem::exists(path)) {
             int texWidth;

@@ -2,7 +2,7 @@
 #include "canyon/graphics/vulkan/vulkan_command_buffer.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     CommandBuffer::CommandBuffer(SurfaceContext& context)
         : m_context(context) {
         VkCommandBufferAllocateInfo info{};

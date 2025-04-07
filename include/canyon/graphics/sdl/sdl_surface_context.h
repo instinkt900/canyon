@@ -13,7 +13,7 @@
 #include <filesystem>
 #include <cstdint>
 
-namespace graphics::sdl {
+namespace canyon::graphics::sdl {
     class SurfaceContext : public graphics::SurfaceContext {
     public:
         SurfaceContext(Context& context, SDL_Renderer* renderer);

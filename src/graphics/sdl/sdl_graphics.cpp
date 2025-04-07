@@ -5,7 +5,7 @@
 #include "canyon/graphics/sdl/sdl_utils.hpp"
 #include "../utils.h"
 
-namespace graphics::sdl {
+namespace canyon::graphics::sdl {
     Graphics::Graphics(SurfaceContext& context)
         : m_surfaceContext(context)
         , m_drawColor(graphics::BasicColors::White) {

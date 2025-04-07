@@ -11,7 +11,7 @@
 #include <string>
 #include <stddef.h>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     struct Shader {
         Shader(uint32_t hash);
         ~Shader();

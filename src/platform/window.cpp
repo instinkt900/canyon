@@ -2,7 +2,7 @@
 #include <moth_ui/context.h>
 #include "canyon/platform/window.h"
 
-namespace platform {
+namespace canyon::platform {
     Window::Window(std::string const& title, int width, int height)
         : m_title(title)
         , m_windowWidth(width)

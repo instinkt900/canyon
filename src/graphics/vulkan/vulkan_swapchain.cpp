@@ -20,7 +20,7 @@ namespace {
     }
 }
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     Swapchain::Swapchain(SurfaceContext& context, RenderPass& renderPass, VkSurfaceKHR surface, VkExtent2D extent)
         : m_context(context)
         , m_extent(extent) {

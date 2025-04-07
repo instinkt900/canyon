@@ -19,7 +19,7 @@
         }                                                                                                     \
     }
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     static constexpr uint32_t HashSeed = 0xc00db11c;
 
     template <typename T>

@@ -7,7 +7,7 @@
 #include <memory>
 #include <filesystem>
 
-namespace graphics::sdl {
+namespace canyon::graphics::sdl {
     class Font : public IFont {
     public:
         explicit Font(CachedFontRef fontObj);

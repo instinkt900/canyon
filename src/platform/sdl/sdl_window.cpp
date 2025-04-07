@@ -31,7 +31,7 @@ namespace {
     }
 }
 
-namespace platform::sdl {
+namespace canyon::platform::sdl {
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {

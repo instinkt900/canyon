@@ -10,7 +10,7 @@
 #include <filesystem>
 #include <cstdint>
 
-namespace graphics {
+namespace canyon::graphics {
     class SurfaceContext {
     public:
         virtual ~SurfaceContext() = default;

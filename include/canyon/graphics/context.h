@@ -1,6 +1,6 @@
 #pragma once
 
-namespace graphics {
+namespace canyon::graphics {
     class Context {
     public:
         virtual ~Context() = default;

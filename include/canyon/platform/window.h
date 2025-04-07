@@ -16,7 +16,7 @@
 #include <string>
 #include <cstdint>
 
-namespace platform {
+namespace canyon::platform {
     class Window : public EventEmitter {
     public:
         Window(std::string const& windowTitle, int width, int height);

@@ -9,8 +9,8 @@
 #include <filesystem>
 #include <memory>
 
-namespace graphics::sdl {
-    class Texture : public graphics::ITexture {
+namespace canyon::graphics::sdl {
+    class Texture : public ITexture {
     public:
         explicit Texture(SDLTextureRef texture);
         virtual ~Texture() = default;

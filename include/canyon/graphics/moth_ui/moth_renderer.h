@@ -12,7 +12,7 @@
 
 #include <stack>
 
-namespace graphics {
+namespace canyon::graphics {
     class MothRenderer : public moth_ui::IRenderer {
     public:
         MothRenderer(IGraphics& graphics);

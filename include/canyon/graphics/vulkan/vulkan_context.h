@@ -6,7 +6,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class Context : public graphics::Context {
     public:
         Context();

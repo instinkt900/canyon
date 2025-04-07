@@ -1,6 +1,6 @@
 #pragma once
 
-namespace graphics {
+namespace canyon::graphics {
     enum class BlendMode {
         Invalid = -1,
         Replace,

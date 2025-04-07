@@ -78,7 +78,7 @@ namespace {
     while (0)               \
         ;
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     Context::Context() {
 
         FT_CHECK(FT_Init_FreeType(&m_ftLibrary));

@@ -3,8 +3,8 @@
 #include "canyon/graphics/itexture.h"
 #include "canyon/utils/rect_serialization.h"
 
-namespace graphics {
-    ImageFactory::ImageFactory(graphics::SurfaceContext& context)
+namespace canyon::graphics {
+    ImageFactory::ImageFactory(SurfaceContext& context)
         : m_context(context) {
     }
 

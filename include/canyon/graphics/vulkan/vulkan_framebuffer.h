@@ -11,7 +11,7 @@
 #include <memory>
 #include <cstdint>
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     class CommandBuffer;
 
     class Framebuffer : public ITarget {

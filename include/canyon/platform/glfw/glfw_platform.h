@@ -7,7 +7,7 @@
 
 #include <memory>
 
-namespace platform::glfw {
+namespace canyon::platform::glfw {
     class Platform : public IPlatform {
     public:
         virtual ~Platform() = default;
