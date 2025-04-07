@@ -1,11 +1,11 @@
-#include "canyon.h"
+#include "canyon/canyon.h"
 #include "example_layer.h"
-#include "platform/application.h"
-#include "platform/window.h"
+#include "canyon/platform/application.h"
+#include "canyon/platform/window.h"
 #include <moth_ui/event_listener.h>
 
-void startExampleApp(platform::IPlatform& platform) {
-    auto application = std::make_unique<Application>(platform);
+void startExampleApp(canyon::platform::IPlatform& platform) {
+    auto application = std::make_unique<canyon::platform::Application>(platform);
     auto& window = application->GetWindow();
     auto& mothContext = window.GetMothContext();
     auto& graphics = window.GetGraphics();

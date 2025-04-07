@@ -4,7 +4,7 @@
 #include <moth_ui/group.h>
 #include <moth_ui/event_dispatch.h>
 
-TestLayer::TestLayer(moth_ui::Context& context, graphics::IGraphics& graphics, std::filesystem::path const& layoutPath)
+TestLayer::TestLayer(moth_ui::Context& context, canyon::graphics::IGraphics& graphics, std::filesystem::path const& layoutPath)
     : m_context(context)
     , m_graphics(graphics) {
     LoadLayout(layoutPath);
@@ -47,7 +47,7 @@ void TestLayer::Draw() {
     m_lastDrawnSize = currentSize;
 }
 
-void TestLayer::OnAddedToStack(LayerStack* stack) {
+void TestLayer::OnAddedToStack(canyon::LayerStack* stack) {
     Layer::OnAddedToStack(stack);
 
     if (m_root) {

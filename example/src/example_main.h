@@ -1,5 +1,5 @@
 #pragma once
 
-#include "platform/iplatform.h"
+#include "canyon/platform/iplatform.h"
 
-void exampleMain(platform::IPlatform& platform);
+void exampleMain(canyon::platform::IPlatform& platform);
