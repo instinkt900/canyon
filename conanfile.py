@@ -1,14 +1,15 @@
 from conan import ConanFile
-from conan.tools.cmake import cmake_layout
+from conan.tools.cmake import cmake_layout, CMake
 from conan.tools.files import load
 
 class canyon(ConanFile):
     name = "canyon"
     settings = "os", "compiler", "build_type", "arch"
-    generators = "CMakeToolchain", "CMakeDeps", "MSBuildToolchain", "MSBuildDeps"
+    generators = "CMakeToolchain", "CMakeDeps"
+    exports_sources = "CMakeLists.txt", "version.txt", "include/*", "src/*", "external/imgui/*", "external/murmurhash.c/*"
 
     def set_version(self):
-        self.version = load(self, "version.txt")
+        self.version = load(self, "version.txt").strip()
 
     def requirements(self):
         self.requires("sdl/2.28.3")
@@ -31,3 +32,17 @@ class canyon(ConanFile):
 
     def layout(self):
         cmake_layout(self)
+
+    def build(self):
+        cmake = CMake(self)
+        cmake.configure()
+        cmake.build()
+
+    def package(self):
+        cmake = CMake(self)
+        cmake.install()
+
+    def package_info(self):
+        self.cpp_info.libs = ["canyon"]
+        self.cpp_info.libdirs = ["lib"]
+        self.cpp_info.includedirs = ["include"]

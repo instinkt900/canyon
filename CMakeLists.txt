@@ -84,7 +84,8 @@ find_package(harfbuzz REQUIRED)
 find_package(moth_ui REQUIRED)
 
 add_library(${PROJECT_NAME} ${SOURCES})
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
+# adding the version number to the library name would be nice but it messes with conan
+# set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_include_directories(${PROJECT_NAME} PRIVATE src)
@@ -108,8 +109,8 @@ else()
 endif()
 
 # target_precompile_headers(${PROJECT_NAME} PRIVATE include/canyon.h)
-set_source_files_properties(external/murmurhash.c/murmurhash.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
-set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+# set_source_files_properties(external/murmurhash.c/murmurhash.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+# set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(DIRECTORY "include/" # source directory
