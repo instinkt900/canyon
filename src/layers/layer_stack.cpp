@@ -75,5 +75,6 @@ namespace canyon {
     }
 
     void LayerStack::SetLayerLogicalSize(IntVec2 const& size) {
+        // TODO: this will need some graphical implementation.
     }
 }
