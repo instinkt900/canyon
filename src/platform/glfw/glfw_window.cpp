@@ -9,7 +9,7 @@
 
 namespace canyon::platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
-        : platform::Window(title, width, height)
+        : canyon::platform::Window(title, width, height)
         , m_context(context) {
             CreateWindow();
             Finalize();

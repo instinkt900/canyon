@@ -10,7 +10,7 @@ namespace canyon {
         }
         virtual ~Ticker() {}
 
-        void SetRunning(bool running) { m_running = false; }
+        void SetRunning(bool running) { m_running = running; }
 
         void TickSync() {
             m_running = true;
@@ -30,7 +30,7 @@ namespace canyon {
         virtual void Tick(uint32_t ticks) = 0;
 
     private:
-        bool m_running;
+        bool m_running = false;
         std::chrono::milliseconds m_updateTicks;
         std::chrono::time_point<std::chrono::steady_clock> m_lastUpdateTicks;
     };

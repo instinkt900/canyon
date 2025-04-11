@@ -14,7 +14,7 @@
 #include <cstdint>
 
 namespace canyon::platform::glfw {
-    class Window : public platform::Window {
+    class Window : public canyon::platform::Window {
     public:
         Window(graphics::vulkan::Context& context, std::string const& title, int width, int height);
         virtual ~Window();
