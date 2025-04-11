@@ -4,7 +4,7 @@
 #include "canyon/graphics/moth_ui/moth_font.h"
 
 namespace canyon::graphics {
-    MothFontFactory::MothFontFactory(std::shared_ptr<graphics::FontFactory> factoryImpl)
+    MothFontFactory::MothFontFactory(std::shared_ptr<canyon::graphics::FontFactory> factoryImpl)
         : m_factoryImpl(factoryImpl) {
     }
 

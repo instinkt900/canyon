@@ -17,7 +17,7 @@ namespace canyon::platform::glfw {
 
         graphics::Context& GetGraphicsContext() override;
 
-        std::unique_ptr<platform::Window> CreateWindow(char const* title, int width, int height) override;
+        std::unique_ptr<canyon::platform::Window> CreateWindow(char const* title, int width, int height) override;
 
     private:
         std::unique_ptr<graphics::vulkan::Context> m_context;

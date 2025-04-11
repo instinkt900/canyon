@@ -25,7 +25,7 @@ namespace canyon::graphics {
         struct ImageDesc {
             std::shared_ptr<ITexture> m_texture;
             IntRect m_sourceRect;
-            std::string m_path;
+            std::filesystem::path m_path;
         };
 
         SurfaceContext& m_context;

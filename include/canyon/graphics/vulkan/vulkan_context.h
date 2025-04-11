@@ -7,7 +7,7 @@
 #include FT_FREETYPE_H
 
 namespace canyon::graphics::vulkan {
-    class Context : public graphics::Context {
+    class Context : public canyon::graphics::Context {
     public:
         Context();
         virtual ~Context();
