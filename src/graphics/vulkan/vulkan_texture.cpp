@@ -1,14 +1,14 @@
-#include "canyon.h"
-#include "graphics/vulkan/vulkan_texture.h"
-#include "graphics/vulkan/vulkan_command_buffer.h"
-#include "graphics/vulkan/vulkan_utils.h"
-#include "graphics/stb_image.h"
+#include "common.h"
+#include "canyon/graphics/vulkan/vulkan_texture.h"
+#include "canyon/graphics/vulkan/vulkan_command_buffer.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/stb_image.h"
 
 namespace {
     static uint32_t NextTextureId = 1;
 }
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     std::unique_ptr<Texture> Texture::FromFile(SurfaceContext& context, std::filesystem::path const& path) {
         if (std::filesystem::exists(path)) {
             int texWidth;

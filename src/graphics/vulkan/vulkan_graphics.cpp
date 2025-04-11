@@ -1,22 +1,19 @@
-#include "canyon.h"
-#include "graphics/vulkan/vulkan_graphics.h"
-#include "graphics/color.h"
-#include "graphics/vulkan/vulkan_command_buffer.h"
-#include "graphics/vulkan/vulkan_texture.h"
-#include "graphics/vulkan/vulkan_font.h"
-#include "graphics/vulkan/shaders/vulkan_shaders.h"
-
-#include "harfbuzz/hb.h"
-#include "harfbuzz/hb-ft.h"
-
-#include "graphics/stb_image_write.h"
+#include "common.h"
+#include "canyon/graphics/vulkan/vulkan_graphics.h"
+#include "canyon/graphics/color.h"
+#include "canyon/graphics/vulkan/vulkan_command_buffer.h"
+#include "canyon/graphics/vulkan/vulkan_texture.h"
+#include "canyon/graphics/vulkan/vulkan_font.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/stb_image_write.h"
+#include "shaders/vulkan_shaders.h"
 
 namespace {
     VkVertexInputBindingDescription getVertexBindingDescription() {
         VkVertexInputBindingDescription vertexBindingDesc{};
 
         vertexBindingDesc.binding = 0;
-        vertexBindingDesc.stride = sizeof(graphics::vulkan::Graphics::Vertex);
+        vertexBindingDesc.stride = sizeof(canyon::graphics::vulkan::Graphics::Vertex);
         vertexBindingDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
         return vertexBindingDesc;
@@ -28,17 +25,17 @@ namespace {
         vertexAttributeDescs[0].binding = 0;
         vertexAttributeDescs[0].location = 0;
         vertexAttributeDescs[0].format = VK_FORMAT_R32G32_SFLOAT;
-        vertexAttributeDescs[0].offset = offsetof(graphics::vulkan::Graphics::Vertex, xy);
+        vertexAttributeDescs[0].offset = offsetof(canyon::graphics::vulkan::Graphics::Vertex, xy);
 
         vertexAttributeDescs[1].binding = 0;
         vertexAttributeDescs[1].location = 1;
         vertexAttributeDescs[1].format = VK_FORMAT_R32G32_SFLOAT;
-        vertexAttributeDescs[1].offset = offsetof(graphics::vulkan::Graphics::Vertex, uv);
+        vertexAttributeDescs[1].offset = offsetof(canyon::graphics::vulkan::Graphics::Vertex, uv);
 
         vertexAttributeDescs[2].binding = 0;
         vertexAttributeDescs[2].location = 2;
         vertexAttributeDescs[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        vertexAttributeDescs[2].offset = offsetof(graphics::vulkan::Graphics::Vertex, color);
+        vertexAttributeDescs[2].offset = offsetof(canyon::graphics::vulkan::Graphics::Vertex, color);
 
         return vertexAttributeDescs;
     }
@@ -47,7 +44,7 @@ namespace {
         VkVertexInputBindingDescription vertexBindingDesc{};
 
         vertexBindingDesc.binding = 0;
-        vertexBindingDesc.stride = sizeof(graphics::vulkan::Graphics::FontGlyphInstance);
+        vertexBindingDesc.stride = sizeof(canyon::graphics::vulkan::Graphics::FontGlyphInstance);
         vertexBindingDesc.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
 
         return vertexBindingDesc;
@@ -59,23 +56,23 @@ namespace {
         vertexAttributeDescs[0].binding = 0;
         vertexAttributeDescs[0].location = 0;
         vertexAttributeDescs[0].format = VK_FORMAT_R32G32_SFLOAT;
-        vertexAttributeDescs[0].offset = offsetof(graphics::vulkan::Graphics::FontGlyphInstance, pos);
+        vertexAttributeDescs[0].offset = offsetof(canyon::graphics::vulkan::Graphics::FontGlyphInstance, pos);
 
         vertexAttributeDescs[1].binding = 0;
         vertexAttributeDescs[1].location = 1;
         vertexAttributeDescs[1].format = VK_FORMAT_R32_UINT;
-        vertexAttributeDescs[1].offset = offsetof(graphics::vulkan::Graphics::FontGlyphInstance, glyphIndex);
+        vertexAttributeDescs[1].offset = offsetof(canyon::graphics::vulkan::Graphics::FontGlyphInstance, glyphIndex);
 
         vertexAttributeDescs[2].binding = 0;
         vertexAttributeDescs[2].location = 2;
         vertexAttributeDescs[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        vertexAttributeDescs[2].offset = offsetof(graphics::vulkan::Graphics::FontGlyphInstance, color);
+        vertexAttributeDescs[2].offset = offsetof(canyon::graphics::vulkan::Graphics::FontGlyphInstance, color);
 
         return vertexAttributeDescs;
     }
 }
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     Graphics::Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
         : m_context(context) {
         CreateRenderPass();
@@ -195,23 +192,16 @@ namespace graphics::vulkan {
     }
 
     void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
-        // TODO:
-        // DrawImage(image, destRect, sourceRect);
-        IntRect imageRect = MakeRect(0, 0, image.GetWidth(), image.GetHeight());
+        IntRect const imageRect = MakeRect(0, 0, image.GetWidth(), image.GetHeight());
         if (!sourceRect) {
             sourceRect = &imageRect;
         }
         auto const imageWidth = static_cast<int>(sourceRect->w() * scale);
         auto const imageHeight = static_cast<int>(sourceRect->h() * scale);
-        int t = 0;
         for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
             for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
-                    // printf("{ %d, %d, %d, %d }\n", x, y, imageWidth, imageHeight);
-                IntRect tiledDstRect{ { x, y }, { x + imageWidth, y + imageHeight } };
+                IntRect const tiledDstRect{ { x, y }, { x + imageWidth, y + imageHeight } };
                 DrawImage(image, tiledDstRect, sourceRect);
-                // SetColor(FromARGB(rand()));
-                // DrawFillRectF(static_cast<FloatRect>(tiledDstRect));
-                t++;
             }
         }
     }

@@ -1,6 +1,6 @@
-#include "canyon.h"
-#include "graphics/vulkan/vulkan_swapchain.h"
-#include "graphics/vulkan/vulkan_utils.h"
+#include "common.h"
+#include "canyon/graphics/vulkan/vulkan_swapchain.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
 
 namespace {
     VkExtent2D chooseSwapExtent(uint32_t width, uint32_t height, const VkSurfaceCapabilitiesKHR& capabilities) {
@@ -20,7 +20,7 @@ namespace {
     }
 }
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     Swapchain::Swapchain(SurfaceContext& context, RenderPass& renderPass, VkSurfaceKHR surface, VkExtent2D extent)
         : m_context(context)
         , m_extent(extent) {

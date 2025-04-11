@@ -1,8 +1,8 @@
-#include "canyon.h"
-#include "graphics/vulkan/vulkan_renderpass.h"
-#include "graphics/vulkan/vulkan_utils.h"
+#include "common.h"
+#include "canyon/graphics/vulkan/vulkan_renderpass.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     RenderPass::RenderPass(uint32_t hash, VkDevice device, VkRenderPass renderPass)
         : m_hash(hash)
         , m_device(device)

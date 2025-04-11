@@ -1,12 +1,11 @@
-#include "canyon.h"
-#include "graphics/sdl/sdl_graphics.h"
-#include "graphics/sdl/sdl_context.h"
-#include "graphics/sdl/sdl_font.h"
-#include "graphics/sdl/sdl_image.h"
-#include "graphics/sdl/sdl_utils.hpp"
+#include "common.h"
+#include "canyon/graphics/sdl/sdl_graphics.h"
+#include "canyon/graphics/sdl/sdl_font.h"
+#include "canyon/graphics/sdl/sdl_image.h"
+#include "canyon/graphics/sdl/sdl_utils.hpp"
 #include "../utils.h"
 
-namespace graphics::sdl {
+namespace canyon::graphics::sdl {
     Graphics::Graphics(SurfaceContext& context)
         : m_surfaceContext(context)
         , m_drawColor(graphics::BasicColors::White) {

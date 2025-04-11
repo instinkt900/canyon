@@ -1,6 +1,8 @@
-#include "canyon.h"
-#include "graphics/vulkan/vulkan_context.h"
-#include "graphics/vulkan/vulkan_utils.h"
+#include "common.h"
+#include "canyon/graphics/vulkan/vulkan_context.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
+
+#include <spdlog/spdlog.h>
 
 namespace {
     std::vector<char const*> validationLayers = {
@@ -76,7 +78,7 @@ namespace {
     while (0)               \
         ;
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     Context::Context() {
 
         FT_CHECK(FT_Init_FreeType(&m_ftLibrary));

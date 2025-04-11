@@ -1,15 +1,15 @@
-#include "canyon.h"
-#include "platform/glfw/glfw_window.h"
-#include "graphics/vulkan/vulkan_graphics.h"
-#include "graphics/vulkan/vulkan_surface_context.h"
-#include "platform/glfw/glfw_events.h"
-#include "moth_ui/events/event_mouse.h"
-#include "events/event_window.h"
-#include "graphics/moth_ui/utils.h"
+#include "common.h"
+#include "canyon/platform/glfw/glfw_window.h"
+#include "canyon/graphics/vulkan/vulkan_graphics.h"
+#include "canyon/graphics/vulkan/vulkan_surface_context.h"
+#include "canyon/platform/glfw/glfw_events.h"
+#include <moth_ui/events/event_mouse.h>
+#include "canyon/events/event_window.h"
+#include "canyon/graphics/moth_ui/utils.h"
 
-namespace platform::glfw {
+namespace canyon::platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
-        : platform::Window(title, width, height)
+        : canyon::platform::Window(title, width, height)
         , m_context(context) {
             CreateWindow();
             Finalize();

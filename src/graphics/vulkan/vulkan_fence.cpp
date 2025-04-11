@@ -1,7 +1,7 @@
-#include "canyon.h"
-#include "graphics/vulkan/vulkan_fence.h"
+#include "common.h"
+#include "canyon/graphics/vulkan/vulkan_fence.h"
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     Fence::Fence(SurfaceContext& context)
         : m_context(context) {
         VkFenceCreateInfo fenceInfo{};

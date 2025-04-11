@@ -1,8 +1,8 @@
-#include "canyon.h"
-#include "graphics/sdl/sdl_texture.h"
-#include "graphics/sdl/smart_sdl.h"
+#include "common.h"
+#include "canyon/graphics/sdl/sdl_texture.h"
+#include "canyon/graphics/sdl/smart_sdl.hpp"
 
-namespace graphics::sdl {
+namespace canyon::graphics::sdl {
     Texture::Texture(SDLTextureRef texture)
         : m_texture(texture) {
         SDL_QueryTexture(texture->GetImpl(), NULL, NULL, &m_textureDimensions.x, &m_textureDimensions.y);
