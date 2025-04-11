@@ -1,11 +1,13 @@
 #pragma once
 
 #include <chrono>
+#include <thread>
 
 namespace canyon {
     class Ticker {
     public:
         Ticker(int ticksPerSecond = 60) {
+            ticksPerSecond = ticksPerSecond > 0 ? ticksPerSecond : 60;
             m_updateTicks = std::chrono::milliseconds(1000 / ticksPerSecond);
         }
         virtual ~Ticker() {}
@@ -23,6 +25,7 @@ namespace canyon {
                     m_lastUpdateTicks += m_updateTicks;
                     deltaTicks -= m_updateTicks;
                 }
+                std::this_thread::yield();
             }
         }
 

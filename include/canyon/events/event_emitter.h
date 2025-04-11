@@ -18,7 +18,7 @@ namespace canyon {
         bool IsValid() const { return m_id != 0; }
 
     private:
-        explicit LambdaHandle(uint64_t id)
+        explicit LambdaHandle(uint32_t id)
             : m_id(id) {}
         uint32_t m_id = 0;
     };

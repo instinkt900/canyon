@@ -15,11 +15,11 @@ namespace canyon::platform::glfw {
         bool Startup() override;
         void Shutdown() override;
 
-        graphics::Context& GetGraphicsContext() override;
+        canyon::graphics::Context& GetGraphicsContext() override;
 
         std::unique_ptr<canyon::platform::Window> CreateWindow(char const* title, int width, int height) override;
 
     private:
-        std::unique_ptr<graphics::vulkan::Context> m_context;
+        std::unique_ptr<canyon::graphics::vulkan::Context> m_context;
     };
 }
