@@ -43,6 +43,6 @@ class canyon(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["canyon"]
+        self.cpp_info.libs = ["canyon-"+self.version]
         self.cpp_info.libdirs = ["lib"]
         self.cpp_info.includedirs = ["include"]
