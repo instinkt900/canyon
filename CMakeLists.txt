@@ -83,7 +83,7 @@ find_package(spdlog REQUIRED)
 find_package(harfbuzz REQUIRED)
 find_package(moth_ui REQUIRED)
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
@@ -107,6 +107,7 @@ else()
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall -Werror")
 endif()
 
+# temp disabled while i figure out other build issues. it is intended to use precompiled headers eventually
 # target_precompile_headers(${PROJECT_NAME} PRIVATE include/canyon.h)
 # set_source_files_properties(external/murmurhash.c/murmurhash.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 # set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
