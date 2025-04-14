@@ -11,7 +11,7 @@ namespace canyon::graphics {
         m_fonts.clear();
     }
 
-    std::shared_ptr<IFont> FontFactory::GetFont(char const* name, int size) {
+    std::shared_ptr<IFont> FontFactory::GetFont(std::string const& name, int size) {
         auto fileIt = m_fonts.find(name);
         if (fileIt != m_fonts.end()) {
             auto sizeMap = fileIt->second;

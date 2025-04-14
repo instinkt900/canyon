@@ -28,7 +28,7 @@ class canyon(ConanFile):
         self.requires("fmt/10.2.1", override=True)
 
     def build_requirements(self):
-        self.tool_requires("cmake/3.27.9")
+        self.tool_requires("cmake/[>=3.27.0]")
 
     def layout(self):
         cmake_layout(self)

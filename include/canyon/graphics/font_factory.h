@@ -14,7 +14,7 @@ namespace canyon::graphics {
         virtual ~FontFactory() = default;
 
         void ClearFonts();
-        std::shared_ptr<IFont> GetFont(char const* name, int size);
+        std::shared_ptr<IFont> GetFont(std::string const& name, int size);
 
     private:
         SurfaceContext& m_context;
