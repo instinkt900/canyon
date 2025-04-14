@@ -12,7 +12,7 @@ namespace canyon::graphics {
         m_factoryImpl->ClearFonts();
     }
 
-    std::shared_ptr<moth_ui::IFont> MothFontFactory::GetFont(char const* name, int size) {
+    std::shared_ptr<moth_ui::IFont> MothFontFactory::GetFont(std::string const& name, int size) {
         auto it = m_fontPaths.find(name);
         if (it != m_fontPaths.end()) {
            auto const font = m_factoryImpl->GetFont(it->second.c_str(), size);
