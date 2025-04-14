@@ -7,6 +7,7 @@ class canyon(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "CMakeToolchain", "CMakeDeps"
     exports_sources = "CMakeLists.txt", "version.txt", "include/*", "src/*", "external/imgui/*", "external/murmurhash.c/*"
+    package_type = "static-library"
 
     def set_version(self):
         self.version = load(self, "version.txt").strip()
@@ -17,14 +18,13 @@ class canyon(ConanFile):
         self.requires("sdl_ttf/2.20.2")
         self.requires("glfw/3.3.8")
         self.requires("libpng/1.6.42", override=True)
-        self.requires("nlohmann_json/3.11.2")
-        self.requires("vulkan-headers/1.3.243.0")
+        self.requires("vulkan-headers/1.3.243.0", transitive_headers=True)
         self.requires("vulkan-loader/1.3.243.0")
         self.requires("vulkan-memory-allocator/3.0.1")
-        self.requires("freetype/2.13.2")
+        self.requires("freetype/2.13.2", transitive_headers=True)
         self.requires("spdlog/1.12.0")
         self.requires("harfbuzz/8.3.0")
-        self.requires("moth_ui/0.1")
+        self.requires("moth_ui/0.1", transitive_headers=True)
         self.requires("fmt/10.2.1", override=True)
 
     def build_requirements(self):
