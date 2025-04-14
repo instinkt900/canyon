@@ -1,9 +1,9 @@
-#include "canyon.h"
-#include "graphics/vulkan/vulkan_font.h"
-#include "graphics/stb_rect_pack.h"
-#include "graphics/vulkan/vulkan_utils.h"
+#include "common.h"
+#include "canyon/graphics/vulkan/vulkan_font.h"
+#include "canyon/graphics/stb_rect_pack.h"
+#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/stb_image_write.h"
 #include "harfbuzz/hb-ft.h"
-#include "graphics/stb_image_write.h"
 
 #define _unused(x) ((void)(x))
 #define FT_CHECK(r)         \
@@ -27,7 +27,7 @@ namespace {
         return value;
     }
 
-    IntVec2 FindOptimalDimensions(std::vector<stbrp_node>& nodes, std::vector<stbrp_rect>& rects, IntVec2 const& minPack, IntVec2 const& maxPack) {
+    canyon::IntVec2 FindOptimalDimensions(std::vector<stbrp_node>& nodes, std::vector<stbrp_rect>& rects, canyon::IntVec2 const& minPack, canyon::IntVec2 const& maxPack) {
         // collect some info about all the rects
         int minWidth = std::numeric_limits<int>::max();
         int minHeight = std::numeric_limits<int>::max();
@@ -44,7 +44,7 @@ namespace {
         }
 
         struct PackTest {
-            IntVec2 m_dimensions;
+            canyon::IntVec2 m_dimensions;
             float m_ratio;
         };
 
@@ -61,7 +61,7 @@ namespace {
                 int const curArea = curWidth * curHeight;
                 if (curArea > totalArea) {
                     PackTest info;
-                    info.m_dimensions = IntVec2{ curWidth, curHeight };
+                    info.m_dimensions = canyon::IntVec2{ curWidth, curHeight };
                     info.m_ratio = 0;
                     testDimensions.push_back(info);
                 }
@@ -85,7 +85,7 @@ namespace {
     }
 }
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     std::unique_ptr<Font> Font::Load(std::filesystem::path const& path, int size, SurfaceContext& context) {
         FT_Face face;
         if (FT_New_Face(context.GetContext().GetFTLibrary(), path.c_str(), 0, &face) != 0) {

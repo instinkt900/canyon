@@ -1,8 +1,8 @@
-#include "canyon.h"
-#include "graphics/vulkan/vulkan_image.h"
-#include "graphics/vulkan/vulkan_graphics.h"
+#include "common.h"
+#include "canyon/graphics/vulkan/vulkan_image.h"
+#include "canyon/graphics/vulkan/vulkan_graphics.h"
 
-namespace graphics::vulkan {
+namespace canyon::graphics::vulkan {
     Graphics* Image::s_graphicsContext = nullptr;
 
     Image::Image(std::shared_ptr<Texture> texture)

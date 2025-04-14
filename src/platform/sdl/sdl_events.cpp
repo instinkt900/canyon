@@ -1,12 +1,12 @@
-#include "canyon.h"
-#include "platform/sdl/sdl_events.h"
-#include "moth_ui/events/event_key.h"
-#include "moth_ui/events/event_mouse.h"
-#include "moth_ui/events/event.h"
-#include "events/event_window.h"
+#include "common.h"
+#include "canyon/platform/sdl/sdl_events.h"
+#include "canyon/events/event_window.h"
 
-#include "moth_ui/events/event_mouse.h"
-#include "moth_ui/events/event_key.h"
+#include <moth_ui/events/event_key.h>
+#include <moth_ui/events/event_mouse.h>
+#include <moth_ui/events/event.h>
+#include <moth_ui/events/event_mouse.h>
+#include <moth_ui/events/event_key.h>
 
 namespace {
     moth_ui::MouseButton FromSDLMouse(uint8_t button) {
@@ -273,59 +273,61 @@ namespace {
     }
 }
 
-std::unique_ptr<moth_ui::Event> FromSDL(SDL_Event const& event) {
-    switch (event.type) {
-    case SDL_WINDOWEVENT: {
-        switch (event.window.event) {
-        case SDL_WINDOWEVENT_CLOSE: {
+namespace canyon::platform::sdl {
+    std::unique_ptr<moth_ui::Event> FromSDL(SDL_Event const& event) {
+        switch (event.type) {
+        case SDL_WINDOWEVENT: {
+            switch (event.window.event) {
+            case SDL_WINDOWEVENT_CLOSE: {
+                return std::make_unique<EventRequestQuit>();
+            }
+            case SDL_WINDOWEVENT_SIZE_CHANGED: {
+                return std::make_unique<EventWindowSize>(event.window.data1, event.window.data2);
+            }
+            default:
+                return nullptr;
+            }
+        }
+        case SDL_QUIT: {
             return std::make_unique<EventRequestQuit>();
         }
-        case SDL_WINDOWEVENT_SIZE_CHANGED: {
-            return std::make_unique<EventWindowSize>(event.window.data1, event.window.data2);
+        case SDL_KEYUP:
+        case SDL_KEYDOWN: {
+            moth_ui::KeyAction action = event.type == SDL_KEYUP ? moth_ui::KeyAction::Up : moth_ui::KeyAction::Down;
+            int mods = 0;
+            if ((event.key.keysym.mod & KMOD_LSHIFT) != 0)
+                mods |= moth_ui::KeyMod_LeftShift;
+            if ((event.key.keysym.mod & KMOD_RSHIFT) != 0)
+                mods |= moth_ui::KeyMod_RightShift;
+            if ((event.key.keysym.mod & KMOD_LALT) != 0)
+                mods |= moth_ui::KeyMod_LeftAlt;
+            if ((event.key.keysym.mod & KMOD_RALT) != 0)
+                mods |= moth_ui::KeyMod_RightAlt;
+            if ((event.key.keysym.mod & KMOD_LCTRL) != 0)
+                mods |= moth_ui::KeyMod_LeftCtrl;
+            if ((event.key.keysym.mod & KMOD_RCTRL) != 0)
+                mods |= moth_ui::KeyMod_RightCtrl;
+            return std::make_unique<moth_ui::EventKey>(action, FromSDLKey(event.key.keysym.sym), mods);
         }
-        default:
-            return nullptr;
+        case SDL_RENDER_DEVICE_RESET: {
+            return std::make_unique<EventRenderDeviceReset>();
         }
+        case SDL_RENDER_TARGETS_RESET: {
+            return std::make_unique<EventRenderTargetReset>();
+        }
+        case SDL_MOUSEBUTTONDOWN: {
+            return std::make_unique<moth_ui::EventMouseDown>(FromSDLMouse(event.button.button), moth_ui::IntVec2{ event.button.x, event.button.y });
+        }
+        case SDL_MOUSEBUTTONUP: {
+            return std::make_unique<moth_ui::EventMouseUp>(FromSDLMouse(event.button.button), moth_ui::IntVec2{ event.button.x, event.button.y });
+        }
+        case SDL_MOUSEMOTION: {
+            return std::make_unique<moth_ui::EventMouseMove>(moth_ui::IntVec2{ event.motion.x, event.motion.y }, moth_ui::FloatVec2{ static_cast<float>(event.motion.xrel), static_cast<float>(event.motion.yrel) });
+        }
+        case SDL_MOUSEWHEEL: {
+            return std::make_unique<moth_ui::EventMouseWheel>(moth_ui::IntVec2{ event.wheel.x, event.wheel.y });
+        }
+        }
+        return nullptr;
     }
-    case SDL_QUIT: {
-        return std::make_unique<EventRequestQuit>();
-    }
-    case SDL_KEYUP:
-    case SDL_KEYDOWN: {
-        moth_ui::KeyAction action = event.type == SDL_KEYUP ? moth_ui::KeyAction::Up : moth_ui::KeyAction::Down;
-        int mods = 0;
-        if ((event.key.keysym.mod & KMOD_LSHIFT) != 0)
-            mods |= moth_ui::KeyMod_LeftShift;
-        if ((event.key.keysym.mod & KMOD_RSHIFT) != 0)
-            mods |= moth_ui::KeyMod_RightShift;
-        if ((event.key.keysym.mod & KMOD_LALT) != 0)
-            mods |= moth_ui::KeyMod_LeftAlt;
-        if ((event.key.keysym.mod & KMOD_RALT) != 0)
-            mods |= moth_ui::KeyMod_RightAlt;
-        if ((event.key.keysym.mod & KMOD_LCTRL) != 0)
-            mods |= moth_ui::KeyMod_LeftCtrl;
-        if ((event.key.keysym.mod & KMOD_RCTRL) != 0)
-            mods |= moth_ui::KeyMod_RightCtrl;
-        return std::make_unique<moth_ui::EventKey>(action, FromSDLKey(event.key.keysym.sym), mods);
-    }
-    case SDL_RENDER_DEVICE_RESET: {
-        return std::make_unique<EventRenderDeviceReset>();
-    }
-    case SDL_RENDER_TARGETS_RESET: {
-        return std::make_unique<EventRenderTargetReset>();
-    }
-    case SDL_MOUSEBUTTONDOWN: {
-        return std::make_unique<moth_ui::EventMouseDown>(FromSDLMouse(event.button.button), moth_ui::IntVec2{ event.button.x, event.button.y });
-    }
-    case SDL_MOUSEBUTTONUP: {
-        return std::make_unique<moth_ui::EventMouseUp>(FromSDLMouse(event.button.button), moth_ui::IntVec2{ event.button.x, event.button.y });
-    }
-    case SDL_MOUSEMOTION: {
-        return std::make_unique<moth_ui::EventMouseMove>(moth_ui::IntVec2{ event.motion.x, event.motion.y }, moth_ui::FloatVec2{ static_cast<float>(event.motion.xrel), static_cast<float>(event.motion.yrel) });
-    }
-    case SDL_MOUSEWHEEL: {
-        return std::make_unique<moth_ui::EventMouseWheel>(moth_ui::IntVec2{ event.wheel.x, event.wheel.y });
-    }
-    }
-    return nullptr;
 }

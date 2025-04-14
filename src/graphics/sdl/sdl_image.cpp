@@ -1,8 +1,8 @@
-#include "canyon.h"
-#include "graphics/sdl/sdl_surface_context.h"
-#include "graphics/sdl/sdl_image.h"
+#include "common.h"
+#include "canyon/graphics/sdl/sdl_surface_context.h"
+#include "canyon/graphics/sdl/sdl_image.h"
 
-namespace graphics::sdl {
+namespace canyon::graphics::sdl {
     Image::Image(std::shared_ptr<Texture> texture)
         : m_texture(texture) {
         m_sourceRect = IntRect{ { 0, 0 }, { m_texture->GetWidth(), m_texture->GetHeight() } };

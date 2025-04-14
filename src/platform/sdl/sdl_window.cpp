@@ -1,8 +1,8 @@
-#include "canyon.h"
-#include "platform/sdl/sdl_window.h"
-#include "graphics/sdl/sdl_surface_context.h"
-#include "platform/sdl/sdl_events.h"
-#include "graphics/sdl/sdl_graphics.h"
+#include "common.h"
+#include "canyon/platform/sdl/sdl_window.h"
+#include "canyon/graphics/sdl/sdl_surface_context.h"
+#include "canyon/platform/sdl/sdl_events.h"
+#include "canyon/graphics/sdl/sdl_graphics.h"
 
 namespace {
     std::mutex EventFetchMutex;
@@ -31,7 +31,7 @@ namespace {
     }
 }
 
-namespace platform::sdl {
+namespace canyon::platform::sdl {
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {

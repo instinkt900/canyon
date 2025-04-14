@@ -1,8 +1,8 @@
-#include "canyon.h"
-#include "platform/glfw/glfw_platform.h"
-#include "platform/glfw/glfw_window.h"
+#include "common.h"
+#include "canyon/platform/glfw/glfw_platform.h"
+#include "canyon/platform/glfw/glfw_window.h"
 
-namespace platform::glfw {
+namespace canyon::platform::glfw {
     bool Platform::Startup() {
         if (!glfwInit()) {
             return false;
@@ -19,7 +19,7 @@ namespace platform::glfw {
         return *m_context;
     }
 
-    std::unique_ptr<platform::Window> Platform::CreateWindow(char const* title, int width, int height) {
+    std::unique_ptr<canyon::platform::Window> Platform::CreateWindow(char const* title, int width, int height) {
         return std::make_unique<platform::glfw::Window>(*m_context, title, width, height);
     }
 }

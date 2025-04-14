@@ -1,9 +1,10 @@
-#include "graphics/image_factory.h"
-#include "graphics/itexture.h"
-#include "utils/rect_serialization.h"
+#include "common.h"
+#include "canyon/graphics/image_factory.h"
+#include "canyon/graphics/itexture.h"
+#include "canyon/utils/rect_serialization.h"
 
-namespace graphics {
-    ImageFactory::ImageFactory(graphics::SurfaceContext& context)
+namespace canyon::graphics {
+    ImageFactory::ImageFactory(SurfaceContext& context)
         : m_context(context) {
     }
 

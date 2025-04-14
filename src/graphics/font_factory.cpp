@@ -1,7 +1,8 @@
-#include "graphics/font_factory.h"
-#include "graphics/surface_context.h"
+#include "common.h"
+#include "canyon/graphics/font_factory.h"
+#include "canyon/graphics/surface_context.h"
 
-namespace graphics {
+namespace canyon::graphics {
     FontFactory::FontFactory(SurfaceContext& context)
         : m_context(context) {
     }
@@ -10,7 +11,7 @@ namespace graphics {
         m_fonts.clear();
     }
 
-    std::shared_ptr<graphics::IFont> FontFactory::GetFont(char const* name, int size) {
+    std::shared_ptr<IFont> FontFactory::GetFont(std::string const& name, int size) {
         auto fileIt = m_fonts.find(name);
         if (fileIt != m_fonts.end()) {
             auto sizeMap = fileIt->second;
@@ -20,7 +21,7 @@ namespace graphics {
             }
         }
 
-        std::shared_ptr<graphics::IFont> font = m_context.FontFromFile(name, size);
+        std::shared_ptr<IFont> font = m_context.FontFromFile(name, size);
         auto sizeMap = m_fonts[name];
         sizeMap[size] = font;
         return font;

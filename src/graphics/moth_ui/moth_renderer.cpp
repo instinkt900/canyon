@@ -1,11 +1,11 @@
-#include "canyon.h"
-#include "graphics/moth_ui/moth_renderer.h"
-#include "graphics/igraphics.h"
-#include "graphics/moth_ui/moth_font.h"
-#include "graphics/moth_ui/moth_image.h"
-#include "graphics/moth_ui/utils.h"
+#include "common.h"
+#include "canyon/graphics/moth_ui/moth_renderer.h"
+#include "canyon/graphics/igraphics.h"
+#include "canyon/graphics/moth_ui/moth_font.h"
+#include "canyon/graphics/moth_ui/moth_image.h"
+#include "canyon/graphics/moth_ui/utils.h"
 
-namespace graphics {
+namespace canyon::graphics {
     MothRenderer::MothRenderer(IGraphics& graphics)
         : m_graphics(graphics) {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });
@@ -44,11 +44,11 @@ namespace graphics {
 
     void MothRenderer::PushClip(moth_ui::IntRect const& rect) {
         if (m_clip.empty()) {
-            m_clip.push(::FromMothUI(rect));
+            m_clip.push(FromMothUI(rect));
         } else {
             // want to clip rect within the current clip
             auto const parentRect = m_clip.top();
-            auto const newRect = ClipRect(parentRect, ::FromMothUI(rect));
+            auto const newRect = ClipRect(parentRect, FromMothUI(rect));
             m_clip.push(newRect);
         }
 
@@ -66,14 +66,14 @@ namespace graphics {
     }
 
     void MothRenderer::RenderRect(moth_ui::IntRect const& rect) {
-        auto const floatRect = static_cast<FloatRect>(::FromMothUI(rect));
+        auto const floatRect = static_cast<FloatRect>(FromMothUI(rect));
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
         m_graphics.DrawRectF(floatRect);
     }
 
     void MothRenderer::RenderFilledRect(moth_ui::IntRect const& rect) {
-        auto const floatRect = static_cast<FloatRect>(::FromMothUI(rect));
+        auto const floatRect = static_cast<FloatRect>(FromMothUI(rect));
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
         m_graphics.DrawFillRectF(floatRect);
@@ -83,13 +83,13 @@ namespace graphics {
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
 
-        auto& mothImage = static_cast<graphics::MothImage&>(image);
+        auto& mothImage = static_cast<MothImage&>(image);
         auto& internalImage = *mothImage.GetImage();
-        auto const srcRect = ::FromMothUI(sourceRect);
+        auto const srcRect = FromMothUI(sourceRect);
         if (scaleType == moth_ui::ImageScaleType::Stretch) {
-            m_graphics.DrawImage(internalImage, ::FromMothUI(destRect), &srcRect);
+            m_graphics.DrawImage(internalImage, FromMothUI(destRect), &srcRect);
         } else if (scaleType == moth_ui::ImageScaleType::Tile) {
-            m_graphics.DrawImageTiled(internalImage, ::FromMothUI(destRect), &srcRect, scale);
+            m_graphics.DrawImageTiled(internalImage, FromMothUI(destRect), &srcRect, scale);
         }
     }
 
@@ -99,6 +99,6 @@ namespace graphics {
 
         auto& fcFont = static_cast<MothFont&>(font);
         auto& internalFont = *fcFont.GetInternalFont();
-        m_graphics.DrawText(text, internalFont, FromMothUI(horizontalAlignment), FromMothUI(verticalAlignment), ::FromMothUI(destRect));
+        m_graphics.DrawText(text, internalFont, FromMothUI(horizontalAlignment), FromMothUI(verticalAlignment), FromMothUI(destRect));
     }
 }
