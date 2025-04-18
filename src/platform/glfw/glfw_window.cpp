@@ -3,9 +3,9 @@
 #include "canyon/graphics/vulkan/vulkan_graphics.h"
 #include "canyon/graphics/vulkan/vulkan_surface_context.h"
 #include "canyon/platform/glfw/glfw_events.h"
-#include <moth_ui/events/event_mouse.h>
 #include "canyon/events/event_window.h"
 #include "canyon/graphics/moth_ui/utils.h"
+#include <moth_ui/events/event_mouse.h>
 
 namespace canyon::platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
@@ -104,7 +104,6 @@ namespace canyon::platform::glfw {
         m_surfaceContext = std::make_unique<graphics::vulkan::SurfaceContext>(m_context);
 
         m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight);
-        m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
 
         return true;
     }

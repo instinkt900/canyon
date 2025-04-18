@@ -57,8 +57,6 @@ set(SOURCES ${SOURCES}
 	src/graphics/vulkan/vulkan_swapchain.cpp
 	src/graphics/vulkan/vulkan_texture.cpp
 	src/graphics/vulkan/vulkan_vma.cpp
-	src/layers/layer.cpp
-	src/layers/layer_stack.cpp
 	src/platform/application.cpp
 	src/platform/glfw/glfw_events.cpp
 	src/platform/glfw/glfw_platform.cpp

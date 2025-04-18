@@ -19,7 +19,7 @@ namespace canyon::platform::glfw {
         return *m_context;
     }
 
-    std::unique_ptr<canyon::platform::Window> Platform::CreateWindow(char const* title, int width, int height) {
+    std::unique_ptr<canyon::platform::Window> Platform::CreateWindow(std::string const& title, int width, int height) {
         return std::make_unique<platform::glfw::Window>(*m_context, title, width, height);
     }
 }
