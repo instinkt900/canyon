@@ -15,6 +15,14 @@ namespace canyon::graphics::sdl {
         , m_drawColor(graphics::BasicColors::White) {
     }
 
+    Graphics::~Graphics() {
+        if (m_imguiWindow) {
+            ImGui_ImplSDLRenderer2_Shutdown();
+            ImGui_ImplSDL2_Shutdown();
+            ImGui::DestroyContext();
+        }
+    }
+
     void Graphics::InitImgui(canyon::platform::Window const& window) {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
