@@ -116,6 +116,10 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::InitImgui(canyon::platform::Window const& window) {
+        if (m_imguiInitialized) {
+            return;
+        }
+
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
