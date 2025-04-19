@@ -98,7 +98,7 @@ namespace canyon::graphics::vulkan {
     }
 
     Graphics::~Graphics() {
-        if (m_imguiContext) {
+        if (m_imguiInitialized) {
             ImGui_ImplVulkan_Shutdown();
             ImGui_ImplGlfw_Shutdown();
             ImGui::DestroyContext();
@@ -152,11 +152,11 @@ namespace canyon::graphics::vulkan {
             ImGui_ImplVulkan_CreateFontsTexture();
         }
 
-        m_imguiContext = true;
+        m_imguiInitialized = true;
     }
 
     void Graphics::Begin() {
-        if (m_imguiContext) {
+        if (m_imguiInitialized) {
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
@@ -171,7 +171,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::End() {
-        if (m_imguiContext) {
+        if (m_imguiInitialized) {
             ImGui::Render();
             if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
                 ImGui::UpdatePlatformWindows();

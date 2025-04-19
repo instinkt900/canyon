@@ -19,7 +19,6 @@ TestLayer::TestLayer(moth_ui::Context& context, canyon::graphics::IGraphics& gra
 }
 
 TestLayer::~TestLayer() {
-    printf("~TestLayer");
 }
 
 bool TestLayer::OnEvent(moth_ui::Event const& event) {

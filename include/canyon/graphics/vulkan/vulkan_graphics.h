@@ -35,7 +35,7 @@ namespace canyon::graphics::vulkan {
         Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
         ~Graphics();
 
-        void InitImgui(canyon::platform::Window const& glfwWindow) override;
+        void InitImgui(canyon::platform::Window const& window) override;
 
         SurfaceContext& GetContext() const override { return m_context; }
 
@@ -97,7 +97,7 @@ namespace canyon::graphics::vulkan {
         void OnResize(VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
 
     private:
-        bool m_imguiContext = false;
+        bool m_imguiInitialized = false;
         SurfaceContext& m_context;
 
         struct PushConstants {
