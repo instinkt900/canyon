@@ -75,7 +75,6 @@ namespace canyon::platform::sdl {
         m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_context, m_renderer);
 
         m_graphics = std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext);
-        m_layerStack = std::make_unique<LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
 
         m_windowId = SDL_GetWindowID(m_window);
 

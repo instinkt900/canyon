@@ -1,3 +1,7 @@
+## 18/04/25
+- imgui implementation. make the context know whether imgui has a window or not.
+- getting graphics from layer stack or something
+
 ## 05/04/25
 
 - vulkan will crash on window close unless all resources related to that context are destroyed first

@@ -15,7 +15,7 @@ namespace canyon::platform {
 
         virtual canyon::graphics::Context& GetGraphicsContext() = 0;
 
-        virtual std::unique_ptr<Window> CreateWindow(char const* title, int width, int height) = 0;
+        virtual std::unique_ptr<Window> CreateWindow(std::string const& title, int width, int height) = 0;
     };
 }
 

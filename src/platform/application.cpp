@@ -3,11 +3,21 @@
 #include "canyon/platform/window.h"
 
 namespace canyon::platform {
-    Application::Application(platform::IPlatform& platform)
-        : m_platform(platform) {
+    Application::Application(platform::IPlatform& platform, std::string const& title, int width, int height)
+        : m_platform(platform)
+        , m_mainWindowTitle(title)
+        , m_mainWindowWidth(width)
+        , m_mainWindowHeight(height) {
 
-        m_window = m_platform.CreateWindow("testing", 640, 480);
+    }
+
+    void Application::Run() {
+        Startup();
+        m_window = m_platform.CreateWindow(m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
         m_window->AddEventListener(this);
+        PostCreateWindow();
+        TickSync();
+        Shutdown();
     }
 
     bool Application::OnEvent(moth_ui::Event const& event) {
