@@ -39,8 +39,8 @@ namespace canyon::platform {
         std::string m_mainWindowTitle;
         int m_mainWindowWidth;
         int m_mainWindowHeight;
-        IntVec2 m_mainWindowPosition;
-        bool m_mainWindowMaximized;
+        IntVec2 m_mainWindowPosition = { 0, 0 };
+        bool m_mainWindowMaximized = false;
         std::unique_ptr<Window> m_window;
     };
 }
