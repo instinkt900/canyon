@@ -1,4 +1,10 @@
+## 19/04/25
+
+- imgui implementation
+- fix up example app. application tries to get window before run
+
 ## 18/04/25
+
 - imgui implementation. make the context know whether imgui has a window or not.
 - getting graphics from layer stack or something
 

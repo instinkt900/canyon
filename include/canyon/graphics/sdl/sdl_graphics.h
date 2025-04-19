@@ -11,6 +11,7 @@
 #include "canyon/utils/rect.h"
 #include "canyon/utils/vector.h"
 
+#include <SDL_video.h>
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -19,11 +20,14 @@ namespace canyon::graphics::sdl {
     class Graphics : public IGraphics {
     public:
         Graphics(SurfaceContext& context);
+        virtual ~Graphics() = default;
+
+        void InitImgui(canyon::platform::Window const& window) override;
 
         SurfaceContext& GetContext() const override { return m_surfaceContext; }
 
-        void Begin() override {}
-        void End() override {}
+        void Begin() override;
+        void End() override;
 
         void SetBlendMode(BlendMode mode) override;
         // void SetBlendMode(std::shared_ptr<graphics::IImage> target, graphics::BlendMode mode);
@@ -50,5 +54,6 @@ namespace canyon::graphics::sdl {
         Color m_drawColor;
         BlendMode m_blendMode;
         ITarget* m_currentRenderTarget;
+        SDL_Window* m_imguiWindow = nullptr;
     };
 }

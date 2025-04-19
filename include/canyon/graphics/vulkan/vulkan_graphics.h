@@ -16,6 +16,7 @@
 #include "canyon/graphics/vulkan/vulkan_surface_context.h"
 #include "canyon/graphics/vulkan/vulkan_swapchain.h"
 #include "canyon/graphics/vulkan/vulkan_texture.h"
+#include "canyon/platform/window.h"
 #include "canyon/utils/rect.h"
 #include "canyon/utils/vector.h"
 
@@ -33,6 +34,8 @@ namespace canyon::graphics::vulkan {
     public:
         Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
         ~Graphics();
+
+        void InitImgui(canyon::platform::Window const& glfwWindow) override;
 
         SurfaceContext& GetContext() const override { return m_context; }
 
@@ -94,6 +97,7 @@ namespace canyon::graphics::vulkan {
         void OnResize(VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
 
     private:
+        bool m_imguiContext = false;
         SurfaceContext& m_context;
 
         struct PushConstants {

@@ -12,16 +12,23 @@
 #include <filesystem>
 #include <memory>
 
+namespace canyon::platform {
+    class Window;
+}
+
 namespace canyon::graphics {
     class SurfaceContext;
     class IGraphics {
     public:
         virtual ~IGraphics() {}
 
+        virtual void InitImgui(canyon::platform::Window const& glfwWindow) = 0;
+
         virtual SurfaceContext& GetContext() const = 0;
 
         virtual void Begin() = 0;
         virtual void End() = 0;
+
         virtual void SetBlendMode(BlendMode mode) = 0;
         // virtual void SetBlendMode(std::shared_ptr<IImage> target, EBlendMode mode) = 0;
         // virtual void SetColorMod(std::shared_ptr<IImage> target, Color const& color) = 0;

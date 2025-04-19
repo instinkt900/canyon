@@ -13,10 +13,10 @@ class canyon(ConanFile):
         self.version = load(self, "version.txt").strip()
 
     def requirements(self):
-        self.requires("sdl/2.28.3")
+        self.requires("sdl/2.28.3", transitive_headers=True)
         self.requires("sdl_image/2.0.5")
         self.requires("sdl_ttf/2.20.2")
-        self.requires("glfw/3.3.8")
+        self.requires("glfw/3.3.8", transitive_headers=True)
         self.requires("libpng/1.6.42", override=True)
         self.requires("vulkan-headers/1.3.243.0", transitive_headers=True)
         self.requires("vulkan-loader/1.3.243.0")

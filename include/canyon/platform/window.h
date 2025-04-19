@@ -17,6 +17,7 @@
 #include <cstdint>
 
 namespace canyon::platform {
+    class SurfaceContext;
     class Window : public EventEmitter {
     public:
         Window(std::string const& windowTitle, int width, int height);
@@ -37,7 +38,8 @@ namespace canyon::platform {
         moth_ui::LayerStack& GetLayerStack() const { return *m_layerStack; }
 
     protected:
-        void Finalize();
+        void PostCreate();
+        void PreDestroy();
         virtual bool CreateWindow() = 0;
         virtual void DestroyWindow() = 0;
 

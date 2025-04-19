@@ -1,4 +1,5 @@
 #include "common.h"
+#include "canyon/platform/glfw/glfw_window.h"
 #include "canyon/graphics/vulkan/vulkan_graphics.h"
 #include "canyon/graphics/color.h"
 #include "canyon/graphics/vulkan/vulkan_command_buffer.h"
@@ -7,6 +8,14 @@
 #include "canyon/graphics/vulkan/vulkan_utils.h"
 #include "canyon/graphics/stb_image_write.h"
 #include "shaders/vulkan_shaders.h"
+
+#include "backends/imgui_impl_glfw.h"
+
+namespace {
+    void checkVkResult(VkResult err) {
+        CHECK_VK_RESULT(err);
+    }
+}
 
 namespace {
     VkVertexInputBindingDescription getVertexBindingDescription() {
@@ -89,6 +98,11 @@ namespace canyon::graphics::vulkan {
     }
 
     Graphics::~Graphics() {
+        if (m_imguiContext) {
+            ImGui_ImplVulkan_Shutdown();
+            ImGui_ImplGlfw_Shutdown();
+            ImGui::DestroyContext();
+        }
         if (m_overrideContext.m_vertexBuffer && m_overrideContext.m_vertexBufferData) {
             m_overrideContext.m_vertexBuffer->Unmap();
             m_overrideContext.m_vertexBufferData = nullptr;
@@ -100,7 +114,54 @@ namespace canyon::graphics::vulkan {
         vkDestroyPipelineCache(m_context.GetVkDevice(), m_vkPipelineCache, nullptr);
     }
 
+    void Graphics::InitImgui(canyon::platform::Window const& window) {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+
+        ImGui::StyleColorsDark();
+        ImGuiStyle& style = ImGui::GetStyle();
+        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            style.WindowRounding = 0;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
+
+        auto& glfwWindow = static_cast<canyon::platform::glfw::Window const&>(window);
+
+        ImGui_ImplGlfw_InitForVulkan(glfwWindow.GetGLFWWindow(), true);
+        ImGui_ImplVulkan_InitInfo initInfo{};
+        initInfo.Instance = m_context.GetContext().GetInstance();
+        initInfo.PhysicalDevice = m_context.GetVkPhysicalDevice();
+        initInfo.Device = m_context.GetVkDevice();
+        initInfo.QueueFamily = m_context.GetVkQueueFamily();
+        initInfo.Queue = m_context.GetVkQueue();
+        initInfo.DescriptorPool = m_context.GetVkDescriptorPool();
+        initInfo.Subpass = 0;
+        initInfo.MinImageCount = GetSwapchain().GetImageCount();
+        initInfo.ImageCount = GetSwapchain().GetImageCount();
+        initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+        initInfo.Allocator = nullptr;
+        initInfo.CheckVkResultFn = checkVkResult;
+        initInfo.RenderPass = GetRenderPass().GetRenderPass();
+        ImGui_ImplVulkan_Init(&initInfo);
+
+        // create the font texture
+        {
+            VkCommandPool commandPool = GetContext().GetVkCommandPool();
+            CHECK_VK_RESULT(vkResetCommandPool(GetContext().GetVkDevice(), commandPool, 0));
+            ImGui_ImplVulkan_CreateFontsTexture();
+        }
+
+        m_imguiContext = true;
+    }
+
     void Graphics::Begin() {
+        if (m_imguiContext) {
+            ImGui_ImplVulkan_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+        }
+
         m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
         VkFence cmdFence = m_defaultContext.m_target->GetFence().GetVkFence();
         vkWaitForFences(m_context.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
@@ -110,6 +171,17 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::End() {
+        if (m_imguiContext) {
+            ImGui::Render();
+            if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+                ImGui::UpdatePlatformWindows();
+                ImGui::RenderPlatformWindowsDefault();
+            }
+            if (ImDrawData* drawData = ImGui::GetDrawData()) {
+                ImGui_ImplVulkan_RenderDrawData(drawData, GetCurrentCommandBuffer()->GetVkCommandBuffer());
+            }
+        }
+
         EndContext();
 
         VkSemaphore waitSemaphores[] = { m_defaultContext.m_target->GetRenderFinishedSemaphore() };

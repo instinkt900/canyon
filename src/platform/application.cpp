@@ -11,11 +11,15 @@ namespace canyon::platform {
 
     }
 
-    void Application::Run() {
+    void Application::Init() {
         Startup();
         m_window = m_platform.CreateWindow(m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
         m_window->AddEventListener(this);
+        m_window->GetGraphics().InitImgui(*m_window);
         PostCreateWindow();
+    }
+
+    void Application::Run() {
         TickSync();
         Shutdown();
     }
@@ -45,8 +49,6 @@ namespace canyon::platform {
 
     void Application::Tick(uint32_t ticks) {
         m_window->Update(ticks);
-        m_window->GetGraphics().Begin();
         m_window->Draw();
-        m_window->GetGraphics().End();
     }
 }

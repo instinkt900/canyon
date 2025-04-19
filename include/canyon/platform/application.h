@@ -18,6 +18,7 @@ namespace canyon::platform {
         Application(IPlatform& platform, std::string const& title, int width, int height);
         virtual ~Application() = default;
 
+        void Init();
         void Run();
 
         bool OnEvent(moth_ui::Event const& event) override;
@@ -27,7 +28,7 @@ namespace canyon::platform {
 
         void Tick(uint32_t ticks) override;
 
-        Window& GetWindow() { return *m_window; }
+        Window* GetWindow() { return m_window.get(); }
 
     protected:
         virtual void Startup() {}

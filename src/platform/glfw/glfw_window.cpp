@@ -12,7 +12,7 @@ namespace canyon::platform::glfw {
         : canyon::platform::Window(title, width, height)
         , m_context(context) {
             CreateWindow();
-            Finalize();
+            PostCreate();
     }
 
     Window::~Window() {
@@ -32,7 +32,9 @@ namespace canyon::platform::glfw {
     }
 
     void Window::Draw() {
+        m_graphics->Begin();
         m_layerStack->Draw();
+        m_graphics->End();
     }
 
     bool Window::CreateWindow() {
@@ -114,6 +116,7 @@ namespace canyon::platform::glfw {
     }
 
     void Window::DestroyWindow() {
+        PreDestroy();
         // TODO: why do we do this in destroy?
         m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
         m_graphics = nullptr;
