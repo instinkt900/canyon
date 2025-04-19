@@ -10,6 +10,7 @@
 #include "shaders/vulkan_shaders.h"
 
 #include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_vulkan.h"
 
 namespace {
     void checkVkResult(VkResult err) {
