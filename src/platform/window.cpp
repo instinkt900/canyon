@@ -12,7 +12,7 @@ namespace canyon::platform {
     Window::~Window() {
     }
 
-    void Window::Finalize() {
+    void Window::PostCreate() {
         auto& surfaceContext = GetSurfaceContext();
         m_imageFactory = std::make_unique<canyon::graphics::ImageFactory>(surfaceContext);
         m_fontFactory = std::make_unique<canyon::graphics::FontFactory>(surfaceContext);
@@ -21,5 +21,15 @@ namespace canyon::platform {
         m_mothFontFactory = std::make_unique<canyon::graphics::MothFontFactory>(m_fontFactory);
         m_mothContext = std::make_shared<moth_ui::Context>(m_mothImageFactory.get(), m_mothFontFactory.get(), m_uiRenderer.get());
         m_layerStack = std::make_unique<moth_ui::LayerStack>(m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
+    }
+
+    void Window::PreDestroy() {
+        m_imageFactory.reset();
+        m_fontFactory.reset();
+        m_uiRenderer.reset();
+        m_mothImageFactory.reset();
+        m_mothFontFactory.reset();
+        m_mothContext.reset();
+        m_layerStack.reset();
     }
 }

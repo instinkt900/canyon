@@ -18,6 +18,7 @@ namespace canyon::platform {
         Application(IPlatform& platform, std::string const& title, int width, int height);
         virtual ~Application() = default;
 
+        void Init();
         void Run();
 
         bool OnEvent(moth_ui::Event const& event) override;
@@ -27,7 +28,7 @@ namespace canyon::platform {
 
         void Tick(uint32_t ticks) override;
 
-        Window& GetWindow() { return *m_window; }
+        Window* GetWindow() { return m_window.get(); }
 
     protected:
         virtual void Startup() {}
@@ -38,8 +39,8 @@ namespace canyon::platform {
         std::string m_mainWindowTitle;
         int m_mainWindowWidth;
         int m_mainWindowHeight;
-        IntVec2 m_mainWindowPosition;
-        bool m_mainWindowMaximized;
+        IntVec2 m_mainWindowPosition = { 0, 0 };
+        bool m_mainWindowMaximized = false;
         std::unique_ptr<Window> m_window;
     };
 }

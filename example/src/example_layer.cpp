@@ -1,4 +1,5 @@
 #include "example_layer.h"
+#include "imgui.h"
 #include "ui_button.h"
 
 #include <moth_ui/group.h>
@@ -15,6 +16,9 @@ TestLayer::TestLayer(moth_ui::Context& context, canyon::graphics::IGraphics& gra
             m_root->SetAnimation("transition_out");
         });
     }
+}
+
+TestLayer::~TestLayer() {
 }
 
 bool TestLayer::OnEvent(moth_ui::Event const& event) {
@@ -34,6 +38,7 @@ void TestLayer::Update(uint32_t ticks) {
 }
 
 void TestLayer::Draw() {
+    ImGui::ShowDemoWindow();
     moth_ui::IntVec2 const currentSize{ GetWidth(), GetHeight() };
     if (m_lastDrawnSize != currentSize) {
         moth_ui::IntRect displayRect;
@@ -47,7 +52,7 @@ void TestLayer::Draw() {
     m_lastDrawnSize = currentSize;
 }
 
-void TestLayer::OnAddedToStack(canyon::LayerStack* stack) {
+void TestLayer::OnAddedToStack(moth_ui::LayerStack* stack) {
     Layer::OnAddedToStack(stack);
 
     if (m_root) {

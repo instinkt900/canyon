@@ -1,3 +1,4 @@
+#include "backends/imgui_impl_sdl2.h"
 #include "common.h"
 #include "canyon/platform/sdl/sdl_window.h"
 #include "canyon/graphics/sdl/sdl_surface_context.h"
@@ -36,7 +37,7 @@ namespace canyon::platform::sdl {
         : platform::Window(title, width, height)
         , m_context(context) {
         CreateWindow();
-        Finalize();
+        PostCreate();
     }
 
     Window::~Window() {
@@ -47,6 +48,7 @@ namespace canyon::platform::sdl {
         std::vector<SDL_Event> events;
         CollectSDLEventsForWindow(m_windowId, &events);
         for (auto event : events) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
             if (auto const translatedEvent = FromSDL(event)) {
                 moth_ui::EventDispatch dispatch(*translatedEvent);
                 dispatch.Dispatch(this, &Window::OnResizeEvent);
@@ -73,9 +75,7 @@ namespace canyon::platform::sdl {
         }
 
         m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_context, m_renderer);
-
         m_graphics = std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext);
-
         m_windowId = SDL_GetWindowID(m_window);
 
         return true;
@@ -87,11 +87,16 @@ namespace canyon::platform::sdl {
     }
 
     void Window::Draw() {
+        m_graphics->Begin();
         m_layerStack->Draw();
+        m_graphics->End();
         SDL_RenderPresent(m_renderer);
     }
 
     void Window::DestroyWindow() {
+        PreDestroy();
+        m_graphics.reset();
+        m_surfaceContext.reset();
         SDL_DestroyRenderer(m_renderer);
         SDL_DestroyWindow(m_window);
     }
