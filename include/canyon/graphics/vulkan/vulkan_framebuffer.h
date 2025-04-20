@@ -23,6 +23,9 @@ namespace canyon::graphics::vulkan {
         // void BeginPass(RenderPass& renderPass);
         // void EndPass();
         // void Submit();
+        
+        int GetWidth() const override { return m_image->GetWidth(); }
+        int GetHeight() const override { return m_image->GetHeight(); }
 
         VkFramebuffer GetVkFramebuffer() const { return m_vkFramebuffer; }
         CommandBuffer& GetCommandBuffer() { return *m_commandBuffer; }
