@@ -10,7 +10,7 @@
 namespace canyon::graphics {
     class MothImage : public moth_ui::IImage {
     public:
-        MothImage(std::shared_ptr<canyon::graphics::IImage> baseImage);
+        explicit MothImage(std::shared_ptr<canyon::graphics::IImage> baseImage);
         virtual ~MothImage() = default;
 
         int GetWidth() const override;

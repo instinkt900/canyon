@@ -11,7 +11,7 @@
 namespace canyon::graphics {
     class MothImageFactory : public moth_ui::IImageFactory {
     public:
-        MothImageFactory(std::shared_ptr<graphics::ImageFactory> factoryImpl);
+        explicit MothImageFactory(std::shared_ptr<graphics::ImageFactory> factoryImpl);
         virtual ~MothImageFactory() = default;
 
         void FlushCache() override;

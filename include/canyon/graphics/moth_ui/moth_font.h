@@ -9,7 +9,7 @@
 namespace canyon::graphics {
     class MothFont : public moth_ui::IFont {
     public:
-        MothFont(std::shared_ptr<graphics::IFont> internalFont)
+        explicit MothFont(std::shared_ptr<graphics::IFont> internalFont)
             : m_font(internalFont) {}
         virtual ~MothFont() = default;
 

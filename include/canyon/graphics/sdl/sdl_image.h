@@ -3,14 +3,13 @@
 #include "canyon/graphics/itarget.h"
 #include "canyon/graphics/sdl/sdl_surface_context.h"
 #include "canyon/graphics/sdl/sdl_texture.h"
-#include "canyon/graphics/iimage.h"
 #include "canyon/utils/rect.h"
 
 #include <memory>
 #include <filesystem>
 
 namespace canyon::graphics::sdl {
-    class Image : public IImage, public ITarget {
+    class Image : public ITarget {
     public:
         explicit Image(std::shared_ptr<Texture> texture);
         Image(std::shared_ptr<Texture> texture, IntRect const& sourceRect);
