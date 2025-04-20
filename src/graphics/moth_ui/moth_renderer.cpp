@@ -101,4 +101,8 @@ namespace canyon::graphics {
         auto& internalFont = *fcFont.GetInternalFont();
         m_graphics.DrawText(text, internalFont, FromMothUI(horizontalAlignment), FromMothUI(verticalAlignment), FromMothUI(destRect));
     }
+
+    void MothRenderer::SetRendererLogicalSize(moth_ui::IntVec2 const& size) {
+        m_graphics.SetLogicalSize(FromMothUI(size));
+    }
 }

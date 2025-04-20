@@ -231,7 +231,7 @@ namespace canyon::graphics::sdl {
         if (!target) {
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), nullptr);
         } else {
-            auto sdlImage = dynamic_cast<Texture*>(target);
+            auto sdlImage = dynamic_cast<Image*>(target)->GetTexture();
             auto sdlTexture = sdlImage->GetSDLTexture();
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), sdlTexture->GetImpl());
         }
