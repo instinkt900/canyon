@@ -31,6 +31,8 @@ namespace canyon::graphics {
         void RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) override;
         void RenderText(std::string const& text, moth_ui::IFont& font, moth_ui::TextHorizAlignment horizontalAlignment, moth_ui::TextVertAlignment verticalAlignment, moth_ui::IntRect const& destRect) override;
 
+        void SetRendererLogicalSize(moth_ui::IntVec2 const& size) override;
+
     private:
         IGraphics& m_graphics;
         std::stack<Color> m_drawColor;
