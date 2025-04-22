@@ -115,7 +115,7 @@ namespace canyon::graphics::vulkan {
 
     VkDescriptorSet Texture::GetDescriptorSet() {
         if (m_vkDescriptorSet == VK_NULL_HANDLE) {
-            m_vkDescriptorSet = ImGui_ImplVulkan_AddTexture(m_vkSampler, m_vkView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            m_vkDescriptorSet = ImGui_ImplVulkan_AddTexture(GetVkSampler(), GetVkView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         }
         return m_vkDescriptorSet;
     }

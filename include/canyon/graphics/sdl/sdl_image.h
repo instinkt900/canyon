@@ -9,7 +9,7 @@
 #include <filesystem>
 
 namespace canyon::graphics::sdl {
-    class Image : public ITarget {
+    class Image : public ITarget, public IImage {
     public:
         explicit Image(std::shared_ptr<Texture> texture);
         Image(std::shared_ptr<Texture> texture, IntRect const& sourceRect);
@@ -17,6 +17,7 @@ namespace canyon::graphics::sdl {
 
         int GetWidth() const override;
         int GetHeight() const override;
+        IImage* GetImage() override { return this; }
 
         void ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0 = { 0, 0 }, canyon::FloatVec2 const& uv1 = { 1, 1 }) const override;
 
