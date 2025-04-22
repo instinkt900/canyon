@@ -24,17 +24,15 @@ namespace canyon::graphics::vulkan {
         // void EndPass();
         // void Submit();
         
-        int GetWidth() const override { return m_image ? m_image->GetWidth() : 0; }
-        int GetHeight() const override { return m_image ? m_image->GetHeight() : 0; }
-
-        void ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0 = { 0, 0 }, canyon::FloatVec2 const& uv1 = { 1, 1 }) const override;
+        int GetWidth() const { return m_image ? m_image->GetWidth() : 0; }
+        int GetHeight() const { return m_image ? m_image->GetHeight() : 0; }
 
         VkFramebuffer GetVkFramebuffer() const { return m_vkFramebuffer; }
         CommandBuffer& GetCommandBuffer() { return *m_commandBuffer; }
         Fence& GetFence() const { return *m_fence; }
         VkSemaphore GetAvailableSemaphore() const { return m_imageAvailableSemaphore; }
         VkSemaphore GetRenderFinishedSemaphore() const { return m_renderFinishedSemaphore; }
-        IImage* GetImage() { return m_image.get(); }
+        IImage* GetImage() override { return m_image.get(); }
         uint32_t GetSwapchainIndex() const { return m_swapchainIndex; }
         VkExtent2D GetVkExtent() const;
         VkFormat GetVkFormat() const;

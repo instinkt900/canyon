@@ -84,16 +84,16 @@ namespace {
 
 namespace canyon::graphics::vulkan {
     Graphics::Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
-        : m_context(context) {
+        : m_surfaceContext(context) {
         CreateRenderPass();
         CreateShaders();
         CreateDefaultImage();
 
         VkPipelineCacheCreateInfo cacheInfo{};
         cacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-        CHECK_VK_RESULT(vkCreatePipelineCache(m_context.GetVkDevice(), &cacheInfo, nullptr, &m_vkPipelineCache));
+        CHECK_VK_RESULT(vkCreatePipelineCache(m_surfaceContext.GetVkDevice(), &cacheInfo, nullptr, &m_vkPipelineCache));
 
-        m_swapchain = std::make_unique<Swapchain>(m_context, *m_renderPass, surface, VkExtent2D{ surfaceWidth, surfaceHeight });
+        m_swapchain = std::make_unique<Swapchain>(m_surfaceContext, *m_renderPass, surface, VkExtent2D{ surfaceWidth, surfaceHeight });
 
         m_contextStack.push(nullptr);
     }
@@ -112,7 +112,7 @@ namespace canyon::graphics::vulkan {
             m_defaultContext.m_vertexBuffer->Unmap();
             m_defaultContext.m_vertexBufferData = nullptr;
         }
-        vkDestroyPipelineCache(m_context.GetVkDevice(), m_vkPipelineCache, nullptr);
+        vkDestroyPipelineCache(m_surfaceContext.GetVkDevice(), m_vkPipelineCache, nullptr);
     }
 
     void Graphics::InitImgui(canyon::platform::Window const& window) {
@@ -135,27 +135,21 @@ namespace canyon::graphics::vulkan {
 
         ImGui_ImplGlfw_InitForVulkan(glfwWindow.GetGLFWWindow(), true);
         ImGui_ImplVulkan_InitInfo initInfo{};
-        initInfo.Instance = m_context.GetContext().GetInstance();
-        initInfo.PhysicalDevice = m_context.GetVkPhysicalDevice();
-        initInfo.Device = m_context.GetVkDevice();
-        initInfo.QueueFamily = m_context.GetVkQueueFamily();
-        initInfo.Queue = m_context.GetVkQueue();
-        initInfo.DescriptorPool = m_context.GetVkDescriptorPool();
+        initInfo.Instance = m_surfaceContext.GetContext().GetInstance();
+        initInfo.PhysicalDevice = m_surfaceContext.GetVkPhysicalDevice();
+        initInfo.Device = m_surfaceContext.GetVkDevice();
+        initInfo.QueueFamily = m_surfaceContext.GetVkQueueFamily();
+        initInfo.Queue = m_surfaceContext.GetVkQueue();
+        initInfo.DescriptorPool = m_surfaceContext.GetVkDescriptorPool();
+        initInfo.RenderPass = m_renderPass->GetRenderPass();
         initInfo.Subpass = 0;
-        initInfo.MinImageCount = GetSwapchain().GetImageCount();
-        initInfo.ImageCount = GetSwapchain().GetImageCount();
+        initInfo.MinImageCount = m_swapchain->GetImageCount();
+        initInfo.ImageCount = m_swapchain->GetImageCount();
         initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         initInfo.Allocator = nullptr;
         initInfo.CheckVkResultFn = checkVkResult;
-        initInfo.RenderPass = GetRenderPass().GetRenderPass();
         ImGui_ImplVulkan_Init(&initInfo);
-
-        // create the font texture
-        {
-            VkCommandPool commandPool = GetContext().GetVkCommandPool();
-            CHECK_VK_RESULT(vkResetCommandPool(GetContext().GetVkDevice(), commandPool, 0));
-            ImGui_ImplVulkan_CreateFontsTexture();
-        }
+        ImGui_ImplVulkan_CreateFontsTexture();
 
         m_imguiInitialized = true;
     }
@@ -169,8 +163,8 @@ namespace canyon::graphics::vulkan {
 
         m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
         VkFence cmdFence = m_defaultContext.m_target->GetFence().GetVkFence();
-        vkWaitForFences(m_context.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
-        vkResetFences(m_context.GetVkDevice(), 1, &cmdFence);
+        vkWaitForFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
+        vkResetFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence);
 
         BeginContext(&m_defaultContext);
     }
@@ -200,7 +194,7 @@ namespace canyon::graphics::vulkan {
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapChains;
         presentInfo.pImageIndices = swapchainIndices;
-        vkQueuePresentKHR(m_context.GetVkQueue(), &presentInfo);
+        vkQueuePresentKHR(m_surfaceContext.GetVkQueue(), &presentInfo);
     }
 
     void Graphics::SetBlendMode(BlendMode mode) {
@@ -286,7 +280,7 @@ namespace canyon::graphics::vulkan {
     void Graphics::DrawToPNG(std::filesystem::path const& path) {
         FlushCommands();
 
-        auto& context = m_context;
+        auto& context = m_surfaceContext;
         auto drawContext = m_contextStack.top();
 
         auto const targetFormat = VK_FORMAT_R8G8B8A8_UNORM;
@@ -513,7 +507,7 @@ namespace canyon::graphics::vulkan {
     }
 
     std::unique_ptr<ITarget> Graphics::CreateTarget(int width, int height) {
-        return std::make_unique<Framebuffer>(m_context, width, height, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, m_rtRenderPass->GetRenderPass());
+        return std::make_unique<Framebuffer>(m_surfaceContext, width, height, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, m_rtRenderPass->GetRenderPass());
     }
 
     bool Graphics::IsRenderTarget() const {
@@ -533,7 +527,7 @@ namespace canyon::graphics::vulkan {
             m_overrideContext.m_target = dynamic_cast<Framebuffer*>(target);
             assert(m_overrideContext.m_target);
             VkFence fence = m_overrideContext.m_target->GetFence().GetVkFence();
-            vkResetFences(m_context.GetVkDevice(), 1, &fence);
+            vkResetFences(m_surfaceContext.GetVkDevice(), 1, &fence);
             BeginContext(&m_overrideContext);
         }
     }
@@ -651,7 +645,7 @@ namespace canyon::graphics::vulkan {
             dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
             dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-            m_renderPass = RenderPassBuilder(m_context.GetVkDevice())
+            m_renderPass = RenderPassBuilder(m_surfaceContext.GetVkDevice())
                                .AddAttachment(colorAttachment)
                                .AddSubpass(subpass)
                                .AddDependency(dependency)
@@ -686,7 +680,7 @@ namespace canyon::graphics::vulkan {
             dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
             dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-            m_rtRenderPass = RenderPassBuilder(m_context.GetVkDevice())
+            m_rtRenderPass = RenderPassBuilder(m_surfaceContext.GetVkDevice())
                                  .AddAttachment(colorAttachment)
                                  .AddSubpass(subpass)
                                  .AddDependency(dependency)
@@ -695,14 +689,14 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::CreateShaders() {
-        m_drawingShader = ShaderBuilder(m_context.GetVkDevice(), m_context.GetVkDescriptorPool())
+        m_drawingShader = ShaderBuilder(m_surfaceContext.GetVkDevice(), m_surfaceContext.GetVkDescriptorPool())
                               .AddPushConstant(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants))
                               .AddBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT)
                               .AddStage(VK_SHADER_STAGE_VERTEX_BIT, "main", drawing_shader_vert_spv, drawing_shader_vert_spv_len)
                               .AddStage(VK_SHADER_STAGE_FRAGMENT_BIT, "main", drawing_shader_frag_spv, drawing_shader_frag_spv_len)
                               .Build();
 
-        m_fontShader = ShaderBuilder(m_context.GetVkDevice(), m_context.GetVkDescriptorPool())
+        m_fontShader = ShaderBuilder(m_surfaceContext.GetVkDevice(), m_surfaceContext.GetVkDescriptorPool())
                            .AddPushConstant(VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants))
                            .AddBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
                            .AddBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT)
@@ -712,7 +706,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::CreateDefaultImage() {
-        auto stagingBuffer = std::make_unique<Buffer>(m_context, 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        auto stagingBuffer = std::make_unique<Buffer>(m_surfaceContext, 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         unsigned char const pixel[] = { 0xFF, 0xFF, 0xFF, 0xFF };
         void* data = stagingBuffer->Map();
@@ -721,9 +715,9 @@ namespace canyon::graphics::vulkan {
 
         const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 
-        m_defaultImage = std::make_unique<Texture>(m_context, 1, 1, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+        m_defaultImage = std::make_unique<Texture>(m_surfaceContext, 1, 1, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 
-        auto commandBuffer = std::make_unique<CommandBuffer>(m_context);
+        auto commandBuffer = std::make_unique<CommandBuffer>(m_surfaceContext);
         commandBuffer->BeginRecord();
         commandBuffer->TransitionImageLayout(*m_defaultImage, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
         commandBuffer->CopyBufferToImage(*m_defaultImage, *stagingBuffer);
@@ -742,7 +736,7 @@ namespace canyon::graphics::vulkan {
         auto const vertexInputBinding = getVertexBindingDescription();
         auto const vertexAttributeBindings = getVertexAttributeDescriptions();
 
-        auto const builder = PipelineBuilder(m_context.GetVkDevice())
+        auto const builder = PipelineBuilder(m_surfaceContext.GetVkDevice())
                                  .SetPipelineCache(m_vkPipelineCache)
                                  .SetRenderPass(GetCurrentRenderPass())
                                  .SetShader(m_drawingShader)
@@ -772,7 +766,7 @@ namespace canyon::graphics::vulkan {
         auto const vertexInputBinding = getFontVertexBindingDescription();
         auto const vertexAttributeBindings = getFontVertexAttributeDescriptions();
 
-        auto const builder = PipelineBuilder(m_context.GetVkDevice())
+        auto const builder = PipelineBuilder(m_surfaceContext.GetVkDevice())
                                  .SetPipelineCache(m_vkPipelineCache)
                                  .SetRenderPass(GetCurrentRenderPass())
                                  .SetShader(m_fontShader)
@@ -802,13 +796,13 @@ namespace canyon::graphics::vulkan {
         context->m_currentPipelineId = 0;
 
         if (!context->m_vertexBuffer) {
-            context->m_vertexBuffer = std::make_unique<Buffer>(m_context, 1024 * sizeof(Vertex), VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+            context->m_vertexBuffer = std::make_unique<Buffer>(m_surfaceContext, 1024 * sizeof(Vertex), VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
             context->m_vertexBufferData = static_cast<Vertex*>(context->m_vertexBuffer->Map());
         }
 
         if (!context->m_fontInstanceBuffer) {
-            context->m_fontInstanceBuffer = std::make_unique<Buffer>(m_context, 1024 * sizeof(FontGlyphInstance), VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-            context->m_fontInstanceStagingBuffer = std::make_unique<Buffer>(m_context, 1024 * sizeof(FontGlyphInstance), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+            context->m_fontInstanceBuffer = std::make_unique<Buffer>(m_surfaceContext, 1024 * sizeof(FontGlyphInstance), VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+            context->m_fontInstanceStagingBuffer = std::make_unique<Buffer>(m_surfaceContext, 1024 * sizeof(FontGlyphInstance), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         }
 
         context->m_glyphCount = 0;
@@ -858,7 +852,7 @@ namespace canyon::graphics::vulkan {
         commandBuffer.EndRecord();
 
         if (context->m_glyphCount) {
-            auto uploadCommandBuffer = std::make_unique<CommandBuffer>(m_context);
+            auto uploadCommandBuffer = std::make_unique<CommandBuffer>(m_surfaceContext);
             uploadCommandBuffer->BeginRecord();
 
             VkBufferMemoryBarrier barrier{};
@@ -893,7 +887,7 @@ namespace canyon::graphics::vulkan {
         }
 
         commandBuffer.Submit(cmdFence, context->m_target->GetAvailableSemaphore(), context->m_target->GetRenderFinishedSemaphore());
-        vkWaitForFences(m_context.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
+        vkWaitForFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
     }
 
     void Graphics::SubmitVertices(Vertex* vertices, uint32_t vertCount, ETopologyType topology, VkDescriptorSet descriptorSet) {
@@ -932,8 +926,8 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::OnResize(VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight) {
-        vkDeviceWaitIdle(m_context.GetVkDevice());
+        vkDeviceWaitIdle(m_surfaceContext.GetVkDevice());
         m_swapchain.reset();
-        m_swapchain = std::make_unique<Swapchain>(m_context, *m_renderPass, surface, VkExtent2D{ surfaceWidth, surfaceHeight });
+        m_swapchain = std::make_unique<Swapchain>(m_surfaceContext, *m_renderPass, surface, VkExtent2D{ surfaceWidth, surfaceHeight });
     }
 }

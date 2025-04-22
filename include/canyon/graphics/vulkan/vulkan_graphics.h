@@ -37,7 +37,7 @@ namespace canyon::graphics::vulkan {
 
         void InitImgui(canyon::platform::Window const& window) override;
 
-        SurfaceContext& GetContext() const override { return m_context; }
+        SurfaceContext& GetContext() const override { return m_surfaceContext; }
 
         struct Vertex {
             FloatVec2 xy;
@@ -98,7 +98,7 @@ namespace canyon::graphics::vulkan {
 
     private:
         bool m_imguiInitialized = false;
-        SurfaceContext& m_context;
+        SurfaceContext& m_surfaceContext;
 
         struct PushConstants {
             FloatVec2 xyScale;
