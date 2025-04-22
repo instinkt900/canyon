@@ -530,7 +530,8 @@ namespace canyon::graphics::vulkan {
         }
 
         if (target) {
-            m_overrideContext.m_target = static_cast<Framebuffer*>(target);
+            m_overrideContext.m_target = dynamic_cast<Framebuffer*>(target);
+            assert(m_overrideContext.m_target);
             VkFence fence = m_overrideContext.m_target->GetFence().GetVkFence();
             vkResetFences(m_context.GetVkDevice(), 1, &fence);
             BeginContext(&m_overrideContext);

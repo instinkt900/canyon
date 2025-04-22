@@ -24,7 +24,7 @@ namespace {
         void* pUserData) {
         switch (messageSeverity) {
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-            // spdlog::info("Validation Layer: {}", pCallbackData->pMessage);
+            spdlog::info("Validation Layer: {}", pCallbackData->pMessage);
             break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
             spdlog::info("Validation Layer: {}", pCallbackData->pMessage);

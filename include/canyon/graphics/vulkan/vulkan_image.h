@@ -18,11 +18,11 @@ namespace canyon::graphics::vulkan {
         int GetWidth() const override;
         int GetHeight() const override;
 
+        void ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0 = { 0, 0 }, canyon::FloatVec2 const& uv1 = { 1, 1 }) const override;
+
         static std::unique_ptr<Image> Load(SurfaceContext& context, std::filesystem::path const& path);
 
         std::shared_ptr<Texture> m_texture;
         IntRect m_sourceRect;
-
-        static class Graphics* s_graphicsContext;
     };
 }
