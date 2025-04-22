@@ -3,8 +3,6 @@
 #include "canyon/graphics/vulkan/vulkan_graphics.h"
 
 namespace canyon::graphics::vulkan {
-    Graphics* Image::s_graphicsContext = nullptr;
-
     Image::Image(std::shared_ptr<Texture> texture)
     : m_texture(texture) 
     , m_sourceRect({{ 0, 0 }, { texture->GetWidth(), texture->GetHeight() }}) {
@@ -25,6 +23,16 @@ namespace canyon::graphics::vulkan {
 
     int Image::GetHeight() const {
         return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
+    }
+
+
+    void Image::ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0, canyon::FloatVec2 const& uv1) const {
+        if (m_texture) {
+            ImGui::Image(m_texture->GetDescriptorSet(),
+                            ImVec2(static_cast<float>(size.x), static_cast<float>(size.y)),
+                            ImVec2(uv0.x, uv0.y),
+                            ImVec2(uv1.x, uv1.y));
+        }
     }
 
     std::unique_ptr<Image> Image::Load(SurfaceContext& context, std::filesystem::path const& path) {

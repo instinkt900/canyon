@@ -27,6 +27,8 @@ namespace canyon::graphics::vulkan {
         int GetWidth() const override { return m_image ? m_image->GetWidth() : 0; }
         int GetHeight() const override { return m_image ? m_image->GetHeight() : 0; }
 
+        void ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0 = { 0, 0 }, canyon::FloatVec2 const& uv1 = { 1, 1 }) const override;
+
         VkFramebuffer GetVkFramebuffer() const { return m_vkFramebuffer; }
         CommandBuffer& GetCommandBuffer() { return *m_commandBuffer; }
         Fence& GetFence() const { return *m_fence; }

@@ -21,6 +21,13 @@ namespace canyon::graphics::sdl {
         return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
     }
 
+    void Image::ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0, canyon::FloatVec2 const& uv1) const {
+        ImGui::Image(m_texture ? m_texture->GetSDLTexture()->GetImpl() : nullptr,
+                     ImVec2(static_cast<float>(size.x), static_cast<float>(size.y)),
+                     ImVec2(uv0.x, uv0.y),
+                     ImVec2(uv1.x, uv1.y));
+    }
+
     std::unique_ptr<Image> Image::Load(SurfaceContext& context, std::filesystem::path const& path) {
         if (auto texture = Texture::FromFile(context.GetRenderer(), path)) {
             auto sdlTexture = std::unique_ptr<Texture>(static_cast<Texture*>(texture.release()));

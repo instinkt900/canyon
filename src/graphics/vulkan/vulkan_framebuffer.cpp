@@ -42,6 +42,12 @@ namespace canyon::graphics::vulkan {
         vkDestroyFramebuffer(m_context.GetVkDevice(), m_vkFramebuffer, nullptr);
     }
 
+    void Framebuffer::ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0, canyon::FloatVec2 const& uv1) const {
+        if (m_image) {
+            m_image->ImGui(size, uv0, uv1);
+        }
+    }
+
     VkExtent2D Framebuffer::GetVkExtent() const {
         return m_image->m_texture->GetVkExtent();
     }
