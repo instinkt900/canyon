@@ -16,6 +16,8 @@ TestLayer::TestLayer(moth_ui::Context& context, canyon::graphics::IGraphics& gra
             m_root->SetAnimation("transition_out");
         });
     }
+
+    m_target = graphics.CreateTarget(64, 64);
 }
 
 TestLayer::~TestLayer() {
@@ -35,6 +37,11 @@ void TestLayer::Update(uint32_t ticks) {
     if (m_root) {
         m_root->Update(ticks);
     }
+
+    m_graphics.SetTarget(m_target.get());
+    m_graphics.SetColor(canyon::graphics::BasicColors::Red);
+    m_graphics.Clear();
+    m_graphics.SetTarget(nullptr);
 }
 
 void TestLayer::Draw() {
@@ -49,6 +56,8 @@ void TestLayer::Draw() {
     if (m_root) {
         m_root->Draw();
     }
+    m_graphics.SetColor(canyon::graphics::BasicColors::White);
+    m_graphics.DrawImage(*m_target->GetImage(), canyon::IntRect{ { 0, 0 }, { 64, 64 } }, nullptr);
     m_lastDrawnSize = currentSize;
 }
 

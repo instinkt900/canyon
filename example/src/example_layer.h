@@ -30,4 +30,6 @@ private:
 
     std::shared_ptr<moth_ui::Group> m_root;
     moth_ui::IntVec2 m_lastDrawnSize;
+
+    std::unique_ptr<canyon::graphics::ITarget> m_target;
 };
