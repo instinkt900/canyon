@@ -43,7 +43,7 @@ namespace canyon::graphics {
                     desc.m_texture = std::shared_ptr<ITexture>(texture.release());
                     desc.m_path = absPath.string();
                     imageJson.at("rect").get_to(desc.m_sourceRect);
-                    m_cachedImages.insert(std::make_pair(desc.m_path, desc));
+                    m_cachedImages.insert(std::make_pair(desc.m_path.string(), desc));
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace canyon::graphics {
                 cacheDesc.m_path = path.string();
                 cacheDesc.m_sourceRect = sourceRect;
                 cacheDesc.m_texture = texture;
-                m_cachedImages.insert(std::make_pair(cacheDesc.m_path, cacheDesc));
+                m_cachedImages.insert(std::make_pair(cacheDesc.m_path.string(), cacheDesc));
                 return m_context.NewImage(texture, sourceRect);
             }
         }
