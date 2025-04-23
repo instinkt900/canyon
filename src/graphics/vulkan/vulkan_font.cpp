@@ -88,7 +88,7 @@ namespace {
 namespace canyon::graphics::vulkan {
     std::unique_ptr<Font> Font::Load(std::filesystem::path const& path, int size, SurfaceContext& context) {
         FT_Face face;
-        if (FT_New_Face(context.GetContext().GetFTLibrary(), path.c_str(), 0, &face) != 0) {
+        if (FT_New_Face(context.GetContext().GetFTLibrary(), path.string().c_str(), 0, &face) != 0) {
             return nullptr;
         }
         return std::unique_ptr<Font>(new Font(face, size, context));
