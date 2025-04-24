@@ -24,7 +24,7 @@ class canyon(ConanFile):
         self.requires("freetype/2.13.2", transitive_headers=True)
         self.requires("spdlog/1.12.0", transitive_headers=True)
         self.requires("harfbuzz/8.3.0")
-        self.requires("moth_ui/0.1", transitive_headers=True)
+        self.requires("moth_ui/0.1.0", transitive_headers=True)
         self.requires("fmt/10.2.1", override=True)
 
     def build_requirements(self):
@@ -45,4 +45,6 @@ class canyon(ConanFile):
     def package_info(self):
         self.cpp_info.libs = ["canyon"]
         self.cpp_info.libdirs = ["lib"]
-        self.cpp_info.includedirs = ["include"]
+        self.cpp_info.includedirs = ["include", "external/imgui"]
+        self.cpp_info.defines = ["IMGUI_DEFINE_MATH_OPERATORS"]
+

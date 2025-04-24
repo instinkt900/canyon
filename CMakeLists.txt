@@ -12,11 +12,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_compile_definitions(_CRT_SECURE_NO_WARNINGS IMGUI_DEFINE_MATH_OPERATORS)
-
-include_directories(external/imgui)
-include_directories(external/murmurhash.c)
-
 set(SOURCES ${SOURCES}
 	external/imgui/backends/imgui_impl_glfw.cpp
 	external/imgui/backends/imgui_impl_sdl2.cpp
@@ -82,7 +77,10 @@ find_package(moth_ui REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
+target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_include_directories(${PROJECT_NAME} PRIVATE external/imgui)
+target_include_directories(${PROJECT_NAME} PRIVATE external/murmurhash.c)
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} SDL2::SDL2main)
 target_link_libraries(${PROJECT_NAME} SDL2_image::SDL2_image)
@@ -98,6 +96,7 @@ if (MSVC)
     set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES COMPILE_FLAGS "/W0")
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ignore:4099")
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3 /WX")
+	target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
 else()
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall -Werror")
 endif()
@@ -110,6 +109,12 @@ endif()
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(DIRECTORY "include/" # source directory
         DESTINATION "include" # target directory
+        FILES_MATCHING # install only matched files
+        PATTERN "*.h" # select header files
+        PATTERN "*.hpp" # select header files
+)
+install(DIRECTORY "external/imgui/" # source directory
+        DESTINATION "external/imgui" # target directory
         FILES_MATCHING # install only matched files
         PATTERN "*.h" # select header files
         PATTERN "*.hpp" # select header files
