@@ -1,4 +1,4 @@
-name: Build Example
+name: Build Tests
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build-example:
+  build-test:
     runs-on: ${{ matrix.os == 'windows' && 'windows-latest' || 'ubuntu-latest' }}
     strategy:
       matrix:
@@ -15,19 +15,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        sparse-checkout: |
-          conan
-          example
 
     - name: Setup Conan
       uses: conan-io/setup-conan@v1
       with:
         cache_packages: true
 
-    - name: Build package
-      working-directory: example
+    - name: Add private artifactory
       run: |
         conan remote add artifactory https://artifactory.matthewcotton.net/artifactory/api/conan/conan-local
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
-        conan create . --profile ../conan/profiles/${{ matrix.os }}_profile --build=missing -s build_type=${{ matrix.build_type }}
+
+    - name: Build package
+      run: conan create . --profile conan/profiles/${{ matrix.os }}_profile --build=missing -s build_type=${{ matrix.build_type }}
+
+    - name: Build example
+      working-directory: example
+      run: conan create . --profile ../conan/profiles/${{ matrix.os }}_profile --build=missing -s build_type=${{ matrix.build_type }}
