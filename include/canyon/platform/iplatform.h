@@ -2,6 +2,7 @@
 
 #include "canyon/graphics/context.h"
 
+#include <string>
 #include <memory>
 
 namespace canyon::platform {
