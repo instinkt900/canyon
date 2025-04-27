@@ -31,6 +31,7 @@ class canyon(ConanFile):
         self.requires("spdlog/1.12.0", transitive_headers=True)
         self.requires("harfbuzz/8.3.0")
         self.requires("moth_ui/[<1.0.0]", transitive_headers=True)
+        self.requires("fmt/10.2.1", override=True)
 
     def build_requirements(self):
         self.tool_requires("cmake/[>=3.27.0]")
