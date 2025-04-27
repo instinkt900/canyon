@@ -32,7 +32,6 @@ jobs:
       run: |
         conan remote add artifactory https://artifactory.matthewcotton.net/artifactory/api/conan/conan-local
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
-        conan remove "*" -c
 
     - name: Build package
       run: conan create . --profile conan/profiles/${{ matrix.os }}_profile --build=missing -s build_type=${{ matrix.build_type }}

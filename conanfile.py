@@ -20,7 +20,7 @@ class canyon(ConanFile):
         self.version = load(self, "version.txt").strip()
 
     def requirements(self):
-        self.requires("sdl/[~2.28]", transitive_headers=True)
+        self.requires("sdl/[~2.28]", override=True, transitive_headers=True)
         self.requires("sdl_image/[~2.0]")
         self.requires("sdl_ttf/[~2.20]")
         self.requires("glfw/3.3.8", transitive_headers=True)
