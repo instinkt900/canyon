@@ -20,16 +20,16 @@ class canyon(ConanFile):
         self.version = load(self, "version.txt").strip()
 
     def requirements(self):
-        self.requires("sdl/2.28.3", transitive_headers=True)
-        self.requires("sdl_image/2.0.5")
-        self.requires("sdl_ttf/2.20.2")
+        self.requires("sdl/[~2.28]", transitive_headers=True)
+        self.requires("sdl_image/[~2.0]")
+        self.requires("sdl_ttf/[~2.20]")
         self.requires("glfw/3.3.8", transitive_headers=True)
         self.requires("vulkan-headers/1.3.243.0", transitive_headers=True)
         self.requires("vulkan-loader/1.3.243.0")
         self.requires("vulkan-memory-allocator/3.0.1", transitive_headers=True)
-        self.requires("freetype/2.13.2", transitive_headers=True)
-        self.requires("spdlog/[>1.0.0 <2.0.0]", transitive_headers=True)
-        self.requires("harfbuzz/8.3.0")
+        self.requires("freetype/[~2.13]", transitive_headers=True)
+        self.requires("spdlog/[~1.14]", transitive_headers=True)
+        self.requires("harfbuzz/[~8.3]")
         self.requires("moth_ui/[<1.0.0]", transitive_headers=True)
 
     def build_requirements(self):
