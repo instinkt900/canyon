@@ -1,5 +1,5 @@
 from conan import ConanFile
-from conan.tools.cmake import cmake_layout, CMake
+from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.files import load
 
 class canyon(ConanFile):
