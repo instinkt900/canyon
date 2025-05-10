@@ -75,7 +75,7 @@ find_package(spdlog REQUIRED)
 find_package(harfbuzz REQUIRED)
 find_package(moth_ui REQUIRED)
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
@@ -96,7 +96,10 @@ if (MSVC)
     set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES COMPILE_FLAGS "/W0")
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ignore:4099")
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3 /WX")
-	target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS CANYON_BUILD)
+	if (BUILD_SHARED_LIBS)
+		target_compile_definitions(${PROJECT_NAME} PRIVATE CANYON_BUILD_SHARED)
+	endif()
 else()
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall -Werror")
 endif()
@@ -106,16 +109,19 @@ endif()
 # set_source_files_properties(external/murmurhash.c/murmurhash.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 # set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION lib)
-install(DIRECTORY "include/" # source directory
-        DESTINATION "include" # target directory
-        FILES_MATCHING # install only matched files
-        PATTERN "*.h" # select header files
-        PATTERN "*.hpp" # select header files
+install(TARGETS ${PROJECT_NAME}
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+	INCLUDES DESTINATION include
 )
-install(DIRECTORY "external/imgui/" # source directory
-        DESTINATION "external/imgui" # target directory
-        FILES_MATCHING # install only matched files
-        PATTERN "*.h" # select header files
-        PATTERN "*.hpp" # select header files
+install(DIRECTORY "include/"
+	DESTINATION "include"
+	FILES_MATCHING PATTERN "*.h"
+)
+install(DIRECTORY "external/imgui/"
+	DESTINATION "external/imgui"
+	FILES_MATCHING
+		PATTERN "*.h"
+		PATTERN "*.hpp"
 )

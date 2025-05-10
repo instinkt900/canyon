@@ -5,8 +5,8 @@
 #include "canyon/graphics/blend_mode.h"
 #include "canyon/utils/rect.h"
 
-#include <moth_ui/irenderer.h>
-#include <moth_ui/blend_mode.h>
+#include <moth_ui/graphics/irenderer.h>
+#include <moth_ui/graphics/blend_mode.h>
 #include <moth_ui/utils/color.h>
 #include <moth_ui/utils/rect.h>
 

@@ -2,8 +2,8 @@
 #include "imgui.h"
 #include "ui_button.h"
 
-#include <moth_ui/group.h>
-#include <moth_ui/event_dispatch.h>
+#include <moth_ui/nodes/group.h>
+#include <moth_ui/events/event_dispatch.h>
 
 TestLayer::TestLayer(moth_ui::Context& context, canyon::graphics::IGraphics& graphics, std::filesystem::path const& layoutPath)
     : m_context(context)

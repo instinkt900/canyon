@@ -2,7 +2,7 @@
 
 #include "canyon/graphics/ifont.h"
 
-#include <moth_ui/ifont.h>
+#include <moth_ui/graphics/ifont.h>
 
 #include <memory>
 
