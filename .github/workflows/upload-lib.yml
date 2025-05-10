@@ -30,9 +30,9 @@ jobs:
 
     - name: Build package and upload
       run: |
-        conan create . --profile conan/profiles/${{ matrix.os }}_profile --build=missing
         conan remote add artifactory https://artifactory.matthewcotton.net/artifactory/api/conan/conan-local
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
+        conan create . --profile conan/profiles/${{ matrix.os }}_profile --build=missing
         conan upload canyon --confirm --remote artifactory
 
   tag-package:
