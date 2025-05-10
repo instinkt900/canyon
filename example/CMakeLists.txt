@@ -14,14 +14,6 @@ add_compile_definitions(_CRT_SECURE_NO_WARNINGS IMGUI_DEFINE_MATH_OPERATORS)
 include_directories(../external/imgui)
 
 set(SOURCES ${SOURCES}
-	../external/imgui/backends/imgui_impl_glfw.cpp
-	../external/imgui/backends/imgui_impl_sdl2.cpp
-	../external/imgui/backends/imgui_impl_sdlrenderer2.cpp
-	../external/imgui/backends/imgui_impl_vulkan.cpp
-	../external/imgui/imgui.cpp
-	../external/imgui/imgui_draw.cpp
-	../external/imgui/imgui_tables.cpp
-	../external/imgui/imgui_widgets.cpp
 	../external/imgui/imgui_demo.cpp
 	src/main.cpp
 	src/example_app.cpp

@@ -6,7 +6,7 @@
 #include "canyon/graphics/text_alignment.h"
 #include "canyon/utils/rect.h"
 
-#include <moth_ui/blend_mode.h>
+#include <moth_ui/graphics/blend_mode.h>
 #include <moth_ui/utils/rect.h>
 
 #include <SDL_rect.h>

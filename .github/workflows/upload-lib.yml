@@ -8,11 +8,16 @@ on:
 jobs:
   build-and-upload:
     if: github.repository == 'instinkt900/canyon'
-    runs-on: ${{ matrix.os == 'windows' && 'windows-latest' || 'ubuntu-latest' }}
+    runs-on: ${{ matrix.runs_on }}
     strategy:
       matrix:
         os: [windows, linux]
-        build_type: [Release, Debug]
+        library_type: [shared, static]
+        include:
+          - os: windows
+            runs_on: windows-latest
+          - os: linux
+            runs_on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -31,5 +36,5 @@ jobs:
 
     - name: Build package and upload
       run: |
-        conan create . --profile conan/profiles/${{ matrix.os }}_profile --build=missing -s build_type=${{ matrix.build_type }}
+        conan create . --profile conan/profiles/${{ matrix.os }}_profile --build=missing -o canyon/*:shared=${{ matrix.library_type == 'shared' && 'True' || 'False' }}
         conan upload canyon --confirm --remote artifactory

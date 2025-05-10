@@ -5,7 +5,7 @@
 #include "canyon/events/event_window.h"
 #include "canyon/utils/vector.h"
 
-#include <moth_ui/event_listener.h>
+#include <moth_ui/events/event_listener.h>
 #include <moth_ui/events/event.h>
 
 #include <memory>
