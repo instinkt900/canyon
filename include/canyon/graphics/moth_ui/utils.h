@@ -5,8 +5,8 @@
 #include "canyon/utils/rect.h"
 #include "canyon/utils/vector.h"
 
-#include <moth_ui/blend_mode.h>
-#include <moth_ui/text_alignment.h>
+#include <moth_ui/graphics/blend_mode.h>
+#include <moth_ui/graphics/text_alignment.h>
 #include <moth_ui/utils/rect.h>
 #include <moth_ui/utils/vector.h>
 

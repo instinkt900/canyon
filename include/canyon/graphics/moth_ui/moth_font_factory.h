@@ -3,7 +3,7 @@
 #include "canyon/graphics/font_factory.h"
 
 #include <moth_ui/font_factory.h>
-#include <moth_ui/ifont.h>
+#include <moth_ui/graphics/ifont.h>
 
 #include <memory>
 

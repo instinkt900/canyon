@@ -2,7 +2,7 @@
 #include "canyon/platform/application.h"
 #include "canyon/platform/window.h"
 #include "example_layer.h"
-#include <moth_ui/event_listener.h>
+#include <moth_ui/events/event_listener.h>
 
 void startExampleApp(canyon::platform::IPlatform& platform) {
     auto application = std::make_unique<canyon::platform::Application>(platform, "Example", 640, 480);

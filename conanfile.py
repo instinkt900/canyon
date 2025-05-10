@@ -10,9 +10,7 @@ class canyon(ConanFile):
     description = "A basic graphical application framework that uses moth_ui"
 
     settings = "os", "compiler", "build_type", "arch"
-    options = { "shared": [True, False], "fPIC": [True, False] }
-    default_options = { "shared": False, "fPIC": True }
-    package_type = "library"
+    package_type = "static-library"
 
     exports_sources = "CMakeLists.txt", "version.txt", "include/*", "src/*", "external/imgui/*", "external/murmurhash.c/*"
 
@@ -30,14 +28,10 @@ class canyon(ConanFile):
         self.requires("freetype/[~2.13]", transitive_headers=True)
         self.requires("spdlog/[~1.14]", transitive_headers=True)
         self.requires("harfbuzz/[~8.3]")
-        self.requires("moth_ui/[<1.0.0]", transitive_headers=True)
+        self.requires("moth_ui/0.2.0", transitive_headers=True)
 
     def build_requirements(self):
         self.tool_requires("cmake/[>=3.27.0]")
-
-    def config_options(self):
-        if self.settings.os == "Windows":
-            del self.options.fPIC
 
     def layout(self):
         cmake_layout(self)
