@@ -2,6 +2,7 @@
 #include "canyon/graphics/vulkan/vulkan_framebuffer.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
 #include "canyon/graphics/vulkan/vulkan_command_buffer.h"
+#include <vulkan/vulkan_core.h>
 
 namespace canyon::graphics::vulkan {
     Framebuffer::Framebuffer(SurfaceContext& context, uint32_t width, uint32_t height, VkImage image, VkImageView view, VkFormat format, VkRenderPass renderPass, uint32_t swapchainIndex)
@@ -30,6 +31,10 @@ namespace canyon::graphics::vulkan {
         IntRect rec = { { 0, 0 }, { width, height } };
         m_image = std::make_unique<Image>(std::move(texture), rec);
         CreateFramebufferResource(renderPass);
+
+        m_commandBuffer->BeginRecord();
+        m_commandBuffer->TransitionImageLayout(*m_image->m_texture, m_image->m_texture->GetVkFormat(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        m_commandBuffer->SubmitAndWait();
     }
 
     Framebuffer::~Framebuffer() {

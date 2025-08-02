@@ -66,7 +66,7 @@ namespace canyon::graphics::vulkan {
         // void SetColorMod(std::shared_ptr<IImage> target, Color const& color) override;
         void SetColor(Color const& color) override;
         void Clear() override;
-        void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) override;
+        void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) override;
         void DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
         void DrawToPNG(std::filesystem::path const& path) override;
         void DrawRectF(FloatRect const& rect) override;
@@ -155,6 +155,7 @@ namespace canyon::graphics::vulkan {
         Pipeline& GetCurrentFontPipeline();
 
         void BeginContext(DrawContext* target);
+        void RestartContext();
         void EndContext();
         void StartCommands();
         void FlushCommands();

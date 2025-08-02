@@ -87,7 +87,7 @@ namespace canyon::graphics {
         auto& internalImage = *mothImage.GetImage();
         auto const srcRect = sourceRect;
         if (scaleType == moth_ui::ImageScaleType::Stretch) {
-            m_graphics.DrawImage(internalImage, destRect, &srcRect);
+            m_graphics.DrawImage(internalImage, destRect, &srcRect, 0);
         } else if (scaleType == moth_ui::ImageScaleType::Tile) {
             m_graphics.DrawImageTiled(internalImage, destRect, &srcRect, scale);
         }

@@ -99,6 +99,12 @@ namespace canyon::graphics::vulkan {
     }
 
     Graphics::~Graphics() {
+        if (!m_contextStack.empty()) {
+            auto context = m_contextStack.top();
+            auto cmdFence = context->m_target->GetFence().GetVkFence();
+            vkWaitForFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
+        }
+
         if (m_imguiInitialized) {
             ImGui_ImplVulkan_Shutdown();
             ImGui_ImplGlfw_Shutdown();
@@ -218,7 +224,7 @@ namespace canyon::graphics::vulkan {
         DrawFillRectF({ { 0, 0 }, { static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height) } });
     }
 
-    void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
+    void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) {
         auto context = m_contextStack.top();
         auto& vulkanImage = dynamic_cast<Image&>(image);
         auto texture = vulkanImage.m_texture;
@@ -258,6 +264,15 @@ namespace canyon::graphics::vulkan {
         vertices[5].uv = { imageRect.bottomRight.x, imageRect.topLeft.y };
         vertices[5].color = context->m_currentColor;
 
+        if (rotation != 0) {
+            auto const center = static_cast<FloatVec2>(destRect.topLeft + IntVec2{ destRect.w() / 2, destRect.h() / 2 });
+            for (int i = 0; i < 6; ++i) {
+                auto const translated = Translate(vertices[i].xy, -center);
+                auto const rotated = Rotate2D(translated, rotation);
+                vertices[i].xy = Translate(rotated, center);
+            }
+        }
+
         VkDescriptorSet descriptorSet = m_drawingShader->GetDescriptorSet(*texture);
         SubmitVertices(vertices, 6, ETopologyType::Triangles, descriptorSet);
     }
@@ -272,7 +287,7 @@ namespace canyon::graphics::vulkan {
         for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
             for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
                 IntRect const tiledDstRect{ { x, y }, { x + imageWidth, y + imageHeight } };
-                DrawImage(image, tiledDstRect, sourceRect);
+                DrawImage(image, tiledDstRect, sourceRect, 0);
             }
         }
     }
@@ -656,11 +671,11 @@ namespace canyon::graphics::vulkan {
             VkAttachmentDescription colorAttachment{};
             colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
             colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-            colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+            colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
             colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
             colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
             colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-            colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            colorAttachment.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
             VkAttachmentReference colorAttachmentRef{};
@@ -811,6 +826,20 @@ namespace canyon::graphics::vulkan {
         StartCommands();
     }
 
+    void Graphics::RestartContext() {
+        auto context = m_contextStack.top();
+        FlushCommands();
+        auto cmdFence = context->m_target->GetFence().GetVkFence();
+        vkWaitForFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
+        vkResetFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence);
+        context->m_logicalExtent = context->m_target->GetVkExtent();
+        context->m_vertexCount = 0;
+        context->m_maxVertexCount = 1024;
+        context->m_currentPipelineId = 0;
+        context->m_glyphCount = 0;
+        StartCommands();
+    }
+
     void Graphics::EndContext() {
         FlushCommands();
         m_contextStack.pop();
@@ -821,6 +850,9 @@ namespace canyon::graphics::vulkan {
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         commandBuffer.Reset();
         commandBuffer.BeginRecord();
+        if (IsRenderTarget()) {
+            commandBuffer.TransitionImageLayout(*context->m_target->GetVkImage().m_texture, context->m_target->GetVkFormat(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        }
         commandBuffer.BeginRenderPass(GetCurrentRenderPass(), *context->m_target);
 
         VkViewport viewport;
@@ -887,7 +919,6 @@ namespace canyon::graphics::vulkan {
         }
 
         commandBuffer.Submit(cmdFence, context->m_target->GetAvailableSemaphore(), context->m_target->GetRenderFinishedSemaphore());
-        vkWaitForFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
     }
 
     void Graphics::SubmitVertices(Vertex* vertices, uint32_t vertCount, ETopologyType topology, VkDescriptorSet descriptorSet) {
@@ -897,8 +928,7 @@ namespace canyon::graphics::vulkan {
 
         const uint32_t availableVertices = context->m_maxVertexCount - context->m_vertexCount;
         if (availableVertices < vertCount) {
-            FlushCommands();
-            StartCommands();
+            RestartContext();
         }
 
         const uint32_t vertexDataSize = sizeof(Vertex) * vertCount;

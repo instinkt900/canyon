@@ -34,7 +34,7 @@ namespace canyon::graphics {
         // virtual void SetColorMod(std::shared_ptr<IImage> target, Color const& color) = 0;
         virtual void SetColor(Color const& color) = 0;
         virtual void Clear() = 0;
-        virtual void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) = 0;
+        virtual void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) = 0;
         virtual void DrawImageTiled(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) = 0;
         virtual void DrawToPNG(std::filesystem::path const& path) = 0;
         virtual void DrawRectF(FloatRect const& rect) = 0;
