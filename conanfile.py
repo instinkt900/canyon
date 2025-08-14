@@ -35,6 +35,7 @@ class canyon(ConanFile):
 
     def layout(self):
         cmake_layout(self)
+        self.cpp.source.includedirs.append("external/imgui")
 
     def generate(self):
         deps = CMakeDeps(self)
