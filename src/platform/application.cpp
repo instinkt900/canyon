@@ -34,7 +34,7 @@ namespace canyon::platform {
     }
 
     bool Application::OnWindowSizeEvent(EventWindowSize const& event) {
-        return true;
+        return false;
     }
 
     bool Application::OnRequestQuitEvent(EventRequestQuit const& event) {
@@ -47,8 +47,11 @@ namespace canyon::platform {
         return true;
     }
 
-    void Application::Tick(uint32_t ticks) {
+    void Application::TickFixed(uint32_t ticks) {
         m_window->Update(ticks);
+    }
+
+    void Application::Tick(uint32_t ticks) {
         m_window->Draw();
     }
 }

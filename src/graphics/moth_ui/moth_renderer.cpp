@@ -13,7 +13,7 @@ namespace canyon::graphics {
     }
 
     void MothRenderer::PushBlendMode(moth_ui::BlendMode mode) {
-        m_blendMode.push(FromMothUI(mode));
+        m_blendMode.push(mode);
     }
 
     void MothRenderer::PopBlendMode() {
@@ -23,7 +23,7 @@ namespace canyon::graphics {
     }
 
     void MothRenderer::PushColor(moth_ui::Color const& color) {
-        auto const modColor = m_drawColor.top() * FromMothUI(color);
+        auto const modColor = m_drawColor.top() * color;
         m_drawColor.push(modColor);
     }
 
@@ -44,11 +44,11 @@ namespace canyon::graphics {
 
     void MothRenderer::PushClip(moth_ui::IntRect const& rect) {
         if (m_clip.empty()) {
-            m_clip.push(FromMothUI(rect));
+            m_clip.push(rect);
         } else {
             // want to clip rect within the current clip
             auto const parentRect = m_clip.top();
-            auto const newRect = ClipRect(parentRect, FromMothUI(rect));
+            auto const newRect = ClipRect(parentRect, rect);
             m_clip.push(newRect);
         }
 
@@ -66,14 +66,14 @@ namespace canyon::graphics {
     }
 
     void MothRenderer::RenderRect(moth_ui::IntRect const& rect) {
-        auto const floatRect = static_cast<FloatRect>(FromMothUI(rect));
+        auto const floatRect = static_cast<FloatRect>(rect);
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
         m_graphics.DrawRectF(floatRect);
     }
 
     void MothRenderer::RenderFilledRect(moth_ui::IntRect const& rect) {
-        auto const floatRect = static_cast<FloatRect>(FromMothUI(rect));
+        auto const floatRect = static_cast<FloatRect>(rect);
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
         m_graphics.DrawFillRectF(floatRect);
@@ -85,11 +85,11 @@ namespace canyon::graphics {
 
         auto& mothImage = static_cast<MothImage&>(image);
         auto& internalImage = *mothImage.GetImage();
-        auto const srcRect = FromMothUI(sourceRect);
+        auto const srcRect = sourceRect;
         if (scaleType == moth_ui::ImageScaleType::Stretch) {
-            m_graphics.DrawImage(internalImage, FromMothUI(destRect), &srcRect);
+            m_graphics.DrawImage(internalImage, destRect, &srcRect, 0);
         } else if (scaleType == moth_ui::ImageScaleType::Tile) {
-            m_graphics.DrawImageTiled(internalImage, FromMothUI(destRect), &srcRect, scale);
+            m_graphics.DrawImageTiled(internalImage, destRect, &srcRect, scale);
         }
     }
 
@@ -99,10 +99,10 @@ namespace canyon::graphics {
 
         auto& fcFont = static_cast<MothFont&>(font);
         auto& internalFont = *fcFont.GetInternalFont();
-        m_graphics.DrawText(text, internalFont, FromMothUI(horizontalAlignment), FromMothUI(verticalAlignment), FromMothUI(destRect));
+        m_graphics.DrawText(text, internalFont, horizontalAlignment, verticalAlignment, destRect);
     }
 
     void MothRenderer::SetRendererLogicalSize(moth_ui::IntVec2 const& size) {
-        m_graphics.SetLogicalSize(FromMothUI(size));
+        m_graphics.SetLogicalSize(size);
     }
 }

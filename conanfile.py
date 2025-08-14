@@ -28,13 +28,16 @@ class canyon(ConanFile):
         self.requires("freetype/[~2.13]", transitive_headers=True)
         self.requires("spdlog/[~1.14]", transitive_headers=True)
         self.requires("harfbuzz/[~8.3]")
-        self.requires("moth_ui/0.2.0", transitive_headers=True)
+        self.requires("libjpeg/9e", override=True)
+        self.requires("moth_ui/0.3.0", transitive_headers=True)
 
     def build_requirements(self):
         self.tool_requires("cmake/[>=3.27.0]")
 
     def layout(self):
         cmake_layout(self)
+        # Added this here so that the package in editable mode still works with the extra includes.
+        self.cpp.source.includedirs.append("external/imgui")
 
     def generate(self):
         deps = CMakeDeps(self)

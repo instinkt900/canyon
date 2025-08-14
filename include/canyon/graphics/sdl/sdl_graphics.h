@@ -34,7 +34,7 @@ namespace canyon::graphics::sdl {
         // void SetColorMod(std::shared_ptr<graphics::IImage> target, graphics::Color const& color) override;
         void SetColor(Color const& color) override;
         void Clear() override;
-        void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) override;
+        void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) override;
         void DrawImageTiled(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
         void DrawToPNG(std::filesystem::path const& path) override;
         void DrawRectF(FloatRect const& rect) override;

@@ -83,14 +83,14 @@ namespace canyon::platform::glfw {
             }
             app->m_lastMousePos = newMousePos;
             app->m_haveMousePos = true;
-            auto lastMousePos = static_cast<moth_ui::IntVec2>(ToMothUI(app->m_lastMousePos));
-            auto const translatedEvent = std::make_unique<moth_ui::EventMouseMove>(lastMousePos, ToMothUI(mouseDelta));
+            auto lastMousePos = static_cast<moth_ui::IntVec2>(app->m_lastMousePos);
+            auto const translatedEvent = std::make_unique<moth_ui::EventMouseMove>(lastMousePos, mouseDelta);
             app->EmitEvent(*translatedEvent);
         });
 
         glfwSetMouseButtonCallback(m_glfwWindow, [](GLFWwindow* window, int button, int action, int mods) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
-            if (auto const translatedEvent = FromGLFW(button, action, mods, static_cast<moth_ui::IntVec2>(ToMothUI(app->m_lastMousePos)))) {
+            if (auto const translatedEvent = FromGLFW(button, action, mods, static_cast<moth_ui::IntVec2>(app->m_lastMousePos))) {
                 app->EmitEvent(*translatedEvent);
             }
         });

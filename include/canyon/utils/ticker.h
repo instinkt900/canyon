@@ -12,6 +12,7 @@ namespace canyon {
         }
         virtual ~Ticker() {}
 
+        uint32_t GetFixedTicks() const { return static_cast<uint32_t>(m_updateTicks.count()); }
         void SetRunning(bool running) { m_running = running; }
 
         void TickSync() {
@@ -21,15 +22,17 @@ namespace canyon {
                 auto const nowTicks = std::chrono::steady_clock::now();
                 auto deltaTicks = std::chrono::duration_cast<std::chrono::milliseconds>(nowTicks - m_lastUpdateTicks);
                 while (deltaTicks > m_updateTicks) {
-                    Tick(static_cast<uint32_t>(m_updateTicks.count()));
+                    TickFixed(static_cast<uint32_t>(m_updateTicks.count()));
                     m_lastUpdateTicks += m_updateTicks;
                     deltaTicks -= m_updateTicks;
                 }
+                Tick(static_cast<uint32_t>(deltaTicks.count()));
                 std::this_thread::yield();
             }
         }
 
     protected:
+        virtual void TickFixed(uint32_t ticks) = 0;
         virtual void Tick(uint32_t ticks) = 0;
 
     private:

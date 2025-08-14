@@ -1,15 +1,8 @@
 #pragma once
 
-namespace canyon::graphics {
-    enum class TextHorizAlignment {
-        Left,
-        Center,
-        Right
-    };
+#include <moth_ui/graphics/text_alignment.h>
 
-    enum class TextVertAlignment {
-        Top,
-        Middle,
-        Bottom
-    };
+namespace canyon::graphics {
+    using TextHorizAlignment = moth_ui::TextHorizAlignment;
+    using TextVertAlignment = moth_ui::TextVertAlignment;
 }

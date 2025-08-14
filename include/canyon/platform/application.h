@@ -26,6 +26,7 @@ namespace canyon::platform {
         bool OnRequestQuitEvent(EventRequestQuit const& event);
         bool OnQuitEvent(EventQuit const& event);
 
+        void TickFixed(uint32_t ticks) override;
         void Tick(uint32_t ticks) override;
 
         Window* GetWindow() { return m_window.get(); }

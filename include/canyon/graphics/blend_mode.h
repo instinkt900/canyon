@@ -1,12 +1,7 @@
 #pragma once
 
+#include <moth_ui/graphics/blend_mode.h>
+
 namespace canyon::graphics {
-    enum class BlendMode {
-        Invalid = -1,
-        Replace,
-        Alpha,
-        Add,
-        Multiply,
-        Modulate
-    };
+    using BlendMode = moth_ui::BlendMode;
 }

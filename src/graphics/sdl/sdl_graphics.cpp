@@ -80,7 +80,7 @@ namespace canyon::graphics::sdl {
         SDL_RenderClear(m_surfaceContext.GetRenderer());
     }
 
-    void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
+    void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) {
         auto& sdlImage = dynamic_cast<Image&>(image);
         auto sdlTexture = sdlImage.GetTexture();
         // auto const& textureSourceRect = sdlImage.GetSourceRect();
@@ -98,7 +98,13 @@ namespace canyon::graphics::sdl {
         //     sdlSrcRect.y += sourceRect->y();
         // }
 
-        SDL_RenderCopy(m_surfaceContext.GetRenderer(), sdlTexture->GetSDLTexture()->GetImpl(), &sdlSrcRect, &sdlDstRect);
+        SDL_RenderCopyEx(m_surfaceContext.GetRenderer(),
+                         sdlTexture->GetSDLTexture()->GetImpl(),
+                         &sdlSrcRect,
+                         &sdlDstRect,
+                         rotation,
+                         nullptr,
+                         SDL_RendererFlip::SDL_FLIP_NONE);
     }
 
     void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {

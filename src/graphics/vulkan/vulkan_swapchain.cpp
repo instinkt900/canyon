@@ -1,6 +1,7 @@
 #include "common.h"
 #include "canyon/graphics/vulkan/vulkan_swapchain.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "canyon/graphics/vulkan/vulkan_command_buffer.h"
 
 namespace {
     VkExtent2D chooseSwapExtent(uint32_t width, uint32_t height, const VkSurfaceCapabilitiesKHR& capabilities) {
@@ -72,9 +73,13 @@ namespace canyon::graphics::vulkan {
             CHECK_VK_RESULT(vkCreateImageView(m_context.GetVkDevice(), &createInfo, nullptr, &swapchainImageViews[i]));
         }
 
+        auto commandBuffer = std::make_unique<CommandBuffer>(m_context);
+        commandBuffer->BeginRecord();
         for (uint32_t i = 0; i < imageCount; ++i) {
             m_framebuffers.push_back(std::make_unique<Framebuffer>(m_context, extent.width, extent.height, swapchainImages[i], swapchainImageViews[i], surfaceFormat.format, renderPass.GetRenderPass(), i));
+            commandBuffer->TransitionImageLayout(*m_framebuffers[i]->GetVkImage().m_texture, surfaceFormat.format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         }
+        commandBuffer->SubmitAndWait();
 
         m_imageCount = imageCount;
     }
