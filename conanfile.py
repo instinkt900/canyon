@@ -36,6 +36,7 @@ class canyon(ConanFile):
 
     def layout(self):
         cmake_layout(self)
+        # Added this here so that the package in editable mode still works with the extra includes.
         self.cpp.source.includedirs.append("external/imgui")
 
     def generate(self):
