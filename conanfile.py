@@ -28,6 +28,7 @@ class canyon(ConanFile):
         self.requires("freetype/[~2.13]", transitive_headers=True)
         self.requires("spdlog/[~1.14]", transitive_headers=True)
         self.requires("harfbuzz/[~8.3]")
+        self.requires("libjpeg/9e", override=True)
         self.requires("moth_ui/0.3.0", transitive_headers=True)
 
     def build_requirements(self):
