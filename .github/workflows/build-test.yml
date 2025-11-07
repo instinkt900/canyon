@@ -28,6 +28,9 @@ jobs:
       with:
         cache_packages: true
 
+    - name: Test conan version
+      run: conan --version
+
     - name: Add private artifactory
       run: |
         conan remote add artifactory https://artifactory.matthewcotton.net/artifactory/api/conan/conan-local
