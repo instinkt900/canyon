@@ -27,6 +27,10 @@ jobs:
       uses: conan-io/setup-conan@v1
       with:
         cache_packages: true
+        version: 2.15.1
+
+    - name: Test conan version
+      run: conan --version
 
     - name: Add private artifactory
       run: |

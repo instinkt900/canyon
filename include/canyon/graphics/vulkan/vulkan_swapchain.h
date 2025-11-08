@@ -11,6 +11,11 @@
 #include <cstdint>
 
 namespace canyon::graphics::vulkan {
+    struct FrameSlot {
+        VkSemaphore imageAvailable;
+        VkSemaphore renderFinished;
+    };
+
     class Swapchain {
     public:
         Swapchain(SurfaceContext& context, RenderPass& renderPass, VkSurfaceKHR surface, VkExtent2D extent);
@@ -31,5 +36,6 @@ namespace canyon::graphics::vulkan {
         std::vector<std::unique_ptr<Framebuffer>> m_framebuffers;
         uint32_t m_currentFrame = 0;
         uint32_t m_imageCount = 0;
+        std::vector<std::shared_ptr<FrameSlot>> m_frames;
     };
 }

@@ -32,7 +32,7 @@ namespace canyon::graphics::vulkan {
         const VkFormat requestSurfaceImageFormat[] = { VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM };
         const VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
         VkSurfaceFormatKHR surfaceFormat = SurfaceContext::selectSurfaceFormat(m_context.GetVkPhysicalDevice(), surface, requestSurfaceImageFormat, 4, requestSurfaceColorSpace);
-        VkPresentModeKHR presentModes[] = { VK_PRESENT_MODE_MAILBOX_KHR, /*VK_PRESENT_MODE_IMMEDIATE_KHR, */VK_PRESENT_MODE_FIFO_KHR };
+        VkPresentModeKHR presentModes[] = { VK_PRESENT_MODE_MAILBOX_KHR, /*VK_PRESENT_MODE_IMMEDIATE_KHR, */ VK_PRESENT_MODE_FIFO_KHR };
         VkPresentModeKHR presentMode = SurfaceContext::selectPresentMode(m_context.GetVkPhysicalDevice(), surface, presentModes, 3);
         VkSwapchainCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -78,6 +78,13 @@ namespace canyon::graphics::vulkan {
         for (uint32_t i = 0; i < imageCount; ++i) {
             m_framebuffers.push_back(std::make_unique<Framebuffer>(m_context, extent.width, extent.height, swapchainImages[i], swapchainImageViews[i], surfaceFormat.format, renderPass.GetRenderPass(), i));
             commandBuffer->TransitionImageLayout(*m_framebuffers[i]->GetVkImage().m_texture, surfaceFormat.format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+            auto slot = std::make_shared<FrameSlot>();
+            VkSemaphoreCreateInfo semaphoreInfo{};
+            semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+            CHECK_VK_RESULT(vkCreateSemaphore(m_context.GetVkDevice(), &semaphoreInfo, nullptr, &slot->imageAvailable));
+            CHECK_VK_RESULT(vkCreateSemaphore(m_context.GetVkDevice(), &semaphoreInfo, nullptr, &slot->renderFinished));
+            m_frames.push_back(slot);
         }
         commandBuffer->SubmitAndWait();
 
@@ -85,16 +92,28 @@ namespace canyon::graphics::vulkan {
     }
 
     Swapchain::~Swapchain() {
+        for (uint32_t i = 0; i < m_imageCount; ++i) {
+            auto& slot = m_frames[i];
+            if (slot->imageAvailable) {
+                vkDestroySemaphore(m_context.GetVkDevice(), slot->imageAvailable, nullptr);
+            }
+            if (slot->renderFinished) {
+                vkDestroySemaphore(m_context.GetVkDevice(), slot->renderFinished, nullptr);
+            }
+        }
         vkDestroySwapchainKHR(m_context.GetVkDevice(), m_vkSwapchain, nullptr);
     }
 
     Framebuffer* Swapchain::GetNextFramebuffer() {
+        auto& slot = m_frames[m_currentFrame];
+
         uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(m_context.GetVkDevice(), m_vkSwapchain, UINT64_MAX, m_framebuffers[m_currentFrame]->GetAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+        VkResult result = vkAcquireNextImageKHR(m_context.GetVkDevice(), m_vkSwapchain, UINT64_MAX, slot->imageAvailable, VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
             return nullptr;
         }
         CHECK_VK_RESULT(result);
+        m_framebuffers[imageIndex]->SetFrameSlot(slot);
         m_currentFrame = (m_currentFrame + 1) % m_framebuffers.size();
         return m_framebuffers[imageIndex].get();
     }

@@ -2,6 +2,7 @@
 #include "canyon/graphics/vulkan/vulkan_framebuffer.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
 #include "canyon/graphics/vulkan/vulkan_command_buffer.h"
+#include "canyon/graphics/vulkan/vulkan_swapchain.h"
 #include <vulkan/vulkan_core.h>
 
 namespace canyon::graphics::vulkan {
@@ -15,11 +16,6 @@ namespace canyon::graphics::vulkan {
         IntRect rec = { { 0, 0 }, { width, height } };
         m_image = std::make_unique<Image>(std::move(texture), rec);
         CreateFramebufferResource(renderPass);
-
-        VkSemaphoreCreateInfo semaphoreInfo{};
-        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        CHECK_VK_RESULT(vkCreateSemaphore(m_context.GetVkDevice(), &semaphoreInfo, nullptr, &m_imageAvailableSemaphore));
-        CHECK_VK_RESULT(vkCreateSemaphore(m_context.GetVkDevice(), &semaphoreInfo, nullptr, &m_renderFinishedSemaphore));
     }
 
     Framebuffer::Framebuffer(SurfaceContext& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkRenderPass renderPass)
@@ -38,12 +34,6 @@ namespace canyon::graphics::vulkan {
     }
 
     Framebuffer::~Framebuffer() {
-        if (m_imageAvailableSemaphore) {
-            vkDestroySemaphore(m_context.GetVkDevice(), m_imageAvailableSemaphore, nullptr);
-        }
-        if (m_renderFinishedSemaphore) {
-            vkDestroySemaphore(m_context.GetVkDevice(), m_renderFinishedSemaphore, nullptr);
-        }
         vkDestroyFramebuffer(m_context.GetVkDevice(), m_vkFramebuffer, nullptr);
     }
 
@@ -57,6 +47,13 @@ namespace canyon::graphics::vulkan {
 
     Image& Framebuffer::GetVkImage() {
         return *m_image;
+    }
+
+    VkSemaphore Framebuffer::GetAvailableSemaphore() const {
+        return m_frameSlot ? m_frameSlot->imageAvailable : VK_NULL_HANDLE;
+    }
+    VkSemaphore Framebuffer::GetRenderFinishedSemaphore() const {
+        return m_frameSlot ? m_frameSlot->renderFinished : VK_NULL_HANDLE;
     }
 
     void Framebuffer::CreateFramebufferResource(VkRenderPass renderPass) {

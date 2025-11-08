@@ -32,7 +32,7 @@ class canyon(ConanFile):
         self.requires("moth_ui/0.3.0", transitive_headers=True)
 
     def build_requirements(self):
-        self.tool_requires("cmake/[>=3.27.0]")
+        self.tool_requires("cmake/3.27.0")
 
     def layout(self):
         cmake_layout(self)

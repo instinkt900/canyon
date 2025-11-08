@@ -10,10 +10,10 @@ class CanyonExample(ConanFile):
     package_type = "application"
 
     def requirements(self):
-        self.requires("canyon/0.2.0")
+        self.requires("canyon/0.3.0")
 
     def build_requirements(self):
-        self.tool_requires("cmake/[>=3.27.0]")
+        self.tool_requires("cmake/3.27.0")
 
     def layout(self):
         cmake_layout(self)
