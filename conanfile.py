@@ -72,6 +72,6 @@ class canyon(ConanFile):
         if self.settings.os == "Linux":
             # System SDL2/SDL_image/SDL_ttf/GLFW — propagate link flags and
             # SDL2's non-default include path to all consumers.
-            self.cpp_info.system_libs = ["SDL2", "SDL2_image", "SDL2_ttf", "glfw"]
+            self.cpp_info.system_libs = ["SDL2", "SDL2_image", "SDL2_ttf", "glfw", "freetype"]
             self.cpp_info.includedirs.append("/usr/include/SDL2")
 
