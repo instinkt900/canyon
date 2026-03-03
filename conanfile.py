@@ -71,7 +71,18 @@ class canyon(ConanFile):
         self.cpp_info.defines = ["IMGUI_DEFINE_MATH_OPERATORS"]
         if self.settings.os == "Linux":
             # System SDL2/SDL_image/SDL_ttf/GLFW — propagate link flags and
-            # SDL2's non-default include path to all consumers.
+            # SDL2 include paths to all consumers. Paths are detected via
+            # pkg-config rather than hard-coding a sysroot-relative location.
             self.cpp_info.system_libs = ["SDL2", "SDL2_image", "SDL2_ttf", "glfw", "freetype"]
-            self.cpp_info.includedirs.append("/usr/include/SDL2")
+            import subprocess
+            try:
+                flags = subprocess.check_output(
+                    ["pkg-config", "--cflags-only-I", "sdl2"],
+                    text=True
+                ).split()
+                for flag in flags:
+                    if flag.startswith("-I"):
+                        self.cpp_info.includedirs.append(flag[2:])
+            except (subprocess.SubprocessError, FileNotFoundError):
+                self.output.warning("pkg-config not found; SDL2 include path not automatically propagated to consumers")
 
