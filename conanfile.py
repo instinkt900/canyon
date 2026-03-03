@@ -30,6 +30,9 @@ class canyon(ConanFile):
             self.requires("sdl_image/[~2.0]")
             self.requires("sdl_ttf/[~2.20]")
             self.requires("glfw/3.3.8", transitive_headers=True)
+            # vulkan_context.h includes <ft2build.h> so consumers need FreeType
+            # headers. On Linux FreeType comes from the system package manager.
+            self.requires("freetype/[~2.13]", transitive_headers=True)
         self.requires("vulkan-headers/1.3.243.0", transitive_headers=True)
         self.requires("vulkan-loader/1.3.243.0")
         self.requires("vulkan-memory-allocator/3.0.1", transitive_headers=True)
