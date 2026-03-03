@@ -81,15 +81,20 @@ class canyon(ConanFile):
             # SDL2 include paths to all consumers. Paths are detected via
             # pkg-config rather than hard-coding a sysroot-relative location.
             self.cpp_info.system_libs = ["SDL2", "SDL2_image", "SDL2_ttf", "glfw", "freetype"]
+            import shutil
             import subprocess
-            try:
-                flags = subprocess.check_output(
-                    ["pkg-config", "--cflags-only-I", "sdl2"],
-                    text=True
-                ).split()
-                for flag in flags:
-                    if flag.startswith("-I"):
-                        self.cpp_info.includedirs.append(flag[2:])
-            except (subprocess.SubprocessError, FileNotFoundError):
+            pkg_config = shutil.which("pkg-config")
+            if not pkg_config:
                 self.output.warning("pkg-config not found; SDL2 include path not automatically propagated to consumers")
+            else:
+                try:
+                    flags = subprocess.check_output(
+                        [pkg_config, "--cflags-only-I", "sdl2"],
+                        text=True
+                    ).split()
+                    for flag in flags:
+                        if flag.startswith("-I"):
+                            self.cpp_info.includedirs.append(flag[2:])
+                except subprocess.SubprocessError as e:
+                    self.output.warning(f"pkg-config query failed; SDL2 include path not automatically propagated to consumers: {e}")
 
