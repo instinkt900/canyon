@@ -44,12 +44,12 @@ class canyon(ConanFile):
             import shutil
             if not shutil.which("apt-get"):
                 raise ConanInvalidConfiguration(
-                    "apt-get is required to install system SDL2/GLFW libraries on Linux. "
+                    "apt-get is required to install system SDL2/GLFW/FreeType libraries on Linux. "
                     "On non-Debian/Ubuntu systems, install libsdl2-dev, libsdl2-image-dev, "
-                    "libsdl2-ttf-dev, and libglfw3-dev manually via your system package manager."
+                    "libsdl2-ttf-dev, libglfw3-dev, and libfreetype6-dev manually via your system package manager."
                 )
             apt = Apt(self)
-            apt.install(["libsdl2-dev", "libsdl2-image-dev", "libsdl2-ttf-dev", "libglfw3-dev"])
+            apt.install(["libsdl2-dev", "libsdl2-image-dev", "libsdl2-ttf-dev", "libglfw3-dev", "libfreetype6-dev"])
 
     def build_requirements(self):
         self.tool_requires("cmake/3.27.0")
