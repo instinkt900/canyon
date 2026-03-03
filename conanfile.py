@@ -1,4 +1,5 @@
 from conan import ConanFile
+from conan.errors import ConanInvalidConfiguration
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.files import load
 from conan.tools.system.package_manager import Apt
@@ -37,6 +38,13 @@ class canyon(ConanFile):
 
     def system_requirements(self):
         if self.settings.os == "Linux":
+            import shutil
+            if not shutil.which("apt-get"):
+                raise ConanInvalidConfiguration(
+                    "apt-get is required to install system SDL2/GLFW libraries on Linux. "
+                    "On non-Debian/Ubuntu systems, install libsdl2-dev, libsdl2-image-dev, "
+                    "libsdl2-ttf-dev, and libglfw3-dev manually via your system package manager."
+                )
             apt = Apt(self)
             apt.install(["libsdl2-dev", "libsdl2-image-dev", "libsdl2-ttf-dev", "libglfw3-dev"])
 
