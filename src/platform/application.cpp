@@ -15,6 +15,7 @@ namespace canyon::platform {
         Startup();
         m_window = m_platform.CreateWindow(m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
         m_window->AddEventListener(this);
+        m_window->GetLayerStack().SetEventListener(this);
         m_window->GetGraphics().InitImgui(*m_window);
         PostCreateWindow();
     }
