@@ -116,11 +116,19 @@ namespace canyon::platform::glfw {
     }
 
     void Window::DestroyWindow() {
+        // Wait for all GPU work to finish before destroying Vulkan-backed resources
+        if (m_surfaceContext) {
+            vkDeviceWaitIdle(m_surfaceContext->GetVkDevice());
+        }
         PreDestroy();
         // TODO: why do we do this in destroy?
         m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
         m_graphics = nullptr;
         m_surfaceContext = nullptr;
+        if (m_customVkSurface != VK_NULL_HANDLE) {
+            vkDestroySurfaceKHR(m_context.GetInstance(), m_customVkSurface, nullptr);
+            m_customVkSurface = VK_NULL_HANDLE;
+        }
         glfwDestroyWindow(m_glfwWindow);
     }
 
