@@ -14,6 +14,7 @@ namespace canyon::graphics::vulkan {
     struct FrameSlot {
         VkSemaphore imageAvailable;
         VkSemaphore renderFinished;
+        uint32_t lastImageIndex = UINT32_MAX;
     };
 
     class Swapchain {

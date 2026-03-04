@@ -99,11 +99,7 @@ namespace canyon::graphics::vulkan {
     }
 
     Graphics::~Graphics() {
-        if (!m_contextStack.empty()) {
-            auto context = m_contextStack.top();
-            auto cmdFence = context->m_target->GetFence().GetVkFence();
-            vkWaitForFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
-        }
+        vkDeviceWaitIdle(m_surfaceContext.GetVkDevice());
 
         if (m_imguiInitialized) {
             ImGui_ImplVulkan_Shutdown();
@@ -169,7 +165,6 @@ namespace canyon::graphics::vulkan {
 
         m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
         VkFence cmdFence = m_defaultContext.m_target->GetFence().GetVkFence();
-        vkWaitForFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
         vkResetFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence);
 
         BeginContext(&m_defaultContext);
@@ -542,6 +537,7 @@ namespace canyon::graphics::vulkan {
             m_overrideContext.m_target = dynamic_cast<Framebuffer*>(target);
             assert(m_overrideContext.m_target);
             VkFence fence = m_overrideContext.m_target->GetFence().GetVkFence();
+            vkWaitForFences(m_surfaceContext.GetVkDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
             vkResetFences(m_surfaceContext.GetVkDevice(), 1, &fence);
             BeginContext(&m_overrideContext);
         }
@@ -577,7 +573,7 @@ namespace canyon::graphics::vulkan {
         switch (mode) {
         default:
         case BlendMode::Replace:
-            currentBlend.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT;
+            currentBlend.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
             currentBlend.blendEnable = VK_FALSE;
             currentBlend.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
             currentBlend.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;

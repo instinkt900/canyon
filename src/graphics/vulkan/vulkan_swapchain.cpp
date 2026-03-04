@@ -107,12 +107,29 @@ namespace canyon::graphics::vulkan {
     Framebuffer* Swapchain::GetNextFramebuffer() {
         auto& slot = m_frames[m_currentFrame];
 
+        // Wait for the framebuffer this slot previously submitted to.
+        // This guarantees slot->imageAvailable has no pending operations
+        // from its last use as a wait semaphore in vkQueueSubmit.
+        if (slot->lastImageIndex != UINT32_MAX) {
+            VkFence prevFence = m_framebuffers[slot->lastImageIndex]->GetFence().GetVkFence();
+            vkWaitForFences(m_context.GetVkDevice(), 1, &prevFence, VK_TRUE, UINT64_MAX);
+        }
+
         uint32_t imageIndex;
         VkResult result = vkAcquireNextImageKHR(m_context.GetVkDevice(), m_vkSwapchain, UINT64_MAX, slot->imageAvailable, VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
             return nullptr;
         }
         CHECK_VK_RESULT(result);
+
+        // If the acquired image differs from this slot's last image, also wait on
+        // the acquired image's fence so its command buffer is safe to reuse.
+        if (imageIndex != slot->lastImageIndex) {
+            VkFence imageFence = m_framebuffers[imageIndex]->GetFence().GetVkFence();
+            vkWaitForFences(m_context.GetVkDevice(), 1, &imageFence, VK_TRUE, UINT64_MAX);
+        }
+
+        slot->lastImageIndex = imageIndex;
         m_framebuffers[imageIndex]->SetFrameSlot(slot);
         m_currentFrame = (m_currentFrame + 1) % m_framebuffers.size();
         return m_framebuffers[imageIndex].get();
