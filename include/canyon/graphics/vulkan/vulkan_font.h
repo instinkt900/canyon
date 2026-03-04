@@ -10,6 +10,11 @@
 #include <harfbuzz/hb.h>
 #include <vulkan/vulkan_core.h>
 
+// Forward-declare FT_Face to avoid requiring FreeType headers in consumers.
+// FT_Face is typedef struct FT_FaceRec_ *FT_Face in freetype/freetype.h.
+struct FT_FaceRec_;
+typedef FT_FaceRec_* FT_Face;
+
 #include <cstdint>
 #include <filesystem>
 #include <map>

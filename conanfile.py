@@ -94,12 +94,12 @@ class canyon(ConanFile):
             else:
                 try:
                     flags = subprocess.check_output(
-                        [pkg_config, "--cflags-only-I", "sdl2"],
+                        [pkg_config, "--cflags-only-I", "sdl2", "freetype2", "harfbuzz"],
                         text=True
                     ).split()
                     for flag in flags:
                         if flag.startswith("-I"):
                             self.cpp_info.includedirs.append(flag[2:])
                 except subprocess.SubprocessError as e:
-                    self.output.warning(f"pkg-config query failed; SDL2 include path not automatically propagated to consumers: {e}")
+                    self.output.warning(f"pkg-config query failed; system library include paths not automatically propagated to consumers: {e}")
 
