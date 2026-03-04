@@ -48,10 +48,10 @@ class canyon(ConanFile):
                 raise ConanInvalidConfiguration(
                     "apt-get is required to install system SDL2/GLFW/FreeType/HarfBuzz libraries on Linux. "
                     "On non-Debian/Ubuntu systems, install libsdl2-dev, libsdl2-image-dev, "
-                    "libsdl2-ttf-dev, libglfw3-dev, libfreetype6-dev, and libharfbuzz-dev manually via your system package manager."
+                    "libsdl2-ttf-dev, libglfw3-dev, libfreetype-dev, and libharfbuzz-dev manually via your system package manager."
                 )
             apt = Apt(self)
-            apt.install(["libsdl2-dev", "libsdl2-image-dev", "libsdl2-ttf-dev", "libglfw3-dev", "libfreetype6-dev", "libharfbuzz-dev"])
+            apt.install(["libsdl2-dev", "libsdl2-image-dev", "libsdl2-ttf-dev", "libglfw3-dev", "libfreetype-dev", "libharfbuzz-dev"])
 
     def build_requirements(self):
         self.tool_requires("cmake/3.27.0")
