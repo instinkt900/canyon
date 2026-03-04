@@ -3,8 +3,11 @@
 #include "canyon/graphics/context.h"
 
 #include <vulkan/vulkan_core.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
+
+// Forward-declare FT_Library to avoid requiring FreeType headers in consumers.
+// FT_Library is typedef struct FT_LibraryRec_ *FT_Library in freetype/freetype.h.
+struct FT_LibraryRec_;
+typedef FT_LibraryRec_* FT_Library;
 
 namespace canyon::graphics::vulkan {
     class Context : public canyon::graphics::Context {

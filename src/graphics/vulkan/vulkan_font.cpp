@@ -1,4 +1,6 @@
 #include "common.h"
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include "canyon/graphics/vulkan/vulkan_font.h"
 #include "canyon/graphics/stb_rect_pack.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
