@@ -21,6 +21,10 @@ namespace canyon::graphics::sdl {
         return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
     }
 
+    std::shared_ptr<ITexture> Image::GetTexture() const {
+        return m_texture;
+    }
+
     void Image::ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0, canyon::FloatVec2 const& uv1) const {
         ImGui::Image(m_texture ? m_texture->GetSDLTexture()->GetImpl() : nullptr,
                      ImVec2(static_cast<float>(size.x), static_cast<float>(size.y)),

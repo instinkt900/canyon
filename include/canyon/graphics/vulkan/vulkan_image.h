@@ -17,6 +17,7 @@ namespace canyon::graphics::vulkan {
 
         int GetWidth() const override;
         int GetHeight() const override;
+        std::shared_ptr<ITexture> GetTexture() const override;
 
         void ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0 = { 0, 0 }, canyon::FloatVec2 const& uv1 = { 1, 1 }) const override;
 

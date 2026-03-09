@@ -17,6 +17,7 @@ namespace canyon::graphics::sdl {
 
         int GetWidth() const override;
         int GetHeight() const override;
+        void SetFilter(TextureFilter minFilter, TextureFilter magFilter) override;
 
         SDLTextureRef GetSDLTexture() const { return m_texture; }
 

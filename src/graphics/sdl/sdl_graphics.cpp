@@ -82,7 +82,7 @@ namespace canyon::graphics::sdl {
 
     void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) {
         auto& sdlImage = dynamic_cast<Image&>(image);
-        auto sdlTexture = sdlImage.GetTexture();
+        auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
         // auto const& textureSourceRect = sdlImage.GetSourceRect();
 
         ColorComponents const components{ m_drawColor };
@@ -109,7 +109,7 @@ namespace canyon::graphics::sdl {
 
     void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
         auto& sdlImage = dynamic_cast<Image&>(image);
-        auto sdlTexture = sdlImage.GetTexture();
+        auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
         auto const& textureSourceRect = sdlImage.GetSourceRect();
 
         ColorComponents const components{ m_drawColor };
@@ -237,7 +237,7 @@ namespace canyon::graphics::sdl {
         if (!target) {
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), nullptr);
         } else {
-            auto sdlImage = dynamic_cast<Image*>(target)->GetTexture();
+            auto sdlImage = std::dynamic_pointer_cast<Texture>(dynamic_cast<Image*>(target)->GetTexture());
             auto sdlTexture = sdlImage->GetSDLTexture();
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), sdlTexture->GetImpl());
         }

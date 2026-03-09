@@ -16,6 +16,15 @@ namespace canyon::graphics::sdl {
         return m_textureDimensions.y;
     }
 
+    void Texture::SetFilter(TextureFilter minFilter, TextureFilter magFilter) {
+        // SDL2 has a single scale mode rather than separate min/mag filters.
+        // Use Nearest if either filter requests it, Linear if both agree.
+        SDL_ScaleMode const mode = (minFilter == TextureFilter::Nearest || magFilter == TextureFilter::Nearest)
+                                       ? SDL_ScaleModeNearest
+                                       : SDL_ScaleModeLinear;
+        SDL_SetTextureScaleMode(m_texture->GetImpl(), mode);
+    }
+
     std::unique_ptr<Texture> Texture::FromFile(SDL_Renderer* renderer, std::filesystem::path const& path) {
         if (auto texture = CreateTextureRef(renderer, path)) {
             return std::make_unique<Texture>(texture);

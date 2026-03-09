@@ -1,5 +1,6 @@
 #pragma once
 
+#include "canyon/graphics/itexture.h"
 #include "canyon/utils/vector.h"
 
 namespace canyon::graphics {
@@ -9,6 +10,7 @@ namespace canyon::graphics {
 
         virtual int GetWidth() const = 0;
         virtual int GetHeight() const = 0;
+        virtual std::shared_ptr<ITexture> GetTexture() const = 0;
 
         virtual void ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0 = { 0, 0 }, canyon::FloatVec2 const& uv1 = { 1, 1 }) const = 0;
     };

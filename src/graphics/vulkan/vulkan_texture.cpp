@@ -169,21 +169,36 @@ namespace canyon::graphics::vulkan {
         CHECK_VK_RESULT(vkCreateImageView(m_context.GetVkDevice(), &info, nullptr, &m_vkView));
     }
 
+    void Texture::SetFilter(TextureFilter minFilter, TextureFilter magFilter) {
+        m_minFilter = (minFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        m_magFilter = (magFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        if (m_vkDescriptorSet != VK_NULL_HANDLE) {
+            ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
+            m_vkDescriptorSet = VK_NULL_HANDLE;
+        }
+        if (m_vkSampler != VK_NULL_HANDLE) {
+            vkDestroySampler(m_context.GetVkDevice(), m_vkSampler, nullptr);
+            m_vkSampler = VK_NULL_HANDLE;
+        }
+    }
+
     void Texture::CreateDefaultSampler() {
+        spdlog::info("CreateDefaultSampler");
         VkSamplerCreateInfo samplerInfo{};
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        samplerInfo.magFilter = VK_FILTER_LINEAR;
-        samplerInfo.minFilter = VK_FILTER_LINEAR;
+        samplerInfo.magFilter = m_magFilter;
+        samplerInfo.minFilter = m_minFilter;
         samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        samplerInfo.anisotropyEnable = VK_TRUE;
+        bool const useAnisotropy = (m_minFilter != VK_FILTER_NEAREST && m_magFilter != VK_FILTER_NEAREST);
+        samplerInfo.anisotropyEnable = useAnisotropy ? VK_TRUE : VK_FALSE;
 
         // todo can probably cache this
         VkPhysicalDeviceProperties properties{};
         vkGetPhysicalDeviceProperties(m_context.GetVkPhysicalDevice(), &properties);
 
-        samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+        samplerInfo.maxAnisotropy = useAnisotropy ? properties.limits.maxSamplerAnisotropy : 1.0f;
         samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
         samplerInfo.unnormalizedCoordinates = VK_FALSE;
         samplerInfo.compareEnable = VK_FALSE;

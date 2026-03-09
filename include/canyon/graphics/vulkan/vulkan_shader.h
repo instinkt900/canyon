@@ -32,7 +32,11 @@ namespace canyon::graphics::vulkan {
         VkDescriptorSet GetDescriptorSet(Texture& image);
         VkDescriptorSet CreateDescriptorSet(Texture& image);
 
-        std::map<uint32_t, VkDescriptorSet> m_descriptorSets;
+        struct CachedDescriptorSet {
+            VkSampler m_sampler;
+            VkDescriptorSet m_descriptorSet;
+        };
+        std::map<uint32_t, CachedDescriptorSet> m_descriptorSets;
     };
 
     class ShaderBuilder {

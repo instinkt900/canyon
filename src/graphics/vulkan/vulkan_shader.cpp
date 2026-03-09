@@ -10,8 +10,8 @@ namespace canyon::graphics::vulkan {
     Shader::~Shader() {
         if (!m_descriptorSets.empty()) {
             std::vector<VkDescriptorSet> freedSets;
-            for (auto& [imageId, descriptorSet] : m_descriptorSets) {
-                freedSets.push_back(descriptorSet);
+            for (auto& [imageId, cached] : m_descriptorSets) {
+                freedSets.push_back(cached.m_descriptorSet);
             }
             vkFreeDescriptorSets(m_device, m_descriptorPool, static_cast<uint32_t>(freedSets.size()), freedSets.data());
         }
@@ -24,9 +24,16 @@ namespace canyon::graphics::vulkan {
     }
 
     VkDescriptorSet Shader::GetDescriptorSet(Texture& image) {
+        VkSampler currentSampler = image.GetVkSampler();
         auto it = m_descriptorSets.find(image.GetId());
         if (std::end(m_descriptorSets) != it) {
-            return it->second;
+            if (it->second.m_sampler == currentSampler) {
+                return it->second.m_descriptorSet;
+            }
+            // Sampler changed (e.g. SetFilter was called) — free the stale descriptor set
+            vkFreeDescriptorSets(m_device, m_descriptorPool, 1, &it->second.m_descriptorSet);
+            m_descriptorSets.erase(it);
+            spdlog::info("erase");
         }
         return CreateDescriptorSet(image);
     }
@@ -41,8 +48,9 @@ namespace canyon::graphics::vulkan {
         alloc_info.pSetLayouts = &m_descriptorSetLayout;
         CHECK_VK_RESULT(vkAllocateDescriptorSets(m_device, &alloc_info, &descriptorSet));
 
+        VkSampler sampler = image.GetVkSampler();
         VkDescriptorImageInfo desc_image[1] = {};
-        desc_image[0].sampler = image.GetVkSampler();
+        desc_image[0].sampler = sampler;
         desc_image[0].imageView = image.GetVkView();
         desc_image[0].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         VkWriteDescriptorSet write_desc[1] = {};
@@ -53,7 +61,7 @@ namespace canyon::graphics::vulkan {
         write_desc[0].pImageInfo = desc_image;
         vkUpdateDescriptorSets(m_device, 1, write_desc, 0, nullptr);
 
-        m_descriptorSets.insert(std::make_pair(image.GetId(), descriptorSet));
+        m_descriptorSets.insert(std::make_pair(image.GetId(), CachedDescriptorSet{ sampler, descriptorSet }));
         return descriptorSet;
     }
 

@@ -36,6 +36,7 @@ namespace canyon::graphics::vulkan {
 
         int GetWidth() const override { return m_vkExtent.width; }
         int GetHeight() const override { return m_vkExtent.height; }
+        void SetFilter(TextureFilter minFilter, TextureFilter magFilter) override;
 
     protected:
         uint32_t m_id;
@@ -48,6 +49,8 @@ namespace canyon::graphics::vulkan {
         VkImageView m_vkView = VK_NULL_HANDLE;
         VkSampler m_vkSampler = VK_NULL_HANDLE;
         VkDescriptorSet m_vkDescriptorSet = VK_NULL_HANDLE;
+        VkFilter m_minFilter = VK_FILTER_LINEAR;
+        VkFilter m_magFilter = VK_FILTER_LINEAR;
 
         bool m_owningImage = true;
 
