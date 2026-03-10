@@ -52,8 +52,8 @@ namespace canyon::graphics::sdl {
     private:
         sdl::SurfaceContext& m_surfaceContext;
         Color m_drawColor;
-        BlendMode m_blendMode;
-        ITarget* m_currentRenderTarget;
+        BlendMode m_blendMode = BlendMode::Replace;
+        ITarget* m_currentRenderTarget = nullptr;
         SDL_Window* m_imguiWindow = nullptr;
     };
 }

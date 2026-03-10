@@ -83,20 +83,29 @@ namespace canyon::graphics::sdl {
     void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) {
         auto& sdlImage = dynamic_cast<Image&>(image);
         auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
-        // auto const& textureSourceRect = sdlImage.GetSourceRect();
+        auto const& textureSourceRect = sdlImage.GetSourceRect();
 
         ColorComponents const components{ m_drawColor };
         SDL_SetTextureBlendMode(sdlTexture->GetSDLTexture()->GetImpl(), ToSDL(m_blendMode));
         SDL_SetTextureColorMod(sdlTexture->GetSDLTexture()->GetImpl(), components.r, components.g, components.b);
         SDL_SetTextureAlphaMod(sdlTexture->GetSDLTexture()->GetImpl(), components.a);
 
-        SDL_Rect sdlSrcRect = ToSDL(*sourceRect);
+        SDL_Rect sdlSrcRect = ToSDL(sourceRect ? *sourceRect : textureSourceRect);
         SDL_Rect sdlDstRect = ToSDL(destRect);
 
-        // if (sourceRect) {
-        //     sdlSrcRect.x += sourceRect->x();
-        //     sdlSrcRect.y += sourceRect->y();
-        // }
+        // Negative src dimensions mean the caller wants a mirrored draw.
+        // SDL doesn't support negative-dimension rects; normalise and flip instead.
+        SDL_RendererFlip flip = SDL_FLIP_NONE;
+        if (sdlSrcRect.w < 0) {
+            sdlSrcRect.x += sdlSrcRect.w;
+            sdlSrcRect.w = -sdlSrcRect.w;
+            flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_HORIZONTAL);
+        }
+        if (sdlSrcRect.h < 0) {
+            sdlSrcRect.y += sdlSrcRect.h;
+            sdlSrcRect.h = -sdlSrcRect.h;
+            flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_VERTICAL);
+        }
 
         SDL_RenderCopyEx(m_surfaceContext.GetRenderer(),
                          sdlTexture->GetSDLTexture()->GetImpl(),
@@ -104,7 +113,7 @@ namespace canyon::graphics::sdl {
                          &sdlDstRect,
                          rotation,
                          nullptr,
-                         SDL_RendererFlip::SDL_FLIP_NONE);
+                         flip);
     }
 
     void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
@@ -117,11 +126,7 @@ namespace canyon::graphics::sdl {
         SDL_SetTextureColorMod(sdlTexture->GetSDLTexture()->GetImpl(), components.r, components.g, components.b);
         SDL_SetTextureAlphaMod(sdlTexture->GetSDLTexture()->GetImpl(), components.a);
 
-        SDL_Rect sdlSrcRect = ToSDL(textureSourceRect);
-        if (sourceRect) {
-            sdlSrcRect.x += sourceRect->x();
-            sdlSrcRect.y += sourceRect->y();
-        }
+        SDL_Rect sdlSrcRect = ToSDL(sourceRect ? *sourceRect : textureSourceRect);
 
         auto const imageWidth = static_cast<int>(image.GetWidth() * scale);
         auto const imageHeight = static_cast<int>(image.GetHeight() * scale);
