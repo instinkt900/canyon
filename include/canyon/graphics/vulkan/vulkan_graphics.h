@@ -26,6 +26,7 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <optional>
 #include <stack>
 #include <string>
 
@@ -128,6 +129,13 @@ namespace canyon::graphics::vulkan {
             uint32_t m_vertexCount = 0;
             uint32_t m_maxVertexCount = 0;
             uint32_t m_currentPipelineId = 0;
+
+            struct PendingBatch {
+                uint32_t m_firstVertex = 0;
+                uint32_t m_vertexCount = 0;
+                VkDescriptorSet m_descriptorSet = VK_NULL_HANDLE;
+            };
+            std::optional<PendingBatch> m_pendingBatch;
         };
 
         VkPipelineCache m_vkPipelineCache;
@@ -159,6 +167,7 @@ namespace canyon::graphics::vulkan {
         void EndContext();
         void StartCommands();
         void FlushCommands();
+        void FlushPendingBatch();
         void SubmitVertices(Vertex* vertices, uint32_t vertCount, ETopologyType topology, VkDescriptorSet descriptorSet = VK_NULL_HANDLE);
 
         bool IsRenderTarget() const;

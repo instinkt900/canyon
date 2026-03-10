@@ -169,9 +169,34 @@ namespace canyon::graphics::vulkan {
         CHECK_VK_RESULT(vkCreateImageView(m_context.GetVkDevice(), &info, nullptr, &m_vkView));
     }
 
+    namespace {
+        VkSamplerAddressMode ToVkAddressMode(TextureAddressMode mode) {
+            switch (mode) {
+                case TextureAddressMode::Repeat:         return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+                case TextureAddressMode::MirroredRepeat: return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
+                case TextureAddressMode::ClampToEdge:    return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+                case TextureAddressMode::ClampToBorder:  return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+            }
+            return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        }
+    }
+
     void Texture::SetFilter(TextureFilter minFilter, TextureFilter magFilter) {
         m_minFilter = (minFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
         m_magFilter = (magFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        if (m_vkDescriptorSet != VK_NULL_HANDLE) {
+            ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
+            m_vkDescriptorSet = VK_NULL_HANDLE;
+        }
+        if (m_vkSampler != VK_NULL_HANDLE) {
+            vkDestroySampler(m_context.GetVkDevice(), m_vkSampler, nullptr);
+            m_vkSampler = VK_NULL_HANDLE;
+        }
+    }
+
+    void Texture::SetAddressMode(TextureAddressMode u, TextureAddressMode v) {
+        m_addressModeU = ToVkAddressMode(u);
+        m_addressModeV = ToVkAddressMode(v);
         if (m_vkDescriptorSet != VK_NULL_HANDLE) {
             ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
             m_vkDescriptorSet = VK_NULL_HANDLE;
@@ -188,8 +213,8 @@ namespace canyon::graphics::vulkan {
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
         samplerInfo.magFilter = m_magFilter;
         samplerInfo.minFilter = m_minFilter;
-        samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        samplerInfo.addressModeU = m_addressModeU;
+        samplerInfo.addressModeV = m_addressModeV;
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         bool const useAnisotropy = (m_minFilter != VK_FILTER_NEAREST && m_magFilter != VK_FILTER_NEAREST);
         samplerInfo.anisotropyEnable = useAnisotropy ? VK_TRUE : VK_FALSE;

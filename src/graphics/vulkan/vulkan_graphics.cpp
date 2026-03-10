@@ -178,6 +178,7 @@ namespace canyon::graphics::vulkan {
                 ImGui::RenderPlatformWindowsDefault();
             }
             if (ImDrawData* drawData = ImGui::GetDrawData()) {
+                FlushPendingBatch();
                 ImGui_ImplVulkan_RenderDrawData(drawData, GetCurrentCommandBuffer()->GetVkCommandBuffer());
             }
         }
@@ -484,6 +485,7 @@ namespace canyon::graphics::vulkan {
         if (glyphCount) {
             auto& commandBuffer = context->m_target->GetCommandBuffer();
 
+            FlushPendingBatch();
             commandBuffer.BindVertexBuffer(*context->m_fontInstanceBuffer, 0);
 
             auto const& pipeline = GetCurrentFontPipeline();
@@ -498,6 +500,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::SetClip(IntRect const* clipRect) {
+        FlushPendingBatch();
         auto context = m_contextStack.top();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         if (clipRect) {
@@ -805,6 +808,7 @@ namespace canyon::graphics::vulkan {
         context->m_vertexCount = 0;
         context->m_maxVertexCount = 1024;
         context->m_currentPipelineId = 0;
+        context->m_pendingBatch.reset();
 
         if (!context->m_vertexBuffer) {
             context->m_vertexBuffer = std::make_unique<Buffer>(m_surfaceContext, 1024 * sizeof(Vertex), VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -832,6 +836,7 @@ namespace canyon::graphics::vulkan {
         context->m_vertexCount = 0;
         context->m_maxVertexCount = 1024;
         context->m_currentPipelineId = 0;
+        context->m_pendingBatch.reset();
         context->m_glyphCount = 0;
         StartCommands();
     }
@@ -870,9 +875,24 @@ namespace canyon::graphics::vulkan {
         pushConstants.xyScale = { 2.0f / static_cast<float>(context->m_logicalExtent.width), 2.0f / static_cast<float>(context->m_logicalExtent.height) };
         pushConstants.xyOffset = { -1.0f, -1.0f };
         commandBuffer.PushConstants(*m_drawingShader, VK_SHADER_STAGE_VERTEX_BIT, sizeof(PushConstants), &pushConstants);
+        commandBuffer.BindVertexBuffer(*context->m_vertexBuffer, 0);
+    }
+
+    void Graphics::FlushPendingBatch() {
+        auto context = m_contextStack.top();
+        if (!context->m_pendingBatch) {
+            return;
+        }
+        auto const& batch = *context->m_pendingBatch;
+        auto& commandBuffer = context->m_target->GetCommandBuffer();
+        commandBuffer.BindVertexBuffer(*context->m_vertexBuffer, 0);
+        commandBuffer.BindDescriptorSet(*m_drawingShader, batch.m_descriptorSet, 0);
+        commandBuffer.Draw(batch.m_vertexCount, batch.m_firstVertex);
+        context->m_pendingBatch.reset();
     }
 
     void Graphics::FlushCommands() {
+        FlushPendingBatch();
         auto context = m_contextStack.top();
         VkFence cmdFence = context->m_target->GetFence().GetVkFence();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
@@ -927,27 +947,29 @@ namespace canyon::graphics::vulkan {
             RestartContext();
         }
 
-        const uint32_t vertexDataSize = sizeof(Vertex) * vertCount;
-        const uint32_t existingVertexOffset = /*sizeof(Vertex) **/ context->m_vertexCount;
-        memcpy(context->m_vertexBufferData + existingVertexOffset, vertices, vertexDataSize);
+        const uint32_t existingVertexOffset = context->m_vertexCount;
+        memcpy(context->m_vertexBufferData + existingVertexOffset, vertices, sizeof(Vertex) * vertCount);
 
         auto& commandBuffer = context->m_target->GetCommandBuffer();
-        commandBuffer.BindVertexBuffer(*context->m_vertexBuffer, 0);
 
         auto const& pipeline = GetCurrentPipeline(topology);
         if (context->m_currentPipelineId != pipeline.m_hash) {
+            FlushPendingBatch();
             commandBuffer.BindPipeline(pipeline);
             context->m_currentPipelineId = pipeline.m_hash;
         }
 
-        if (descriptorSet != VK_NULL_HANDLE) {
-            commandBuffer.BindDescriptorSet(*m_drawingShader, descriptorSet, 0);
+        VkDescriptorSet resolvedDescriptorSet = (descriptorSet != VK_NULL_HANDLE)
+            ? descriptorSet
+            : m_drawingShader->GetDescriptorSet(*m_defaultImage);
+
+        if (context->m_pendingBatch && context->m_pendingBatch->m_descriptorSet == resolvedDescriptorSet) {
+            context->m_pendingBatch->m_vertexCount += vertCount;
         } else {
-            VkDescriptorSet defaultDescriptorSet = m_drawingShader->GetDescriptorSet(*m_defaultImage);
-            commandBuffer.BindDescriptorSet(*m_drawingShader, defaultDescriptorSet, 0);
+            FlushPendingBatch();
+            context->m_pendingBatch = DrawContext::PendingBatch{ existingVertexOffset, vertCount, resolvedDescriptorSet };
         }
 
-        commandBuffer.Draw(vertCount, context->m_vertexCount);
         context->m_vertexCount += vertCount;
     }
 
