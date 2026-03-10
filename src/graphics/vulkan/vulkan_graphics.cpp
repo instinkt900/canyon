@@ -328,8 +328,6 @@ namespace canyon::graphics::vulkan {
         stbi_write_png(path.string().c_str(), targetWidth, targetHeight, 4, dst, targetWidth * 4);
 
         targetImage->Unmap();
-
-        m_contextStack.pop();
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {
@@ -905,14 +903,14 @@ namespace canyon::graphics::vulkan {
 
             VkBufferMemoryBarrier barrier{};
             barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-            barrier.srcAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
-            barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
             barrier.buffer = context->m_fontInstanceStagingBuffer->GetVKBuffer();
             barrier.offset = 0;
             barrier.size = context->m_fontInstanceStagingBuffer->GetSize();
 
             vkCmdPipelineBarrier(uploadCommandBuffer->GetVkCommandBuffer(),
-                                 VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+                                 VK_PIPELINE_STAGE_HOST_BIT,
                                  VK_PIPELINE_STAGE_TRANSFER_BIT,
                                  0, 0, nullptr, 1, &barrier, 0, nullptr);
 

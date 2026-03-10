@@ -33,7 +33,6 @@ namespace canyon::graphics::vulkan {
             // Sampler changed (e.g. SetFilter was called) — free the stale descriptor set
             vkFreeDescriptorSets(m_device, m_descriptorPool, 1, &it->second.m_descriptorSet);
             m_descriptorSets.erase(it);
-            spdlog::info("erase");
         }
         return CreateDescriptorSet(image);
     }

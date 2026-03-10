@@ -208,7 +208,6 @@ namespace canyon::graphics::vulkan {
     }
 
     void Texture::CreateDefaultSampler() {
-        spdlog::info("CreateDefaultSampler");
         VkSamplerCreateInfo samplerInfo{};
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
         samplerInfo.magFilter = m_magFilter;
