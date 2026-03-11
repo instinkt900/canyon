@@ -25,6 +25,7 @@ namespace canyon::graphics::vulkan {
         void SubmitAndWait();
         void Reset();
 
+        void HostWriteToVertexBarrier(Buffer const& buffer);
         void TransitionImageLayout(Texture& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
         void CopyBufferToImage(Texture& image, Buffer& buffer);
         void CopyImageToBuffer(Buffer& buffer, Texture& image);

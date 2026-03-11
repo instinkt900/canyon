@@ -189,6 +189,9 @@ namespace canyon::graphics::vulkan {
             m_vkDescriptorSet = VK_NULL_HANDLE;
         }
         if (m_vkSampler != VK_NULL_HANDLE) {
+            // Wait for the GPU to finish before destroying the sampler — any
+            // in-flight descriptor set may still reference it.
+            vkDeviceWaitIdle(m_context.GetVkDevice());
             vkDestroySampler(m_context.GetVkDevice(), m_vkSampler, nullptr);
             m_vkSampler = VK_NULL_HANDLE;
         }
@@ -202,6 +205,9 @@ namespace canyon::graphics::vulkan {
             m_vkDescriptorSet = VK_NULL_HANDLE;
         }
         if (m_vkSampler != VK_NULL_HANDLE) {
+            // Wait for the GPU to finish before destroying the sampler — any
+            // in-flight descriptor set may still reference it.
+            vkDeviceWaitIdle(m_context.GetVkDevice());
             vkDestroySampler(m_context.GetVkDevice(), m_vkSampler, nullptr);
             m_vkSampler = VK_NULL_HANDLE;
         }

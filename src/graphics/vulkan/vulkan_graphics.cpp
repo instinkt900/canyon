@@ -849,6 +849,7 @@ namespace canyon::graphics::vulkan {
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         commandBuffer.Reset();
         commandBuffer.BeginRecord();
+        commandBuffer.HostWriteToVertexBarrier(*context->m_vertexBuffer);
         if (IsRenderTarget()) {
             commandBuffer.TransitionImageLayout(*context->m_target->GetVkImage().m_texture, context->m_target->GetVkFormat(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         }

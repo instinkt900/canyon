@@ -280,6 +280,25 @@ namespace canyon::graphics::vulkan {
         vkCmdCopyImage(m_vkCommandBuffer, srcImage.GetVkImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstImage.GetVkImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
     }
 
+    void CommandBuffer::HostWriteToVertexBarrier(Buffer const& buffer) {
+        VkBufferMemoryBarrier barrier{};
+        barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+        barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+        barrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+        barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.buffer = buffer.GetVKBuffer();
+        barrier.offset = 0;
+        barrier.size = VK_WHOLE_SIZE;
+        vkCmdPipelineBarrier(m_vkCommandBuffer,
+                             VK_PIPELINE_STAGE_HOST_BIT,
+                             VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+                             0,
+                             0, nullptr,
+                             1, &barrier,
+                             0, nullptr);
+    }
+
     void CommandBuffer::BeginRenderPass(RenderPass& renderPass, Framebuffer& framebuffer) {
         VkClearValue clearColor = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
         VkRenderPassBeginInfo info = {};
