@@ -34,13 +34,13 @@ namespace canyon::graphics {
         // virtual void SetColorMod(std::shared_ptr<IImage> target, Color const& color) = 0;
         virtual void SetColor(Color const& color) = 0;
         virtual void Clear() = 0;
-        virtual void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) = 0;
-        virtual void DrawImageTiled(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) = 0;
+        virtual void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect = nullptr, float rotation = 0.0f) = 0;
+        virtual void DrawImageTiled(IImage& image, IntRect const& destRect, IntRect const* sourceRect = nullptr, float scale = 1.0f) = 0;
         virtual void DrawToPNG(std::filesystem::path const& path) = 0;
         virtual void DrawRectF(FloatRect const& rect) = 0;
         virtual void DrawFillRectF(FloatRect const& rect) = 0;
         virtual void DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) = 0;
-        virtual void DrawText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) = 0;
+        virtual void DrawText(std::string const& text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment = TextHorizAlignment::Left, TextVertAlignment verticalAlignment = TextVertAlignment::Top) = 0;
         virtual void SetClip(IntRect const* rect) = 0;
 
         virtual std::unique_ptr<ITarget> CreateTarget(int width, int height) = 0;

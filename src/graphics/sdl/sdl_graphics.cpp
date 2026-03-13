@@ -178,7 +178,7 @@ namespace canyon::graphics::sdl {
         SDL_RenderDrawLineF(m_surfaceContext.GetRenderer(), p0.x, p0.y, p1.x, p1.y);
     }
 
-    void Graphics::DrawText(std::string const& text, graphics::IFont& font, graphics::TextHorizAlignment horizontalAlignment, graphics::TextVertAlignment verticalAlignment, IntRect const& destRect) {
+    void Graphics::DrawText(std::string const& text, graphics::IFont& font, IntRect const& destRect, graphics::TextHorizAlignment horizontalAlignment, graphics::TextVertAlignment verticalAlignment) {
         auto const fcFont = static_cast<Font&>(font).GetFontObj();
 
         auto const destWidth = destRect.bottomRight.x - destRect.topLeft.x;

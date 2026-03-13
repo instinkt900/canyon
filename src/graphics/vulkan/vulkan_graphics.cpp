@@ -294,7 +294,7 @@ namespace canyon::graphics::vulkan {
         SubmitVertices(vertices, 2, ETopologyType::Lines);
     }
 
-    void Graphics::DrawText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) {
+    void Graphics::DrawText(std::string const& text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment) {
         auto context = CurrentContext();
         context->m_currentBlendMode = BlendMode::Alpha; // force alpha blending for text
         Font& vulkanFont = static_cast<Font&>(font);

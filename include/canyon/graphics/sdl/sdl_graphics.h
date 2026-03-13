@@ -40,7 +40,7 @@ namespace canyon::graphics::sdl {
         void DrawRectF(FloatRect const& rect) override;
         void DrawFillRectF(FloatRect const& rect) override;
         void DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) override;
-        void DrawText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) override;
+        void DrawText(std::string const& text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment = TextHorizAlignment::Left, TextVertAlignment verticalAlignment = TextVertAlignment::Top) override;
         void SetClip(IntRect const* rect) override;
 
         std::unique_ptr<ITarget> CreateTarget(int width, int height) override;

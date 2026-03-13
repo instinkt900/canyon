@@ -99,7 +99,7 @@ namespace canyon::graphics {
 
         auto& fcFont = static_cast<MothFont&>(font);
         auto& internalFont = *fcFont.GetInternalFont();
-        m_graphics.DrawText(text, internalFont, horizontalAlignment, verticalAlignment, destRect);
+        m_graphics.DrawText(text, internalFont, destRect, horizontalAlignment, verticalAlignment);
     }
 
     void MothRenderer::SetRendererLogicalSize(moth_ui::IntVec2 const& size) {
