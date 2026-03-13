@@ -3,6 +3,7 @@
 #include "canyon/graphics/igraphics.h"
 #include <moth_ui/context.h>
 #include <moth_ui/events/event_animation.h>
+#include <moth_ui/events/event_key.h>
 #include <moth_ui/font_factory.h>
 #include <moth_ui/layers/layer.h>
 #include <moth_ui/utils/vector.h>
@@ -19,7 +20,7 @@ public:
     void LoadLayout(std::filesystem::path const& path);
     bool OnUIEvent(moth_ui::Event const& event);
     bool OnAnimationStopped(moth_ui::EventAnimationStopped const& event);
-    // bool OnQuitEvent(QuitEvent  const& event);
+    bool OnKey(moth_ui::EventKey const& event);
 
 private:
     moth_ui::Context& m_context;
@@ -32,4 +33,7 @@ private:
     moth_ui::IntVec2 m_lastDrawnSize;
 
     std::unique_ptr<canyon::graphics::ITarget> m_target;
+    std::unique_ptr<canyon::graphics::ITarget> m_screenTarget;
+    uint32_t m_elapsedMs = 0;
+    bool m_pendingScreenshot = false;
 };
