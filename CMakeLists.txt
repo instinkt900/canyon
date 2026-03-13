@@ -44,6 +44,9 @@ set(SOURCES ${SOURCES}
 	src/graphics/vulkan/vulkan_font.cpp
 	src/graphics/vulkan/vulkan_framebuffer.cpp
 	src/graphics/vulkan/vulkan_graphics.cpp
+	src/graphics/vulkan/vulkan_graphics_frame.cpp
+	src/graphics/vulkan/vulkan_graphics_imgui.cpp
+	src/graphics/vulkan/vulkan_graphics_pipeline.cpp
 	src/graphics/vulkan/vulkan_image.cpp
 	src/graphics/vulkan/vulkan_pipeline.cpp
 	src/graphics/vulkan/vulkan_renderpass.cpp
