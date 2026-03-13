@@ -12,123 +12,175 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(SOURCES ${SOURCES}
-	external/imgui/backends/imgui_impl_glfw.cpp
-	external/imgui/backends/imgui_impl_sdl2.cpp
-	external/imgui/backends/imgui_impl_sdlrenderer2.cpp
-	external/imgui/backends/imgui_impl_vulkan.cpp
-	external/imgui/imgui.cpp
-	external/imgui/imgui_draw.cpp
-	external/imgui/imgui_tables.cpp
-	external/imgui/imgui_widgets.cpp
-	src/graphics/font_factory.cpp
-	src/graphics/image_factory.cpp
-	src/graphics/moth_ui/moth_font_factory.cpp
-	src/graphics/moth_ui/moth_image.cpp
-	src/graphics/moth_ui/moth_image_factory.cpp
-	src/graphics/moth_ui/moth_renderer.cpp
-	src/graphics/sdl/sdl_context.cpp
-	src/graphics/sdl/sdl_font.cpp
-	src/graphics/sdl/sdl_graphics.cpp
-	src/graphics/sdl/sdl_image.cpp
-	src/graphics/sdl/sdl_surface_context.cpp
-	src/graphics/sdl/sdl_texture.cpp
-	src/graphics/stb_image.cpp
-	src/graphics/stb_image_write.cpp
-	src/graphics/stb_rect_pack.cpp
-	src/graphics/vulkan/shaders/vulkan_shaders.cpp
-	src/graphics/vulkan/vulkan_buffer.cpp
-	src/graphics/vulkan/vulkan_command_buffer.cpp 
-	src/graphics/vulkan/vulkan_context.cpp
-	src/graphics/vulkan/vulkan_fence.cpp
-	src/graphics/vulkan/vulkan_font.cpp
-	src/graphics/vulkan/vulkan_framebuffer.cpp
-	src/graphics/vulkan/vulkan_graphics.cpp
-	src/graphics/vulkan/vulkan_graphics_frame.cpp
-	src/graphics/vulkan/vulkan_graphics_imgui.cpp
-	src/graphics/vulkan/vulkan_graphics_pipeline.cpp
-	src/graphics/vulkan/vulkan_image.cpp
-	src/graphics/vulkan/vulkan_pipeline.cpp
-	src/graphics/vulkan/vulkan_renderpass.cpp
-	src/graphics/vulkan/vulkan_shader.cpp
-	src/graphics/vulkan/vulkan_surface_context.cpp
-	src/graphics/vulkan/vulkan_swapchain.cpp
-	src/graphics/vulkan/vulkan_texture.cpp
-	src/graphics/vulkan/vulkan_vma.cpp
-	src/platform/application.cpp
-	src/platform/glfw/glfw_events.cpp
-	src/platform/glfw/glfw_platform.cpp
-	src/platform/glfw/glfw_window.cpp
-	src/platform/sdl/sdl_events.cpp
-	src/platform/sdl/sdl_platform.cpp
-	src/platform/sdl/sdl_window.cpp
-	src/platform/window.cpp
+option(CANYON_DISABLE_VULKAN "Disable the Vulkan/GLFW backend" OFF)
+option(CANYON_DISABLE_SDL "Disable the SDL2 backend" OFF)
+
+if(CANYON_DISABLE_VULKAN AND CANYON_DISABLE_SDL)
+    message(FATAL_ERROR "At least one backend must be enabled (CANYON_DISABLE_VULKAN and CANYON_DISABLE_SDL cannot both be ON).")
+endif()
+
+# ---- Always-compiled sources ------------------------------------------------
+set(SOURCES
+    external/imgui/imgui.cpp
+    external/imgui/imgui_draw.cpp
+    external/imgui/imgui_tables.cpp
+    external/imgui/imgui_widgets.cpp
+    src/graphics/font_factory.cpp
+    src/graphics/image_factory.cpp
+    src/graphics/moth_ui/moth_font_factory.cpp
+    src/graphics/moth_ui/moth_image.cpp
+    src/graphics/moth_ui/moth_image_factory.cpp
+    src/graphics/moth_ui/moth_renderer.cpp
+    src/graphics/stb_image.cpp
+    src/graphics/stb_image_write.cpp
+    src/graphics/stb_rect_pack.cpp
+    src/platform/application.cpp
+    src/platform/window.cpp
     external/murmurhash.c/murmurhash.c
-    src/graphics/sdl/SDL_FontCache.c
 )
+
+# ---- SDL backend sources -----------------------------------------------------
+if(NOT CANYON_DISABLE_SDL)
+    list(APPEND SOURCES
+        external/imgui/backends/imgui_impl_sdl2.cpp
+        external/imgui/backends/imgui_impl_sdlrenderer2.cpp
+        src/graphics/sdl/sdl_context.cpp
+        src/graphics/sdl/sdl_font.cpp
+        src/graphics/sdl/sdl_graphics.cpp
+        src/graphics/sdl/sdl_image.cpp
+        src/graphics/sdl/sdl_surface_context.cpp
+        src/graphics/sdl/sdl_texture.cpp
+        src/graphics/sdl/SDL_FontCache.c
+        src/platform/sdl/sdl_events.cpp
+        src/platform/sdl/sdl_platform.cpp
+        src/platform/sdl/sdl_window.cpp
+    )
+endif()
+
+# ---- Vulkan backend sources --------------------------------------------------
+if(NOT CANYON_DISABLE_VULKAN)
+    list(APPEND SOURCES
+        external/imgui/backends/imgui_impl_glfw.cpp
+        external/imgui/backends/imgui_impl_vulkan.cpp
+        src/graphics/vulkan/shaders/vulkan_shaders.cpp
+        src/graphics/vulkan/vulkan_buffer.cpp
+        src/graphics/vulkan/vulkan_command_buffer.cpp
+        src/graphics/vulkan/vulkan_context.cpp
+        src/graphics/vulkan/vulkan_fence.cpp
+        src/graphics/vulkan/vulkan_font.cpp
+        src/graphics/vulkan/vulkan_framebuffer.cpp
+        src/graphics/vulkan/vulkan_graphics.cpp
+        src/graphics/vulkan/vulkan_graphics_frame.cpp
+        src/graphics/vulkan/vulkan_graphics_imgui.cpp
+        src/graphics/vulkan/vulkan_graphics_pipeline.cpp
+        src/graphics/vulkan/vulkan_image.cpp
+        src/graphics/vulkan/vulkan_pipeline.cpp
+        src/graphics/vulkan/vulkan_renderpass.cpp
+        src/graphics/vulkan/vulkan_shader.cpp
+        src/graphics/vulkan/vulkan_surface_context.cpp
+        src/graphics/vulkan/vulkan_swapchain.cpp
+        src/graphics/vulkan/vulkan_texture.cpp
+        src/graphics/vulkan/vulkan_vma.cpp
+        src/platform/glfw/glfw_events.cpp
+        src/platform/glfw/glfw_platform.cpp
+        src/platform/glfw/glfw_window.cpp
+    )
+endif()
+
+# ---- Dependencies ------------------------------------------------------------
 
 # SDL2/SDL_image/SDL_ttf/GLFW must come from the system on Linux to avoid
 # runtime symbol conflicts with GTK3/GDK-Pixbuf (used by NFD's file dialog).
 # Conan-built copies statically embed libpng, libjpeg, etc. which clash with
 # the system versions loaded by GTK3 at runtime.
-if(WIN32)
-    find_package(SDL2 REQUIRED)
-    find_package(SDL2_image REQUIRED)
-    find_package(SDL2_ttf REQUIRED)
-    find_package(glfw3 REQUIRED)
-    set(CANYON_SDL2_LINK SDL2::SDL2)
-    set(CANYON_SDL2_IMAGE_LINK SDL2_image::SDL2_image)
-    set(CANYON_SDL2_TTF_LINK SDL2_ttf::SDL2_ttf-static)
-    set(CANYON_GLFW_LINK glfw)
-else()
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
-    pkg_check_modules(SDL2_image REQUIRED IMPORTED_TARGET SDL2_image)
-    pkg_check_modules(SDL2_ttf REQUIRED IMPORTED_TARGET SDL2_ttf)
-    pkg_check_modules(GLFW3 REQUIRED IMPORTED_TARGET glfw3)
-    set(CANYON_SDL2_LINK PkgConfig::SDL2)
-    set(CANYON_SDL2_IMAGE_LINK PkgConfig::SDL2_image)
-    set(CANYON_SDL2_TTF_LINK PkgConfig::SDL2_ttf)
-    set(CANYON_GLFW_LINK PkgConfig::GLFW3)
+if(NOT CANYON_DISABLE_SDL)
+    if(WIN32)
+        find_package(SDL2 REQUIRED)
+        find_package(SDL2_image REQUIRED)
+        find_package(SDL2_ttf REQUIRED)
+        set(CANYON_SDL2_LINK SDL2::SDL2)
+        set(CANYON_SDL2_IMAGE_LINK SDL2_image::SDL2_image)
+        set(CANYON_SDL2_TTF_LINK SDL2_ttf::SDL2_ttf-static)
+    else()
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
+        pkg_check_modules(SDL2_image REQUIRED IMPORTED_TARGET SDL2_image)
+        pkg_check_modules(SDL2_ttf REQUIRED IMPORTED_TARGET SDL2_ttf)
+        set(CANYON_SDL2_LINK PkgConfig::SDL2)
+        set(CANYON_SDL2_IMAGE_LINK PkgConfig::SDL2_image)
+        set(CANYON_SDL2_TTF_LINK PkgConfig::SDL2_ttf)
+    endif()
 endif()
-find_package(Vulkan REQUIRED)
-find_package(VulkanMemoryAllocator REQUIRED)
-find_package(Freetype REQUIRED)
+
+if(NOT CANYON_DISABLE_VULKAN)
+    if(WIN32)
+        find_package(glfw3 REQUIRED)
+        find_package(Freetype REQUIRED)
+        find_package(harfbuzz REQUIRED)
+        set(CANYON_GLFW_LINK glfw)
+    else()
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(GLFW3 REQUIRED IMPORTED_TARGET glfw3)
+        set(CANYON_GLFW_LINK PkgConfig::GLFW3)
+        find_package(Freetype REQUIRED)
+        find_package(harfbuzz REQUIRED)
+    endif()
+    find_package(Vulkan REQUIRED)
+    find_package(VulkanMemoryAllocator REQUIRED)
+endif()
+
 find_package(spdlog REQUIRED)
-find_package(harfbuzz REQUIRED)
 find_package(moth_ui REQUIRED)
+
+# ---- Target ------------------------------------------------------------------
 
 add_library(${PROJECT_NAME} ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_include_directories(${PROJECT_NAME} PUBLIC
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/imgui>
-	$<INSTALL_INTERFACE:external/imgui>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/imgui>
+    $<INSTALL_INTERFACE:external/imgui>
 )
 target_include_directories(${PROJECT_NAME} PRIVATE external/murmurhash.c)
 target_include_directories(${PROJECT_NAME} PRIVATE src)
-target_link_libraries(${PROJECT_NAME} PUBLIC ${CANYON_SDL2_LINK})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${CANYON_SDL2_IMAGE_LINK})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${CANYON_SDL2_TTF_LINK})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${CANYON_GLFW_LINK})
-target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
-target_link_libraries(${PROJECT_NAME} PUBLIC GPUOpen::VulkanMemoryAllocator)
-target_link_libraries(${PROJECT_NAME} PUBLIC Freetype::Freetype)
+
+if(NOT CANYON_DISABLE_SDL)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC CANYON_DISABLE_SDL=0)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${CANYON_SDL2_LINK})
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${CANYON_SDL2_IMAGE_LINK})
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${CANYON_SDL2_TTF_LINK})
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC CANYON_DISABLE_SDL=1)
+    set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES HEADER_FILE_ONLY TRUE)
+endif()
+
+if(NOT CANYON_DISABLE_VULKAN)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC CANYON_DISABLE_VULKAN=0)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${CANYON_GLFW_LINK})
+    target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
+    target_link_libraries(${PROJECT_NAME} PUBLIC GPUOpen::VulkanMemoryAllocator)
+    target_link_libraries(${PROJECT_NAME} PUBLIC Freetype::Freetype)
+    target_link_libraries(${PROJECT_NAME} PUBLIC harfbuzz::harfbuzz)
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC CANYON_DISABLE_VULKAN=1)
+endif()
+
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
-target_link_libraries(${PROJECT_NAME} PUBLIC harfbuzz::harfbuzz)
 target_link_libraries(${PROJECT_NAME} PUBLIC moth_ui::moth_ui)
 
-if (MSVC)
-    set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES COMPILE_FLAGS "/W0")
-	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ignore:4099")
-	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3 /WX")
-	target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS CANYON_BUILD)
-	if (BUILD_SHARED_LIBS)
-		target_compile_definitions(${PROJECT_NAME} PRIVATE CANYON_BUILD_SHARED)
-	endif()
+if(MSVC)
+    if(NOT CANYON_DISABLE_SDL)
+        set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES COMPILE_FLAGS "/W0")
+    endif()
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ignore:4099")
+    set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3 /WX")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS CANYON_BUILD)
+    if(BUILD_SHARED_LIBS)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE CANYON_BUILD_SHARED)
+    endif()
 else()
-	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall -Werror")
+    set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall -Werror")
 endif()
 
 # temp disabled while i figure out other build issues. it is intended to use precompiled headers eventually
@@ -137,18 +189,18 @@ endif()
 # set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
 install(TARGETS ${PROJECT_NAME}
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib
-	INCLUDES DESTINATION include
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    INCLUDES DESTINATION include
 )
 install(DIRECTORY "include/"
-	DESTINATION "include"
-	FILES_MATCHING PATTERN "*.h"
+    DESTINATION "include"
+    FILES_MATCHING PATTERN "*.h"
 )
 install(DIRECTORY "external/imgui/"
-	DESTINATION "external/imgui"
-	FILES_MATCHING
-		PATTERN "*.h"
-		PATTERN "*.hpp"
+    DESTINATION "external/imgui"
+    FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN "*.hpp"
 )

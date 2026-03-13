@@ -47,6 +47,61 @@ cmake --build --preset conan-debug
 
 For a Release build replace `Debug` / `conan-debug` with `Release` / `conan-release`.
 
+### Disabling backends
+
+Both backends are enabled by default. Pass `disable_vulkan=True` or `disable_sdl=True` as Conan options to strip a backend and its dependencies entirely. At least one backend must remain enabled.
+
+**Vulkan only** (no SDL2 dependency):
+
+```bash
+conan install . --profile conan/profiles/linux_profile --build missing -s build_type=Debug -o canyon/*:disable_sdl=True
+cmake --preset conan-debug
+cmake --build --preset conan-debug
+```
+
+**SDL only** (no Vulkan/GLFW/FreeType/HarfBuzz dependency):
+
+```bash
+conan install . --profile conan/profiles/linux_profile --build missing -s build_type=Debug -o canyon/*:disable_vulkan=True
+cmake --preset conan-debug
+cmake --build --preset conan-debug
+```
+
+When a backend is disabled, the corresponding compile definition is propagated to all consumers:
+
+| Option | Definition |
+|---|---|
+| `disable_vulkan=True` | `CANYON_DISABLE_VULKAN=1` |
+| `disable_sdl=True` | `CANYON_DISABLE_SDL=1` |
+
+Use these in your own code to guard backend-specific includes:
+
+```cpp
+#if !CANYON_DISABLE_VULKAN
+#include <canyon/platform/glfw/glfw_platform.h>
+#endif
+#if !CANYON_DISABLE_SDL
+#include <canyon/platform/sdl/sdl_platform.h>
+#endif
+```
+
+### Consumer projects
+
+When depending on canyon via Conan, pass the option at install time to control which backends are compiled into the canyon package your project links against:
+
+```bash
+conan install . -o canyon/*:disable_sdl=True
+```
+
+Or pin the option permanently in your own `conanfile.py`:
+
+```python
+def configure(self):
+    self.options["canyon"].disable_sdl = True
+```
+
+The `CANYON_DISABLE_SDL` / `CANYON_DISABLE_VULKAN` compile definitions are propagated **automatically** to any target that links against canyon (they are declared `PUBLIC`). Your own `#if` guards stay in sync with how canyon was built without any extra steps.
+
 ## Installing / publishing
 
 To install the library locally for use by another project:
