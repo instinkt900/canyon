@@ -184,6 +184,20 @@ namespace canyon::graphics::vulkan {
                     VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
                     VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
                 };
+            } else if (oldLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR && newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) {
+                return {
+                    VK_ACCESS_MEMORY_READ_BIT,
+                    VK_ACCESS_TRANSFER_READ_BIT,
+                    VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                    VK_PIPELINE_STAGE_TRANSFER_BIT
+                };
+            } else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR) {
+                return {
+                    VK_ACCESS_TRANSFER_READ_BIT,
+                    VK_ACCESS_MEMORY_READ_BIT,
+                    VK_PIPELINE_STAGE_TRANSFER_BIT,
+                    VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT
+                };
             } else if (newLayout == VK_IMAGE_LAYOUT_GENERAL) {
                 return {
                     VK_ACCESS_TRANSFER_WRITE_BIT,

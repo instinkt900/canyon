@@ -66,9 +66,10 @@ namespace canyon::graphics {
         /// @param scale Scale factor applied to each tile.
         virtual void DrawImageTiled(IImage& image, IntRect const& destRect, IntRect const* sourceRect = nullptr, float scale = 1.0f) = 0;
 
-        /// @brief Capture the current render target and write it to a PNG file.
+        /// @brief Capture an image and write it to a PNG file.
+        /// @param image The image to capture (typically from @c ITarget::GetImage()).
         /// @param path Destination file path.
-        virtual void DrawToPNG(std::filesystem::path const& path) = 0;
+        virtual void DrawToPNG(IImage& image, std::filesystem::path const& path) = 0;
 
         /// @brief Draw an axis-aligned rectangle outline using the current colour.
         /// @param rect Rectangle in logical pixels.

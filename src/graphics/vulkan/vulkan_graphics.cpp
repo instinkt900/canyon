@@ -176,46 +176,55 @@ namespace canyon::graphics::vulkan {
         }
     }
 
-    void Graphics::DrawToPNG(std::filesystem::path const& path) {
-        FlushCommands();
+    void Graphics::DrawToPNG(IImage& image, std::filesystem::path const& path) {
+        auto& srcVkImage = dynamic_cast<Image&>(image);
+        auto srcTexture = srcVkImage.m_texture;
+        auto const srcFormat = srcTexture->GetVkFormat();
 
-        auto& context = m_surfaceContext;
-        auto drawContext = CurrentContext();
-
+        auto const targetWidth = static_cast<uint32_t>(image.GetWidth());
+        auto const targetHeight = static_cast<uint32_t>(image.GetHeight());
         auto const targetFormat = VK_FORMAT_R8G8B8A8_UNORM;
-        auto targetImage = std::make_unique<Texture>(context, drawContext->m_logicalExtent.width, drawContext->m_logicalExtent.height, targetFormat, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        auto stagingImage = std::make_unique<Texture>(
+            m_surfaceContext, targetWidth, targetHeight,
+            targetFormat, VK_IMAGE_TILING_LINEAR,
+            VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-        auto renderedSubImage = static_cast<Image*>(drawContext->m_target->GetImage());
-        auto srcImage = renderedSubImage->m_texture;
-        auto srcFormat = srcImage->GetVkFormat();
+        // Render target images are in SHADER_READ_ONLY_OPTIMAL after SetTarget(nullptr).
+        VkImageLayout const srcLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-        auto commandBuffer = std::make_unique<CommandBuffer>(context);
+        auto commandBuffer = std::make_unique<CommandBuffer>(m_surfaceContext);
         commandBuffer->BeginRecord();
-        commandBuffer->TransitionImageLayout(*srcImage, srcFormat, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-        commandBuffer->TransitionImageLayout(*targetImage, targetFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        commandBuffer->CopyImageToImage(*srcImage, *targetImage);
-        commandBuffer->TransitionImageLayout(*targetImage, targetFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL);
-        commandBuffer->TransitionImageLayout(*srcImage, srcFormat, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        commandBuffer->TransitionImageLayout(*srcTexture, srcFormat, srcLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        commandBuffer->TransitionImageLayout(*stagingImage, targetFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        commandBuffer->CopyImageToImage(*srcTexture, *stagingImage);
+        commandBuffer->TransitionImageLayout(*stagingImage, targetFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL);
+        commandBuffer->TransitionImageLayout(*srcTexture, srcFormat, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, srcLayout);
         commandBuffer->SubmitAndWait();
 
-        // swizzle BGRA to RGBA
-        // theres probably a way to do this on the gpu?
-        auto const targetWidth = drawContext->m_logicalExtent.width;
-        auto const targetHeight = drawContext->m_logicalExtent.height;
-        uint8_t* data = static_cast<uint8_t*>(targetImage->Map());
-        std::vector<uint8_t> dataCopy;
-        dataCopy.resize(targetWidth * targetHeight * 4);
-        uint8_t* dst = dataCopy.data();
-        for (size_t j = 0; j < dataCopy.size(); j += 4) {
-            dst[j + 0] = data[j + 2];
-            dst[j + 1] = data[j + 1];
-            dst[j + 2] = data[j + 0];
-            dst[j + 3] = data[j + 3];
+        // Query the actual row pitch — linear images may have alignment padding
+        // that makes rowPitch > width * bytesPerPixel.
+        VkImageSubresource subresource{};
+        subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        VkSubresourceLayout subLayout{};
+        vkGetImageSubresourceLayout(m_surfaceContext.GetVkDevice(), stagingImage->GetVkImage(), &subresource, &subLayout);
+        auto const rowPitch = static_cast<uint32_t>(subLayout.rowPitch);
+
+        // Swizzle BGRA → RGBA row by row, respecting the actual row pitch.
+        uint8_t const* data = static_cast<uint8_t const*>(stagingImage->Map());
+        std::vector<uint8_t> dataCopy(targetWidth * targetHeight * 4);
+        for (uint32_t row = 0; row < targetHeight; ++row) {
+            uint8_t const* src = data + row * rowPitch;
+            uint8_t* dst = dataCopy.data() + row * targetWidth * 4;
+            for (uint32_t col = 0; col < targetWidth; ++col) {
+                dst[col * 4 + 0] = src[col * 4 + 2];
+                dst[col * 4 + 1] = src[col * 4 + 1];
+                dst[col * 4 + 2] = src[col * 4 + 0];
+                dst[col * 4 + 3] = src[col * 4 + 3];
+            }
         }
-
-        stbi_write_png(path.string().c_str(), targetWidth, targetHeight, 4, dst, targetWidth * 4);
-
-        targetImage->Unmap();
+        stbi_write_png(path.string().c_str(), targetWidth, targetHeight, 4, dataCopy.data(), targetWidth * 4);
+        stagingImage->Unmap();
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {

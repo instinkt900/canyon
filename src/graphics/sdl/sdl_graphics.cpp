@@ -141,27 +141,22 @@ namespace canyon::graphics::sdl {
         SDL_RenderSetClipRect(m_surfaceContext.GetRenderer(), nullptr);
     }
 
-    void Graphics::DrawToPNG(std::filesystem::path const& path) {
-        Uint32 rmask, gmask, bmask, amask;
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-        rmask = 0xff000000;
-        gmask = 0x00ff0000;
-        bmask = 0x0000ff00;
-        amask = 0x000000ff;
-#else
-        rmask = 0x000000ff;
-        gmask = 0x0000ff00;
-        bmask = 0x00ff0000;
-        amask = 0xff000000;
-#endif
+    void Graphics::DrawToPNG(IImage& image, std::filesystem::path const& path) {
+        auto& sdlImage = dynamic_cast<Image&>(image);
+        auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
+        SDL_Texture* tex = sdlTexture->GetSDLTexture()->GetImpl();
 
-        int width;
-        int height;
-        SDL_GetRendererOutputSize(m_surfaceContext.GetRenderer(), &width, &height);
+        int width = image.GetWidth();
+        int height = image.GetHeight();
 
-        SurfaceRef surface = CreateSurfaceRef(SDL_CreateRGBSurface(0, width, height, 32, rmask, gmask, bmask, amask));
+        SDL_Texture* prevTarget = SDL_GetRenderTarget(m_surfaceContext.GetRenderer());
+        SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), tex);
+
+        SurfaceRef surface = CreateSurfaceRef(SDL_CreateRGBSurface(0, width, height, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000));
         SDL_RenderReadPixels(m_surfaceContext.GetRenderer(), nullptr, surface->format->format, surface->pixels, surface->pitch);
         IMG_SavePNG(surface.get(), path.string().c_str());
+
+        SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), prevTarget);
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {

@@ -36,7 +36,7 @@ namespace canyon::graphics::sdl {
         void Clear() override;
         void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) override;
         void DrawImageTiled(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
-        void DrawToPNG(std::filesystem::path const& path) override;
+        void DrawToPNG(IImage& image, std::filesystem::path const& path) override;
         void DrawRectF(FloatRect const& rect) override;
         void DrawFillRectF(FloatRect const& rect) override;
         void DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) override;
