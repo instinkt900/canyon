@@ -7,7 +7,7 @@
 #include "canyon/graphics/vulkan/vulkan_utils.h"
 
 namespace {
-    char const* deviceExtensions[] = {
+    char const* const deviceExtensions[] = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
     };
 }
@@ -19,7 +19,7 @@ namespace canyon::graphics::vulkan {
 
         // select device
         {
-            uint32_t gpuCount;
+            uint32_t gpuCount = 0;
             CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.GetInstance(), &gpuCount, nullptr));
             std::vector<VkPhysicalDevice> gpus(gpuCount);
             CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.GetInstance(), &gpuCount, gpus.data()));
@@ -45,13 +45,13 @@ namespace canyon::graphics::vulkan {
 
         // queue family
         {
-            uint32_t queueCount;
+            uint32_t queueCount = 0;
             vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueCount, nullptr);
             std::vector<VkQueueFamilyProperties> queues(queueCount);
             vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueCount, queues.data());
 
             for (uint32_t i = 0; i < queueCount; ++i) {
-                if (queues[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                if ((queues[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0u) {
                     m_vkQueueFamily = i;
                     break;
                 }
@@ -137,7 +137,7 @@ namespace canyon::graphics::vulkan {
     }
 
     std::unique_ptr<IFont> SurfaceContext::FontFromFile(std::filesystem::path const& path, uint32_t size) {
-        return Font::Load(path, size, *this);
+        return Font::Load(path, static_cast<int>(size), *this);
     }
 
     std::unique_ptr<ITexture> SurfaceContext::TextureFromFile(std::filesystem::path const& path) {
@@ -149,7 +149,7 @@ namespace canyon::graphics::vulkan {
         if (!texture) {
             return nullptr;
         }
-        std::shared_ptr<Texture> vulkanTexture(static_cast<Texture*>(texture.release()));
+        std::shared_ptr<Texture> vulkanTexture(dynamic_cast<Texture*>(texture.release()));
         if (!vulkanTexture) {
             return nullptr;
         }
@@ -172,7 +172,7 @@ namespace canyon::graphics::vulkan {
         allocInfo.commandPool = m_vkCommandPool;
         allocInfo.commandBufferCount = 1;
 
-        VkCommandBuffer commandBuffer;
+        VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
         CHECK_VK_RESULT(vkAllocateCommandBuffers(m_vkDevice, &allocInfo, &commandBuffer));
 
         VkCommandBufferBeginInfo beginInfo{};
@@ -198,10 +198,10 @@ namespace canyon::graphics::vulkan {
     }
 
     VkSurfaceFormatKHR SurfaceContext::selectSurfaceFormat(VkPhysicalDevice physical_device, VkSurfaceKHR surface, const VkFormat* request_formats, int request_formats_count, VkColorSpaceKHR request_color_space) {
-        uint32_t avail_count;
+        uint32_t avail_count = 0;
         vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &avail_count, NULL);
         ImVector<VkSurfaceFormatKHR> avail_format;
-        avail_format.resize((int)avail_count);
+        avail_format.resize(static_cast<int>(avail_count));
         vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &avail_count, avail_format.Data);
 
         // First check if only one format, VK_FORMAT_UNDEFINED, is available, which would imply that any format is available
@@ -211,20 +211,21 @@ namespace canyon::graphics::vulkan {
                 ret.format = request_formats[0];
                 ret.colorSpace = request_color_space;
                 return ret;
-            } else {
-                // No point in searching another format
-                return avail_format[0];
             }
-        } else {
-            // Request several formats, the first found will be used
-            for (int request_i = 0; request_i < request_formats_count; request_i++)
-                for (uint32_t avail_i = 0; avail_i < avail_count; avail_i++)
-                    if (avail_format[avail_i].format == request_formats[request_i] && avail_format[avail_i].colorSpace == request_color_space)
-                        return avail_format[avail_i];
-
-            // If none of the requested image formats could be found, use the first available
+            // No point in searching another format
             return avail_format[0];
         }
+        // Request several formats, the first found will be used
+        for (int request_i = 0; request_i < request_formats_count; request_i++) {
+            for (uint32_t avail_i = 0; avail_i < avail_count; avail_i++) {
+                if (avail_format[static_cast<int>(avail_i)].format == request_formats[request_i] && avail_format[static_cast<int>(avail_i)].colorSpace == request_color_space) {
+                    return avail_format[static_cast<int>(avail_i)];
+                }
+            }
+        }
+
+        // If none of the requested image formats could be found, use the first available
+        return avail_format[0];
     }
 
     VkPresentModeKHR SurfaceContext::selectPresentMode(VkPhysicalDevice physical_device, VkSurfaceKHR surface, const VkPresentModeKHR* request_modes, int request_modes_count) {
@@ -232,24 +233,30 @@ namespace canyon::graphics::vulkan {
         uint32_t avail_count = 0;
         vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &avail_count, NULL);
         ImVector<VkPresentModeKHR> avail_modes;
-        avail_modes.resize((int)avail_count);
+        avail_modes.resize(static_cast<int>(avail_count));
         vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &avail_count, avail_modes.Data);
 
-        for (int request_i = 0; request_i < request_modes_count; request_i++)
-            for (uint32_t avail_i = 0; avail_i < avail_count; avail_i++)
-                if (request_modes[request_i] == avail_modes[avail_i])
+        for (int request_i = 0; request_i < request_modes_count; request_i++) {
+            for (uint32_t avail_i = 0; avail_i < avail_count; avail_i++) {
+                if (request_modes[request_i] == avail_modes[static_cast<int>(avail_i)]) {
                     return request_modes[request_i];
+                }
+            }
+        }
 
         return VK_PRESENT_MODE_FIFO_KHR; // Always available
     }
 
     int SurfaceContext::getMinImageCountFromPresentMode(VkPresentModeKHR present_mode) {
-        if (present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
+        if (present_mode == VK_PRESENT_MODE_MAILBOX_KHR) {
             return 3;
-        if (present_mode == VK_PRESENT_MODE_FIFO_KHR || present_mode == VK_PRESENT_MODE_FIFO_RELAXED_KHR)
+        }
+        if (present_mode == VK_PRESENT_MODE_FIFO_KHR || present_mode == VK_PRESENT_MODE_FIFO_RELAXED_KHR) {
             return 2;
-        if (present_mode == VK_PRESENT_MODE_IMMEDIATE_KHR)
+        }
+        if (present_mode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
             return 1;
+        }
         IM_ASSERT(0);
         return 1;
     }

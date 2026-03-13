@@ -38,7 +38,7 @@ namespace canyon {
             , m_id(id) {
         }
 
-        virtual ~LambdaWrapper() = default;
+        ~LambdaWrapper() override = default;
 
         uint32_t GetID() const { return m_id; }
 
@@ -81,8 +81,9 @@ namespace canyon {
 
         /// @brief Unregister a lambda listener by its handle.
         void RemoveEventListener(LambdaHandle const& handle) {
-            if (!handle.IsValid())
+            if (!handle.IsValid()) {
                 return;
+            }
 
             auto it = std::find_if(m_owning.begin(), m_owning.end(), [&](std::unique_ptr<LambdaWrapper> const& ptr) {
                 return ptr->GetID() == handle.m_id;
@@ -98,7 +99,7 @@ namespace canyon {
         /// @returns @c true if any listener handled the event.
         bool EmitEvent(moth_ui::Event const& event) {
             moth_ui::EventDispatch dispatch(event);
-            for (auto listener : m_listeners) {
+            for (auto* listener : m_listeners) {
                 dispatch.Dispatch(listener);
             }
             return dispatch.GetHandled();

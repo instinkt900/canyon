@@ -7,10 +7,11 @@ namespace {
     VkExtent2D chooseSwapExtent(uint32_t width, uint32_t height, const VkSurfaceCapabilitiesKHR& capabilities) {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
             return capabilities.currentExtent;
-        } else {
+        }
+        {
             VkExtent2D actualExtent = {
-                static_cast<uint32_t>(width),
-                static_cast<uint32_t>(height)
+                width,
+                height
             };
 
             actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
@@ -24,7 +25,8 @@ namespace {
 namespace canyon::graphics::vulkan {
     Swapchain::Swapchain(SurfaceContext& context, RenderPass& renderPass, VkSurfaceKHR surface, VkExtent2D extent)
         : m_context(context)
-        , m_extent(extent) {
+        , m_extent(extent)
+        , m_vkSwapchain(VK_NULL_HANDLE) {
         VkSurfaceCapabilitiesKHR capabilities;
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_context.GetVkPhysicalDevice(), surface, &capabilities);
         extent = chooseSwapExtent(extent.width, extent.height, capabilities);
@@ -51,7 +53,7 @@ namespace canyon::graphics::vulkan {
         createInfo.oldSwapchain = VK_NULL_HANDLE;
         CHECK_VK_RESULT(vkCreateSwapchainKHR(m_context.GetVkDevice(), &createInfo, nullptr, &m_vkSwapchain));
 
-        uint32_t imageCount;
+        uint32_t imageCount = 0;
         std::vector<VkImage> swapchainImages;
         std::vector<VkImageView> swapchainImageViews;
         vkGetSwapchainImagesKHR(m_context.GetVkDevice(), m_vkSwapchain, &imageCount, nullptr);
@@ -94,10 +96,10 @@ namespace canyon::graphics::vulkan {
     Swapchain::~Swapchain() {
         for (uint32_t i = 0; i < m_imageCount; ++i) {
             auto& slot = m_frames[i];
-            if (slot->imageAvailable) {
+            if (slot->imageAvailable != VK_NULL_HANDLE) {
                 vkDestroySemaphore(m_context.GetVkDevice(), slot->imageAvailable, nullptr);
             }
-            if (slot->renderFinished) {
+            if (slot->renderFinished != VK_NULL_HANDLE) {
                 vkDestroySemaphore(m_context.GetVkDevice(), slot->renderFinished, nullptr);
             }
         }
@@ -115,7 +117,7 @@ namespace canyon::graphics::vulkan {
             vkWaitForFences(m_context.GetVkDevice(), 1, &prevFence, VK_TRUE, UINT64_MAX);
         }
 
-        uint32_t imageIndex;
+        uint32_t imageIndex = 0;
         VkResult result = vkAcquireNextImageKHR(m_context.GetVkDevice(), m_vkSwapchain, UINT64_MAX, slot->imageAvailable, VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
             return nullptr;

@@ -28,9 +28,9 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::RestartContext() {
-        auto context = m_contextStack.top();
+        auto* context = m_contextStack.top();
         FlushCommands();
-        auto cmdFence = context->m_target->GetFence().GetVkFence();
+        auto* cmdFence = context->m_target->GetFence().GetVkFence();
         vkWaitForFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence, VK_TRUE, UINT64_MAX);
         vkResetFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence);
         context->m_logicalExtent = context->m_target->GetVkExtent();
@@ -48,7 +48,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::StartCommands() {
-        auto context = m_contextStack.top();
+        auto* context = m_contextStack.top();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         commandBuffer.Reset();
         commandBuffer.BeginRecord();
@@ -81,7 +81,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::FlushPendingBatch() {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         if (!context->m_pendingBatch) {
             return;
         }
@@ -95,13 +95,13 @@ namespace canyon::graphics::vulkan {
 
     void Graphics::FlushCommands() {
         FlushPendingBatch();
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         VkFence cmdFence = context->m_target->GetFence().GetVkFence();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         commandBuffer.EndRenderPass();
         commandBuffer.EndRecord();
 
-        if (context->m_glyphCount) {
+        if (context->m_glyphCount != 0u) {
             auto uploadCommandBuffer = std::make_unique<CommandBuffer>(m_surfaceContext);
             uploadCommandBuffer->BeginRecord();
 
@@ -140,7 +140,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::SubmitVertices(Vertex* vertices, uint32_t vertCount, ETopologyType topology, VkDescriptorSet descriptorSet) {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
 
         assert(vertCount <= context->m_maxVertexCount);
 

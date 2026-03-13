@@ -54,6 +54,6 @@ namespace canyon::graphics::vulkan {
         VkDescriptorPool m_vkDescriptorPool = VK_NULL_HANDLE;
         VkCommandPool m_vkCommandPool = VK_NULL_HANDLE;
         VmaAllocator m_vmaAllocator = VK_NULL_HANDLE;
-        VkPhysicalDeviceProperties m_vkDeviceProperties;
+        VkPhysicalDeviceProperties m_vkDeviceProperties = {};
     };
 }

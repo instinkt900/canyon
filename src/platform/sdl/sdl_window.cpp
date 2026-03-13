@@ -6,14 +6,14 @@
 #include "canyon/graphics/sdl/sdl_graphics.h"
 
 namespace {
-    std::mutex EventFetchMutex;
-    std::list<SDL_Event> PendingEvents;
+    std::mutex EventFetchMutex;      // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    std::list<SDL_Event> PendingEvents; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
     bool CollectSDLEventsForWindow(uint32_t windowId, std::vector<SDL_Event>* outEvents) {
         std::lock_guard lock(EventFetchMutex);
 
         SDL_Event event;
-        while (SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event) != 0) {
             PendingEvents.push_back(event);
         }
 
@@ -36,12 +36,12 @@ namespace canyon::platform::sdl {
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {
-        CreateWindow();
+        CreateWindow(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
         PostCreate();
     }
 
     Window::~Window() {
-        DestroyWindow();
+        DestroyWindow(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
     }
 
     void Window::Update(uint32_t ticks) {

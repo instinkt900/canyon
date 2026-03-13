@@ -24,12 +24,12 @@ namespace canyon::graphics::vulkan {
 
         ImGui::StyleColorsDark();
         ImGuiStyle& style = ImGui::GetStyle();
-        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        if ((ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0) {
             style.WindowRounding = 0;
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-        auto& glfwWindow = static_cast<canyon::platform::glfw::Window const&>(window);
+        auto const& glfwWindow = dynamic_cast<canyon::platform::glfw::Window const&>(window);
 
         ImGui_ImplGlfw_InitForVulkan(glfwWindow.GetGLFWWindow(), true);
         ImGui_ImplVulkan_InitInfo initInfo{};

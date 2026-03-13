@@ -30,7 +30,7 @@ namespace canyon::platform {
         /// @param width Initial width in pixels.
         /// @param height Initial height in pixels.
         Window(std::string const& windowTitle, int width, int height);
-        virtual ~Window();
+        ~Window() override;
 
         /// @brief Poll events and advance the UI layer stack by @p ticks milliseconds.
         virtual void Update(uint32_t ticks) {}

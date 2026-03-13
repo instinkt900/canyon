@@ -12,18 +12,18 @@ namespace canyon::platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
         : canyon::platform::Window(title, width, height)
         , m_context(context) {
-        CreateWindow();
+        CreateWindow(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
         PostCreate();
     }
 
     Window::~Window() {
-        DestroyWindow();
+        DestroyWindow(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
     }
 
     void Window::Update(uint32_t ticks) {
         glfwPollEvents();
 
-        if (glfwWindowShouldClose(m_glfwWindow)) {
+        if (glfwWindowShouldClose(m_glfwWindow) != 0) {
             glfwSetWindowShouldClose(m_glfwWindow, 0);
             EmitEvent(EventRequestQuit());
         }
@@ -116,7 +116,8 @@ namespace canyon::platform::glfw {
             }
         });
 
-        int width, height;
+        int width = 0;
+        int height = 0;
         glfwGetFramebufferSize(m_glfwWindow, &width, &height);
 
         if (m_windowMaximized) {
@@ -156,7 +157,7 @@ namespace canyon::platform::glfw {
 
     void Window::OnResize() {
         spdlog::info("GLFW: window '{}' resized to {}x{}", m_title, m_windowWidth, m_windowHeight);
-        graphics::vulkan::Graphics* graphics = static_cast<graphics::vulkan::Graphics*>(m_graphics.get());
+        graphics::vulkan::Graphics* graphics = dynamic_cast<graphics::vulkan::Graphics*>(m_graphics.get());
         graphics->OnResize(m_customVkSurface, m_windowWidth, m_windowHeight);
         m_layerStack->SetWindowSize({ m_windowWidth, m_windowHeight });
     }

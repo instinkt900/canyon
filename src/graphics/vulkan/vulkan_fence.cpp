@@ -4,7 +4,8 @@
 
 namespace canyon::graphics::vulkan {
     Fence::Fence(SurfaceContext& context)
-        : m_context(context) {
+        : m_context(context)
+        , m_vkFence(VK_NULL_HANDLE) {
         VkFenceCreateInfo fenceInfo{};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;

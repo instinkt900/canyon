@@ -152,8 +152,8 @@ namespace canyon::graphics::vulkan {
         DrawContext m_overrideContext;
         std::stack<DrawContext*> m_contextStack;
 
-        VkPrimitiveTopology ToVulkan(ETopologyType type) const;
-        VkPipelineColorBlendAttachmentState ToVulkan(BlendMode mode) const;
+        static VkPrimitiveTopology ToVulkan(ETopologyType type);
+        static VkPipelineColorBlendAttachmentState ToVulkan(BlendMode mode);
 
         void CreateRenderPass();
         void CreateShaders();
@@ -168,7 +168,7 @@ namespace canyon::graphics::vulkan {
             return m_contextStack.top();
         }
 
-        void BeginContext(DrawContext* target);
+        void BeginContext(DrawContext* context);
         void RestartContext();
         void EndContext();
         void StartCommands();

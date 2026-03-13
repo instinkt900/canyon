@@ -5,8 +5,6 @@
 #include <moth_ui/events/event_key.h>
 #include <moth_ui/events/event_mouse.h>
 #include <moth_ui/events/event.h>
-#include <moth_ui/events/event_mouse.h>
-#include <moth_ui/events/event_key.h>
 
 namespace {
     moth_ui::MouseButton FromSDLMouse(uint8_t button) {
@@ -295,18 +293,24 @@ namespace canyon::platform::sdl {
         case SDL_KEYDOWN: {
             moth_ui::KeyAction action = event.type == SDL_KEYUP ? moth_ui::KeyAction::Up : moth_ui::KeyAction::Down;
             int mods = 0;
-            if ((event.key.keysym.mod & KMOD_LSHIFT) != 0)
+            if ((event.key.keysym.mod & KMOD_LSHIFT) != 0) {
                 mods |= moth_ui::KeyMod_LeftShift;
-            if ((event.key.keysym.mod & KMOD_RSHIFT) != 0)
+            }
+            if ((event.key.keysym.mod & KMOD_RSHIFT) != 0) {
                 mods |= moth_ui::KeyMod_RightShift;
-            if ((event.key.keysym.mod & KMOD_LALT) != 0)
+            }
+            if ((event.key.keysym.mod & KMOD_LALT) != 0) {
                 mods |= moth_ui::KeyMod_LeftAlt;
-            if ((event.key.keysym.mod & KMOD_RALT) != 0)
+            }
+            if ((event.key.keysym.mod & KMOD_RALT) != 0) {
                 mods |= moth_ui::KeyMod_RightAlt;
-            if ((event.key.keysym.mod & KMOD_LCTRL) != 0)
+            }
+            if ((event.key.keysym.mod & KMOD_LCTRL) != 0) {
                 mods |= moth_ui::KeyMod_LeftCtrl;
-            if ((event.key.keysym.mod & KMOD_RCTRL) != 0)
+            }
+            if ((event.key.keysym.mod & KMOD_RCTRL) != 0) {
                 mods |= moth_ui::KeyMod_RightCtrl;
+            }
             return std::make_unique<moth_ui::EventKey>(action, FromSDLKey(event.key.keysym.sym), mods);
         }
         case SDL_RENDER_DEVICE_RESET: {

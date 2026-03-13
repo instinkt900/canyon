@@ -4,7 +4,7 @@
 
 namespace canyon::platform::glfw {
     bool Platform::Startup() {
-        if (!glfwInit()) {
+        if (glfwInit() == 0) {
             spdlog::error("GLFW: initialization failed");
             return false;
         }

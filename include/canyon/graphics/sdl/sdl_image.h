@@ -13,7 +13,7 @@ namespace canyon::graphics::sdl {
     public:
         explicit Image(std::shared_ptr<Texture> texture);
         Image(std::shared_ptr<Texture> texture, IntRect const& sourceRect);
-        virtual ~Image() = default;
+        ~Image() override = default;
 
         int GetWidth() const override;
         int GetHeight() const override;

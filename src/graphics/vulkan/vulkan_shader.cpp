@@ -4,7 +4,11 @@
 
 namespace canyon::graphics::vulkan {
     Shader::Shader(uint32_t hash)
-        : m_hash(hash) {
+        : m_hash(hash)
+        , m_device(VK_NULL_HANDLE)
+        , m_descriptorPool(VK_NULL_HANDLE)
+        , m_descriptorSetLayout(VK_NULL_HANDLE)
+        , m_pipelineLayout(VK_NULL_HANDLE) {
     }
 
     Shader::~Shader() {
@@ -38,7 +42,7 @@ namespace canyon::graphics::vulkan {
     }
 
     VkDescriptorSet Shader::CreateDescriptorSet(Texture& image) {
-        VkDescriptorSet descriptorSet;
+        VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
 
         VkDescriptorSetAllocateInfo alloc_info{};
         alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -114,7 +118,7 @@ namespace canyon::graphics::vulkan {
             VkShaderModuleCreateInfo createInfo{};
             createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
             createInfo.codeSize = stage.m_byteCode.size();
-            createInfo.pCode = reinterpret_cast<uint32_t const*>(stage.m_byteCode.data());
+            createInfo.pCode = reinterpret_cast<uint32_t const*>(stage.m_byteCode.data()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
             CHECK_VK_RESULT(vkCreateShaderModule(m_device, &createInfo, nullptr, &newStage.m_module));
 
             newShader->m_stages.push_back(newStage);
@@ -139,11 +143,11 @@ namespace canyon::graphics::vulkan {
 
     uint32_t ShaderBuilder::CalculateHash() const {
         std::vector<uint32_t> hashes;
-        for (auto& stage : m_stages) {
+        for (const auto& stage : m_stages) {
             hashes.push_back(CalcHash(stage.m_stageFlags));
             hashes.push_back(CalcHash(stage.m_entryPoint));
             hashes.push_back(CalcHash(stage.m_byteCode.data(), stage.m_byteCode.size()));
         }
-        return CalcHash(reinterpret_cast<void const*>(hashes.data()), sizeof(uint32_t) * hashes.size());
+        return CalcHash(reinterpret_cast<void const*>(hashes.data()), sizeof(uint32_t) * hashes.size()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     }
 }

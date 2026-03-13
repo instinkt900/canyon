@@ -2,18 +2,18 @@
 #include "canyon/graphics/vulkan/vulkan_texture.h"
 #include "canyon/graphics/vulkan/vulkan_command_buffer.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
-#include "canyon/graphics/stb_image.h"
+#include "stb_image.h"
 
 namespace {
-    static uint32_t NextTextureId = 1;
+    uint32_t NextTextureId = 1; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 }
 
 namespace canyon::graphics::vulkan {
     std::unique_ptr<Texture> Texture::FromFile(SurfaceContext& context, std::filesystem::path const& path) {
         if (std::filesystem::exists(path)) {
-            int texWidth;
-            int texHeight;
-            int texChannels;
+            int texWidth = 0;
+            int texHeight = 0;
+            int texChannels = 0;
             stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
             VkDeviceSize imageSize = texWidth * texHeight * 4;
             if (pixels != nullptr) {
@@ -63,7 +63,9 @@ namespace canyon::graphics::vulkan {
 
     Texture::Texture(SurfaceContext& context)
         : m_id(NextTextureId++)
-        , m_context(context) {
+        , m_context(context)
+        , m_vkExtent{}
+        , m_vkFormat(VK_FORMAT_UNDEFINED) {
     }
 
     Texture::Texture(SurfaceContext& context, VkImage image, VkImageView view, VkExtent2D extent, VkFormat format, bool owning)
@@ -121,7 +123,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void* Texture::Map() {
-        void* data;
+        void* data = nullptr;
         vmaMapMemory(m_context.GetVmaAllocator(), m_vmaAllocation, &data);
         return data;
     }
@@ -148,7 +150,7 @@ namespace canyon::graphics::vulkan {
         VmaAllocationCreateInfo allocInfo{};
         allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
         allocInfo.requiredFlags = properties;
-        if (properties & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) {
+        if ((properties & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) != 0u) {
             allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
         }
         CHECK_VK_RESULT(vmaCreateImage(m_context.GetVmaAllocator(), &info, &allocInfo, &m_vkImage, &m_vmaAllocation, nullptr));

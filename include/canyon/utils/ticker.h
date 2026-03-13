@@ -17,9 +17,8 @@ namespace canyon {
     class Ticker {
     public:
         /// @param ticksPerSecond Fixed update rate in Hz. Clamped to 1 if <= 0.
-        Ticker(int ticksPerSecond = 60) {
-            ticksPerSecond = ticksPerSecond > 0 ? ticksPerSecond : 60;
-            m_updateTicks = std::chrono::milliseconds(1000 / ticksPerSecond);
+        explicit Ticker(int ticksPerSecond = 60)
+            : m_updateTicks(std::chrono::milliseconds(1000 / (ticksPerSecond > 0 ? ticksPerSecond : 60))) {
         }
         virtual ~Ticker() {}
 

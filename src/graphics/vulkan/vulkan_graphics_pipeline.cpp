@@ -73,7 +73,7 @@ namespace canyon::graphics::vulkan {
         return m_drawingShader->GetDescriptorSet(image);
     }
 
-    VkPrimitiveTopology Graphics::ToVulkan(ETopologyType type) const {
+    VkPrimitiveTopology Graphics::ToVulkan(ETopologyType type) {
         switch (type) {
         default:
             assert(false);
@@ -84,7 +84,7 @@ namespace canyon::graphics::vulkan {
         }
     }
 
-    VkPipelineColorBlendAttachmentState Graphics::ToVulkan(BlendMode mode) const {
+    VkPipelineColorBlendAttachmentState Graphics::ToVulkan(BlendMode mode) {
         VkPipelineColorBlendAttachmentState currentBlend{};
         switch (mode) {
         default:
@@ -257,7 +257,7 @@ namespace canyon::graphics::vulkan {
     }
 
     Pipeline& Graphics::GetCurrentPipeline(ETopologyType topology) {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         auto const vkTopology = ToVulkan(topology);
         auto const blendAttachment = ToVulkan(context->m_currentBlendMode);
         auto const vertexInputBinding = getVertexBindingDescription();
@@ -287,7 +287,7 @@ namespace canyon::graphics::vulkan {
     }
 
     Pipeline& Graphics::GetCurrentFontPipeline() {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         auto const vkTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
         auto const blendAttachment = ToVulkan(context->m_currentBlendMode);
         auto const vertexInputBinding = getFontVertexBindingDescription();

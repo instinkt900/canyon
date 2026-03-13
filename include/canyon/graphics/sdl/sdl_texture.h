@@ -13,7 +13,7 @@ namespace canyon::graphics::sdl {
     class Texture : public ITexture {
     public:
         explicit Texture(SDLTextureRef texture);
-        virtual ~Texture() = default;
+        ~Texture() override = default;
 
         int GetWidth() const override;
         int GetHeight() const override;

@@ -9,7 +9,7 @@
 namespace canyon::platform::sdl {
     class Platform : public IPlatform {
     public:
-        virtual ~Platform() = default;
+        ~Platform() override = default;
 
         bool Startup() override;
         void Shutdown() override;

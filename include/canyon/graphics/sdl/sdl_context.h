@@ -6,6 +6,6 @@ namespace canyon::graphics::sdl {
     class Context : public canyon::graphics::Context {
     public:
         Context() = default;
-        virtual ~Context() = default;
+        ~Context() override = default;
     };
 }

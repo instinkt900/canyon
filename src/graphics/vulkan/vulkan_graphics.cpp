@@ -4,14 +4,15 @@
 #include "canyon/graphics/vulkan/vulkan_font.h"
 #include "canyon/graphics/vulkan/vulkan_texture.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
-#include "canyon/graphics/stb_image_write.h"
+#include "stb_image_write.h"
 
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
 
 namespace canyon::graphics::vulkan {
     Graphics::Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
-        : m_surfaceContext(context) {
+        : m_surfaceContext(context)
+        , m_vkPipelineCache(VK_NULL_HANDLE) {
         CreateRenderPass();
         CreateShaders();
         CreateDefaultImage();
@@ -33,11 +34,11 @@ namespace canyon::graphics::vulkan {
             ImGui_ImplGlfw_Shutdown();
             ImGui::DestroyContext();
         }
-        if (m_overrideContext.m_vertexBuffer && m_overrideContext.m_vertexBufferData) {
+        if (m_overrideContext.m_vertexBuffer != nullptr && m_overrideContext.m_vertexBufferData != nullptr) {
             m_overrideContext.m_vertexBuffer->Unmap();
             m_overrideContext.m_vertexBufferData = nullptr;
         }
-        if (m_defaultContext.m_vertexBuffer && m_defaultContext.m_vertexBufferData) {
+        if (m_defaultContext.m_vertexBuffer != nullptr && m_defaultContext.m_vertexBufferData != nullptr) {
             m_defaultContext.m_vertexBuffer->Unmap();
             m_defaultContext.m_vertexBufferData = nullptr;
         }
@@ -61,7 +62,7 @@ namespace canyon::graphics::vulkan {
     void Graphics::End() {
         if (m_imguiInitialized) {
             ImGui::Render();
-            if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            if ((ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0) {
                 ImGui::UpdatePlatformWindows();
                 ImGui::RenderPlatformWindowsDefault();
             }
@@ -88,7 +89,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::SetBlendMode(BlendMode mode) {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         context->m_currentBlendMode = mode;
     }
 
@@ -99,24 +100,24 @@ namespace canyon::graphics::vulkan {
     // }
 
     void Graphics::SetColor(Color const& color) {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         context->m_currentColor = color;
     }
 
     void Graphics::Clear() {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         DrawFillRectF({ { 0, 0 }, { static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height) } });
     }
 
     void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         auto& vulkanImage = dynamic_cast<Image&>(image);
         auto texture = vulkanImage.m_texture;
 
         FloatRect fDestRect = static_cast<FloatRect>(destRect);
 
         FloatRect imageRect;
-        if (sourceRect) {
+        if (sourceRect != nullptr) {
             imageRect = static_cast<FloatRect>(*sourceRect);
         } else {
             imageRect = MakeRect(0.0f, 0.0f, static_cast<float>(image.GetWidth()), static_cast<float>(image.GetHeight()));
@@ -163,11 +164,11 @@ namespace canyon::graphics::vulkan {
 
     void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
         IntRect const imageRect = MakeRect(0, 0, image.GetWidth(), image.GetHeight());
-        if (!sourceRect) {
+        if (sourceRect == nullptr) {
             sourceRect = &imageRect;
         }
-        auto const imageWidth = static_cast<int>(sourceRect->w() * scale);
-        auto const imageHeight = static_cast<int>(sourceRect->h() * scale);
+        auto const imageWidth = static_cast<int>(static_cast<float>(sourceRect->w()) * scale);
+        auto const imageHeight = static_cast<int>(static_cast<float>(sourceRect->h()) * scale);
         for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
             for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
                 IntRect const tiledDstRect{ { x, y }, { x + imageWidth, y + imageHeight } };
@@ -223,12 +224,12 @@ namespace canyon::graphics::vulkan {
                 dst[col * 4 + 3] = src[col * 4 + 3];
             }
         }
-        stbi_write_png(path.string().c_str(), targetWidth, targetHeight, 4, dataCopy.data(), targetWidth * 4);
+        stbi_write_png(path.string().c_str(), static_cast<int>(targetWidth), static_cast<int>(targetHeight), 4, dataCopy.data(), static_cast<int>(targetWidth) * 4);
         stagingImage->Unmap();
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         Vertex vertices[8];
 
         vertices[0].xy = { rect.topLeft.x, rect.topLeft.y };
@@ -263,7 +264,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::DrawFillRectF(FloatRect const& rect) {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         Vertex vertices[6];
 
         vertices[0].xy = { rect.topLeft.x, rect.topLeft.y };
@@ -290,7 +291,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         Vertex vertices[2];
 
         vertices[0].xy = { p0.x, p0.y };
@@ -304,17 +305,18 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::DrawText(std::string const& text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment) {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         context->m_currentBlendMode = BlendMode::Alpha; // force alpha blending for text
-        Font& vulkanFont = static_cast<Font&>(font);
+        Font& vulkanFont = dynamic_cast<Font&>(font);
 
         uint32_t const glyphStart = context->m_glyphCount;
         FontGlyphInstance* glyphInstances = static_cast<FontGlyphInstance*>(context->m_fontInstanceStagingBuffer->Map());
 
         // use this to actually submit characters at a position
         auto SubmitCharacter = [&](uint32_t glyphIndex, FloatVec2 const& pos) {
-            if (context->m_glyphCount >= 1024)
+            if (context->m_glyphCount >= 1024) {
                 return;
+            }
 
             FontGlyphInstance* inst = &glyphInstances[context->m_glyphCount];
             inst->pos = pos;
@@ -335,18 +337,18 @@ namespace canyon::graphics::vulkan {
         case TextVertAlignment::Top:
             break;
         case TextVertAlignment::Middle:
-            penPos.y += (destRect.h() - linesHeight) / 2.0f;
+            penPos.y += static_cast<float>(destRect.h() - linesHeight) / 2.0f;
             break;
         case TextVertAlignment::Bottom:
-            penPos.y += destRect.h() - linesHeight;
+            penPos.y += static_cast<float>(destRect.h() - linesHeight);
             break;
         }
 
         // move down to the bottom of the line, minus the descent value (so the descent of the glyphs dont extend past the whole line)
-        penPos.y += singleLineHeight + singleLineDescent;
+        penPos.y += static_cast<float>(singleLineHeight + singleLineDescent);
 
         // render lines one by one
-        for (auto& line : lines) {
+        for (const auto& line : lines) {
             auto const shapeInfo = vulkanFont.ShapeString(line.text);
 
             switch (horizontalAlignment) {
@@ -354,10 +356,10 @@ namespace canyon::graphics::vulkan {
                 penPos.x = static_cast<float>(destRect.topLeft.x);
                 break;
             case TextHorizAlignment::Center:
-                penPos.x = static_cast<float>(destRect.topLeft.x) + ((destRect.w() - line.lineWidth) / 2.0f);
+                penPos.x = static_cast<float>(destRect.topLeft.x) + (static_cast<float>(destRect.w() - line.lineWidth) / 2.0f);
                 break;
             case TextHorizAlignment::Right:
-                penPos.x = static_cast<float>(destRect.bottomRight.x) - line.lineWidth;
+                penPos.x = static_cast<float>(destRect.bottomRight.x) - static_cast<float>(line.lineWidth);
                 break;
             }
 
@@ -366,18 +368,18 @@ namespace canyon::graphics::vulkan {
                     auto const bearing = static_cast<FloatVec2>(vulkanFont.GetGlyphBearing(info.glyphIndex));
                     auto const offset = static_cast<FloatVec2>(info.offset);
                     auto const glyphPos = penPos + bearing + offset;
-                    SubmitCharacter(info.glyphIndex, glyphPos);
+                    SubmitCharacter(static_cast<uint32_t>(info.glyphIndex), glyphPos);
                 }
-                penPos.x += info.advance.x;
+                penPos.x += static_cast<float>(info.advance.x);
             }
 
-            penPos.y += singleLineHeight;
+            penPos.y += static_cast<float>(singleLineHeight);
         }
 
         context->m_fontInstanceStagingBuffer->Unmap();
 
         uint32_t const glyphCount = context->m_glyphCount - glyphStart;
-        if (glyphCount) {
+        if (glyphCount != 0u) {
             auto& commandBuffer = context->m_target->GetCommandBuffer();
 
             FlushPendingBatch();
@@ -396,9 +398,9 @@ namespace canyon::graphics::vulkan {
 
     void Graphics::SetClip(IntRect const* clipRect) {
         FlushPendingBatch();
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
-        if (clipRect) {
+        if (clipRect != nullptr) {
             VkRect2D scissor;
             scissor.offset.x = clipRect->x();
             scissor.offset.y = clipRect->y();
@@ -431,7 +433,7 @@ namespace canyon::graphics::vulkan {
             EndContext();
         }
 
-        if (target) {
+        if (target != nullptr) {
             m_overrideContext.m_target = dynamic_cast<Framebuffer*>(target);
             assert(m_overrideContext.m_target);
             VkFence fence = m_overrideContext.m_target->GetFence().GetVkFence();
@@ -442,7 +444,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::SetLogicalSize(IntVec2 const& logicalSize) {
-        auto context = CurrentContext();
+        auto* context = CurrentContext();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         PushConstants constants;
         constants.xyScale = { 2.0f / static_cast<float>(logicalSize.x), 2.0f / static_cast<float>(logicalSize.y) };

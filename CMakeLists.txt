@@ -143,6 +143,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:external/imgui>
 )
 target_include_directories(${PROJECT_NAME} PRIVATE external/murmurhash.c)
+target_include_directories(${PROJECT_NAME} PRIVATE external/stb)
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 if(NOT CANYON_DISABLE_SDL)
@@ -181,6 +182,32 @@ if(MSVC)
     endif()
 else()
     set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall -Werror")
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR DEFINED ENV{CI})
+    find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+    if(CLANG_TIDY_EXE)
+        set_target_properties(${PROJECT_NAME} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
+        # Third-party source files — skip all linting (requires CMake 3.27+)
+        set_source_files_properties(
+            src/graphics/sdl/SDL_FontCache.c
+            external/imgui/imgui.cpp
+            external/imgui/imgui_draw.cpp
+            external/imgui/imgui_tables.cpp
+            external/imgui/imgui_widgets.cpp
+            external/imgui/backends/imgui_impl_sdl2.cpp
+            external/imgui/backends/imgui_impl_sdlrenderer2.cpp
+            external/imgui/backends/imgui_impl_glfw.cpp
+            external/imgui/backends/imgui_impl_vulkan.cpp
+            external/murmurhash.c/murmurhash.c
+            src/graphics/vulkan/shaders/vulkan_shaders.cpp
+            PROPERTIES SKIP_LINTING ON
+        )
+    elseif(DEFINED ENV{CI})
+        message(FATAL_ERROR "clang-tidy not found but required in CI")
+    else()
+        message(STATUS "clang-tidy not found, skipping")
+    endif()
 endif()
 
 # temp disabled while i figure out other build issues. it is intended to use precompiled headers eventually

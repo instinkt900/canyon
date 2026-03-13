@@ -16,7 +16,7 @@ namespace canyon::graphics::sdl {
     }
 
     Graphics::~Graphics() {
-        if (m_imguiWindow) {
+        if (m_imguiWindow != nullptr) {
             ImGui_ImplSDLRenderer2_Shutdown();
             ImGui_ImplSDL2_Shutdown();
             ImGui::DestroyContext();
@@ -30,14 +30,14 @@ namespace canyon::graphics::sdl {
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         ImGui::StyleColorsDark();
 
-        auto& sdlWindow = static_cast<canyon::platform::sdl::Window const&>(window);
+        const auto& sdlWindow = dynamic_cast<canyon::platform::sdl::Window const&>(window);
         m_imguiWindow = sdlWindow.GetSDLWindow();
         ImGui_ImplSDL2_InitForSDLRenderer(sdlWindow.GetSDLWindow(), sdlWindow.GetSDLRenderer());
         ImGui_ImplSDLRenderer2_Init(sdlWindow.GetSDLRenderer());
     }
 
     void Graphics::Begin() {
-        if (m_imguiWindow) {
+        if (m_imguiWindow != nullptr) {
             ImGui_ImplSDLRenderer2_NewFrame();
             ImGui_ImplSDL2_NewFrame();
             ImGui::NewFrame();
@@ -45,7 +45,7 @@ namespace canyon::graphics::sdl {
     }
 
     void Graphics::End() {
-        if (m_imguiWindow) {
+        if (m_imguiWindow != nullptr) {
             ImGui::Render();
             ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
         }
@@ -90,21 +90,30 @@ namespace canyon::graphics::sdl {
         SDL_SetTextureColorMod(sdlTexture->GetSDLTexture()->GetImpl(), components.r, components.g, components.b);
         SDL_SetTextureAlphaMod(sdlTexture->GetSDLTexture()->GetImpl(), components.a);
 
-        SDL_Rect sdlSrcRect = ToSDL(sourceRect ? *sourceRect : textureSourceRect);
+        SDL_Rect sdlSrcRect = ToSDL(sourceRect != nullptr ? *sourceRect : textureSourceRect);
         SDL_Rect sdlDstRect = ToSDL(destRect);
 
         // Negative src dimensions mean the caller wants a mirrored draw.
         // SDL doesn't support negative-dimension rects; normalise and flip instead.
-        SDL_RendererFlip flip = SDL_FLIP_NONE;
+        bool flipH = false;
+        bool flipV = false;
         if (sdlSrcRect.w < 0) {
             sdlSrcRect.x += sdlSrcRect.w;
             sdlSrcRect.w = -sdlSrcRect.w;
-            flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_HORIZONTAL);
+            flipH = true;
         }
         if (sdlSrcRect.h < 0) {
             sdlSrcRect.y += sdlSrcRect.h;
             sdlSrcRect.h = -sdlSrcRect.h;
-            flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_VERTICAL);
+            flipV = true;
+        }
+        SDL_RendererFlip flip = SDL_FLIP_NONE;
+        if (flipH && flipV) {
+            flip = static_cast<SDL_RendererFlip>(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+        } else if (flipH) {
+            flip = SDL_FLIP_HORIZONTAL;
+        } else if (flipV) {
+            flip = SDL_FLIP_VERTICAL;
         }
 
         SDL_RenderCopyEx(m_surfaceContext.GetRenderer(),
@@ -126,10 +135,10 @@ namespace canyon::graphics::sdl {
         SDL_SetTextureColorMod(sdlTexture->GetSDLTexture()->GetImpl(), components.r, components.g, components.b);
         SDL_SetTextureAlphaMod(sdlTexture->GetSDLTexture()->GetImpl(), components.a);
 
-        SDL_Rect sdlSrcRect = ToSDL(sourceRect ? *sourceRect : textureSourceRect);
+        SDL_Rect sdlSrcRect = ToSDL(sourceRect != nullptr ? *sourceRect : textureSourceRect);
 
-        auto const imageWidth = static_cast<int>(image.GetWidth() * scale);
-        auto const imageHeight = static_cast<int>(image.GetHeight() * scale);
+        auto const imageWidth = static_cast<int>(static_cast<float>(image.GetWidth()) * scale);
+        auto const imageHeight = static_cast<int>(static_cast<float>(image.GetHeight()) * scale);
         auto const sdlTotalDestRect{ ToSDL(destRect) };
         SDL_RenderSetClipRect(m_surfaceContext.GetRenderer(), &sdlTotalDestRect);
         for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
@@ -174,21 +183,21 @@ namespace canyon::graphics::sdl {
     }
 
     void Graphics::DrawText(std::string const& text, graphics::IFont& font, IntRect const& destRect, graphics::TextHorizAlignment horizontalAlignment, graphics::TextVertAlignment verticalAlignment) {
-        auto const fcFont = static_cast<Font&>(font).GetFontObj();
+        auto const fcFont = dynamic_cast<Font&>(font).GetFontObj();
 
         auto const destWidth = destRect.bottomRight.x - destRect.topLeft.x;
         auto const destHeight = destRect.bottomRight.y - destRect.topLeft.y;
-        auto const textHeight = FC_GetColumnHeight(fcFont.get(), destWidth, "%s", text.c_str());
+        auto const textHeight = FC_GetColumnHeight(fcFont.get(), destWidth, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
 
         auto x = static_cast<float>(destRect.topLeft.x);
         switch (horizontalAlignment) {
         case graphics::TextHorizAlignment::Left:
             break;
         case graphics::TextHorizAlignment::Center:
-            x = x + destWidth / 2.0f;
+            x = x + static_cast<float>(destWidth) / 2.0f;
             break;
         case graphics::TextHorizAlignment::Right:
-            x = x + destWidth;
+            x = x + static_cast<float>(destWidth);
             break;
         }
 
@@ -197,10 +206,10 @@ namespace canyon::graphics::sdl {
         case graphics::TextVertAlignment::Top:
             break;
         case graphics::TextVertAlignment::Middle:
-            y = y + (destHeight - textHeight) / 2.0f;
+            y = y + (static_cast<float>(destHeight) - static_cast<float>(textHeight)) / 2.0f;
             break;
         case graphics::TextVertAlignment::Bottom:
-            y = y + destHeight - textHeight;
+            y = y + static_cast<float>(destHeight) - static_cast<float>(textHeight);
             break;
         }
 
@@ -210,11 +219,11 @@ namespace canyon::graphics::sdl {
         effect.scale.x = 1.0f;
         effect.scale.y = 1.0f;
 
-        FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), x, y, destWidth, effect, "%s", text.c_str());
+        FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), x, y, destWidth, effect, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
     }
 
     void Graphics::SetClip(IntRect const* rect) {
-        if (rect) {
+        if (rect != nullptr) {
             auto const currentRect = ToSDL(*rect);
             SDL_RenderSetClipRect(m_surfaceContext.GetRenderer(), &currentRect);
         } else {
@@ -234,7 +243,7 @@ namespace canyon::graphics::sdl {
     }
 
     void Graphics::SetTarget(graphics::ITarget* target) {
-        if (!target) {
+        if (target == nullptr) {
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), nullptr);
         } else {
             auto* image = dynamic_cast<Image*>(target);

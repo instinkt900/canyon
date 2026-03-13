@@ -111,7 +111,7 @@ namespace canyon::graphics::vulkan {
 
         uint32_t hash = CalculateHash();
 
-        VkPipeline pipeline;
+        VkPipeline pipeline = VK_NULL_HANDLE;
 
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -174,12 +174,12 @@ namespace canyon::graphics::vulkan {
         hashes.push_back(CalcHash(m_rasterizationInfo.cullMode));
         hashes.push_back(CalcHash(m_rasterizationInfo.frontFace));
         hashes.push_back(CalcHash(m_rasterizationInfo.lineWidth));
-        for (auto& colorBlend : m_colorBlendStates) {
+        for (const auto& colorBlend : m_colorBlendStates) {
             hashes.push_back(CalcHash(colorBlend));
         }
-        for (auto& dynamicState : m_dynamicStates) {
+        for (const auto& dynamicState : m_dynamicStates) {
             hashes.push_back(CalcHash(dynamicState));
         }
-        return CalcHash(reinterpret_cast<void const*>(hashes.data()), sizeof(uint32_t) * hashes.size());
+        return CalcHash(reinterpret_cast<void const*>(hashes.data()), sizeof(uint32_t) * hashes.size()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     }
 }

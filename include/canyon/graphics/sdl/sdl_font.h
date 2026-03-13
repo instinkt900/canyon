@@ -11,7 +11,7 @@ namespace canyon::graphics::sdl {
     class Font : public IFont {
     public:
         explicit Font(CachedFontRef fontObj);
-        virtual ~Font() = default;
+        ~Font() override = default;
 
         CachedFontRef GetFontObj() const {
             return m_fontObj;

@@ -87,7 +87,7 @@ namespace canyon {
     using CachedFontRef = std::shared_ptr<FC_Font>;
 
     inline CachedFontRef CreateCachedFontRef(SDL_Renderer* renderer, std::filesystem::path const& assetPath, int size, SDL_Color const& color, int style) {
-        auto font = FC_CreateFont();
+        auto* font = FC_CreateFont();
         FC_LoadFont(font, renderer, assetPath.string().c_str(), size, color, style);
         return CachedFontRef(font, FC_FreeFont);
     }

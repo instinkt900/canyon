@@ -26,7 +26,7 @@ namespace canyon::platform {
         /// @param width Initial window width in pixels.
         /// @param height Initial window height in pixels.
         Application(IPlatform& platform, std::string const& title, int width, int height);
-        virtual ~Application() = default;
+        ~Application() override = default;
 
         /// @brief Initialise the platform, create the window, and set up ImGui.
         void Init();

@@ -83,7 +83,7 @@ namespace canyon::graphics {
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
 
-        auto& mothImage = static_cast<MothImage&>(image);
+        auto& mothImage = dynamic_cast<MothImage&>(image);
         auto& internalImage = *mothImage.GetImage();
         auto const srcRect = sourceRect;
         if (scaleType == moth_ui::ImageScaleType::Stretch) {
@@ -97,7 +97,7 @@ namespace canyon::graphics {
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
 
-        auto& fcFont = static_cast<MothFont&>(font);
+        auto& fcFont = dynamic_cast<MothFont&>(font);
         auto& internalFont = *fcFont.GetInternalFont();
         m_graphics.DrawText(text, internalFont, destRect, horizontalAlignment, verticalAlignment);
     }

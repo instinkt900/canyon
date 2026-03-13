@@ -20,7 +20,7 @@ namespace canyon::graphics::sdl {
     class Graphics : public IGraphics {
     public:
         Graphics(SurfaceContext& context);
-        virtual ~Graphics();
+        ~Graphics() override;
 
         void InitImgui(canyon::platform::Window const& window) override;
 

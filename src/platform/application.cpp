@@ -39,7 +39,7 @@ namespace canyon::platform {
         return dispatch.GetHandled();
     }
 
-    bool Application::OnWindowSizeEvent(EventWindowSize const& event) {
+    bool Application::OnWindowSizeEvent(EventWindowSize const& /*event*/) { // NOLINT(readability-convert-member-functions-to-static)
         return false;
     }
 

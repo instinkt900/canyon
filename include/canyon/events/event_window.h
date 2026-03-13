@@ -12,7 +12,7 @@ namespace canyon {
     public:
         EventRenderDeviceReset()
             : Event(GetStaticType()) {}
-        virtual ~EventRenderDeviceReset() = default;
+        ~EventRenderDeviceReset() override = default;
 
         static constexpr int GetStaticType() { return EVENTTYPE_RENDERDEVICERESET; }
 
@@ -26,7 +26,7 @@ namespace canyon {
     public:
         EventRenderTargetReset()
             : Event(GetStaticType()) {}
-        virtual ~EventRenderTargetReset() = default;
+        ~EventRenderTargetReset() override = default;
 
         static constexpr int GetStaticType() { return EVENTTYPE_RENDERTARGETRESET; }
 
@@ -44,7 +44,7 @@ namespace canyon {
             : Event(GetStaticType())
             , m_width(width)
             , m_height(height) {}
-        virtual ~EventWindowSize() = default;
+        ~EventWindowSize() override = default;
 
         static constexpr int GetStaticType() { return EVENTTYPE_WINDOWSIZE; }
 
@@ -72,7 +72,7 @@ namespace canyon {
     public:
         EventRequestQuit()
             : Event(GetStaticType()) {}
-        virtual ~EventRequestQuit() = default;
+        ~EventRequestQuit() override = default;
 
         static constexpr int GetStaticType() { return EVENTTYPE_REQUEST_QUIT; }
 
@@ -86,7 +86,7 @@ namespace canyon {
     public:
         EventQuit()
             : Event(GetStaticType()) {}
-        virtual ~EventQuit() = default;
+        ~EventQuit() override = default;
 
         static constexpr int GetStaticType() { return EVENTTYPE_QUIT; }
 
