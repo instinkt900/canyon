@@ -82,7 +82,9 @@ namespace {
 
 namespace canyon::graphics::vulkan {
     Context::Context() {
+        spdlog::info("Vulkan: initializing context");
 
+        spdlog::info("Vulkan: initializing FreeType");
         FT_CHECK(FT_Init_FreeType(&m_ftLibrary));
 
         // create instance
@@ -139,16 +141,20 @@ namespace canyon::graphics::vulkan {
             createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
             createInfo.ppEnabledExtensionNames = extensions.data();
             CHECK_VK_RESULT(vkCreateInstance(&createInfo, nullptr, &m_vkInstance));
+            spdlog::info("Vulkan: instance created");
         }
 
         if (enableValidationLayers) {
+            spdlog::info("Vulkan: enabling validation layers");
             VkDebugUtilsMessengerCreateInfoEXT createInfo{};
             populateDebugMessengerCreateInfo(createInfo);
             CHECK_VK_RESULT(CreateDebugUtilsMessengerEXT(m_vkInstance, &createInfo, nullptr, &m_vkDebugMessenger));
         }
+        spdlog::info("Vulkan: context ready");
     }
 
     Context::~Context() {
+        spdlog::info("Vulkan: destroying context");
         if (enableValidationLayers) {
             DestroyDebugUtilsMessengerEXT(m_vkInstance, m_vkDebugMessenger, nullptr);
         }

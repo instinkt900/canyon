@@ -12,16 +12,21 @@ namespace canyon::platform {
     }
 
     void Application::Init() {
+        spdlog::info("Application: initializing");
         Startup();
+        spdlog::info("Application: creating window '{}' ({}x{})", m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
         m_window = m_platform.CreateWindow(m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
         m_window->AddEventListener(this);
         m_window->GetLayerStack().SetEventListener(this);
         m_window->GetGraphics().InitImgui(*m_window);
         PostCreateWindow();
+        spdlog::info("Application: ready");
     }
 
     void Application::Run() {
+        spdlog::info("Application: running");
         TickSync();
+        spdlog::info("Application: shutting down");
         Shutdown();
     }
 

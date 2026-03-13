@@ -66,11 +66,14 @@ namespace canyon::platform::sdl {
     }
 
     bool Window::CreateWindow() {
+        spdlog::info("SDL: creating window '{}' ({}x{})", m_title, m_windowWidth, m_windowHeight);
         if (nullptr == (m_window = SDL_CreateWindow(m_title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_windowWidth, m_windowHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE))) {
+            spdlog::error("SDL: failed to create window '{}': {}", m_title, SDL_GetError());
             return false;
         }
 
         if (nullptr == (m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC))) {
+            spdlog::error("SDL: failed to create renderer: {}", SDL_GetError());
             SDL_DestroyWindow(m_window);
             m_window = nullptr;
             return false;
@@ -79,7 +82,7 @@ namespace canyon::platform::sdl {
         m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_context, m_renderer);
         m_graphics = std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext);
         m_windowId = SDL_GetWindowID(m_window);
-
+        spdlog::info("SDL: window '{}' ready", m_title);
         return true;
     }
 
@@ -96,6 +99,7 @@ namespace canyon::platform::sdl {
     }
 
     void Window::DestroyWindow() {
+        spdlog::info("SDL: destroying window '{}'", m_title);
         PreDestroy();
         m_graphics.reset();
         m_surfaceContext.reset();

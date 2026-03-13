@@ -5,13 +5,16 @@
 namespace canyon::platform::glfw {
     bool Platform::Startup() {
         if (!glfwInit()) {
+            spdlog::error("GLFW: initialization failed");
             return false;
         }
+        spdlog::info("GLFW: initialized");
         m_context = std::make_unique<graphics::vulkan::Context>();
         return true;
     }
 
     void Platform::Shutdown() {
+        spdlog::info("GLFW: shutting down");
         glfwTerminate();
     }
     

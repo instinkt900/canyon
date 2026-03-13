@@ -57,7 +57,7 @@ void TestLayer::Draw() {
         m_root->Draw();
     }
     m_graphics.SetColor(canyon::graphics::BasicColors::White);
-    m_graphics.DrawImage(*m_target->GetImage(), canyon::IntRect{ { 0, 0 }, { 64, 64 } }, nullptr);
+    m_graphics.DrawImage(*m_target->GetImage(), canyon::IntRect{ { 0, 0 }, { 64, 64 } }, nullptr, 0);
     m_lastDrawnSize = currentSize;
 }
 

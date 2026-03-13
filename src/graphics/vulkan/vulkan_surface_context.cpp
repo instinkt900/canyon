@@ -15,6 +15,7 @@ namespace {
 namespace canyon::graphics::vulkan {
     SurfaceContext::SurfaceContext(Context& context)
         : m_context(context) {
+        spdlog::info("Vulkan: initializing surface context");
 
         // select device
         {
@@ -22,6 +23,7 @@ namespace canyon::graphics::vulkan {
             CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.GetInstance(), &gpuCount, nullptr));
             std::vector<VkPhysicalDevice> gpus(gpuCount);
             CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.GetInstance(), &gpuCount, gpus.data()));
+            spdlog::info("Vulkan: {} physical device(s) found", gpuCount);
 
             uint32_t selectedGpu = 0;
             for (uint32_t i = 0; i < gpuCount; ++i) {
@@ -29,6 +31,7 @@ namespace canyon::graphics::vulkan {
                 VkPhysicalDeviceProperties properties;
                 vkGetPhysicalDeviceProperties(gpus[i], &properties);
                 vkGetPhysicalDeviceFeatures(gpus[i], &features);
+                spdlog::info("Vulkan: device {}: {}", i, properties.deviceName);
                 if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && features.samplerAnisotropy == VK_TRUE) {
                     selectedGpu = i;
                     m_vkDeviceProperties = properties;
@@ -37,6 +40,7 @@ namespace canyon::graphics::vulkan {
             }
 
             m_vkPhysicalDevice = gpus[selectedGpu];
+            spdlog::info("Vulkan: selected device: {}", m_vkDeviceProperties.deviceName);
         }
 
         // queue family
@@ -74,6 +78,7 @@ namespace canyon::graphics::vulkan {
             createInfo.pEnabledFeatures = &deviceFeatures;
             CHECK_VK_RESULT(vkCreateDevice(m_vkPhysicalDevice, &createInfo, nullptr, &m_vkDevice));
             vkGetDeviceQueue(m_vkDevice, m_vkQueueFamily, 0, &m_vkQueue);
+            spdlog::info("Vulkan: logical device created (queue family {})", m_vkQueueFamily);
         }
 
         // descriptor pool
@@ -118,6 +123,7 @@ namespace canyon::graphics::vulkan {
             allocatorCreateInfo.device = m_vkDevice;
             vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator);
         }
+        spdlog::info("Vulkan: surface context ready");
     }
 
     std::unique_ptr<IImage> SurfaceContext::NewImage(std::shared_ptr<ITexture> texture) {
@@ -151,6 +157,7 @@ namespace canyon::graphics::vulkan {
     }
 
     SurfaceContext::~SurfaceContext() {
+        spdlog::info("Vulkan: destroying surface context");
         vkDeviceWaitIdle(m_vkDevice);
         vkDestroyDescriptorPool(m_vkDevice, m_vkDescriptorPool, nullptr);
         vkDestroyCommandPool(m_vkDevice, m_vkCommandPool, nullptr);

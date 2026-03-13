@@ -39,9 +39,11 @@ namespace canyon::platform::glfw {
     }
 
     bool Window::CreateWindow() {
+        spdlog::info("GLFW: creating window '{}' ({}x{})", m_title, m_windowWidth, m_windowHeight);
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         m_glfwWindow = glfwCreateWindow(m_windowWidth, m_windowHeight, m_title.c_str(), nullptr, nullptr);
         if (m_glfwWindow == nullptr) {
+            spdlog::error("GLFW: failed to create window '{}'", m_title);
             return false;
         }
         glfwSetWindowUserPointer(m_glfwWindow, this);
@@ -125,7 +127,7 @@ namespace canyon::platform::glfw {
         m_surfaceContext = std::make_unique<graphics::vulkan::SurfaceContext>(m_context);
 
         m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight);
-
+        spdlog::info("GLFW: window '{}' ready", m_title);
         return true;
     }
 
@@ -135,6 +137,7 @@ namespace canyon::platform::glfw {
     }
 
     void Window::DestroyWindow() {
+        spdlog::info("GLFW: destroying window '{}'", m_title);
         // Wait for all GPU work to finish before destroying Vulkan-backed resources
         if (m_surfaceContext) {
             vkDeviceWaitIdle(m_surfaceContext->GetVkDevice());
@@ -152,6 +155,7 @@ namespace canyon::platform::glfw {
     }
 
     void Window::OnResize() {
+        spdlog::info("GLFW: window '{}' resized to {}x{}", m_title, m_windowWidth, m_windowHeight);
         graphics::vulkan::Graphics* graphics = static_cast<graphics::vulkan::Graphics*>(m_graphics.get());
         graphics->OnResize(m_customVkSurface, m_windowWidth, m_windowHeight);
         m_layerStack->SetWindowSize({ m_windowWidth, m_windowHeight });
