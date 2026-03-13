@@ -71,6 +71,8 @@ namespace canyon::platform::sdl {
         }
 
         if (nullptr == (m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC))) {
+            SDL_DestroyWindow(m_window);
+            m_window = nullptr;
             return false;
         }
 

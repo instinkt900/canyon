@@ -200,7 +200,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::SetBlendMode(BlendMode mode) {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         context->m_currentBlendMode = mode;
     }
 
@@ -211,17 +211,17 @@ namespace canyon::graphics::vulkan {
     // }
 
     void Graphics::SetColor(Color const& color) {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         context->m_currentColor = color;
     }
 
     void Graphics::Clear() {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         DrawFillRectF({ { 0, 0 }, { static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height) } });
     }
 
     void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         auto& vulkanImage = dynamic_cast<Image&>(image);
         auto texture = vulkanImage.m_texture;
 
@@ -292,7 +292,7 @@ namespace canyon::graphics::vulkan {
         FlushCommands();
 
         auto& context = m_surfaceContext;
-        auto drawContext = m_contextStack.top();
+        auto drawContext = CurrentContext();
 
         auto const targetFormat = VK_FORMAT_R8G8B8A8_UNORM;
         auto targetImage = std::make_unique<Texture>(context, drawContext->m_logicalExtent.width, drawContext->m_logicalExtent.height, targetFormat, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -331,7 +331,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         Vertex vertices[8];
 
         vertices[0].xy = { rect.topLeft.x, rect.topLeft.y };
@@ -366,7 +366,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::DrawFillRectF(FloatRect const& rect) {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         Vertex vertices[6];
 
         vertices[0].xy = { rect.topLeft.x, rect.topLeft.y };
@@ -393,7 +393,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         Vertex vertices[2];
 
         vertices[0].xy = { p0.x, p0.y };
@@ -407,7 +407,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::DrawText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         context->m_currentBlendMode = BlendMode::Alpha; // force alpha blending for text
         Font& vulkanFont = static_cast<Font&>(font);
 
@@ -499,7 +499,7 @@ namespace canyon::graphics::vulkan {
 
     void Graphics::SetClip(IntRect const* clipRect) {
         FlushPendingBatch();
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         if (clipRect) {
             VkRect2D scissor;
@@ -545,7 +545,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::SetLogicalSize(IntVec2 const& logicalSize) {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         PushConstants constants;
         constants.xyScale = { 2.0f / static_cast<float>(logicalSize.x), 2.0f / static_cast<float>(logicalSize.y) };
@@ -742,7 +742,7 @@ namespace canyon::graphics::vulkan {
     }
 
     Pipeline& Graphics::GetCurrentPipeline(ETopologyType topology) {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         auto const vkTopology = ToVulkan(topology);
         auto const blendAttachment = ToVulkan(context->m_currentBlendMode);
         auto const vertexInputBinding = getVertexBindingDescription();
@@ -772,7 +772,7 @@ namespace canyon::graphics::vulkan {
     }
 
     Pipeline& Graphics::GetCurrentFontPipeline() {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         auto const vkTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
         auto const blendAttachment = ToVulkan(context->m_currentBlendMode);
         auto const vertexInputBinding = getFontVertexBindingDescription();
@@ -878,7 +878,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::FlushPendingBatch() {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         if (!context->m_pendingBatch) {
             return;
         }
@@ -892,7 +892,7 @@ namespace canyon::graphics::vulkan {
 
     void Graphics::FlushCommands() {
         FlushPendingBatch();
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
         VkFence cmdFence = context->m_target->GetFence().GetVkFence();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         commandBuffer.EndRenderPass();
@@ -937,7 +937,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void Graphics::SubmitVertices(Vertex* vertices, uint32_t vertCount, ETopologyType topology, VkDescriptorSet descriptorSet) {
-        auto context = m_contextStack.top();
+        auto context = CurrentContext();
 
         assert(vertCount <= context->m_maxVertexCount);
 

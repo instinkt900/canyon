@@ -31,6 +31,11 @@ namespace canyon::platform {
 
         Window* GetWindow() { return m_window.get(); }
 
+        Application(Application const&) = delete;
+        Application& operator=(Application const&) = delete;
+        Application(Application&&) = delete;
+        Application& operator=(Application&&) = delete;
+
     protected:
         virtual void Startup() {}
         virtual void PostCreateWindow() {}

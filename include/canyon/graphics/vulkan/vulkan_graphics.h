@@ -162,6 +162,12 @@ namespace canyon::graphics::vulkan {
         Pipeline& GetCurrentPipeline(ETopologyType topology);
         Pipeline& GetCurrentFontPipeline();
 
+        DrawContext* CurrentContext() {
+            assert(!m_contextStack.empty() && m_contextStack.top() != nullptr
+                   && "Begin() must be called before any draw operations");
+            return m_contextStack.top();
+        }
+
         void BeginContext(DrawContext* target);
         void RestartContext();
         void EndContext();
