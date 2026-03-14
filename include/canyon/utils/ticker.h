@@ -36,7 +36,7 @@ namespace canyon {
             while (m_running) {
                 auto const nowTicks = std::chrono::steady_clock::now();
                 auto deltaTicks = std::chrono::duration_cast<std::chrono::milliseconds>(nowTicks - m_lastUpdateTicks);
-                while (deltaTicks > m_updateTicks) {
+                while (deltaTicks >= m_updateTicks) {
                     TickFixed(static_cast<uint32_t>(m_updateTicks.count()));
                     m_lastUpdateTicks += m_updateTicks;
                     deltaTicks -= m_updateTicks;
