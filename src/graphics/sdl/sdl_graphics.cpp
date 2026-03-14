@@ -131,6 +131,9 @@ namespace canyon::graphics::sdl {
     void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
         auto& sdlImage = dynamic_cast<Image&>(image);
         auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
+        if (!sdlTexture) {
+            return;
+        }
         auto const& textureSourceRect = sdlImage.GetSourceRect();
 
         ColorComponents const components{ m_drawColor };
