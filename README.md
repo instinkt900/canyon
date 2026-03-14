@@ -147,6 +147,13 @@ Consumers can then depend on `canyon/<<version>>` in their own `conanfile.py`.
 `Application` ties a platform, a window, and a fixed-timestep loop together. Subclass it and override the lifecycle hooks:
 
 ```cpp
+#include <canyon/platform/application.h>
+#if !CANYON_DISABLE_VULKAN
+#include <canyon/platform/glfw/glfw_platform.h>
+#else
+#include <canyon/platform/sdl/sdl_platform.h>
+#endif
+
 class MyApp : public canyon::platform::Application {
 public:
     MyApp(canyon::platform::IPlatform& platform)
@@ -159,7 +166,11 @@ protected:
 };
 
 int main() {
+#if !CANYON_DISABLE_VULKAN
     canyon::platform::glfw::Platform platform;
+#else
+    canyon::platform::sdl::Platform platform;
+#endif
     platform.Startup();
     MyApp app(platform);
     app.Init();
