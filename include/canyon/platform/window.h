@@ -72,11 +72,6 @@ namespace canyon::platform {
         /// @brief Called before the native window and graphics objects are destroyed.
         void PreDestroy();
 
-        /// @brief Create the native window and initialise graphics resources.
-        virtual bool CreateWindow() = 0;
-
-        /// @brief Destroy the native window and release graphics resources.
-        virtual void DestroyWindow() = 0;
 
         std::string m_title;
         int m_windowWidth = 0;

@@ -28,11 +28,11 @@ namespace canyon::platform::sdl {
         void Update(uint32_t ticks) override;
         void Draw() override;
 
-    protected:
-        bool CreateWindow() override;
-        void DestroyWindow() override;
-
     private:
+        bool CreateWindow();
+        void DestroyWindow();
+
+
         graphics::sdl::Context& m_context;
         std::unique_ptr<graphics::sdl::SurfaceContext> m_surfaceContext;
 

@@ -17,7 +17,7 @@ namespace canyon::platform::glfw {
     class Window : public canyon::platform::Window {
     public:
         Window(graphics::vulkan::Context& context, std::string const& title, int width, int height);
-        virtual ~Window();
+        ~Window() override;
 
         graphics::SurfaceContext & GetSurfaceContext() const override { return *m_surfaceContext; }
         void SetWindowTitle(std::string const& title) override;
@@ -27,11 +27,11 @@ namespace canyon::platform::glfw {
         void Update(uint32_t ticks) override;
         void Draw() override;
 
-    protected:
-        bool CreateWindow() override;
-        void DestroyWindow() override;
-
     private:
+        bool CreateWindow();
+        void DestroyWindow();
+
+
         graphics::vulkan::Context& m_context;
         std::unique_ptr<graphics::vulkan::SurfaceContext> m_surfaceContext;
 

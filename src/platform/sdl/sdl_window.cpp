@@ -42,14 +42,14 @@ namespace canyon::platform::sdl {
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {
-        if (!CreateWindow()) { // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
+        if (!CreateWindow()) {
             throw std::runtime_error("SDL: failed to create window '" + title + "'");
         }
         PostCreate();
     }
 
     Window::~Window() {
-        DestroyWindow(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
+        DestroyWindow();
     }
 
     void Window::Update(uint32_t ticks) {
