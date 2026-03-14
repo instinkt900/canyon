@@ -42,7 +42,10 @@ namespace canyon {
                     deltaTicks -= m_updateTicks;
                 }
                 Tick(static_cast<uint32_t>(deltaTicks.count()));
-                std::this_thread::yield();
+                auto const sleepFor = m_updateTicks - deltaTicks;
+                if (sleepFor > std::chrono::milliseconds::zero()) {
+                    std::this_thread::sleep_for(sleepFor);
+                }
             }
         }
 
