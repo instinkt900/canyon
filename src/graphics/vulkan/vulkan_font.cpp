@@ -121,7 +121,7 @@ namespace canyon::graphics::vulkan {
         FT_UInt gindex = 0;
         charcode = FT_Get_First_Char(face, &gindex);
         while (gindex != 0) {
-            FT_CHECK(FT_Load_Glyph(face, gindex, FT_LOAD_DEFAULT));
+            FT_CHECK(FT_Load_Glyph(face, gindex, FT_LOAD_RENDER));
 
             const int glyphWidth = static_cast<int>(face->glyph->bitmap.width) + BorderPixels * 2;
             const int glyphHeight = static_cast<int>(face->glyph->bitmap.rows) + BorderPixels * 2;
