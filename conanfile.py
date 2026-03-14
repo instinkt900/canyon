@@ -145,5 +145,5 @@ class canyon(ConanFile):
                         f"pkg-config query failed for {', '.join(pkg_config_pkgs)}; "
                         "ensure the required system development headers are installed. "
                         f"Error: {e}"
-                    )
+                    ) from e
 
