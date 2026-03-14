@@ -37,7 +37,12 @@ namespace canyon::graphics::vulkan {
 
         auto const& glfwWindow = *glfwWindowPtr;
 
-        ImGui_ImplGlfw_InitForVulkan(glfwWindow.GetGLFWWindow(), true);
+        if (!ImGui_ImplGlfw_InitForVulkan(glfwWindow.GetGLFWWindow(), true)) {
+            spdlog::error("Vulkan: ImGui_ImplGlfw_InitForVulkan failed");
+            ImGui::DestroyContext();
+            return;
+        }
+
         ImGui_ImplVulkan_InitInfo initInfo{};
         initInfo.Instance = m_surfaceContext.GetContext().GetInstance();
         initInfo.PhysicalDevice = m_surfaceContext.GetVkPhysicalDevice();
@@ -52,7 +57,13 @@ namespace canyon::graphics::vulkan {
         initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         initInfo.Allocator = nullptr;
         initInfo.CheckVkResultFn = checkVkResult;
-        ImGui_ImplVulkan_Init(&initInfo);
+        if (!ImGui_ImplVulkan_Init(&initInfo)) {
+            spdlog::error("Vulkan: ImGui_ImplVulkan_Init failed");
+            ImGui_ImplGlfw_Shutdown();
+            ImGui::DestroyContext();
+            return;
+        }
+
         ImGui_ImplVulkan_CreateFontsTexture();
 
         m_imguiInitialized = true;
