@@ -104,6 +104,10 @@ namespace canyon {
             moth_ui::EventDispatch dispatch(event);
             std::vector<moth_ui::EventListener*> snapshot(m_listeners);
             for (auto* listener : snapshot) {
+                // Listener may have been removed during a prior callback.
+                if (std::find(m_listeners.begin(), m_listeners.end(), listener) == m_listeners.end()) {
+                    continue;
+                }
                 dispatch.Dispatch(listener);
             }
             return dispatch.GetHandled();
