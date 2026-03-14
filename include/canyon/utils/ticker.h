@@ -17,7 +17,7 @@ namespace canyon {
     /// is called (typically from within an event handler).
     class Ticker {
     public:
-        /// @param ticksPerSecond Fixed update rate in Hz. Clamped to 1 if <= 0.
+        /// @param ticksPerSecond Fixed update rate in Hz. Clamped to 60 if <= 0.
         explicit Ticker(int ticksPerSecond = 60)
             : m_updateTicks(std::chrono::milliseconds(1000 / (ticksPerSecond > 0 ? ticksPerSecond : 60))) {
         }
