@@ -96,6 +96,6 @@ struct fmt::formatter<T, std::enable_if_t<std::is_enum_v<T>, char>> {
     constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.begin(); }
 
     auto format(T value, fmt::format_context& ctx) const {
-        return fmt::format_to(ctx.out(), "{}", magic_enum::enum_name(value));
+        return fmt::format_to(ctx.out(), "{}::{}", magic_enum::enum_type_name<T>(), magic_enum::enum_name(value));
     }
 };
