@@ -281,7 +281,7 @@ namespace canyon::graphics::vulkan {
         auto const SubmitNewLine = [this, &lines](char const* lineStart, size_t lineLength) {
             // strip preceeding whitespace
             while (lineLength > 0) {
-                if (std::isspace(*lineStart) == 0) {
+                if (std::isspace(static_cast<unsigned char>(*lineStart)) == 0) {
                     break;
                 }
                 ++lineStart;
@@ -290,7 +290,7 @@ namespace canyon::graphics::vulkan {
 
             // strip trailing whitespace
             while (lineLength > 0) {
-                if (std::isspace(lineStart[lineLength - 1]) == 0) {
+                if (std::isspace(static_cast<unsigned char>(lineStart[lineLength - 1])) == 0) {
                     break;
                 }
                 --lineLength;
@@ -326,7 +326,7 @@ namespace canyon::graphics::vulkan {
             size_t lastBreakIdx = 0;
             size_t i = 0;
             for (/* empty */; i < candidateLine.length(); ++i) {
-                if (std::isspace(candidateLine[i]) != 0) {
+                if (std::isspace(static_cast<unsigned char>(candidateLine[i])) != 0) {
                     int32_t const thisLineWidth = GetStringWidth({ candidateLine.data() + beginIdx, i - beginIdx });
                     if (thisLineWidth > width) {
                         // adding this word puts us over the limit

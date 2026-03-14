@@ -18,6 +18,12 @@ namespace canyon::graphics::vulkan {
             return;
         }
 
+        auto const* glfwWindowPtr = dynamic_cast<canyon::platform::glfw::Window const*>(&window);
+        if (glfwWindowPtr == nullptr) {
+            spdlog::error("Vulkan: InitImgui called with non-GLFW window");
+            return;
+        }
+
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
@@ -29,7 +35,7 @@ namespace canyon::graphics::vulkan {
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-        auto const& glfwWindow = dynamic_cast<canyon::platform::glfw::Window const&>(window);
+        auto const& glfwWindow = *glfwWindowPtr;
 
         ImGui_ImplGlfw_InitForVulkan(glfwWindow.GetGLFWWindow(), true);
         ImGui_ImplVulkan_InitInfo initInfo{};

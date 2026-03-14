@@ -12,9 +12,14 @@ namespace {
     bool CollectSDLEventsForWindow(uint32_t windowId, std::vector<SDL_Event>* outEvents) {
         std::lock_guard lock(EventFetchMutex);
 
-        SDL_Event event;
+        SDL_Event event{};
         while (SDL_PollEvent(&event) != 0) {
-            PendingEvents.push_back(event);
+            // Only retain events that target a specific window; non-window
+            // events (e.g. SDL_QUIT) have windowID == 0 and would accumulate
+            // forever since no window will ever match them.
+            if (event.window.windowID != 0) {
+                PendingEvents.push_back(event);
+            }
         }
 
         bool found_event = false;
@@ -36,8 +41,9 @@ namespace canyon::platform::sdl {
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {
-        CreateWindow(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
-        PostCreate();
+        if (CreateWindow()) { // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
+            PostCreate();
+        }
     }
 
     Window::~Window() {

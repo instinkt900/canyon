@@ -12,8 +12,9 @@ namespace canyon::platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
         : canyon::platform::Window(title, width, height)
         , m_context(context) {
-        CreateWindow(); // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
-        PostCreate();
+        if (CreateWindow()) { // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
+            PostCreate();
+        }
     }
 
     Window::~Window() {

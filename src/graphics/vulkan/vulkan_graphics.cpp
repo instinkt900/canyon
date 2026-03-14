@@ -315,6 +315,7 @@ namespace canyon::graphics::vulkan {
         // use this to actually submit characters at a position
         auto SubmitCharacter = [&](uint32_t glyphIndex, FloatVec2 const& pos) {
             if (context->m_glyphCount >= 1024) {
+                spdlog::warn("DrawText: glyph buffer full (1024 limit); remaining glyphs will not be rendered");
                 return;
             }
 

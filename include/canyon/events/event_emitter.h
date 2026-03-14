@@ -99,7 +99,8 @@ namespace canyon {
         /// @returns @c true if any listener handled the event.
         bool EmitEvent(moth_ui::Event const& event) {
             moth_ui::EventDispatch dispatch(event);
-            for (auto* listener : m_listeners) {
+            std::vector<moth_ui::EventListener*> snapshot(m_listeners);
+            for (auto* listener : snapshot) {
                 dispatch.Dispatch(listener);
             }
             return dispatch.GetHandled();

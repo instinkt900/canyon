@@ -40,7 +40,9 @@ namespace canyon::graphics::vulkan {
 
     std::unique_ptr<Image> Image::Load(SurfaceContext& context, std::filesystem::path const& path) {
         if (auto texture = Texture::FromFile(context, path)) {
-            return std::make_unique<Image>(std::move(texture), IntRect{ { 0, 0 }, { texture->GetWidth(), texture->GetHeight() }});
+            int const w = texture->GetWidth();
+            int const h = texture->GetHeight();
+            return std::make_unique<Image>(std::move(texture), IntRect{ { 0, 0 }, { w, h } });
         }
         return nullptr;
     }

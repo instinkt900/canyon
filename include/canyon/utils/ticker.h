@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <thread>
 
@@ -55,7 +56,7 @@ namespace canyon {
         virtual void Tick(uint32_t ticks) = 0;
 
     private:
-        bool m_running = false;
+        std::atomic<bool> m_running = false;
         std::chrono::milliseconds m_updateTicks;
         std::chrono::time_point<std::chrono::steady_clock> m_lastUpdateTicks;
     };

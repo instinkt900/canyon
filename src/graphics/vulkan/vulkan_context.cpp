@@ -129,9 +129,15 @@ namespace canyon::graphics::vulkan {
             }
 
             uint32_t glfwExtensionCount = 0;
-            char const** glfwExtensions = nullptr;
-            glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-            std::vector<char const*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+            char const** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+            if (glfwExtensions == nullptr) {
+                spdlog::error("Vulkan: glfwGetRequiredInstanceExtensions returned nullptr");
+                glfwExtensionCount = 0;
+            }
+            std::vector<char const*> extensions;
+            if (glfwExtensions != nullptr) {
+                extensions.assign(glfwExtensions, glfwExtensions + glfwExtensionCount);
+            }
 
             if (enableValidationLayers) {
                 extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);

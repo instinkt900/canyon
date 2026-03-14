@@ -44,6 +44,24 @@ void TestLayer::Update(uint32_t ticks) {
     if (m_root) {
         m_root->Update(ticks);
     }
+}
+
+void TestLayer::Draw() {
+    // Info overlay showing what each part of the demo illustrates
+    ImGui::Begin("Canyon Feature Demo", nullptr, ImGuiWindowFlags_NoCollapse);
+    ImGui::Text("Top-right  Render target (animated, 256x256)");
+    ImGui::Text("           DrawLineF + DrawFillRectF");
+    ImGui::Text("           Additive and alpha blend modes");
+    ImGui::Text("Bottom-right  Clip rect demo");
+    ImGui::Text("Centre     moth_ui layout + animations");
+    ImGui::Text("           Custom UIButton widget");
+    ImGui::Separator();
+    ImGui::Text("S  save screenshot.png");
+    ImGui::Separator();
+    if (ImGui::Button("Save screenshot")) {
+        m_pendingScreenshot = true;
+    }
+    ImGui::End();
 
     // Render an animated scene into the off-screen target each frame.
     // This demonstrates: render targets, primitive drawing, blend modes.
@@ -78,36 +96,24 @@ void TestLayer::Update(uint32_t ticks) {
     m_graphics.DrawRectF({ { cx - half, cy - half }, { cx + half, cy + half } });
 
     m_graphics.SetTarget(nullptr);
-}
-
-void TestLayer::Draw() {
-    // Info overlay showing what each part of the demo illustrates
-    ImGui::Begin("Canyon Feature Demo", nullptr, ImGuiWindowFlags_NoCollapse);
-    ImGui::Text("Top-right  Render target (animated, 256x256)");
-    ImGui::Text("           DrawLineF + DrawFillRectF");
-    ImGui::Text("           Additive and alpha blend modes");
-    ImGui::Text("Bottom-right  Clip rect demo");
-    ImGui::Text("Centre     moth_ui layout + animations");
-    ImGui::Text("           Custom UIButton widget");
-    ImGui::Separator();
-    ImGui::Text("S  save screenshot.png");
-    ImGui::Separator();
-    if (ImGui::Button("Save screenshot")) {
-        m_pendingScreenshot = true;
-    }
-    ImGui::End();
 
     // Recreate the full-screen target whenever the window is resized.
     moth_ui::IntVec2 const currentSize{ GetWidth(), GetHeight() };
     if (!m_screenTarget || m_lastDrawnSize != currentSize) {
-        m_screenTarget = m_graphics.CreateTarget(currentSize.x, currentSize.y);
-        if (m_root) {
-            moth_ui::IntRect displayRect;
-            displayRect.topLeft = { 0, 0 };
-            displayRect.bottomRight = currentSize;
-            m_root->SetScreenRect(displayRect);
+        if (currentSize.x > 0 && currentSize.y > 0) {
+            m_screenTarget = m_graphics.CreateTarget(currentSize.x, currentSize.y);
+            if (m_root) {
+                moth_ui::IntRect displayRect;
+                displayRect.topLeft = { 0, 0 };
+                displayRect.bottomRight = currentSize;
+                m_root->SetScreenRect(displayRect);
+            }
+            m_lastDrawnSize = currentSize;
         }
-        m_lastDrawnSize = currentSize;
+    }
+
+    if (!m_screenTarget) {
+        return;
     }
 
     // Draw the whole scene into the full-screen target.

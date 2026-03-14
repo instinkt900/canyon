@@ -313,6 +313,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void CommandBuffer::HostWriteToVertexBarrier(Buffer const& buffer) {
+        assert(m_recording);
         VkBufferMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
         barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;

@@ -30,7 +30,6 @@ class canyon(ConanFile):
 
     def validate(self):
         if self.options.disable_vulkan and self.options.disable_sdl:
-            from conan.errors import ConanInvalidConfiguration
             raise ConanInvalidConfiguration("disable_vulkan and disable_sdl cannot both be True")
 
     def requirements(self):
@@ -111,23 +110,33 @@ class canyon(ConanFile):
             self.cpp_info.defines.append("CANYON_DISABLE_SDL=1")
         if self.settings.os == "Linux":
             # System SDL2/SDL_image/SDL_ttf/GLFW — propagate link flags and
-            # SDL2 include paths to all consumers. Paths are detected via
+            # include paths to all consumers. Paths are detected via
             # pkg-config rather than hard-coding a sysroot-relative location.
-            self.cpp_info.system_libs = ["SDL2", "SDL2_image", "SDL2_ttf", "glfw", "freetype", "harfbuzz"]
             import shutil
             import subprocess
+            system_libs = []
+            pkg_config_pkgs = []
+            if not self.options.disable_sdl:
+                system_libs += ["SDL2", "SDL2_image", "SDL2_ttf"]
+                pkg_config_pkgs.append("sdl2")
+            if not self.options.disable_vulkan:
+                system_libs += ["glfw", "freetype", "harfbuzz"]
+                pkg_config_pkgs += ["freetype2", "harfbuzz"]
+            if system_libs:
+                self.cpp_info.system_libs = system_libs
             pkg_config = shutil.which("pkg-config")
-            if not pkg_config:
-                self.output.warning("pkg-config not found; SDL2 include path not automatically propagated to consumers")
-            else:
-                try:
-                    flags = subprocess.check_output(
-                        [pkg_config, "--cflags-only-I", "sdl2", "freetype2", "harfbuzz"],
-                        text=True
-                    ).split()
-                    for flag in flags:
-                        if flag.startswith("-I"):
-                            self.cpp_info.includedirs.append(flag[2:])
-                except subprocess.SubprocessError as e:
-                    self.output.warning(f"pkg-config query failed; system library include paths not automatically propagated to consumers: {e}")
+            if pkg_config_pkgs:
+                if not pkg_config:
+                    self.output.warning("pkg-config not found; system library include paths not automatically propagated to consumers")
+                else:
+                    try:
+                        flags = subprocess.check_output(
+                            [pkg_config, "--cflags-only-I"] + pkg_config_pkgs,
+                            text=True
+                        ).split()
+                        for flag in flags:
+                            if flag.startswith("-I"):
+                                self.cpp_info.includedirs.append(flag[2:])
+                    except subprocess.SubprocessError as e:
+                        self.output.warning(f"pkg-config query failed; system library include paths not automatically propagated to consumers: {e}")
 

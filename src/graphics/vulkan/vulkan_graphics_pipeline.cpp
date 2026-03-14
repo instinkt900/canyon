@@ -1,5 +1,6 @@
 #include "common.h"
 #include "canyon/graphics/vulkan/vulkan_graphics.h"
+#include <stdexcept>
 #include "canyon/graphics/vulkan/vulkan_command_buffer.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
 #include "shaders/vulkan_shaders.h"
@@ -75,12 +76,13 @@ namespace canyon::graphics::vulkan {
 
     VkPrimitiveTopology Graphics::ToVulkan(ETopologyType type) {
         switch (type) {
-        default:
-            assert(false);
         case ETopologyType::Lines:
             return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
         case ETopologyType::Triangles:
             return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        default:
+            assert(false && "Unknown ETopologyType");
+            throw std::runtime_error("Unknown ETopologyType");
         }
     }
 

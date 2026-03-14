@@ -109,6 +109,8 @@ namespace canyon::graphics::vulkan {
             barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
             barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
             barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+            barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
             barrier.buffer = context->m_fontInstanceStagingBuffer->GetVKBuffer();
             barrier.offset = 0;
             barrier.size = context->m_fontInstanceStagingBuffer->GetSize();
