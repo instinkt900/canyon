@@ -65,37 +65,43 @@ void TestLayer::Draw() {
 
     // Render an animated scene into the off-screen target each frame.
     // This demonstrates: render targets, primitive drawing, blend modes.
-    m_graphics.SetTarget(m_target.get());
+    bool const targetValid = m_target != nullptr &&
+                             m_target->GetImage() != nullptr &&
+                             m_target->GetImage()->GetWidth() > 0 &&
+                             m_target->GetImage()->GetHeight() > 0;
+    if (targetValid) {
+        m_graphics.SetTarget(m_target.get());
 
-    m_graphics.SetBlendMode(canyon::graphics::BlendMode::Replace);
-    m_graphics.SetColor({ 0.05f, 0.05f, 0.15f, 1.0f });
-    m_graphics.Clear();
+        m_graphics.SetBlendMode(canyon::graphics::BlendMode::Replace);
+        m_graphics.SetColor({ 0.05f, 0.05f, 0.15f, 1.0f });
+        m_graphics.Clear();
 
-    // Eight spinning coloured lines radiating from the centre
-    float const cx = 128.0f, cy = 128.0f, radius = 110.0f;
-    float const angle = m_elapsedMs * 0.001f;
-    m_graphics.SetBlendMode(canyon::graphics::BlendMode::Add);
-    for (int i = 0; i < 8; i++) {
-        float t = angle + i * (3.14159f / 4.0f);
-        canyon::FloatVec2 p0 = { cx + radius * std::cos(t), cy + radius * std::sin(t) };
-        canyon::FloatVec2 p1 = { cx - radius * std::cos(t), cy - radius * std::sin(t) };
-        float r = std::sin(t + angle) * 0.5f + 0.5f;
-        float g = std::cos(t * 1.3f) * 0.5f + 0.5f;
-        m_graphics.SetColor({ r, g, 1.0f - r, 1.0f });
-        m_graphics.DrawLineF(p0, p1);
+        // Eight spinning coloured lines radiating from the centre
+        float const cx = 128.0f, cy = 128.0f, radius = 110.0f;
+        float const angle = m_elapsedMs * 0.001f;
+        m_graphics.SetBlendMode(canyon::graphics::BlendMode::Add);
+        for (int i = 0; i < 8; i++) {
+            float t = angle + i * (3.14159f / 4.0f);
+            canyon::FloatVec2 p0 = { cx + radius * std::cos(t), cy + radius * std::sin(t) };
+            canyon::FloatVec2 p1 = { cx - radius * std::cos(t), cy - radius * std::sin(t) };
+            float r = std::sin(t + angle) * 0.5f + 0.5f;
+            float g = std::cos(t * 1.3f) * 0.5f + 0.5f;
+            m_graphics.SetColor({ r, g, 1.0f - r, 1.0f });
+            m_graphics.DrawLineF(p0, p1);
+        }
+
+        // Pulsing filled rect in the centre (demonstrates alpha blending)
+        float pulse = std::sin(m_elapsedMs * 0.003f) * 0.5f + 0.5f;
+        float half = 20.0f + 20.0f * pulse;
+        m_graphics.SetBlendMode(canyon::graphics::BlendMode::Alpha);
+        m_graphics.SetColor({ 1.0f, 0.5f + 0.5f * pulse, 0.2f, 0.75f });
+        m_graphics.DrawFillRectF({ { cx - half, cy - half }, { cx + half, cy + half } });
+        m_graphics.SetBlendMode(canyon::graphics::BlendMode::Replace);
+        m_graphics.SetColor(canyon::graphics::BasicColors::White);
+        m_graphics.DrawRectF({ { cx - half, cy - half }, { cx + half, cy + half } });
+
+        m_graphics.SetTarget(nullptr);
     }
-
-    // Pulsing filled rect in the centre (demonstrates alpha blending)
-    float pulse = std::sin(m_elapsedMs * 0.003f) * 0.5f + 0.5f;
-    float half = 20.0f + 20.0f * pulse;
-    m_graphics.SetBlendMode(canyon::graphics::BlendMode::Alpha);
-    m_graphics.SetColor({ 1.0f, 0.5f + 0.5f * pulse, 0.2f, 0.75f });
-    m_graphics.DrawFillRectF({ { cx - half, cy - half }, { cx + half, cy + half } });
-    m_graphics.SetBlendMode(canyon::graphics::BlendMode::Replace);
-    m_graphics.SetColor(canyon::graphics::BasicColors::White);
-    m_graphics.DrawRectF({ { cx - half, cy - half }, { cx + half, cy + half } });
-
-    m_graphics.SetTarget(nullptr);
 
     // Recreate the full-screen target whenever the window is resized.
     moth_ui::IntVec2 const currentSize{ GetWidth(), GetHeight() };
@@ -127,15 +133,17 @@ void TestLayer::Draw() {
     }
 
     // Render target displayed in the top-right corner with a gentle rotation
-    constexpr int kTargetDisplay = 200;
-    canyon::IntRect targetRect{
-        { GetWidth() - kTargetDisplay - 10, 10 },
-        { GetWidth() - 10, kTargetDisplay + 10 }
-    };
-    float rotation = std::sin(m_elapsedMs * 0.0005f) * 8.0f;
-    m_graphics.SetBlendMode(canyon::graphics::BlendMode::Replace);
-    m_graphics.SetColor(canyon::graphics::BasicColors::White);
-    m_graphics.DrawImage(*m_target->GetImage(), targetRect, nullptr, rotation);
+    if (targetValid) {
+        constexpr int kTargetDisplay = 200;
+        canyon::IntRect targetRect{
+            { GetWidth() - kTargetDisplay - 10, 10 },
+            { GetWidth() - 10, kTargetDisplay + 10 }
+        };
+        float rotation = std::sin(m_elapsedMs * 0.0005f) * 8.0f;
+        m_graphics.SetBlendMode(canyon::graphics::BlendMode::Replace);
+        m_graphics.SetColor(canyon::graphics::BasicColors::White);
+        m_graphics.DrawImage(*m_target->GetImage(), targetRect, nullptr, rotation);
+    }
 
     // Clip rect demo: coloured bands rendered into a constrained region in the
     // bottom-right corner.  The bands are drawn wider than the clip zone so the
