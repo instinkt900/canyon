@@ -144,7 +144,11 @@ namespace canyon::graphics::vulkan {
     void Graphics::SubmitVertices(Vertex* vertices, uint32_t vertCount, ETopologyType topology, VkDescriptorSet descriptorSet) {
         auto* context = CurrentContext();
 
-        assert(vertCount <= context->m_maxVertexCount);
+        if (vertCount > context->m_maxVertexCount) {
+            spdlog::warn("SubmitVertices: vertCount {} exceeds m_maxVertexCount {}; draw call ignored",
+                         vertCount, context->m_maxVertexCount);
+            return;
+        }
 
         const uint32_t availableVertices = context->m_maxVertexCount - context->m_vertexCount;
         if (availableVertices < vertCount) {
