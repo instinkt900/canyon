@@ -5,6 +5,8 @@
 #include "canyon/platform/sdl/sdl_events.h"
 #include "canyon/graphics/sdl/sdl_graphics.h"
 
+#include <stdexcept>
+
 namespace {
     std::mutex EventFetchMutex;      // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
     std::list<SDL_Event> PendingEvents; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
@@ -40,9 +42,10 @@ namespace canyon::platform::sdl {
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {
-        if (CreateWindow()) { // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
-            PostCreate();
+        if (!CreateWindow()) { // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
+            throw std::runtime_error("SDL: failed to create window '" + title + "'");
         }
+        PostCreate();
     }
 
     Window::~Window() {
