@@ -149,10 +149,12 @@ namespace canyon::graphics::vulkan {
         if (!texture) {
             return nullptr;
         }
-        std::shared_ptr<Texture> vulkanTexture(dynamic_cast<Texture*>(texture.release()));
-        if (!vulkanTexture) {
+        auto* rawTexture = dynamic_cast<Texture*>(texture.get());
+        if (rawTexture == nullptr) {
             return nullptr;
         }
+        texture.release();
+        std::shared_ptr<Texture> vulkanTexture(rawTexture);
         return std::make_unique<Image>(vulkanTexture);
     }
 
