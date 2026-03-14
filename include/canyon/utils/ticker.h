@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <thread>
@@ -18,8 +19,9 @@ namespace canyon {
     class Ticker {
     public:
         /// @param ticksPerSecond Fixed update rate in Hz. Clamped to 60 if <= 0.
+        /// The resulting period is clamped to a minimum of 1ms to avoid a zero interval.
         explicit Ticker(int ticksPerSecond = 60)
-            : m_updateTicks(std::chrono::milliseconds(1000 / (ticksPerSecond > 0 ? ticksPerSecond : 60))) {
+            : m_updateTicks(std::chrono::milliseconds(std::max(1, 1000 / (ticksPerSecond > 0 ? ticksPerSecond : 60)))) {
         }
         virtual ~Ticker() {}
 
