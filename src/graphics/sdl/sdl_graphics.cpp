@@ -252,9 +252,9 @@ namespace canyon::graphics::sdl {
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), nullptr);
         } else {
             auto* image = dynamic_cast<Image*>(target);
-            assert(image && "SetTarget: target is not an Image");
+            assert(image != nullptr && "SetTarget: target is not an Image");
             auto sdlImage = std::dynamic_pointer_cast<Texture>(image->GetTexture());
-            assert(sdlImage && "SetTarget: texture is not an SDL Texture");
+            assert(sdlImage != nullptr && "SetTarget: texture is not an SDL Texture");
             auto sdlTexture = sdlImage->GetSDLTexture();
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), sdlTexture->GetImpl());
         }
