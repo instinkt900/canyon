@@ -225,8 +225,9 @@ namespace canyon::graphics::vulkan {
                 };
             }
             // ... Add others as needed
-            assert(false && "Unknown transition");
-            return {}; // fallback (or assert)
+            spdlog::error("GetTransitionInfo: unsupported layout transition {} -> {}",
+                          static_cast<int>(oldLayout), static_cast<int>(newLayout));
+            abort();
         }
     }
 
