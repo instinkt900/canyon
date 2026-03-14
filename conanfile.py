@@ -134,7 +134,7 @@ class canyon(ConanFile):
                     )
                 try:
                     flags = subprocess.check_output(
-                        [pkg_config, "--cflags-only-I"] + pkg_config_pkgs,
+                        [pkg_config, "--cflags-only-I", *pkg_config_pkgs],
                         text=True
                     ).split()
                     for flag in flags:
