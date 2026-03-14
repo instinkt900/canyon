@@ -64,6 +64,8 @@ class canyon(ConanFile):
                 packages += ["libsdl2-dev", "libsdl2-image-dev", "libsdl2-ttf-dev"]
             if not self.options.disable_vulkan:
                 packages += ["libglfw3-dev", "libfreetype-dev", "libharfbuzz-dev"]
+            if not self.options.disable_sdl or not self.options.disable_vulkan:
+                packages.append("pkg-config")
             if packages:
                 if not shutil.which("apt-get"):
                     raise ConanInvalidConfiguration(
@@ -127,16 +129,23 @@ class canyon(ConanFile):
             pkg_config = shutil.which("pkg-config")
             if pkg_config_pkgs:
                 if not pkg_config:
-                    self.output.warning("pkg-config not found; system library include paths not automatically propagated to consumers")
-                else:
-                    try:
-                        flags = subprocess.check_output(
-                            [pkg_config, "--cflags-only-I"] + pkg_config_pkgs,
-                            text=True
-                        ).split()
-                        for flag in flags:
-                            if flag.startswith("-I"):
-                                self.cpp_info.includedirs.append(flag[2:])
-                    except subprocess.SubprocessError as e:
-                        self.output.warning(f"pkg-config query failed; system library include paths not automatically propagated to consumers: {e}")
+                    raise ConanInvalidConfiguration(
+                        "pkg-config is required to locate system library headers "
+                        f"for: {', '.join(pkg_config_pkgs)}. "
+                        "Install it with: sudo apt install pkg-config"
+                    )
+                try:
+                    flags = subprocess.check_output(
+                        [pkg_config, "--cflags-only-I"] + pkg_config_pkgs,
+                        text=True
+                    ).split()
+                    for flag in flags:
+                        if flag.startswith("-I"):
+                            self.cpp_info.includedirs.append(flag[2:])
+                except subprocess.SubprocessError as e:
+                    raise ConanInvalidConfiguration(
+                        f"pkg-config query failed for {', '.join(pkg_config_pkgs)}; "
+                        "ensure the required system development headers are installed. "
+                        f"Error: {e}"
+                    )
 
