@@ -87,7 +87,11 @@ namespace canyon::graphics {
         if (mothImagePtr == nullptr) {
             return;
         }
-        auto& internalImage = *mothImagePtr->GetImage();
+        auto internalImagePtr = mothImagePtr->GetImage();
+        if (internalImagePtr == nullptr) {
+            return;
+        }
+        auto& internalImage = *internalImagePtr;
         auto const srcRect = sourceRect;
         if (scaleType == moth_ui::ImageScaleType::Stretch) {
             m_graphics.DrawImage(internalImage, destRect, &srcRect, 0);
@@ -104,7 +108,11 @@ namespace canyon::graphics {
         if (fcFontPtr == nullptr) {
             return;
         }
-        auto& internalFont = *fcFontPtr->GetInternalFont();
+        auto internalFontPtr = fcFontPtr->GetInternalFont();
+        if (internalFontPtr == nullptr) {
+            return;
+        }
+        auto& internalFont = *internalFontPtr;
         m_graphics.DrawText(text, internalFont, destRect, horizontalAlignment, verticalAlignment);
     }
 
