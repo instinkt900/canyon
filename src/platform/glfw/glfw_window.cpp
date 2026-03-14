@@ -158,7 +158,11 @@ namespace canyon::platform::glfw {
 
     void Window::OnResize() {
         spdlog::info("GLFW: window '{}' resized to {}x{}", m_title, m_windowWidth, m_windowHeight);
-        graphics::vulkan::Graphics* graphics = dynamic_cast<graphics::vulkan::Graphics*>(m_graphics.get());
+        auto* graphics = dynamic_cast<graphics::vulkan::Graphics*>(m_graphics.get());
+        if (graphics == nullptr) {
+            spdlog::error("GLFW: OnResize called but graphics backend is not Vulkan");
+            return;
+        }
         graphics->OnResize(m_customVkSurface, m_windowWidth, m_windowHeight);
         m_layerStack->SetWindowSize({ m_windowWidth, m_windowHeight });
     }
