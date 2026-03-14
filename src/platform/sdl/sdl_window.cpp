@@ -11,21 +11,43 @@ namespace {
     std::mutex EventFetchMutex;      // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
     std::list<SDL_Event> PendingEvents; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
+    bool IsInputEvent(SDL_Event const& event) {
+        switch (event.type) {
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+        case SDL_TEXTINPUT:
+        case SDL_TEXTEDITING:
+        case SDL_MOUSEMOTION:
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+        case SDL_MOUSEWHEEL:
+        case SDL_FINGERDOWN:
+        case SDL_FINGERUP:
+        case SDL_FINGERMOTION:
+        case SDL_CONTROLLERAXISMOTION:
+        case SDL_CONTROLLERBUTTONDOWN:
+        case SDL_CONTROLLERBUTTONUP:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     bool CollectSDLEventsForWindow(uint32_t windowId, std::vector<SDL_Event>* outEvents) {
         std::lock_guard lock(EventFetchMutex);
 
         SDL_Event event{};
         while (SDL_PollEvent(&event) != 0) {
-            // Retain window-targeted events and SDL_QUIT (which has windowID == 0).
-            // Other non-window events are discarded so they cannot accumulate forever.
-            if (event.window.windowID != 0 || event.type == SDL_QUIT) {
+            // Retain window-targeted events, input events (which may have windowID == 0
+            // when unfocused), and SDL_QUIT. Other non-window events are discarded.
+            if (event.window.windowID != 0 || event.type == SDL_QUIT || IsInputEvent(event)) {
                 PendingEvents.push_back(event);
             }
         }
 
         bool found_event = false;
         for (auto it = PendingEvents.begin(); it != PendingEvents.end(); /* manually iterate */) {
-            if (it->window.windowID == windowId || it->type == SDL_QUIT) {
+            if (it->window.windowID == windowId || it->type == SDL_QUIT || IsInputEvent(*it)) {
                 outEvents->push_back(*it);
                 found_event = true;
                 it = PendingEvents.erase(it);
