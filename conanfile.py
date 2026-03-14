@@ -23,7 +23,7 @@ class canyon(ConanFile):
         "disable_sdl": False,
     }
 
-    exports_sources = "CMakeLists.txt", "version.txt", "include/*", "src/*", "external/imgui/*", "external/murmurhash.c/*"
+    exports_sources = "CMakeLists.txt", "version.txt", "include/*", "src/*", "external/imgui/*", "external/murmurhash.c/*", "external/stb/*"
 
     def set_version(self):
         self.version = load(self, "version.txt").strip()
