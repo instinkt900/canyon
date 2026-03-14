@@ -82,6 +82,10 @@ namespace {
             }
         }
 
+        if (testDimensions.empty()) {
+            return { 0, 0 };
+        }
+
         std::sort(std::begin(testDimensions), std::end(testDimensions), [](auto const& a, auto const& b) { return b.m_ratio < a.m_ratio; });
         return std::begin(testDimensions)->m_dimensions;
     }
