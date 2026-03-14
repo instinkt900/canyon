@@ -159,6 +159,9 @@ namespace canyon::graphics::sdl {
     void Graphics::DrawToPNG(IImage& image, std::filesystem::path const& path) {
         auto& sdlImage = dynamic_cast<Image&>(image);
         auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
+        if (!sdlTexture) {
+            return;
+        }
         SDL_Texture* tex = sdlTexture->GetSDLTexture()->GetImpl();
 
         SDL_Rect const srcRect = ToSDL(sdlImage.GetSourceRect());
