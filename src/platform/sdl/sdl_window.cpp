@@ -14,17 +14,16 @@ namespace {
 
         SDL_Event event{};
         while (SDL_PollEvent(&event) != 0) {
-            // Only retain events that target a specific window; non-window
-            // events (e.g. SDL_QUIT) have windowID == 0 and would accumulate
-            // forever since no window will ever match them.
-            if (event.window.windowID != 0) {
+            // Retain window-targeted events and SDL_QUIT (which has windowID == 0).
+            // Other non-window events are discarded so they cannot accumulate forever.
+            if (event.window.windowID != 0 || event.type == SDL_QUIT) {
                 PendingEvents.push_back(event);
             }
         }
 
         bool found_event = false;
         for (auto it = PendingEvents.begin(); it != PendingEvents.end(); /* manually iterate */) {
-            if (it->window.windowID == windowId) {
+            if (it->window.windowID == windowId || it->type == SDL_QUIT) {
                 outEvents->push_back(*it);
                 found_event = true;
                 it = PendingEvents.erase(it);
