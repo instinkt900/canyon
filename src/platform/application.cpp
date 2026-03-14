@@ -2,6 +2,8 @@
 #include "canyon/platform/application.h"
 #include "canyon/platform/window.h"
 
+#include <stdexcept>
+
 namespace canyon::platform {
     Application::Application(platform::IPlatform& platform, std::string const& title, int width, int height)
         : m_platform(platform)
@@ -15,7 +17,12 @@ namespace canyon::platform {
         spdlog::info("Application: initializing");
         Startup();
         spdlog::info("Application: creating window '{}' ({}x{})", m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
-        m_window = m_platform.CreateWindow(m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
+        try {
+            m_window = m_platform.CreateWindow(m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
+        } catch (std::exception const& e) {
+            spdlog::error("Application: failed to create window: {}", e.what());
+            throw;
+        }
         m_window->AddEventListener(this);
         m_window->GetLayerStack().SetEventListener(this);
         m_window->GetGraphics().InitImgui(*m_window);
