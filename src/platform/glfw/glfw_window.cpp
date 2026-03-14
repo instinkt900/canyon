@@ -1,3 +1,4 @@
+#include "canyon/graphics/vulkan/vulkan_utils.h"
 #include "common.h"
 #include "canyon/platform/glfw/glfw_window.h"
 #include "canyon/graphics/vulkan/vulkan_graphics.h"
@@ -11,8 +12,9 @@ namespace canyon::platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
         : canyon::platform::Window(title, width, height)
         , m_context(context) {
-            CreateWindow();
+        if (CreateWindow()) {
             PostCreate();
+        }
     }
 
     Window::~Window() {
@@ -22,7 +24,7 @@ namespace canyon::platform::glfw {
     void Window::Update(uint32_t ticks) {
         glfwPollEvents();
 
-        if (glfwWindowShouldClose(m_glfwWindow)) {
+        if (glfwWindowShouldClose(m_glfwWindow) != 0) {
             glfwSetWindowShouldClose(m_glfwWindow, 0);
             EmitEvent(EventRequestQuit());
         }
@@ -38,8 +40,13 @@ namespace canyon::platform::glfw {
     }
 
     bool Window::CreateWindow() {
+        spdlog::info("GLFW: creating window '{}' ({}x{})", m_title, m_windowWidth, m_windowHeight);
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         m_glfwWindow = glfwCreateWindow(m_windowWidth, m_windowHeight, m_title.c_str(), nullptr, nullptr);
+        if (m_glfwWindow == nullptr) {
+            spdlog::error("GLFW: failed to create window '{}'", m_title);
+            return false;
+        }
         glfwSetWindowUserPointer(m_glfwWindow, this);
 
         if (m_windowPos.x != -1 && m_windowPos.y != -1) {
@@ -48,6 +55,9 @@ namespace canyon::platform::glfw {
 
         glfwSetWindowPosCallback(m_glfwWindow, [](GLFWwindow* window, int xpos, int ypos) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            if (app == nullptr) {
+                return;
+            }
             app->m_windowMaximized = glfwGetWindowAttrib(window, GLFW_MAXIMIZED) == GLFW_TRUE;
             if (!app->m_windowMaximized) {
                 app->m_windowPos.x = xpos;
@@ -57,6 +67,9 @@ namespace canyon::platform::glfw {
 
         glfwSetWindowSizeCallback(m_glfwWindow, [](GLFWwindow* window, int width, int height) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            if (app == nullptr) {
+                return;
+            }
             app->m_windowMaximized = glfwGetWindowAttrib(window, GLFW_MAXIMIZED) == GLFW_TRUE;
             if (!app->m_windowMaximized) {
                 app->m_windowWidth = width;
@@ -69,6 +82,9 @@ namespace canyon::platform::glfw {
 
         glfwSetKeyCallback(m_glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            if (app == nullptr) {
+                return;
+            }
             if (auto const translatedEvent = FromGLFW(key, scancode, action, mods)) {
                 app->EmitEvent(*translatedEvent);
             }
@@ -76,6 +92,9 @@ namespace canyon::platform::glfw {
 
         glfwSetCursorPosCallback(m_glfwWindow, [](GLFWwindow* window, double xpos, double ypos) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            if (app == nullptr) {
+                return;
+            }
             auto const newMousePos = FloatVec2{ xpos, ypos };
             FloatVec2 mouseDelta{ 0, 0 };
             if (app->m_haveMousePos) {
@@ -90,23 +109,27 @@ namespace canyon::platform::glfw {
 
         glfwSetMouseButtonCallback(m_glfwWindow, [](GLFWwindow* window, int button, int action, int mods) {
             Window* app = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            if (app == nullptr) {
+                return;
+            }
             if (auto const translatedEvent = FromGLFW(button, action, mods, static_cast<moth_ui::IntVec2>(app->m_lastMousePos))) {
                 app->EmitEvent(*translatedEvent);
             }
         });
 
-        int width, height;
+        int width = 0;
+        int height = 0;
         glfwGetFramebufferSize(m_glfwWindow, &width, &height);
 
         if (m_windowMaximized) {
             glfwMaximizeWindow(m_glfwWindow);
         }
 
-        glfwCreateWindowSurface(m_context.GetInstance(), m_glfwWindow, nullptr, &m_customVkSurface);
+        CHECK_VK_RESULT(glfwCreateWindowSurface(m_context.GetInstance(), m_glfwWindow, nullptr, &m_customVkSurface));
         m_surfaceContext = std::make_unique<graphics::vulkan::SurfaceContext>(m_context);
 
         m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight);
-
+        spdlog::info("GLFW: window '{}' ready", m_title);
         return true;
     }
 
@@ -116,6 +139,7 @@ namespace canyon::platform::glfw {
     }
 
     void Window::DestroyWindow() {
+        spdlog::info("GLFW: destroying window '{}'", m_title);
         // Wait for all GPU work to finish before destroying Vulkan-backed resources
         if (m_surfaceContext) {
             vkDeviceWaitIdle(m_surfaceContext->GetVkDevice());
@@ -133,10 +157,13 @@ namespace canyon::platform::glfw {
     }
 
     void Window::OnResize() {
-        graphics::vulkan::Graphics* graphics = static_cast<graphics::vulkan::Graphics*>(m_graphics.get());
+        spdlog::info("GLFW: window '{}' resized to {}x{}", m_title, m_windowWidth, m_windowHeight);
+        auto* graphics = dynamic_cast<graphics::vulkan::Graphics*>(m_graphics.get());
+        if (graphics == nullptr) {
+            spdlog::error("GLFW: OnResize called but graphics backend is not Vulkan");
+            return;
+        }
         graphics->OnResize(m_customVkSurface, m_windowWidth, m_windowHeight);
         m_layerStack->SetWindowSize({ m_windowWidth, m_windowHeight });
-
     }
 }
-

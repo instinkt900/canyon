@@ -13,10 +13,12 @@ namespace canyon::graphics::sdl {
     class Texture : public ITexture {
     public:
         explicit Texture(SDLTextureRef texture);
-        virtual ~Texture() = default;
+        ~Texture() override = default;
 
         int GetWidth() const override;
         int GetHeight() const override;
+        void SetFilter(TextureFilter minFilter, TextureFilter magFilter) override;
+        void SetAddressMode(TextureAddressMode u, TextureAddressMode v) override {} // not supported in SDL2
 
         SDLTextureRef GetSDLTexture() const { return m_texture; }
 

@@ -21,6 +21,6 @@ namespace canyon::graphics::vulkan {
     private:
         VkInstance m_vkInstance = VK_NULL_HANDLE;
         VkDebugUtilsMessengerEXT m_vkDebugMessenger = VK_NULL_HANDLE;
-        FT_Library m_ftLibrary;
+        FT_Library m_ftLibrary = nullptr;
     };
 }

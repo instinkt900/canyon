@@ -2,18 +2,18 @@
 #include "canyon/graphics/vulkan/vulkan_texture.h"
 #include "canyon/graphics/vulkan/vulkan_command_buffer.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
-#include "canyon/graphics/stb_image.h"
+#include "stb_image.h"
 
 namespace {
-    static uint32_t NextTextureId = 1;
+    uint32_t NextTextureId = 1; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 }
 
 namespace canyon::graphics::vulkan {
     std::unique_ptr<Texture> Texture::FromFile(SurfaceContext& context, std::filesystem::path const& path) {
         if (std::filesystem::exists(path)) {
-            int texWidth;
-            int texHeight;
-            int texChannels;
+            int texWidth = 0;
+            int texHeight = 0;
+            int texChannels = 0;
             stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
             VkDeviceSize imageSize = texWidth * texHeight * 4;
             if (pixels != nullptr) {
@@ -63,7 +63,9 @@ namespace canyon::graphics::vulkan {
 
     Texture::Texture(SurfaceContext& context)
         : m_id(NextTextureId++)
-        , m_context(context) {
+        , m_context(context)
+        , m_vkExtent{}
+        , m_vkFormat(VK_FORMAT_UNDEFINED) {
     }
 
     Texture::Texture(SurfaceContext& context, VkImage image, VkImageView view, VkExtent2D extent, VkFormat format, bool owning)
@@ -121,7 +123,7 @@ namespace canyon::graphics::vulkan {
     }
 
     void* Texture::Map() {
-        void* data;
+        void* data = nullptr;
         vmaMapMemory(m_context.GetVmaAllocator(), m_vmaAllocation, &data);
         return data;
     }
@@ -148,7 +150,7 @@ namespace canyon::graphics::vulkan {
         VmaAllocationCreateInfo allocInfo{};
         allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
         allocInfo.requiredFlags = properties;
-        if (properties & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) {
+        if ((properties & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) != 0u) {
             allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
         }
         CHECK_VK_RESULT(vmaCreateImage(m_context.GetVmaAllocator(), &info, &allocInfo, &m_vkImage, &m_vmaAllocation, nullptr));
@@ -169,21 +171,66 @@ namespace canyon::graphics::vulkan {
         CHECK_VK_RESULT(vkCreateImageView(m_context.GetVkDevice(), &info, nullptr, &m_vkView));
     }
 
+    namespace {
+        VkSamplerAddressMode ToVkAddressMode(TextureAddressMode mode) {
+            switch (mode) {
+                case TextureAddressMode::Repeat:         return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+                case TextureAddressMode::MirroredRepeat: return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
+                case TextureAddressMode::ClampToEdge:    return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+                case TextureAddressMode::ClampToBorder:  return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+            }
+            return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        }
+    }
+
+    void Texture::SetFilter(TextureFilter minFilter, TextureFilter magFilter) {
+        m_minFilter = (minFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        m_magFilter = (magFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        if (m_vkDescriptorSet != VK_NULL_HANDLE) {
+            ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
+            m_vkDescriptorSet = VK_NULL_HANDLE;
+        }
+        if (m_vkSampler != VK_NULL_HANDLE) {
+            // Wait for the GPU to finish before destroying the sampler — any
+            // in-flight descriptor set may still reference it.
+            vkDeviceWaitIdle(m_context.GetVkDevice());
+            vkDestroySampler(m_context.GetVkDevice(), m_vkSampler, nullptr);
+            m_vkSampler = VK_NULL_HANDLE;
+        }
+    }
+
+    void Texture::SetAddressMode(TextureAddressMode u, TextureAddressMode v) {
+        m_addressModeU = ToVkAddressMode(u);
+        m_addressModeV = ToVkAddressMode(v);
+        if (m_vkDescriptorSet != VK_NULL_HANDLE) {
+            ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
+            m_vkDescriptorSet = VK_NULL_HANDLE;
+        }
+        if (m_vkSampler != VK_NULL_HANDLE) {
+            // Wait for the GPU to finish before destroying the sampler — any
+            // in-flight descriptor set may still reference it.
+            vkDeviceWaitIdle(m_context.GetVkDevice());
+            vkDestroySampler(m_context.GetVkDevice(), m_vkSampler, nullptr);
+            m_vkSampler = VK_NULL_HANDLE;
+        }
+    }
+
     void Texture::CreateDefaultSampler() {
         VkSamplerCreateInfo samplerInfo{};
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        samplerInfo.magFilter = VK_FILTER_LINEAR;
-        samplerInfo.minFilter = VK_FILTER_LINEAR;
-        samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        samplerInfo.magFilter = m_magFilter;
+        samplerInfo.minFilter = m_minFilter;
+        samplerInfo.addressModeU = m_addressModeU;
+        samplerInfo.addressModeV = m_addressModeV;
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        samplerInfo.anisotropyEnable = VK_TRUE;
+        bool const useAnisotropy = (m_minFilter != VK_FILTER_NEAREST && m_magFilter != VK_FILTER_NEAREST);
+        samplerInfo.anisotropyEnable = useAnisotropy ? VK_TRUE : VK_FALSE;
 
         // todo can probably cache this
         VkPhysicalDeviceProperties properties{};
         vkGetPhysicalDeviceProperties(m_context.GetVkPhysicalDevice(), &properties);
 
-        samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+        samplerInfo.maxAnisotropy = useAnisotropy ? properties.limits.maxSamplerAnisotropy : 1.0f;
         samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
         samplerInfo.unnormalizedCoordinates = VK_FALSE;
         samplerInfo.compareEnable = VK_FALSE;

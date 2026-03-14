@@ -12,7 +12,7 @@ namespace canyon::graphics {
     class MothImageFactory : public moth_ui::IImageFactory {
     public:
         explicit MothImageFactory(std::shared_ptr<graphics::ImageFactory> factoryImpl);
-        virtual ~MothImageFactory() = default;
+        ~MothImageFactory() override = default;
 
         void FlushCache() override;
         bool LoadTexturePack(std::filesystem::path const& path) override;

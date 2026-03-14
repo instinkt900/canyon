@@ -5,6 +5,8 @@
 namespace canyon::graphics::vulkan {
     Buffer::Buffer(SurfaceContext& context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
         : m_context(context)
+        , m_vkBuffer(VK_NULL_HANDLE)
+        , m_vmaAllocation(nullptr)
         , m_size(size) {
         VkBufferCreateInfo bufferInfo{};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -15,7 +17,7 @@ namespace canyon::graphics::vulkan {
         VmaAllocationCreateInfo allocInfo{};
         allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
         allocInfo.requiredFlags = properties;
-        if (properties & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) {
+        if ((properties & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) != 0u) {
             allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
         }
 
@@ -27,8 +29,8 @@ namespace canyon::graphics::vulkan {
     }
 
     void* Buffer::Map() {
-        void* data;
-        vmaMapMemory(m_context.GetVmaAllocator(), m_vmaAllocation, &data);
+        void* data = nullptr;
+        CHECK_VK_RESULT(vmaMapMemory(m_context.GetVmaAllocator(), m_vmaAllocation, &data));
         return data;
     }
 

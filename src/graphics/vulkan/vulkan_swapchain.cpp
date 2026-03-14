@@ -7,10 +7,11 @@ namespace {
     VkExtent2D chooseSwapExtent(uint32_t width, uint32_t height, const VkSurfaceCapabilitiesKHR& capabilities) {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
             return capabilities.currentExtent;
-        } else {
+        }
+        {
             VkExtent2D actualExtent = {
-                static_cast<uint32_t>(width),
-                static_cast<uint32_t>(height)
+                width,
+                height
             };
 
             actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
@@ -24,10 +25,11 @@ namespace {
 namespace canyon::graphics::vulkan {
     Swapchain::Swapchain(SurfaceContext& context, RenderPass& renderPass, VkSurfaceKHR surface, VkExtent2D extent)
         : m_context(context)
-        , m_extent(extent) {
+        , m_extent{}
+        , m_vkSwapchain(VK_NULL_HANDLE) {
         VkSurfaceCapabilitiesKHR capabilities;
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_context.GetVkPhysicalDevice(), surface, &capabilities);
-        extent = chooseSwapExtent(extent.width, extent.height, capabilities);
+        m_extent = chooseSwapExtent(extent.width, extent.height, capabilities);
 
         const VkFormat requestSurfaceImageFormat[] = { VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM };
         const VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
@@ -40,9 +42,12 @@ namespace canyon::graphics::vulkan {
         createInfo.minImageCount = SurfaceContext::getMinImageCountFromPresentMode(presentMode);
         createInfo.imageFormat = surfaceFormat.format;
         createInfo.imageColorSpace = surfaceFormat.colorSpace;
-        createInfo.imageExtent = extent;
+        createInfo.imageExtent = m_extent;
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        if ((capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT) != 0u) {
+            createInfo.imageUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        }
         createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         createInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
         createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
@@ -51,7 +56,7 @@ namespace canyon::graphics::vulkan {
         createInfo.oldSwapchain = VK_NULL_HANDLE;
         CHECK_VK_RESULT(vkCreateSwapchainKHR(m_context.GetVkDevice(), &createInfo, nullptr, &m_vkSwapchain));
 
-        uint32_t imageCount;
+        uint32_t imageCount = 0;
         std::vector<VkImage> swapchainImages;
         std::vector<VkImageView> swapchainImageViews;
         vkGetSwapchainImagesKHR(m_context.GetVkDevice(), m_vkSwapchain, &imageCount, nullptr);
@@ -76,8 +81,8 @@ namespace canyon::graphics::vulkan {
         auto commandBuffer = std::make_unique<CommandBuffer>(m_context);
         commandBuffer->BeginRecord();
         for (uint32_t i = 0; i < imageCount; ++i) {
-            m_framebuffers.push_back(std::make_unique<Framebuffer>(m_context, extent.width, extent.height, swapchainImages[i], swapchainImageViews[i], surfaceFormat.format, renderPass.GetRenderPass(), i));
-            commandBuffer->TransitionImageLayout(*m_framebuffers[i]->GetVkImage().m_texture, surfaceFormat.format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+            m_framebuffers.push_back(std::make_unique<Framebuffer>(m_context, m_extent.width, m_extent.height, swapchainImages[i], swapchainImageViews[i], surfaceFormat.format, renderPass.GetRenderPass(), i));
+            commandBuffer->TransitionImageLayout(*m_framebuffers[i]->GetVkImage().m_texture, surfaceFormat.format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
             auto slot = std::make_shared<FrameSlot>();
             VkSemaphoreCreateInfo semaphoreInfo{};
@@ -94,10 +99,10 @@ namespace canyon::graphics::vulkan {
     Swapchain::~Swapchain() {
         for (uint32_t i = 0; i < m_imageCount; ++i) {
             auto& slot = m_frames[i];
-            if (slot->imageAvailable) {
+            if (slot->imageAvailable != VK_NULL_HANDLE) {
                 vkDestroySemaphore(m_context.GetVkDevice(), slot->imageAvailable, nullptr);
             }
-            if (slot->renderFinished) {
+            if (slot->renderFinished != VK_NULL_HANDLE) {
                 vkDestroySemaphore(m_context.GetVkDevice(), slot->renderFinished, nullptr);
             }
         }
@@ -115,7 +120,7 @@ namespace canyon::graphics::vulkan {
             vkWaitForFences(m_context.GetVkDevice(), 1, &prevFence, VK_TRUE, UINT64_MAX);
         }
 
-        uint32_t imageIndex;
+        uint32_t imageIndex = 0;
         VkResult result = vkAcquireNextImageKHR(m_context.GetVkDevice(), m_vkSwapchain, UINT64_MAX, slot->imageAvailable, VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
             return nullptr;

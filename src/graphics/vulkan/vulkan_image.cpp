@@ -25,6 +25,9 @@ namespace canyon::graphics::vulkan {
         return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
     }
 
+    std::shared_ptr<ITexture> Image::GetTexture() const {
+        return m_texture;
+    }
 
     void Image::ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0, canyon::FloatVec2 const& uv1) const {
         if (m_texture) {
@@ -37,7 +40,9 @@ namespace canyon::graphics::vulkan {
 
     std::unique_ptr<Image> Image::Load(SurfaceContext& context, std::filesystem::path const& path) {
         if (auto texture = Texture::FromFile(context, path)) {
-            return std::make_unique<Image>(std::move(texture), IntRect{ { 0, 0 }, { texture->GetWidth(), texture->GetHeight() }});
+            int const w = texture->GetWidth();
+            int const h = texture->GetHeight();
+            return std::make_unique<Image>(std::move(texture), IntRect{ { 0, 0 }, { w, h } });
         }
         return nullptr;
     }

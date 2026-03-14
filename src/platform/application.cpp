@@ -2,6 +2,8 @@
 #include "canyon/platform/application.h"
 #include "canyon/platform/window.h"
 
+#include <stdexcept>
+
 namespace canyon::platform {
     Application::Application(platform::IPlatform& platform, std::string const& title, int width, int height)
         : m_platform(platform)
@@ -12,16 +14,26 @@ namespace canyon::platform {
     }
 
     void Application::Init() {
+        spdlog::info("Application: initializing");
         Startup();
-        m_window = m_platform.CreateWindow(m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
+        spdlog::info("Application: creating window '{}' ({}x{})", m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
+        try {
+            m_window = m_platform.CreateWindow(m_mainWindowTitle, m_mainWindowWidth, m_mainWindowHeight);
+        } catch (std::exception const& e) {
+            spdlog::error("Application: failed to create window: {}", e.what());
+            throw;
+        }
         m_window->AddEventListener(this);
         m_window->GetLayerStack().SetEventListener(this);
         m_window->GetGraphics().InitImgui(*m_window);
         PostCreateWindow();
+        spdlog::info("Application: ready");
     }
 
     void Application::Run() {
+        spdlog::info("Application: running");
         TickSync();
+        spdlog::info("Application: shutting down");
         Shutdown();
     }
 
@@ -34,7 +46,7 @@ namespace canyon::platform {
         return dispatch.GetHandled();
     }
 
-    bool Application::OnWindowSizeEvent(EventWindowSize const& event) {
+    bool Application::OnWindowSizeEvent(EventWindowSize const& /*event*/) { // NOLINT(readability-convert-member-functions-to-static)
         return false;
     }
 

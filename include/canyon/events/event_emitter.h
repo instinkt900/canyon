@@ -10,11 +10,20 @@
 #include <memory>
 
 namespace canyon {
+    /// @brief Opaque handle to a lambda-based event listener registration.
+    ///
+    /// Returned by @c EventEmitter::AddEventListener(lambda). Pass back to
+    /// @c EventEmitter::RemoveEventListener() to unregister the listener.
     class LambdaHandle {
         friend class EventEmitter;
 
     public:
         LambdaHandle() = default;
+
+        /// @brief Returns @c true if this handle was assigned by
+        /// @c EventEmitter::AddEventListener (i.e. non-default-constructed).
+        /// Does @e not reflect whether the listener is still registered;
+        /// a handle remains non-zero after @c RemoveEventListener() is called.
         bool IsValid() const { return m_id != 0; }
 
     private:
@@ -23,6 +32,8 @@ namespace canyon {
         uint32_t m_id = 0;
     };
 
+    /// @internal Wraps a callable as an @c EventListener so it can be stored in
+    /// the listeners list.
     class LambdaWrapper : public moth_ui::EventListener {
     public:
         LambdaWrapper(std::function<bool(moth_ui::Event const&)> const& lambda, uint32_t id)
@@ -30,7 +41,7 @@ namespace canyon {
             , m_id(id) {
         }
 
-        virtual ~LambdaWrapper() = default;
+        ~LambdaWrapper() override = default;
 
         uint32_t GetID() const { return m_id; }
 
@@ -43,28 +54,39 @@ namespace canyon {
         uint32_t m_id;
     };
 
+    /// @brief Broadcasts events to a list of registered listeners.
+    ///
+    /// Listeners can be registered as raw @c EventListener pointers (caller
+    /// manages lifetime) or as lambdas (lifetime managed by this emitter via a
+    /// @c LambdaHandle).
     class EventEmitter {
     public:
         EventEmitter() = default;
         virtual ~EventEmitter() = default;
 
+        /// @brief Register a listener. The caller must ensure @p listener outlives this emitter.
         void AddEventListener(moth_ui::EventListener* listener) {
             m_listeners.push_back(listener);
         }
 
+        /// @brief Unregister a previously added pointer listener.
         void RemoveEventListener(moth_ui::EventListener* listener) {
             m_listeners.erase(std::remove(m_listeners.begin(), m_listeners.end(), listener), m_listeners.end());
         }
 
+        /// @brief Register a lambda as a listener. The emitter owns the lambda's lifetime.
+        /// @returns A handle that can be used to unregister the listener later.
         LambdaHandle AddEventListener(std::function<bool(moth_ui::Event const&)> const& lambda) {
             m_owning.emplace_back(std::make_unique<LambdaWrapper>(lambda, ++m_nextLambdaId));
             AddEventListener(m_owning.back().get());
             return LambdaHandle(m_owning.back()->GetID());
         }
 
+        /// @brief Unregister a lambda listener by its handle.
         void RemoveEventListener(LambdaHandle const& handle) {
-            if (!handle.IsValid())
+            if (!handle.IsValid()) {
                 return;
+            }
 
             auto it = std::find_if(m_owning.begin(), m_owning.end(), [&](std::unique_ptr<LambdaWrapper> const& ptr) {
                 return ptr->GetID() == handle.m_id;
@@ -76,9 +98,16 @@ namespace canyon {
             }
         }
 
+        /// @brief Dispatch @p event to all registered listeners.
+        /// @returns @c true if any listener handled the event.
         bool EmitEvent(moth_ui::Event const& event) {
             moth_ui::EventDispatch dispatch(event);
-            for (auto listener : m_listeners) {
+            std::vector<moth_ui::EventListener*> snapshot(m_listeners);
+            for (auto* listener : snapshot) {
+                // Listener may have been removed during a prior callback.
+                if (std::find(m_listeners.begin(), m_listeners.end(), listener) == m_listeners.end()) {
+                    continue;
+                }
                 dispatch.Dispatch(listener);
             }
             return dispatch.GetHandled();

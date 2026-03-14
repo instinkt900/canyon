@@ -17,7 +17,7 @@ namespace canyon::platform::sdl {
     class Window : public platform::Window {
     public:
         Window(graphics::sdl::Context& context, std::string const& applicationTitle, int width, int height);
-        virtual ~Window();
+        ~Window() override;
 
         graphics::SurfaceContext & GetSurfaceContext() const override { return *m_surfaceContext; }
         void SetWindowTitle(std::string const& title) override;
@@ -28,11 +28,11 @@ namespace canyon::platform::sdl {
         void Update(uint32_t ticks) override;
         void Draw() override;
 
-    protected:
-        bool CreateWindow() override;
-        void DestroyWindow() override;
-
     private:
+        bool CreateWindow();
+        void DestroyWindow();
+
+
         graphics::sdl::Context& m_context;
         std::unique_ptr<graphics::sdl::SurfaceContext> m_surfaceContext;
 

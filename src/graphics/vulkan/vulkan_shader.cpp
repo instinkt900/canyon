@@ -4,14 +4,18 @@
 
 namespace canyon::graphics::vulkan {
     Shader::Shader(uint32_t hash)
-        : m_hash(hash) {
+        : m_hash(hash)
+        , m_device(VK_NULL_HANDLE)
+        , m_descriptorPool(VK_NULL_HANDLE)
+        , m_descriptorSetLayout(VK_NULL_HANDLE)
+        , m_pipelineLayout(VK_NULL_HANDLE) {
     }
 
     Shader::~Shader() {
         if (!m_descriptorSets.empty()) {
             std::vector<VkDescriptorSet> freedSets;
-            for (auto& [imageId, descriptorSet] : m_descriptorSets) {
-                freedSets.push_back(descriptorSet);
+            for (auto& [imageId, cached] : m_descriptorSets) {
+                freedSets.push_back(cached.m_descriptorSet);
             }
             vkFreeDescriptorSets(m_device, m_descriptorPool, static_cast<uint32_t>(freedSets.size()), freedSets.data());
         }
@@ -24,15 +28,21 @@ namespace canyon::graphics::vulkan {
     }
 
     VkDescriptorSet Shader::GetDescriptorSet(Texture& image) {
+        VkSampler currentSampler = image.GetVkSampler();
         auto it = m_descriptorSets.find(image.GetId());
         if (std::end(m_descriptorSets) != it) {
-            return it->second;
+            if (it->second.m_sampler == currentSampler) {
+                return it->second.m_descriptorSet;
+            }
+            // Sampler changed (e.g. SetFilter was called) — free the stale descriptor set
+            vkFreeDescriptorSets(m_device, m_descriptorPool, 1, &it->second.m_descriptorSet);
+            m_descriptorSets.erase(it);
         }
         return CreateDescriptorSet(image);
     }
 
     VkDescriptorSet Shader::CreateDescriptorSet(Texture& image) {
-        VkDescriptorSet descriptorSet;
+        VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
 
         VkDescriptorSetAllocateInfo alloc_info{};
         alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -41,8 +51,9 @@ namespace canyon::graphics::vulkan {
         alloc_info.pSetLayouts = &m_descriptorSetLayout;
         CHECK_VK_RESULT(vkAllocateDescriptorSets(m_device, &alloc_info, &descriptorSet));
 
+        VkSampler sampler = image.GetVkSampler();
         VkDescriptorImageInfo desc_image[1] = {};
-        desc_image[0].sampler = image.GetVkSampler();
+        desc_image[0].sampler = sampler;
         desc_image[0].imageView = image.GetVkView();
         desc_image[0].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         VkWriteDescriptorSet write_desc[1] = {};
@@ -53,7 +64,7 @@ namespace canyon::graphics::vulkan {
         write_desc[0].pImageInfo = desc_image;
         vkUpdateDescriptorSets(m_device, 1, write_desc, 0, nullptr);
 
-        m_descriptorSets.insert(std::make_pair(image.GetId(), descriptorSet));
+        m_descriptorSets.insert(std::make_pair(image.GetId(), CachedDescriptorSet{ sampler, descriptorSet }));
         return descriptorSet;
     }
 
@@ -107,7 +118,7 @@ namespace canyon::graphics::vulkan {
             VkShaderModuleCreateInfo createInfo{};
             createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
             createInfo.codeSize = stage.m_byteCode.size();
-            createInfo.pCode = reinterpret_cast<uint32_t const*>(stage.m_byteCode.data());
+            createInfo.pCode = reinterpret_cast<uint32_t const*>(stage.m_byteCode.data()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
             CHECK_VK_RESULT(vkCreateShaderModule(m_device, &createInfo, nullptr, &newStage.m_module));
 
             newShader->m_stages.push_back(newStage);
@@ -132,11 +143,11 @@ namespace canyon::graphics::vulkan {
 
     uint32_t ShaderBuilder::CalculateHash() const {
         std::vector<uint32_t> hashes;
-        for (auto& stage : m_stages) {
+        for (const auto& stage : m_stages) {
             hashes.push_back(CalcHash(stage.m_stageFlags));
             hashes.push_back(CalcHash(stage.m_entryPoint));
             hashes.push_back(CalcHash(stage.m_byteCode.data(), stage.m_byteCode.size()));
         }
-        return CalcHash(reinterpret_cast<void const*>(hashes.data()), sizeof(uint32_t) * hashes.size());
+        return CalcHash(reinterpret_cast<void const*>(hashes.data()), sizeof(uint32_t) * hashes.size()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     }
 }

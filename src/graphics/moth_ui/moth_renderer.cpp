@@ -83,8 +83,15 @@ namespace canyon::graphics {
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
 
-        auto& mothImage = static_cast<MothImage&>(image);
-        auto& internalImage = *mothImage.GetImage();
+        auto* mothImagePtr = dynamic_cast<MothImage*>(&image);
+        if (mothImagePtr == nullptr) {
+            return;
+        }
+        auto internalImagePtr = mothImagePtr->GetImage();
+        if (internalImagePtr == nullptr) {
+            return;
+        }
+        auto& internalImage = *internalImagePtr;
         auto const srcRect = sourceRect;
         if (scaleType == moth_ui::ImageScaleType::Stretch) {
             m_graphics.DrawImage(internalImage, destRect, &srcRect, 0);
@@ -97,9 +104,16 @@ namespace canyon::graphics {
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
 
-        auto& fcFont = static_cast<MothFont&>(font);
-        auto& internalFont = *fcFont.GetInternalFont();
-        m_graphics.DrawText(text, internalFont, horizontalAlignment, verticalAlignment, destRect);
+        auto* fcFontPtr = dynamic_cast<MothFont*>(&font);
+        if (fcFontPtr == nullptr) {
+            return;
+        }
+        auto internalFontPtr = fcFontPtr->GetInternalFont();
+        if (internalFontPtr == nullptr) {
+            return;
+        }
+        auto& internalFont = *internalFontPtr;
+        m_graphics.DrawText(text, internalFont, destRect, horizontalAlignment, verticalAlignment);
     }
 
     void MothRenderer::SetRendererLogicalSize(moth_ui::IntVec2 const& size) {

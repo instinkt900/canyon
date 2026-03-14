@@ -5,21 +5,49 @@
 #include "canyon/platform/sdl/sdl_events.h"
 #include "canyon/graphics/sdl/sdl_graphics.h"
 
+#include <stdexcept>
+
 namespace {
-    std::mutex EventFetchMutex;
-    std::list<SDL_Event> PendingEvents;
+    std::mutex EventFetchMutex;      // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    std::list<SDL_Event> PendingEvents; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+
+    bool IsInputEvent(SDL_Event const& event) {
+        switch (event.type) {
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+        case SDL_TEXTINPUT:
+        case SDL_TEXTEDITING:
+        case SDL_MOUSEMOTION:
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+        case SDL_MOUSEWHEEL:
+        case SDL_FINGERDOWN:
+        case SDL_FINGERUP:
+        case SDL_FINGERMOTION:
+        case SDL_CONTROLLERAXISMOTION:
+        case SDL_CONTROLLERBUTTONDOWN:
+        case SDL_CONTROLLERBUTTONUP:
+            return true;
+        default:
+            return false;
+        }
+    }
 
     bool CollectSDLEventsForWindow(uint32_t windowId, std::vector<SDL_Event>* outEvents) {
         std::lock_guard lock(EventFetchMutex);
 
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            PendingEvents.push_back(event);
+        SDL_Event event{};
+        while (SDL_PollEvent(&event) != 0) {
+            // Retain window-targeted events, input events (which may have windowID == 0
+            // when unfocused), and SDL_QUIT. Other non-window events are discarded.
+            if (event.window.windowID != 0 || event.type == SDL_QUIT || IsInputEvent(event)) {
+                PendingEvents.push_back(event);
+            }
         }
 
         bool found_event = false;
         for (auto it = PendingEvents.begin(); it != PendingEvents.end(); /* manually iterate */) {
-            if (it->window.windowID == windowId) {
+            if (it->window.windowID == windowId || it->type == SDL_QUIT || IsInputEvent(*it)) {
                 outEvents->push_back(*it);
                 found_event = true;
                 it = PendingEvents.erase(it);
@@ -36,7 +64,9 @@ namespace canyon::platform::sdl {
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {
-        CreateWindow();
+        if (!CreateWindow()) {
+            throw std::runtime_error("SDL: failed to create window '" + title + "'");
+        }
         PostCreate();
     }
 
@@ -66,18 +96,23 @@ namespace canyon::platform::sdl {
     }
 
     bool Window::CreateWindow() {
+        spdlog::info("SDL: creating window '{}' ({}x{})", m_title, m_windowWidth, m_windowHeight);
         if (nullptr == (m_window = SDL_CreateWindow(m_title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_windowWidth, m_windowHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE))) {
+            spdlog::error("SDL: failed to create window '{}': {}", m_title, SDL_GetError());
             return false;
         }
 
         if (nullptr == (m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC))) {
+            spdlog::error("SDL: failed to create renderer: {}", SDL_GetError());
+            SDL_DestroyWindow(m_window);
+            m_window = nullptr;
             return false;
         }
 
         m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_context, m_renderer);
         m_graphics = std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext);
         m_windowId = SDL_GetWindowID(m_window);
-
+        spdlog::info("SDL: window '{}' ready", m_title);
         return true;
     }
 
@@ -94,6 +129,7 @@ namespace canyon::platform::sdl {
     }
 
     void Window::DestroyWindow() {
+        spdlog::info("SDL: destroying window '{}'", m_title);
         PreDestroy();
         m_graphics.reset();
         m_surfaceContext.reset();

@@ -18,13 +18,15 @@ namespace canyon::platform::sdl {
 
     bool Platform::Startup() {
         if (0 > SDL_Init(SDL_INIT_EVERYTHING)) {
+            spdlog::error("SDL: initialization failed: {}", SDL_GetError());
             return false;
         }
-
+        spdlog::info("SDL: initialized");
         return true;
     }
 
     void Platform::Shutdown() {
+        spdlog::info("SDL: shutting down");
         SDL_Quit();
     }
 }

@@ -21,7 +21,7 @@ namespace canyon::graphics::sdl {
     }
 
     std::unique_ptr<IFont> SurfaceContext::FontFromFile(std::filesystem::path const& path, uint32_t size) {
-        return Font::Load(*m_renderer, path, size);
+        return Font::Load(*m_renderer, path, static_cast<int>(size));
     }
 
     std::unique_ptr<ITexture> SurfaceContext::TextureFromFile(std::filesystem::path const& path) {
@@ -29,7 +29,7 @@ namespace canyon::graphics::sdl {
     }
 
     std::unique_ptr<IImage> SurfaceContext::ImageFromFile(std::filesystem::path const& path) {
-        std::shared_ptr<Texture> texture(static_cast<Texture*>(TextureFromFile(path).release()));
+        std::shared_ptr<Texture> texture(dynamic_cast<Texture*>(TextureFromFile(path).release()));
         return std::make_unique<Image>(texture);
     }
 }

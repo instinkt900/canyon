@@ -13,17 +13,14 @@ namespace canyon::graphics::sdl {
     public:
         explicit Image(std::shared_ptr<Texture> texture);
         Image(std::shared_ptr<Texture> texture, IntRect const& sourceRect);
-        virtual ~Image() = default;
+        ~Image() override = default;
 
         int GetWidth() const override;
         int GetHeight() const override;
+        std::shared_ptr<ITexture> GetTexture() const override;
         IImage* GetImage() override { return this; }
 
         void ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0 = { 0, 0 }, canyon::FloatVec2 const& uv1 = { 1, 1 }) const override;
-
-        std::shared_ptr<Texture> GetTexture() const {
-            return m_texture;
-        }
 
         IntRect const& GetSourceRect() const {
             return m_sourceRect;

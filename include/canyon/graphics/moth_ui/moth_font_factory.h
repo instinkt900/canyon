@@ -11,7 +11,7 @@ namespace canyon::graphics {
     class MothFontFactory : public moth_ui::FontFactory {
     public:
         explicit MothFontFactory(std::shared_ptr<canyon::graphics::FontFactory> factoryImpl);
-        virtual ~MothFontFactory() = default;
+        ~MothFontFactory() override = default;
 
         void ClearFonts() override;
         std::shared_ptr<moth_ui::IFont> GetFont(std::string const& name, int size) override;

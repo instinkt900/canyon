@@ -26,6 +26,7 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <optional>
 #include <stack>
 #include <string>
 
@@ -68,11 +69,11 @@ namespace canyon::graphics::vulkan {
         void Clear() override;
         void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) override;
         void DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
-        void DrawToPNG(std::filesystem::path const& path) override;
+        void DrawToPNG(IImage& image, std::filesystem::path const& path) override;
         void DrawRectF(FloatRect const& rect) override;
         void DrawFillRectF(FloatRect const& rect) override;
         void DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) override;
-        void DrawText(std::string const& text, IFont& font, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment, IntRect const& destRect) override;
+        void DrawText(std::string const& text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment = TextHorizAlignment::Left, TextVertAlignment verticalAlignment = TextVertAlignment::Top) override;
         void SetClip(IntRect const* clipRect) override;
 
         std::unique_ptr<ITarget> CreateTarget(int width, int height) override;
@@ -128,6 +129,13 @@ namespace canyon::graphics::vulkan {
             uint32_t m_vertexCount = 0;
             uint32_t m_maxVertexCount = 0;
             uint32_t m_currentPipelineId = 0;
+
+            struct PendingBatch {
+                uint32_t m_firstVertex = 0;
+                uint32_t m_vertexCount = 0;
+                VkDescriptorSet m_descriptorSet = VK_NULL_HANDLE;
+            };
+            std::optional<PendingBatch> m_pendingBatch;
         };
 
         VkPipelineCache m_vkPipelineCache;
@@ -144,8 +152,8 @@ namespace canyon::graphics::vulkan {
         DrawContext m_overrideContext;
         std::stack<DrawContext*> m_contextStack;
 
-        VkPrimitiveTopology ToVulkan(ETopologyType type) const;
-        VkPipelineColorBlendAttachmentState ToVulkan(BlendMode mode) const;
+        static VkPrimitiveTopology ToVulkan(ETopologyType type);
+        static VkPipelineColorBlendAttachmentState ToVulkan(BlendMode mode);
 
         void CreateRenderPass();
         void CreateShaders();
@@ -154,11 +162,18 @@ namespace canyon::graphics::vulkan {
         Pipeline& GetCurrentPipeline(ETopologyType topology);
         Pipeline& GetCurrentFontPipeline();
 
-        void BeginContext(DrawContext* target);
+        DrawContext* CurrentContext() {
+            assert(!m_contextStack.empty() && m_contextStack.top() != nullptr
+                   && "Begin() must be called before any draw operations");
+            return m_contextStack.top();
+        }
+
+        void BeginContext(DrawContext* context);
         void RestartContext();
         void EndContext();
         void StartCommands();
         void FlushCommands();
+        void FlushPendingBatch();
         void SubmitVertices(Vertex* vertices, uint32_t vertCount, ETopologyType topology, VkDescriptorSet descriptorSet = VK_NULL_HANDLE);
 
         bool IsRenderTarget() const;

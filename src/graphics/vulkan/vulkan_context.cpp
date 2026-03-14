@@ -7,7 +7,7 @@
 #include <spdlog/spdlog.h>
 
 namespace {
-    std::vector<char const*> validationLayers = {
+    std::vector<char const*> const validationLayers = {
         "VK_LAYER_KHRONOS_validation"
     };
 
@@ -19,7 +19,7 @@ namespace {
 #endif
         ;
 
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+    VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT messageType,
         VkDebugUtilsMessengerCallbackDataEXT const* pCallbackData,
@@ -45,16 +45,15 @@ namespace {
     }
 
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT const* pCreateInfo, VkAllocationCallbacks const* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
-        auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+        auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT")); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
         if (func != nullptr) {
             return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-        } else {
-            return VK_ERROR_EXTENSION_NOT_PRESENT;
         }
+        return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 
     void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, VkAllocationCallbacks const* pAllocator) {
-        auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+        auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT")); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
         if (func != nullptr) {
             func(instance, debugMessenger, pAllocator);
         }
@@ -82,7 +81,9 @@ namespace {
 
 namespace canyon::graphics::vulkan {
     Context::Context() {
+        spdlog::info("Vulkan: initializing context");
 
+        spdlog::info("Vulkan: initializing FreeType");
         FT_CHECK(FT_Init_FreeType(&m_ftLibrary));
 
         // create instance
@@ -95,7 +96,7 @@ namespace canyon::graphics::vulkan {
             if (enableValidationLayers) {
                 bool success = true;
 
-                uint32_t layerCount;
+                uint32_t layerCount = 0;
                 vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
                 std::vector<VkLayerProperties> availableLayers(layerCount);
@@ -128,9 +129,15 @@ namespace canyon::graphics::vulkan {
             }
 
             uint32_t glfwExtensionCount = 0;
-            char const** glfwExtensions;
-            glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-            std::vector<char const*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+            char const** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+            if (glfwExtensions == nullptr) {
+                spdlog::error("Vulkan: glfwGetRequiredInstanceExtensions returned nullptr");
+                glfwExtensionCount = 0;
+            }
+            std::vector<char const*> extensions;
+            if (glfwExtensions != nullptr) {
+                extensions.assign(glfwExtensions, glfwExtensions + glfwExtensionCount);
+            }
 
             if (enableValidationLayers) {
                 extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -139,16 +146,20 @@ namespace canyon::graphics::vulkan {
             createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
             createInfo.ppEnabledExtensionNames = extensions.data();
             CHECK_VK_RESULT(vkCreateInstance(&createInfo, nullptr, &m_vkInstance));
+            spdlog::info("Vulkan: instance created");
         }
 
         if (enableValidationLayers) {
+            spdlog::info("Vulkan: enabling validation layers");
             VkDebugUtilsMessengerCreateInfoEXT createInfo{};
             populateDebugMessengerCreateInfo(createInfo);
             CHECK_VK_RESULT(CreateDebugUtilsMessengerEXT(m_vkInstance, &createInfo, nullptr, &m_vkDebugMessenger));
         }
+        spdlog::info("Vulkan: context ready");
     }
 
     Context::~Context() {
+        spdlog::info("Vulkan: destroying context");
         if (enableValidationLayers) {
             DestroyDebugUtilsMessengerEXT(m_vkInstance, m_vkDebugMessenger, nullptr);
         }

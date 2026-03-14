@@ -44,7 +44,7 @@ void exampleMain(canyon::platform::IPlatform& platform) {
             graphics.DrawImageTiled(*texture, destRect, nullptr, 1.0f);
             graphics.SetBlendMode(canyon::graphics::BlendMode::Alpha);
             graphics.SetColor(canyon::graphics::BasicColors::Blue);
-            graphics.DrawText("hello", *font1, canyon::graphics::TextHorizAlignment::Center, canyon::graphics::TextVertAlignment::Middle, canyon::MakeRect(0, 0, window1->GetWidth(), window1->GetHeight()));
+            graphics.DrawText("hello", *font1, canyon::MakeRect(0, 0, window1->GetWidth(), window1->GetHeight()), canyon::graphics::TextHorizAlignment::Center, canyon::graphics::TextVertAlignment::Middle);
             window1->Update(30);
             window1->Draw();
             graphics.End();
@@ -55,7 +55,7 @@ void exampleMain(canyon::platform::IPlatform& platform) {
             graphics.SetColor(canyon::graphics::BasicColors::Blue);
             graphics.Clear();
             graphics.SetColor(canyon::graphics::BasicColors::White);
-            graphics.DrawText("world", *font2, canyon::graphics::TextHorizAlignment::Center, canyon::graphics::TextVertAlignment::Middle, canyon::MakeRect(0, 0, window2->GetWidth(), window2->GetHeight()));
+            graphics.DrawText("world", *font2, canyon::MakeRect(0, 0, window2->GetWidth(), window2->GetHeight()), canyon::graphics::TextHorizAlignment::Center, canyon::graphics::TextVertAlignment::Middle);
             window2->Update(30);
             window2->Draw();
             graphics.End();

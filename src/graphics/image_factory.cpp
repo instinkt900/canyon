@@ -56,17 +56,16 @@ namespace canyon::graphics {
             auto const& imageDesc = cacheIt->second;
             IntVec2 const textureDimensions{ imageDesc.m_sourceRect.w(), imageDesc.m_sourceRect.h() };
             return m_context.NewImage(imageDesc.m_texture, imageDesc.m_sourceRect);
-        } else {
-            if (std::shared_ptr<ITexture> texture = m_context.TextureFromFile(path)) {
-                IntVec2 textureDimensions{ texture->GetWidth(), texture->GetHeight() };
-                IntRect sourceRect{ { 0, 0 }, textureDimensions };
-                ImageDesc cacheDesc;
-                cacheDesc.m_path = path.string();
-                cacheDesc.m_sourceRect = sourceRect;
-                cacheDesc.m_texture = texture;
-                m_cachedImages.insert(std::make_pair(cacheDesc.m_path.string(), cacheDesc));
-                return m_context.NewImage(texture, sourceRect);
-            }
+        }
+        if (std::shared_ptr<ITexture> texture = m_context.TextureFromFile(path)) {
+            IntVec2 textureDimensions{ texture->GetWidth(), texture->GetHeight() };
+            IntRect sourceRect{ { 0, 0 }, textureDimensions };
+            ImageDesc cacheDesc;
+            cacheDesc.m_path = path.string();
+            cacheDesc.m_sourceRect = sourceRect;
+            cacheDesc.m_texture = texture;
+            m_cachedImages.insert(std::make_pair(cacheDesc.m_path.string(), cacheDesc));
+            return m_context.NewImage(texture, sourceRect);
         }
         return nullptr;
     }

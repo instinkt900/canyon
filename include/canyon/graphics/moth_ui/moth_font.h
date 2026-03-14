@@ -11,7 +11,7 @@ namespace canyon::graphics {
     public:
         explicit MothFont(std::shared_ptr<graphics::IFont> internalFont)
             : m_font(internalFont) {}
-        virtual ~MothFont() = default;
+        ~MothFont() override = default;
 
         std::shared_ptr<graphics::IFont> GetInternalFont() { return m_font; }
 

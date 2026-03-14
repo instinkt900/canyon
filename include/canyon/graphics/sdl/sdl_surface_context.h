@@ -17,7 +17,7 @@ namespace canyon::graphics::sdl {
     class SurfaceContext : public graphics::SurfaceContext {
     public:
         SurfaceContext(Context& context, SDL_Renderer* renderer);
-        virtual ~SurfaceContext() = default;
+        ~SurfaceContext() override = default;
 
         Context& GetContext() const override { return m_context; }
         SDL_Renderer* GetRenderer() const { return m_renderer; }

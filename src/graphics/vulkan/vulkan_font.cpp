@@ -2,9 +2,9 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "canyon/graphics/vulkan/vulkan_font.h"
-#include "canyon/graphics/stb_rect_pack.h"
+#include "stb_rect_pack.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
-#include "canyon/graphics/stb_image_write.h"
+#include "stb_image_write.h"
 #include "harfbuzz/hb-ft.h"
 
 #define _unused(x) ((void)(x))
@@ -47,7 +47,7 @@ namespace {
 
         struct PackTest {
             canyon::IntVec2 m_dimensions;
-            float m_ratio;
+            float m_ratio = 0.0f;
         };
 
         int const minDimX = NextPowerOf2(minPack.x);
@@ -76,10 +76,14 @@ namespace {
             stbrp_context stbContext;
             stbrp_init_target(&stbContext, testDim.m_dimensions.x, testDim.m_dimensions.y, nodes.data(), static_cast<int>(nodes.size()));
             auto const allPacked = stbrp_pack_rects(&stbContext, rects.data(), static_cast<int>(rects.size()));
-            if (allPacked) {
+            if (allPacked != 0) {
                 float testArea = static_cast<float>(testDim.m_dimensions.x * testDim.m_dimensions.y);
-                testDim.m_ratio = totalArea / testArea;
+                testDim.m_ratio = static_cast<float>(totalArea) / testArea;
             }
+        }
+
+        if (testDimensions.empty()) {
+            return { 0, 0 };
         }
 
         std::sort(std::begin(testDimensions), std::end(testDimensions), [](auto const& a, auto const& b) { return b.m_ratio < a.m_ratio; });
@@ -89,7 +93,7 @@ namespace {
 
 namespace canyon::graphics::vulkan {
     std::unique_ptr<Font> Font::Load(std::filesystem::path const& path, int size, SurfaceContext& context) {
-        FT_Face face;
+        FT_Face face = nullptr;
         if (FT_New_Face(context.GetContext().GetFTLibrary(), path.string().c_str(), 0, &face) != 0) {
             return nullptr;
         }
@@ -103,8 +107,10 @@ namespace canyon::graphics::vulkan {
         m_hbFont = hb_ft_font_create(face, nullptr);
 
         std::vector<stbrp_rect> stbRects;
-        int minGlyphWidth, maxGlyphWidth;
-        int minGlyphHeight, maxGlyphHeight;
+        int minGlyphWidth = 0;
+        int maxGlyphWidth = 0;
+        int minGlyphHeight = 0;
+        int maxGlyphHeight = 0;
         int fullWidth = 0;
         int fullHeight = 0;
 
@@ -115,14 +121,14 @@ namespace canyon::graphics::vulkan {
 
         // first we iterate through all the glyphs in the fontData. measuring them and preparing
         // the rects for the stb packer
-        FT_ULong charcode;
-        FT_UInt gindex;
+        FT_ULong charcode = 0;
+        FT_UInt gindex = 0;
         charcode = FT_Get_First_Char(face, &gindex);
         while (gindex != 0) {
-            FT_CHECK(FT_Load_Glyph(face, gindex, FT_LOAD_DEFAULT));
+            FT_CHECK(FT_Load_Glyph(face, gindex, FT_LOAD_RENDER));
 
-            const int glyphWidth = face->glyph->bitmap.width + BorderPixels * 2;
-            const int glyphHeight = face->glyph->bitmap.rows + BorderPixels * 2;
+            const int glyphWidth = static_cast<int>(face->glyph->bitmap.width) + BorderPixels * 2;
+            const int glyphHeight = static_cast<int>(face->glyph->bitmap.rows) + BorderPixels * 2;
 
             minGlyphWidth = std::min(minGlyphWidth, glyphWidth);
             minGlyphHeight = std::min(minGlyphHeight, glyphHeight);
@@ -132,13 +138,13 @@ namespace canyon::graphics::vulkan {
             fullHeight += glyphHeight;
 
             stbrp_rect r;
-            r.id = gindex;
+            r.id = static_cast<int>(gindex);
             r.w = glyphWidth;
             r.h = glyphHeight;
 
             stbRects.push_back(r);
 
-            m_glyphBearings.push_back({ face->glyph->metrics.horiBearingX / 64, -face->glyph->metrics.horiBearingY / 64 }); // -ve y so we can use it as an offset
+            m_glyphBearings.push_back({ static_cast<int32_t>(face->glyph->metrics.horiBearingX / 64), static_cast<int32_t>(-face->glyph->metrics.horiBearingY / 64) }); // -ve y so we can use it as an offset
 
             charcode = FT_Get_Next_Char(face, charcode, &gindex);
         }
@@ -202,10 +208,10 @@ namespace canyon::graphics::vulkan {
         // stbi_write_png("test.png", packDim.x, packDim.y, 4, packData.data(), packDim.x * 4);
 
         m_glyphAtlas = Texture::FromRGBA(m_context, packDim.x, packDim.y, packData.data());
-        m_lineHeight = face->size->metrics.height / 64;
-        m_ascent = face->size->metrics.ascender / 64;
-        m_descent = face->size->metrics.descender / 64;
-        m_underline = FT_MulFix(face->underline_position, face->size->metrics.y_scale) / 64;
+        m_lineHeight = static_cast<int32_t>(face->size->metrics.height / 64);
+        m_ascent = static_cast<int32_t>(face->size->metrics.ascender / 64);
+        m_descent = static_cast<int32_t>(face->size->metrics.descender / 64);
+        m_underline = static_cast<int32_t>(FT_MulFix(face->underline_position, face->size->metrics.y_scale) / 64);
 
         int const dataSize = static_cast<int>(m_shaderInfos.size() * sizeof(ShaderInfo));
         m_glyphInfosBuffer = std::make_unique<Buffer>(m_context, dataSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -258,14 +264,14 @@ namespace canyon::graphics::vulkan {
         hb_buffer_add_utf8(m_hbBuffer, str.data(), static_cast<int>(str.length()), 0, -1);
         hb_shape(m_hbFont, m_hbBuffer, nullptr, 0);
 
-        uint32_t glyphCount;
+        uint32_t glyphCount = 0;
         hb_glyph_info_t* outGlyphInfo = hb_buffer_get_glyph_infos(m_hbBuffer, &glyphCount);
         hb_glyph_position_t* outGlyphPos = hb_buffer_get_glyph_positions(m_hbBuffer, &glyphCount);
 
         std::vector<Font::ShapedInfo> result;
 
         for (uint32_t i = 0; i < glyphCount; ++i) {
-            result.push_back({ CodepointToIndex(outGlyphInfo[i].codepoint),
+            result.push_back({ CodepointToIndex(static_cast<int>(outGlyphInfo[i].codepoint)),
                                { outGlyphPos[i].x_advance / 64, outGlyphPos[i].y_advance / 64 },
                                { outGlyphPos[i].x_offset / 64, outGlyphPos[i].y_offset / 64 } });
         }
@@ -273,13 +279,13 @@ namespace canyon::graphics::vulkan {
         return result;
     }
 
-    std::vector<Font::LineDesc> Font::WrapString(std::string const& str, int32_t width) const {
+    std::vector<Font::LineDesc> Font::WrapString(std::string const& str, int32_t width) const { // NOLINT(readability-function-cognitive-complexity)
         std::vector<Font::LineDesc> lines;
 
         auto const SubmitNewLine = [this, &lines](char const* lineStart, size_t lineLength) {
             // strip preceeding whitespace
             while (lineLength > 0) {
-                if (!std::isspace(*lineStart)) {
+                if (std::isspace(static_cast<unsigned char>(*lineStart)) == 0) {
                     break;
                 }
                 ++lineStart;
@@ -288,7 +294,7 @@ namespace canyon::graphics::vulkan {
 
             // strip trailing whitespace
             while (lineLength > 0) {
-                if (!std::isspace(lineStart[lineLength - 1])) {
+                if (std::isspace(static_cast<unsigned char>(lineStart[lineLength - 1])) == 0) {
                     break;
                 }
                 --lineLength;
@@ -324,7 +330,7 @@ namespace canyon::graphics::vulkan {
             size_t lastBreakIdx = 0;
             size_t i = 0;
             for (/* empty */; i < candidateLine.length(); ++i) {
-                if (std::isspace(candidateLine[i])) {
+                if (std::isspace(static_cast<unsigned char>(candidateLine[i])) != 0) {
                     int32_t const thisLineWidth = GetStringWidth({ candidateLine.data() + beginIdx, i - beginIdx });
                     if (thisLineWidth > width) {
                         // adding this word puts us over the limit
@@ -372,7 +378,7 @@ namespace canyon::graphics::vulkan {
     VkDescriptorSet Font::GetVKDescriptorSetForShader(Shader const& shader) {
         auto it = m_vkDescriptorSets.find(shader.m_hash);
         if (std::end(m_vkDescriptorSets) == it) {
-            VkDescriptorSet vkDescriptorSet;
+            VkDescriptorSet vkDescriptorSet = VK_NULL_HANDLE;
 
             VkDescriptorSetAllocateInfo alloc_info{};
             alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -421,6 +427,6 @@ namespace canyon::graphics::vulkan {
         if (std::end(m_codepointToAtlasIndex) == it) {
             return -1;
         }
-        return it->second;
+        return static_cast<int>(it->second);
     }
 }

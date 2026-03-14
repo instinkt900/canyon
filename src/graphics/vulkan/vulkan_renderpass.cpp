@@ -35,7 +35,7 @@ namespace canyon::graphics::vulkan {
     std::unique_ptr<RenderPass> RenderPassBuilder::Build() {
         uint32_t hash = CalculateHash();
 
-        VkRenderPass renderPass;
+        VkRenderPass renderPass = VK_NULL_HANDLE;
         VkRenderPassCreateInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
         renderPassInfo.attachmentCount = static_cast<uint32_t>(m_attachments.size());
@@ -51,10 +51,10 @@ namespace canyon::graphics::vulkan {
 
     uint32_t RenderPassBuilder::CalculateHash() const {
         std::vector<uint32_t> hashes;
-        for (auto& attachment : m_attachments) {
+        for (const auto& attachment : m_attachments) {
             hashes.push_back(CalcHash(attachment));
         }
-        for (auto& subPass : m_subpasses) {
+        for (const auto& subPass : m_subpasses) {
             hashes.push_back(CalcHash(subPass.flags));
             hashes.push_back(CalcHash(subPass.pipelineBindPoint));
             for (uint32_t i = 0; i < subPass.inputAttachmentCount; ++i) {
@@ -62,17 +62,17 @@ namespace canyon::graphics::vulkan {
             }
             for (uint32_t i = 0; i < subPass.colorAttachmentCount; ++i) {
                 hashes.push_back(CalcHash(subPass.pColorAttachments[i]));
-                if (subPass.pResolveAttachments) {
+                if (subPass.pResolveAttachments != nullptr) {
                     hashes.push_back(CalcHash(subPass.pResolveAttachments[i]));
                 }
             }
-            if (subPass.pDepthStencilAttachment) {
+            if (subPass.pDepthStencilAttachment != nullptr) {
                 hashes.push_back(CalcHash(*subPass.pDepthStencilAttachment));
             }
             for (uint32_t i = 0; i < subPass.preserveAttachmentCount; ++i) {
                 hashes.push_back(CalcHash(subPass.pPreserveAttachments[i]));
             }
         }
-        return CalcHash(reinterpret_cast<void const*>(hashes.data()), sizeof(uint32_t) * hashes.size());
+        return CalcHash(reinterpret_cast<void const*>(hashes.data()), sizeof(uint32_t) * hashes.size()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     }
 }

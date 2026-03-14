@@ -16,7 +16,7 @@ namespace canyon::graphics {
     class MothRenderer : public moth_ui::IRenderer {
     public:
         explicit MothRenderer(IGraphics& graphics);
-        virtual ~MothRenderer() = default;
+        ~MothRenderer() override = default;
 
         void PushBlendMode(moth_ui::BlendMode mode) override;
         void PopBlendMode() override;

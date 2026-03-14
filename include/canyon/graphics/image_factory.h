@@ -11,14 +11,31 @@
 #include <filesystem>
 
 namespace canyon::graphics {
+    /// @brief Cached image loader.
+    ///
+    /// Loads images from disk on first request and returns cached copies on
+    /// subsequent requests with the same path. Supports texture packs (atlases)
+    /// in addition to individual image files.
     class ImageFactory {
     public:
+        /// @param context The surface context used to create GPU resources.
         ImageFactory(SurfaceContext& context);
         virtual ~ImageFactory() = default;
 
+        /// @brief Release all cached textures and images.
         void FlushCache();
+
+        /// @brief Load a texture pack (atlas) from a JSON descriptor file.
+        /// @param path Path to the texture pack descriptor.
+        /// @returns @c true if the pack was loaded successfully.
         bool LoadTexturePack(std::filesystem::path const& path);
 
+        /// @brief Load or retrieve a cached image by file path.
+        ///
+        /// If a texture pack has been loaded and contains the given path, the
+        /// image is sourced from the atlas. Otherwise the file is loaded directly.
+        /// @param path Path to the image file.
+        /// @returns A new image handle, or @c nullptr on failure.
         std::unique_ptr<IImage> GetImage(std::filesystem::path const& path);
 
     private:
