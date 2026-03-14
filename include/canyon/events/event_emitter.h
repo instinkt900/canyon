@@ -20,7 +20,10 @@ namespace canyon {
     public:
         LambdaHandle() = default;
 
-        /// @brief Returns @c true if this handle refers to an active registration.
+        /// @brief Returns @c true if this handle was assigned by
+        /// @c EventEmitter::AddEventListener (i.e. non-default-constructed).
+        /// Does @e not reflect whether the listener is still registered;
+        /// a handle remains non-zero after @c RemoveEventListener() is called.
         bool IsValid() const { return m_id != 0; }
 
     private:
