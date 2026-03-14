@@ -229,8 +229,11 @@ bool TestLayer::OnKey(moth_ui::EventKey const& event) {
     if (event.GetAction() == moth_ui::KeyAction::Down) {
         switch (event.GetKey()) {
         case moth_ui::Key::Escape:
-            m_layerStack->FireEvent(canyon::EventRequestQuit{});
-            return true;
+            if (m_layerStack != nullptr) {
+                m_layerStack->FireEvent(canyon::EventRequestQuit{});
+                return true;
+            }
+            break;
         case moth_ui::Key::S:
             m_pendingScreenshot = true;
             return true;
