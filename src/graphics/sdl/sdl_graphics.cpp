@@ -158,14 +158,13 @@ namespace canyon::graphics::sdl {
         auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
         SDL_Texture* tex = sdlTexture->GetSDLTexture()->GetImpl();
 
-        int width = image.GetWidth();
-        int height = image.GetHeight();
+        SDL_Rect const srcRect = ToSDL(sdlImage.GetSourceRect());
 
         SDL_Texture* prevTarget = SDL_GetRenderTarget(m_surfaceContext.GetRenderer());
         SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), tex);
 
-        SurfaceRef surface = CreateSurfaceRef(SDL_CreateRGBSurface(0, width, height, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000));
-        SDL_RenderReadPixels(m_surfaceContext.GetRenderer(), nullptr, surface->format->format, surface->pixels, surface->pitch);
+        SurfaceRef surface = CreateSurfaceRef(SDL_CreateRGBSurface(0, srcRect.w, srcRect.h, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000));
+        SDL_RenderReadPixels(m_surfaceContext.GetRenderer(), &srcRect, surface->format->format, surface->pixels, surface->pitch);
         IMG_SavePNG(surface.get(), path.string().c_str());
 
         SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), prevTarget);
