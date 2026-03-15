@@ -20,6 +20,5 @@ namespace canyon::graphics {
     }
 
     void MothImage::ImGui(moth_ui::IntVec2 const& size, moth_ui::FloatVec2 const& uv0, moth_ui::FloatVec2 const& uv1) const {
-        m_baseImage->ImGui(size, uv0, uv1);
     }
 }
