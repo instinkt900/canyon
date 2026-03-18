@@ -61,7 +61,6 @@ namespace canyon::graphics {
         auto const cacheIt = m_cachedImages.find(path.string());
         if (std::end(m_cachedImages) != cacheIt) {
             auto const& imageDesc = cacheIt->second;
-            IntVec2 const textureDimensions{ imageDesc.m_sourceRect.w(), imageDesc.m_sourceRect.h() };
             return m_context.NewImage(imageDesc.m_texture, imageDesc.m_sourceRect);
         }
         if (std::shared_ptr<ITexture> texture = m_context.TextureFromFile(path)) {
