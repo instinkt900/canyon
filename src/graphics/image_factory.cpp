@@ -19,6 +19,10 @@ namespace canyon::graphics {
 
         if (std::filesystem::exists(imagePath) && std::filesystem::exists(detailsPath)) {
             auto texture = m_context.TextureFromFile(imagePath);
+            if (!texture) {
+                return false;
+            }
+            auto sharedTexture = std::shared_ptr<ITexture>(texture.release());
 
             std::ifstream ifile(detailsPath);
             if (!ifile.is_open()) {
@@ -39,7 +43,7 @@ namespace canyon::graphics {
                     imageJson.at("path").get_to(relPath);
                     auto const absPath = std::filesystem::absolute(rootPath / relPath);
                     ImageDesc desc;
-                    desc.m_texture = std::shared_ptr<ITexture>(texture.release());
+                    desc.m_texture = sharedTexture;
                     desc.m_path = absPath.string();
                     imageJson.at("rect").get_to(desc.m_sourceRect);
                     m_cachedImages.insert(std::make_pair(desc.m_path.string(), desc));
