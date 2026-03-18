@@ -72,21 +72,6 @@ display can be guarded with a CMake option for headless CI.
 
 ---
 
-## Precompiled Headers
-
-`CMakeLists.txt` line 213 has the PCH target commented out:
-
-```cmake
-# temp disabled while i figure out other build issues. it is intended to use precompiled headers eventually
-# target_precompile_headers(${PROJECT_NAME} PRIVATE include/canyon.h)
-```
-
-Either resolve the build issue and re-enable it, or remove the comment if PCH
-is no longer planned. Leaving dead commented-out build code in CMakeLists
-creates ambiguity about intent.
-
----
-
 ## Shared Library Support
 
 `canyon.h` already has the `CANYON_API` export macro defined correctly for both Windows (`__declspec(dllexport/dllimport)`) and Linux (`__attribute__((visibility("default")))`), but it is currently unused and the build is locked to static.

@@ -1,19 +1,20 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include <memory>
-#include <unordered_map>
-#include <stack>
-#include <filesystem>
 #include <algorithm>
-#include <cmath>
-#include <cstdint>
-#include <chrono>
 #include <array>
 #include <cassert>
+#include <chrono>
+#include <cmath>
+#include <cstdint>
+#include <filesystem>
 #include <fstream>
 #include <list>
+#include <memory>
+#include <stack>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #if !CANYON_DISABLE_VULKAN
 #include <vulkan/vulkan.hpp>
