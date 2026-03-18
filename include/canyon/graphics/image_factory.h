@@ -18,7 +18,7 @@ namespace canyon::graphics {
     /// in addition to individual image files.
     class ImageFactory {
     public:
-        /// @param context The surface context used to create GPU resources.
+        /// @param context The asset context used to load image assets.
         ImageFactory(AssetContext& context);
         virtual ~ImageFactory() = default;
 

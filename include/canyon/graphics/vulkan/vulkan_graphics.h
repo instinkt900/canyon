@@ -127,7 +127,6 @@ namespace canyon::graphics::vulkan {
             uint32_t m_glyphCount = 0;
 
             uint32_t m_vertexCount = 0;
-            uint32_t m_maxVertexCount = 0;
             uint32_t m_currentPipelineId = 0;
 
             struct PendingBatch {

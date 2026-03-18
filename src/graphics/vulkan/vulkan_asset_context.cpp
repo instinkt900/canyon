@@ -12,11 +12,17 @@ namespace canyon::graphics::vulkan {
 
     std::unique_ptr<IImage> AssetContext::NewImage(std::shared_ptr<ITexture> texture) {
         auto vulkanTexture = std::dynamic_pointer_cast<Texture>(texture);
+        if (!vulkanTexture) {
+            return nullptr;
+        }
         return std::make_unique<Image>(vulkanTexture);
     }
 
     std::unique_ptr<IImage> AssetContext::NewImage(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) {
         auto vulkanTexture = std::dynamic_pointer_cast<Texture>(texture);
+        if (!vulkanTexture) {
+            return nullptr;
+        }
         return std::make_unique<Image>(vulkanTexture, sourceRect);
     }
 

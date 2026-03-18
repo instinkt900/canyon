@@ -8,14 +8,10 @@ namespace canyon::graphics::vulkan {
     static constexpr uint32_t kVertexBufferCapacity = 1024;
     // Maximum number of font glyphs that can be submitted in a single frame.
     static constexpr uint32_t kMaxGlyphCount = 1024;
-    // Largest multiple of 3 that fits in the buffer, ensuring chunk boundaries
-    // always land on a triangle primitive boundary.
-    static constexpr uint32_t kMaxVertexCount = kVertexBufferCapacity - (kVertexBufferCapacity % 3);
 
     void Graphics::BeginContext(DrawContext* context) {
         context->m_logicalExtent = context->m_target->GetVkExtent();
         context->m_vertexCount = 0;
-        context->m_maxVertexCount = kMaxVertexCount;
         context->m_currentPipelineId = 0;
         context->m_pendingBatch.reset();
 
@@ -43,7 +39,6 @@ namespace canyon::graphics::vulkan {
         vkResetFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence);
         context->m_logicalExtent = context->m_target->GetVkExtent();
         context->m_vertexCount = 0;
-        context->m_maxVertexCount = kMaxVertexCount;
         context->m_currentPipelineId = 0;
         context->m_pendingBatch.reset();
         context->m_glyphCount = 0;
@@ -152,18 +147,24 @@ namespace canyon::graphics::vulkan {
     void Graphics::SubmitVertices(Vertex* vertices, uint32_t vertCount, ETopologyType topology, VkDescriptorSet descriptorSet) {
         auto* context = CurrentContext();
 
-        if (vertCount > context->m_maxVertexCount) {
+        // Compute the largest chunk that aligns to this topology's primitive boundary.
+        uint32_t const primitiveVertexCount = (topology == ETopologyType::Triangles) ? 3u
+                                            : (topology == ETopologyType::Lines)     ? 2u
+                                                                                     : 1u;
+        uint32_t const chunkMax = kVertexBufferCapacity - (kVertexBufferCapacity % primitiveVertexCount);
+
+        if (vertCount > chunkMax) {
             // Split into chunks and submit each one individually.
             uint32_t offset = 0;
             while (offset < vertCount) {
-                uint32_t const count = std::min(context->m_maxVertexCount, vertCount - offset);
+                uint32_t const count = std::min(chunkMax, vertCount - offset);
                 SubmitVertices(vertices + offset, count, topology, descriptorSet);
                 offset += count;
             }
             return;
         }
 
-        const uint32_t availableVertices = context->m_maxVertexCount - context->m_vertexCount;
+        const uint32_t availableVertices = kVertexBufferCapacity - context->m_vertexCount;
         if (availableVertices < vertCount) {
             RestartContext();
         }

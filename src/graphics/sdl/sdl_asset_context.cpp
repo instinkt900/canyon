@@ -12,11 +12,17 @@ namespace canyon::graphics::sdl {
 
     std::unique_ptr<IImage> AssetContext::NewImage(std::shared_ptr<ITexture> texture) {
         auto sdlTexture = std::dynamic_pointer_cast<Texture>(texture);
+        if (!sdlTexture) {
+            return nullptr;
+        }
         return std::make_unique<Image>(sdlTexture);
     }
 
     std::unique_ptr<IImage> AssetContext::NewImage(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) {
         auto sdlTexture = std::dynamic_pointer_cast<Texture>(texture);
+        if (!sdlTexture) {
+            return nullptr;
+        }
         return std::make_unique<Image>(sdlTexture, sourceRect);
     }
 
@@ -29,7 +35,14 @@ namespace canyon::graphics::sdl {
     }
 
     std::unique_ptr<IImage> AssetContext::ImageFromFile(std::filesystem::path const& path) {
-        std::shared_ptr<Texture> texture(dynamic_cast<Texture*>(TextureFromFile(path).release()));
+        auto rawTexture = TextureFromFile(path);
+        if (!rawTexture) {
+            return nullptr;
+        }
+        std::shared_ptr<Texture> texture(dynamic_cast<Texture*>(rawTexture.release()));
+        if (!texture) {
+            return nullptr;
+        }
         return std::make_unique<Image>(texture);
     }
 }

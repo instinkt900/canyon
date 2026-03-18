@@ -15,7 +15,7 @@ namespace canyon::graphics {
     /// the same @c IFont instance.
     class FontFactory {
     public:
-        /// @param context The surface context used to create GPU resources.
+        /// @param context The asset context used to load font assets.
         FontFactory(AssetContext& context);
         virtual ~FontFactory() = default;
 
