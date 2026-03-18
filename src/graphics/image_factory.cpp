@@ -17,41 +17,44 @@ namespace canyon::graphics {
         auto detailsPath = path;
         detailsPath.replace_extension(".json");
 
-        if (std::filesystem::exists(imagePath) && std::filesystem::exists(detailsPath)) {
-            auto texture = m_context.TextureFromFile(imagePath);
-            if (!texture) {
-                return false;
-            }
-            auto sharedTexture = std::shared_ptr<ITexture>(texture.release());
+        if (!std::filesystem::exists(imagePath) || !std::filesystem::exists(detailsPath)) {
+            return false;
+        }
 
-            std::ifstream ifile(detailsPath);
-            if (!ifile.is_open()) {
-                return false;
-            }
+        auto texture = m_context.TextureFromFile(imagePath);
+        if (!texture) {
+            return false;
+        }
+        auto sharedTexture = std::shared_ptr<ITexture>(texture.release());
 
-            nlohmann::json json;
-            try {
-                ifile >> json;
-            } catch (std::exception&) {
-                return false;
-            }
+        std::ifstream ifile(detailsPath);
+        if (!ifile.is_open()) {
+            return false;
+        }
 
-            auto const images = json["images"];
-            for (auto&& imageJson : images) {
-                if (imageJson.contains("path") && imageJson.contains("rect")) {
-                    std::filesystem::path relPath;
-                    imageJson.at("path").get_to(relPath);
-                    auto const absPath = std::filesystem::absolute(rootPath / relPath);
-                    ImageDesc desc;
-                    desc.m_texture = sharedTexture;
-                    desc.m_path = absPath.string();
-                    imageJson.at("rect").get_to(desc.m_sourceRect);
-                    m_cachedImages.insert(std::make_pair(desc.m_path.string(), desc));
-                }
+        nlohmann::json json;
+        try {
+            ifile >> json;
+        } catch (std::exception&) {
+            return false;
+        }
+
+        auto const images = json["images"];
+        for (auto&& imageJson : images) {
+            if (imageJson.contains("path") && imageJson.contains("rect")) {
+                std::filesystem::path relPath;
+                imageJson.at("path").get_to(relPath);
+                auto const absPath = std::filesystem::absolute(rootPath / relPath);
+                ImageDesc desc;
+                desc.m_texture = sharedTexture;
+                desc.m_path = absPath.string();
+                imageJson.at("rect").get_to(desc.m_sourceRect);
+                m_cachedImages.insert(std::make_pair(desc.m_path.string(), desc));
             }
         }
 
         return true;
+
     }
 
     std::unique_ptr<IImage> ImageFactory::GetImage(std::filesystem::path const& path) {
