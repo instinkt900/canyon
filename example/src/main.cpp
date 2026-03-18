@@ -1,6 +1,5 @@
-#include "canyon/canyon.h"
 #include "example_app.h"
-#include "example_main.h"
+#include "canyon/canyon.h"
 #if !CANYON_DISABLE_VULKAN
 #include "canyon/platform/glfw/glfw_platform.h"
 #endif
@@ -19,10 +18,7 @@ int main(int argc, char* argv[]) {
     auto platform = std::make_unique<canyon::platform::sdl::Platform>();
 #endif
     platform->Startup();
-
     startExampleApp(*platform);
-    // exampleMain(*platform);
-
     platform->Shutdown();
     return 0;
 }

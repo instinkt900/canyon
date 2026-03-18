@@ -14,12 +14,9 @@ add_compile_definitions(_CRT_SECURE_NO_WARNINGS IMGUI_DEFINE_MATH_OPERATORS)
 include_directories(../external/imgui)
 
 set(SOURCES ${SOURCES}
-	../external/imgui/imgui_demo.cpp
 	src/main.cpp
 	src/example_app.cpp
 	src/example_layer.cpp
-	src/example_main.cpp
-	src/ui_button.cpp
 )
 
 find_package(canyon REQUIRED)
