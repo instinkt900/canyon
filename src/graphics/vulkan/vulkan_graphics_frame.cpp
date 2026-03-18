@@ -4,21 +4,29 @@
 #include "canyon/graphics/vulkan/vulkan_utils.h"
 
 namespace canyon::graphics::vulkan {
+    // Allocated size of the vertex buffer.
+    static constexpr uint32_t kVertexBufferCapacity = 1024;
+    // Maximum number of font glyphs that can be submitted in a single frame.
+    static constexpr uint32_t kMaxGlyphCount = 1024;
+    // Largest multiple of 3 that fits in the buffer, ensuring chunk boundaries
+    // always land on a triangle primitive boundary.
+    static constexpr uint32_t kMaxVertexCount = kVertexBufferCapacity - (kVertexBufferCapacity % 3);
+
     void Graphics::BeginContext(DrawContext* context) {
         context->m_logicalExtent = context->m_target->GetVkExtent();
         context->m_vertexCount = 0;
-        context->m_maxVertexCount = 1024;
+        context->m_maxVertexCount = kMaxVertexCount;
         context->m_currentPipelineId = 0;
         context->m_pendingBatch.reset();
 
         if (!context->m_vertexBuffer) {
-            context->m_vertexBuffer = std::make_unique<Buffer>(m_surfaceContext, 1024 * sizeof(Vertex), VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+            context->m_vertexBuffer = std::make_unique<Buffer>(m_surfaceContext, kVertexBufferCapacity * sizeof(Vertex), VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
             context->m_vertexBufferData = static_cast<Vertex*>(context->m_vertexBuffer->Map());
         }
 
         if (!context->m_fontInstanceBuffer) {
-            context->m_fontInstanceBuffer = std::make_unique<Buffer>(m_surfaceContext, 1024 * sizeof(FontGlyphInstance), VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-            context->m_fontInstanceStagingBuffer = std::make_unique<Buffer>(m_surfaceContext, 1024 * sizeof(FontGlyphInstance), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+            context->m_fontInstanceBuffer = std::make_unique<Buffer>(m_surfaceContext, kMaxGlyphCount * sizeof(FontGlyphInstance), VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+            context->m_fontInstanceStagingBuffer = std::make_unique<Buffer>(m_surfaceContext, kMaxGlyphCount * sizeof(FontGlyphInstance), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         }
 
         context->m_glyphCount = 0;
@@ -35,7 +43,7 @@ namespace canyon::graphics::vulkan {
         vkResetFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence);
         context->m_logicalExtent = context->m_target->GetVkExtent();
         context->m_vertexCount = 0;
-        context->m_maxVertexCount = 1024;
+        context->m_maxVertexCount = kMaxVertexCount;
         context->m_currentPipelineId = 0;
         context->m_pendingBatch.reset();
         context->m_glyphCount = 0;
@@ -145,8 +153,13 @@ namespace canyon::graphics::vulkan {
         auto* context = CurrentContext();
 
         if (vertCount > context->m_maxVertexCount) {
-            spdlog::warn("SubmitVertices: vertCount {} exceeds m_maxVertexCount {}; draw call ignored",
-                         vertCount, context->m_maxVertexCount);
+            // Split into chunks and submit each one individually.
+            uint32_t offset = 0;
+            while (offset < vertCount) {
+                uint32_t const count = std::min(context->m_maxVertexCount, vertCount - offset);
+                SubmitVertices(vertices + offset, count, topology, descriptorSet);
+                offset += count;
+            }
             return;
         }
 
