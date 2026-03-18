@@ -2,3 +2,11 @@
 CompileFlags:
    CompilationDatabase: ./build/Debug
 
+---
+# Suppress unused-includes warnings in catch-all / forwarding headers where
+# every include is intentional by design.
+If:
+  PathMatch: '.*include/canyon/(canyon|canyon_fwd)\.h'
+Diagnostics:
+  UnusedIncludes: None
+
