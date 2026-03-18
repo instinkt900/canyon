@@ -110,6 +110,20 @@ creates ambiguity about intent.
 
 ---
 
+## Shared Library Support
+
+`canyon.h` already has the `CANYON_API` export macro defined correctly for both Windows (`__declspec(dllexport/dllimport)`) and Linux (`__attribute__((visibility("default")))`), but it is currently unused and the build is locked to static.
+
+To enable shared library support:
+
+1. **`CMakeLists.txt`** — move `CANYON_BUILD` out of the `if(MSVC)` block so it is defined on all platforms; without it the Linux visibility macro never triggers.
+2. **`conanfile.py`** — change `package_type = "static-library"` to `package_type = "library"` and add a `shared` option.
+3. **Public headers** — annotate every public class declaration with `CANYON_API` across all headers in `include/canyon/` (currently zero classes are annotated). This is the bulk of the work.
+
+Note: changing these signatures is a **public API and ABI break** — all consumers (moth_editor, any downstream) must be recompiled. Coordinate with a version bump in `version.txt`.
+
+---
+
 ## Documentation
 
 - **CHANGELOG**: no version history exists. Add a `CHANGELOG.md` tracking what
