@@ -56,7 +56,7 @@ namespace canyon::graphics {
             try {
                 std::filesystem::path relPath;
                 imageJson.at("path").get_to(relPath);
-                auto const absPath = std::filesystem::absolute(rootPath / relPath);
+                auto const absPath = std::filesystem::absolute(rootPath / relPath).lexically_normal();
                 ImageDesc desc;
                 desc.m_texture = sharedTexture;
                 desc.m_path = absPath.string();
@@ -72,7 +72,7 @@ namespace canyon::graphics {
     }
 
     std::unique_ptr<IImage> ImageFactory::GetImage(std::filesystem::path const& path) {
-        auto const key = std::filesystem::absolute(path).string();
+        auto const key = std::filesystem::absolute(path).lexically_normal().string();
         auto const cacheIt = m_cachedImages.find(key);
         if (std::end(m_cachedImages) != cacheIt) {
             auto const& imageDesc = cacheIt->second;
