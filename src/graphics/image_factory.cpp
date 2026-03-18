@@ -39,9 +39,21 @@ namespace canyon::graphics {
             return false;
         }
 
-        auto const images = json["images"];
-        for (auto&& imageJson : images) {
-            if (imageJson.contains("path") && imageJson.contains("rect")) {
+        if (!json.contains("images") || !json["images"].is_array()) {
+            return false;
+        }
+
+        for (auto&& imageJson : json["images"]) {
+            if (!imageJson.is_object()) {
+                continue;
+            }
+            if (!imageJson.contains("path") || !imageJson["path"].is_string()) {
+                continue;
+            }
+            if (!imageJson.contains("rect") || !imageJson["rect"].is_object()) {
+                continue;
+            }
+            try {
                 std::filesystem::path relPath;
                 imageJson.at("path").get_to(relPath);
                 auto const absPath = std::filesystem::absolute(rootPath / relPath);
@@ -50,6 +62,8 @@ namespace canyon::graphics {
                 desc.m_path = absPath.string();
                 imageJson.at("rect").get_to(desc.m_sourceRect);
                 m_cachedImages.insert(std::make_pair(desc.m_path.string(), desc));
+            } catch (std::exception&) {
+                continue;
             }
         }
 
@@ -58,7 +72,8 @@ namespace canyon::graphics {
     }
 
     std::unique_ptr<IImage> ImageFactory::GetImage(std::filesystem::path const& path) {
-        auto const cacheIt = m_cachedImages.find(path.string());
+        auto const key = std::filesystem::absolute(path).string();
+        auto const cacheIt = m_cachedImages.find(key);
         if (std::end(m_cachedImages) != cacheIt) {
             auto const& imageDesc = cacheIt->second;
             return m_context.NewImage(imageDesc.m_texture, imageDesc.m_sourceRect);
@@ -67,10 +82,10 @@ namespace canyon::graphics {
             IntVec2 textureDimensions{ texture->GetWidth(), texture->GetHeight() };
             IntRect sourceRect{ { 0, 0 }, textureDimensions };
             ImageDesc cacheDesc;
-            cacheDesc.m_path = path.string();
+            cacheDesc.m_path = key;
             cacheDesc.m_sourceRect = sourceRect;
             cacheDesc.m_texture = texture;
-            m_cachedImages.insert(std::make_pair(cacheDesc.m_path.string(), cacheDesc));
+            m_cachedImages.insert(std::make_pair(key, cacheDesc));
             return m_context.NewImage(texture, sourceRect);
         }
         return nullptr;
