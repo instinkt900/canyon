@@ -24,32 +24,6 @@ input to the foreground window only.
 
 ---
 
-## SurfaceContext Design
-
-The current split — `Context` (application-wide, holds Vulkan instance / SDL
-init) and `SurfaceContext` (per-window, holds renderer, pools, allocators) — is
-mostly right but the boundary is fuzzy. The factories (`ImageFactory`,
-`FontFactory`) live on `SurfaceContext`, which is correct because assets are
-window-bound, but consumers sometimes reach through to `GetContext()` to get
-application-wide resources.
-
-From NOTES (29/03/25): the intent was `Context` = application context,
-`SurfaceContext` = surface/window context, and an `AssetLoader` that comes from
-`SurfaceContext` for disk I/O. The asset-loading methods (`ImageFromFile`,
-`FontFromFile`, `TextureFromFile`) currently live directly on `SurfaceContext`
-rather than on a dedicated loader type.
-
-Options:
-- **Option A — Keep current shape, clarify the interface**: Document that
-  `SurfaceContext` is intentionally the asset entry point; remove
-  `GetContext()` from the public API so callers can't reach through.
-- **Option B — Extract `AssetLoader`**: `SurfaceContext` becomes purely about
-  GPU resource lifetime; a separate `AssetLoader` (obtained from
-  `SurfaceContext`) handles file I/O and caching. Cleaner separation but more
-  surface area.
-
----
-
 ## Test Suite
 
 There are no automated tests. The example app exercises the library manually but
@@ -88,9 +62,9 @@ Note: changing these signatures is a **public API and ABI break** — all consum
 
 ## Documentation
 
-- **Known limitations**: the README covers usage but does not mention the vertex
-  buffer limit or any other current constraints. A brief "Known Limitations"
-  section prevents surprises for new consumers.
+- **Known limitations**: the README covers usage but does not document current
+  constraints. A brief "Known Limitations" section prevents surprises for new
+  consumers.
 - **API stability statement**: clarify in the README whether the public API
   (`IGraphics`, `SurfaceContext`, `Application`, etc.) is considered stable at
   1.0, and what the compatibility policy is going forward.

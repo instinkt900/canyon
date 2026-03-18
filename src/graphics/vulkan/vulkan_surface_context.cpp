@@ -1,9 +1,6 @@
 #include "common.h"
 #include "canyon/graphics/vulkan/vulkan_surface_context.h"
 #include "canyon/graphics/vulkan/vulkan_context.h"
-#include "canyon/graphics/vulkan/vulkan_font.h"
-#include "canyon/graphics/vulkan/vulkan_image.h"
-#include "canyon/graphics/vulkan/vulkan_texture.h"
 #include "canyon/graphics/vulkan/vulkan_utils.h"
 
 namespace {
@@ -14,7 +11,8 @@ namespace {
 
 namespace canyon::graphics::vulkan {
     SurfaceContext::SurfaceContext(Context& context)
-        : m_context(context) {
+        : m_context(context)
+        , m_assetContext(*this) {
         spdlog::info("Vulkan: initializing surface context");
 
         // select device
@@ -124,38 +122,6 @@ namespace canyon::graphics::vulkan {
             vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator);
         }
         spdlog::info("Vulkan: surface context ready");
-    }
-
-    std::unique_ptr<IImage> SurfaceContext::NewImage(std::shared_ptr<ITexture> texture) {
-        auto vulkanTexture = std::dynamic_pointer_cast<Texture>(texture);
-        return std::make_unique<Image>(vulkanTexture);
-    }
-
-    std::unique_ptr<IImage> SurfaceContext::NewImage(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) {
-        auto vulkanTexture = std::dynamic_pointer_cast<Texture>(texture);
-        return std::make_unique<Image>(vulkanTexture, sourceRect);
-    }
-
-    std::unique_ptr<IFont> SurfaceContext::FontFromFile(std::filesystem::path const& path, uint32_t size) {
-        return Font::Load(path, static_cast<int>(size), *this);
-    }
-
-    std::unique_ptr<ITexture> SurfaceContext::TextureFromFile(std::filesystem::path const& path) {
-        return Texture::FromFile(*this, path);
-    }
-
-    std::unique_ptr<IImage> SurfaceContext::ImageFromFile(std::filesystem::path const& path) {
-        auto texture = TextureFromFile(path);
-        if (!texture) {
-            return nullptr;
-        }
-        auto* rawTexture = dynamic_cast<Texture*>(texture.get());
-        if (rawTexture == nullptr) {
-            return nullptr;
-        }
-        texture.release();
-        std::shared_ptr<Texture> vulkanTexture(rawTexture);
-        return std::make_unique<Image>(vulkanTexture);
     }
 
     SurfaceContext::~SurfaceContext() {

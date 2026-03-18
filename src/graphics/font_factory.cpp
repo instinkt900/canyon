@@ -1,9 +1,7 @@
 #include "common.h"
 #include "canyon/graphics/font_factory.h"
-#include "canyon/graphics/surface_context.h"
-
 namespace canyon::graphics {
-    FontFactory::FontFactory(SurfaceContext& context)
+    FontFactory::FontFactory(AssetContext& context)
         : m_context(context) {
     }
 

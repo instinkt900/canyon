@@ -30,6 +30,7 @@
 #include "canyon/events/event_window.h"
 
 // graphics — interfaces and core
+#include "canyon/graphics/asset_context.h"
 #include "canyon/graphics/blend_mode.h"
 #include "canyon/graphics/color.h"
 #include "canyon/graphics/context.h"

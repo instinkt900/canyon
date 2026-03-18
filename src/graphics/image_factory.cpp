@@ -3,7 +3,7 @@
 #include "canyon/graphics/itexture.h"
 
 namespace canyon::graphics {
-    ImageFactory::ImageFactory(SurfaceContext& context)
+    ImageFactory::ImageFactory(AssetContext& context)
         : m_context(context) {
     }
 

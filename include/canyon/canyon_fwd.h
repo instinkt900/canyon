@@ -42,6 +42,7 @@ namespace canyon::graphics {
     // -------------------------------------------------------------------------
     // Graphics interfaces
     // -------------------------------------------------------------------------
+    class AssetContext;
     class IGraphics;
     class IImage;
     class IFont;

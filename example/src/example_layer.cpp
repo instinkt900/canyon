@@ -151,7 +151,7 @@ void TestLayer::Draw() {
     constexpr int kClipW = 220, kClipH = 80;
     canyon::IntRect clipZone{
         { GetWidth() - kClipW - 10, GetHeight() - kClipH - 10 },
-        { GetWidth() - 10,          GetHeight() - 10 }
+        { GetWidth() - 10, GetHeight() - 10 }
     };
     m_graphics.SetClip(&clipZone);
     m_graphics.SetBlendMode(canyon::graphics::BlendMode::Replace);
@@ -172,10 +172,8 @@ void TestLayer::Draw() {
     m_graphics.SetClip(nullptr);
     // Outline so the clip zone is easy to spot
     m_graphics.SetColor(canyon::graphics::BasicColors::White);
-    m_graphics.DrawRectF({
-        { static_cast<float>(clipZone.topLeft.x),     static_cast<float>(clipZone.topLeft.y) },
-        { static_cast<float>(clipZone.bottomRight.x), static_cast<float>(clipZone.bottomRight.y) }
-    });
+    m_graphics.DrawRectF({ { static_cast<float>(clipZone.topLeft.x), static_cast<float>(clipZone.topLeft.y) },
+                           { static_cast<float>(clipZone.bottomRight.x), static_cast<float>(clipZone.bottomRight.y) } });
 
     // Screenshot before we return to the swapchain — captures the full scene.
     if (m_pendingScreenshot) {
@@ -217,7 +215,8 @@ bool TestLayer::OnAnimationStopped(moth_ui::EventAnimationStopped const& event) 
     if (event.GetClipName() == "ready") {
         m_root->SetAnimation("idle");
         return true;
-    } else if (event.GetClipName() == "transition_out") {
+    }
+    if (event.GetClipName() == "transition_out") {
         LoadLayout("assets/layouts/demo.mothui");
         m_root->SetAnimation("transition_in");
         return true;

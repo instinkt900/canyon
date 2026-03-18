@@ -1,6 +1,6 @@
 #pragma once
 
-#include "canyon/graphics/surface_context.h"
+#include "canyon/graphics/asset_context.h"
 #include "canyon/graphics/iimage.h"
 #include "canyon/graphics/itexture.h"
 #include "canyon/utils/rect.h"
@@ -19,7 +19,7 @@ namespace canyon::graphics {
     class ImageFactory {
     public:
         /// @param context The surface context used to create GPU resources.
-        ImageFactory(SurfaceContext& context);
+        ImageFactory(AssetContext& context);
         virtual ~ImageFactory() = default;
 
         /// @brief Release all cached textures and images.
@@ -45,7 +45,7 @@ namespace canyon::graphics {
             std::filesystem::path m_path;
         };
 
-        SurfaceContext& m_context;
+        AssetContext& m_context;
         std::unordered_map<std::string, ImageDesc> m_cachedImages;
     };
 }

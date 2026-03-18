@@ -24,7 +24,7 @@ namespace canyon::graphics::sdl {
 
         void InitImgui(canyon::platform::Window const& window) override;
 
-        SurfaceContext& GetContext() const override { return m_surfaceContext; }
+        SurfaceContext& GetSurfaceContext() const override { return m_surfaceContext; }
 
         void Begin() override;
         void End() override;

@@ -33,7 +33,7 @@ namespace canyon::graphics {
         virtual void InitImgui(canyon::platform::Window const& window) = 0;
 
         /// @brief Returns the surface context that owns this graphics instance.
-        virtual SurfaceContext& GetContext() const = 0;
+        virtual SurfaceContext& GetSurfaceContext() const = 0;
 
         /// @brief Begin a new frame. Must be called before any draw operations.
         virtual void Begin() = 0;

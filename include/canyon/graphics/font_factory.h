@@ -1,6 +1,6 @@
 #pragma once
 
-#include "canyon/graphics/igraphics.h"
+#include "canyon/graphics/asset_context.h"
 #include "canyon/graphics/ifont.h"
 
 #include <map>
@@ -16,7 +16,7 @@ namespace canyon::graphics {
     class FontFactory {
     public:
         /// @param context The surface context used to create GPU resources.
-        FontFactory(SurfaceContext& context);
+        FontFactory(AssetContext& context);
         virtual ~FontFactory() = default;
 
         /// @brief Release all cached fonts.
@@ -29,7 +29,7 @@ namespace canyon::graphics {
         std::shared_ptr<IFont> GetFont(std::string const& name, int size);
 
     private:
-        SurfaceContext& m_context;
+        AssetContext& m_context;
         std::map<std::string, std::map<int, std::shared_ptr<IFont>>> m_fonts;
     };
 }

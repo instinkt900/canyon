@@ -48,6 +48,7 @@ if(NOT CANYON_DISABLE_SDL)
         src/graphics/sdl/sdl_font.cpp
         src/graphics/sdl/sdl_graphics.cpp
         src/graphics/sdl/sdl_image.cpp
+        src/graphics/sdl/sdl_asset_context.cpp
         src/graphics/sdl/sdl_surface_context.cpp
         src/graphics/sdl/sdl_texture.cpp
         src/graphics/sdl/SDL_FontCache.c
@@ -77,6 +78,7 @@ if(NOT CANYON_DISABLE_VULKAN)
         src/graphics/vulkan/vulkan_pipeline.cpp
         src/graphics/vulkan/vulkan_renderpass.cpp
         src/graphics/vulkan/vulkan_shader.cpp
+        src/graphics/vulkan/vulkan_asset_context.cpp
         src/graphics/vulkan/vulkan_surface_context.cpp
         src/graphics/vulkan/vulkan_swapchain.cpp
         src/graphics/vulkan/vulkan_texture.cpp
