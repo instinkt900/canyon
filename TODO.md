@@ -126,8 +126,6 @@ Note: changing these signatures is a **public API and ABI break** — all consum
 
 ## Documentation
 
-- **CHANGELOG**: no version history exists. Add a `CHANGELOG.md` tracking what
-  changed between 0.x releases so consumers know what to expect when upgrading.
 - **Known limitations**: the README covers usage but does not mention the vertex
   buffer limit or any other current constraints. A brief "Known Limitations"
   section prevents surprises for new consumers.
