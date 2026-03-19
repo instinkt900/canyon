@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
+## [0.5.1] - 2026-03-19
+### Changes
+- Correct repository name from 'canyon' to 'Canyon'
+
+### Documentation
+- Add build, upload, and licence badges to README
+- Add AI disclosure and table of contents to README
+- Restructure README to match moth_ui layout
+
+### Miscellaneous
+- Bumping moth_ui dependency
+
 ## [0.5.0] - 2026-03-19
 ### Bug Fixes
 - Chunk oversized vertex submissions instead of dropping them
