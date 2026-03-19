@@ -3,7 +3,54 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
-## [Unreleased]
+## [0.5.0] - 2026-03-19
+### Bug Fixes
+- Chunk oversized vertex submissions instead of dropping them
+- Correct copy vs reference bugs in FontFactory and ImageFactory
+- Review fixes — null guards, doc comments, topology-aware chunking
+- Return false from LoadTexturePack when pack files do not exist
+- Harden ImageFactory JSON validation and normalise cache keys
+- Normalise cache keys with lexically_normal to prevent atlas lookup misses
+
+### Changes
+- Standardize workflows to match moth_ui
+- Enable precompiled headers using src/common.h
+- Simplify to a minimal how-to application
+- Clang-tidy in build-test, README asset loading, nested ternary
+
+### Features
+- Add canyon.h catch-all include and canyon_fwd.h forward declarations
+
+### Miscellaneous
+- Updating .clangd to ignore unused includes in catchall headers
+- Removing NOTES.md
+- Updating TODO.md
+- Bumped version to 0.5.0
+- Removed unused variable
+
+### Refactoring
+- Separate AssetContext from SurfaceContext
+
+## [0.4.0] - 2026-03-15
+### Bug Fixes
+- MothImage::ImGui was a no-op, breaking image preview in properties panel
+- MothImage::ImGui was a no-op, breaking image preview in properties panel
+
+### Changes
+- Updates from moth_ui release. Bringing into better state.
+- Add [skip ci] to CHANGELOG commit to prevent re-triggering upload-lib
+- Revert "fix: MothImage::ImGui was a no-op, breaking image preview in properties panel"
+
+### Features
+- Add moth_ui_format.h with fmt formatters for all moth_ui types
+
+### Miscellaneous
+- Add git-cliff changelog automation and expand TODO
+
+### Refactoring
+- Include type name in enum formatter output
+
+## [0.3.0] - 2026-03-04
 ### Bug Fixes
 - Vulkan synchronization and shutdown correctness
 - Remove FreeType headers from public canyon headers
@@ -11,13 +58,9 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Use libfreetype-dev apt package name for Ubuntu 24.04+
 
 ### Changes
+- Aliasing moth ui types instead of duplicating and converting.
 - Decoupling the available semaphore from the swapchain image.
 - Frame-slot
-- Updates from moth_ui release. Bringing into better state.
-
-## [0.3.0] - 2025-08-14
-### Changes
-- Aliasing moth ui types instead of duplicating and converting.
 
 ## [0.2.0] - 2025-05-10
 ### Bug Fixes
