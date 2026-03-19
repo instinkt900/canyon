@@ -205,18 +205,18 @@ gfx.DrawImage(*target->GetImage(), destRect);
 
 ### Asset loading
 
-Images and fonts are loaded through the surface context or the factory helpers:
+Images and fonts are loaded through `AssetContext`, obtained from the window's surface context:
 
 ```cpp
-auto& ctx = window.GetSurfaceContext();
-auto image = ctx.ImageFromFile("assets/sprite.png");
-auto font  = ctx.FontFromFile("assets/fonts/roboto.ttf", 16);
+auto& assets = window.GetSurfaceContext().GetAssetContext();
+auto image = assets.ImageFromFile("assets/sprite.png");
+auto font  = assets.FontFromFile("assets/fonts/roboto.ttf", 16);
 ```
 
 For cached, atlas-aware loading use `ImageFactory` directly:
 
 ```cpp
-canyon::graphics::ImageFactory imageFactory(window.GetSurfaceContext());
+canyon::graphics::ImageFactory imageFactory(window.GetSurfaceContext().GetAssetContext());
 imageFactory.LoadTexturePack("assets/sprites.json");
 auto sprite = imageFactory.GetImage("assets/sprites/player.png"); // sourced from atlas
 ```

@@ -148,9 +148,12 @@ namespace canyon::graphics::vulkan {
         auto* context = CurrentContext();
 
         // Compute the largest chunk that aligns to this topology's primitive boundary.
-        uint32_t const primitiveVertexCount = (topology == ETopologyType::Triangles) ? 3u
-                                            : (topology == ETopologyType::Lines)     ? 2u
-                                                                                     : 1u;
+        uint32_t primitiveVertexCount = 1u;
+        if (topology == ETopologyType::Triangles) {
+            primitiveVertexCount = 3u;
+        } else if (topology == ETopologyType::Lines) {
+            primitiveVertexCount = 2u;
+        }
         uint32_t const chunkMax = kVertexBufferCapacity - (kVertexBufferCapacity % primitiveVertexCount);
 
         if (vertCount > chunkMax) {
