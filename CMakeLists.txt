@@ -48,6 +48,7 @@ if(NOT CANYON_DISABLE_SDL)
         src/graphics/sdl/sdl_font.cpp
         src/graphics/sdl/sdl_graphics.cpp
         src/graphics/sdl/sdl_image.cpp
+        src/graphics/sdl/sdl_asset_context.cpp
         src/graphics/sdl/sdl_surface_context.cpp
         src/graphics/sdl/sdl_texture.cpp
         src/graphics/sdl/SDL_FontCache.c
@@ -77,6 +78,7 @@ if(NOT CANYON_DISABLE_VULKAN)
         src/graphics/vulkan/vulkan_pipeline.cpp
         src/graphics/vulkan/vulkan_renderpass.cpp
         src/graphics/vulkan/vulkan_shader.cpp
+        src/graphics/vulkan/vulkan_asset_context.cpp
         src/graphics/vulkan/vulkan_surface_context.cpp
         src/graphics/vulkan/vulkan_swapchain.cpp
         src/graphics/vulkan/vulkan_texture.cpp
@@ -187,7 +189,10 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR DEFINED ENV{CI})
     find_program(CLANG_TIDY_EXE NAMES clang-tidy)
     if(CLANG_TIDY_EXE)
-        set_target_properties(${PROJECT_NAME} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
+        # --extra-arg=-Wno-ignored-gch: clang-tidy uses Clang, which cannot read
+        # GCC-format PCH files. Suppressing the warning entirely (not just -Wno-error)
+        # prevents clang-tidy's WarningsAsErrors from re-promoting it to an error.
+        set_target_properties(${PROJECT_NAME} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_EXE};--extra-arg=-Wno-ignored-gch")
         # Third-party source files — skip all linting (requires CMake 3.27+)
         set_source_files_properties(
             src/graphics/sdl/SDL_FontCache.c
@@ -210,10 +215,21 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR DEFINED ENV{CI})
     endif()
 endif()
 
-# temp disabled while i figure out other build issues. it is intended to use precompiled headers eventually
-# target_precompile_headers(${PROJECT_NAME} PRIVATE include/canyon.h)
-# set_source_files_properties(external/murmurhash.c/murmurhash.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
-# set_source_files_properties(src/graphics/sdl/SDL_FontCache.c PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+target_precompile_headers(${PROJECT_NAME} PRIVATE src/common.h)
+set_source_files_properties(
+    external/murmurhash.c/murmurhash.c
+    src/graphics/sdl/SDL_FontCache.c
+    external/imgui/imgui.cpp
+    external/imgui/imgui_draw.cpp
+    external/imgui/imgui_tables.cpp
+    external/imgui/imgui_widgets.cpp
+    external/imgui/backends/imgui_impl_sdl2.cpp
+    external/imgui/backends/imgui_impl_sdlrenderer2.cpp
+    external/imgui/backends/imgui_impl_glfw.cpp
+    external/imgui/backends/imgui_impl_vulkan.cpp
+    src/graphics/vulkan/shaders/vulkan_shaders.cpp
+    PROPERTIES SKIP_PRECOMPILE_HEADERS ON
+)
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin

@@ -1,6 +1,7 @@
 #include "common.h"
 #include <moth_ui/context.h>
 #include "canyon/platform/window.h"
+#include "canyon/graphics/surface_context.h"
 
 namespace canyon::platform {
     Window::Window(std::string const& title, int width, int height)
@@ -13,9 +14,9 @@ namespace canyon::platform {
     }
 
     void Window::PostCreate() {
-        auto& surfaceContext = GetSurfaceContext();
-        m_imageFactory = std::make_unique<canyon::graphics::ImageFactory>(surfaceContext);
-        m_fontFactory = std::make_unique<canyon::graphics::FontFactory>(surfaceContext);
+        auto& assetContext = GetSurfaceContext().GetAssetContext();
+        m_imageFactory = std::make_unique<canyon::graphics::ImageFactory>(assetContext);
+        m_fontFactory = std::make_unique<canyon::graphics::FontFactory>(assetContext);
         m_uiRenderer = std::make_unique<canyon::graphics::MothRenderer>(*m_graphics);
         m_mothImageFactory = std::make_unique<canyon::graphics::MothImageFactory>(m_imageFactory);
         m_mothFontFactory = std::make_unique<canyon::graphics::MothFontFactory>(m_fontFactory);
