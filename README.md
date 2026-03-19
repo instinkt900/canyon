@@ -1,4 +1,4 @@
-# canyon
+# Canyon
 
 [![Build Status](https://github.com/instinkt900/canyon/actions/workflows/build-test.yml/badge.svg)](https://github.com/instinkt900/canyon/actions/workflows/build-test.yml)
 [![Upload Status](https://github.com/instinkt900/canyon/actions/workflows/upload-release.yml/badge.svg)](https://github.com/instinkt900/canyon/actions/workflows/upload-release.yml)
