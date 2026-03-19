@@ -1,5 +1,9 @@
 # canyon
 
+[![Build Status](https://github.com/instinkt900/canyon/actions/workflows/build-test.yml/badge.svg)](https://github.com/instinkt900/canyon/actions/workflows/build-test.yml)
+[![Upload Status](https://github.com/instinkt900/canyon/actions/workflows/upload-release.yml/badge.svg)](https://github.com/instinkt900/canyon/actions/workflows/upload-release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A C++ application and graphics framework built on top of [moth_ui](https://github.com/instinkt900/moth_ui). canyon provides a platform abstraction layer (windowing, event loop), two graphics backends (SDL2 and Vulkan), and the glue that connects moth_ui's UI system to a runnable application.
 
 ## Features
