@@ -6,6 +6,32 @@
 
 A C++ application and graphics framework built on top of [moth_ui](https://github.com/instinkt900/moth_ui). canyon provides a platform abstraction layer (windowing, event loop), two graphics backends (SDL2 and Vulkan), and the glue that connects moth_ui's UI system to a runnable application.
 
+## AI Disclosure
+
+AI agents (primarily Claude) are used as tools in this project for tasks such as refactoring, documentation writing, and test implementation. The architecture, design decisions, and direction of the project are human-driven. This is not a vibe-coded project.
+
+---
+
+- [AI Disclosure](#ai-disclosure)
+- [Features](#features)
+- [Requirements](#requirements)
+  - [Linux system dependencies](#linux-system-dependencies)
+- [Setup](#setup)
+- [Build](#build)
+  - [Disabling backends](#disabling-backends)
+  - [Consumer projects](#consumer-projects)
+- [Installing / publishing](#installing--publishing)
+- [Dependencies](#dependencies)
+- [Architecture](#architecture)
+  - [Platform layer](#platform-layer)
+  - [Application](#application)
+  - [Graphics](#graphics)
+  - [Asset loading](#asset-loading)
+  - [moth\_ui integration](#moth_ui-integration)
+- [License](#license)
+
+---
+
 ## Features
 
 - **Platform backends** — SDL2 and GLFW window/event loop implementations
