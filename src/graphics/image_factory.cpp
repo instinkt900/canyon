@@ -2,6 +2,8 @@
 #include "canyon/graphics/image_factory.h"
 #include "canyon/graphics/itexture.h"
 
+//NOLINTBEGIN(readability-function-cognitive-complexity)
+
 namespace canyon::graphics {
     ImageFactory::ImageFactory(AssetContext& context)
         : m_context(context) {
@@ -13,21 +15,12 @@ namespace canyon::graphics {
 
     bool ImageFactory::LoadTexturePack(std::filesystem::path const& path) {
         auto const rootPath = path.parent_path();
-        auto const imagePath = path;
-        auto detailsPath = path;
-        detailsPath.replace_extension(".json");
 
-        if (!std::filesystem::exists(imagePath) || !std::filesystem::exists(detailsPath)) {
+        if (!std::filesystem::exists(path)) {
             return false;
         }
 
-        auto texture = m_context.TextureFromFile(imagePath);
-        if (!texture) {
-            return false;
-        }
-        auto sharedTexture = std::shared_ptr<ITexture>(texture.release());
-
-        std::ifstream ifile(detailsPath);
+        std::ifstream ifile(path);
         if (!ifile.is_open()) {
             return false;
         }
@@ -39,36 +32,57 @@ namespace canyon::graphics {
             return false;
         }
 
-        if (!json.contains("images") || !json["images"].is_array()) {
+        if (!json.contains("atlases") || !json["atlases"].is_array()) {
             return false;
         }
 
-        for (auto&& imageJson : json["images"]) {
-            if (!imageJson.is_object()) {
+        for (auto&& atlasJson : json["atlases"]) {
+            if (!atlasJson.is_object()) {
                 continue;
             }
-            if (!imageJson.contains("path") || !imageJson["path"].is_string()) {
+            if (!atlasJson.contains("atlas") || !atlasJson["atlas"].is_string()) {
                 continue;
             }
-            if (!imageJson.contains("rect") || !imageJson["rect"].is_object()) {
+            if (!atlasJson.contains("images") || !atlasJson["images"].is_array()) {
                 continue;
             }
-            try {
-                std::filesystem::path relPath;
-                imageJson.at("path").get_to(relPath);
-                auto const absPath = std::filesystem::absolute(rootPath / relPath).lexically_normal();
-                ImageDesc desc;
-                desc.m_texture = sharedTexture;
-                desc.m_path = absPath.string();
-                imageJson.at("rect").get_to(desc.m_sourceRect);
-                m_cachedImages.insert(std::make_pair(desc.m_path.string(), desc));
-            } catch (std::exception&) {
+
+            std::filesystem::path atlasRelPath;
+            atlasJson.at("atlas").get_to(atlasRelPath);
+            auto const atlasAbsPath = std::filesystem::absolute(rootPath / atlasRelPath).lexically_normal();
+
+            auto texture = m_context.TextureFromFile(atlasAbsPath);
+            if (!texture) {
                 continue;
+            }
+            auto sharedTexture = std::shared_ptr<ITexture>(texture.release());
+
+            for (auto&& imageJson : atlasJson["images"]) {
+                if (!imageJson.is_object()) {
+                    continue;
+                }
+                if (!imageJson.contains("path") || !imageJson["path"].is_string()) {
+                    continue;
+                }
+                if (!imageJson.contains("rect") || !imageJson["rect"].is_object()) {
+                    continue;
+                }
+                try {
+                    std::filesystem::path relPath;
+                    imageJson.at("path").get_to(relPath);
+                    auto const absPath = std::filesystem::absolute(rootPath / relPath).lexically_normal();
+                    ImageDesc desc;
+                    desc.m_texture = sharedTexture;
+                    desc.m_path = absPath;
+                    imageJson.at("rect").get_to(desc.m_sourceRect);
+                    m_cachedImages.insert(std::make_pair(absPath.string(), desc));
+                } catch (std::exception&) {
+                    continue;
+                }
             }
         }
 
         return true;
-
     }
 
     std::unique_ptr<IImage> ImageFactory::GetImage(std::filesystem::path const& path) {
@@ -91,4 +105,6 @@ namespace canyon::graphics {
         return nullptr;
     }
 }
+
+//NOLINTEND(readability-function-cognitive-complexity)
 
