@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
+## [0.6.0] - 2026-03-21
+### Changes
+- Updating ci actions to simplify build
+
+### Features
+- Updated loading of texture packs
+
+### Miscellaneous
+- Sorting out some linter issues
+- Bump version
+
 ## [0.5.1] - 2026-03-19
 ### Changes
 - Correct repository name from 'canyon' to 'Canyon'
