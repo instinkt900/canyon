@@ -3,8 +3,12 @@ name: Upload Library
 on:
   workflow_dispatch:
     inputs:
-      force_release:
-        description: 'Create a GitHub Release even if the version has not changed'
+      force:
+        description: 'Run even if version has not changed.'
+        type: boolean
+        default: false
+      test:
+        description: 'Test run. Will not create release or tags.'
         type: boolean
         default: false
   push:
@@ -15,7 +19,6 @@ on:
       - 'external/**'
       - 'CMakeLists.txt'
       - 'conanfile.py'
-      - 'conan/**'
       - 'version.txt'
 
 permissions:
@@ -26,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.check.outputs.changed }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,7 +38,7 @@ jobs:
       - name: Check if version.txt changed
         id: check
         run: |
-          if [[ "${{ github.event.inputs.force_release }}" == "true" ]]; then
+          if [[ "${{ github.event.inputs.force }}" == "true" ]]; then
             echo "changed=true" >> $GITHUB_OUTPUT
           elif [[ -z "${{ github.event.before }}" ]]; then
             if git diff HEAD^ HEAD --name-only 2>/dev/null | grep -q "^version.txt$"; then
@@ -50,13 +54,17 @@ jobs:
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Read version
+        id: version
+        shell: bash
+        run: echo "version=$(cat version.txt | tr -d '[:space:]')" >> $GITHUB_OUTPUT
+
   conan-upload:
     if: github.repository == 'instinkt900/canyon'
     needs: check-version
     runs-on: ${{ matrix.runs_on }}
     strategy:
       matrix:
-        os: [windows, linux]
         include:
           - os: windows
             runs_on: windows-latest
@@ -68,11 +76,6 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Read version
-      id: version
-      shell: bash
-      run: echo "version=$(cat version.txt | tr -d '[:space:]')" >> $GITHUB_OUTPUT
-
     - name: Setup Conan
       uses: conan-io/setup-conan@v1
       with:
@@ -83,7 +86,7 @@ jobs:
         conan remote add artifactory ${{ secrets.ARTIFACTORY_URL }} --force
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
         conan create . -s compiler.cppstd=17 -s build_type=Release --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=true
-        conan upload "canyon/${{ steps.version.outputs.version }}:*" --confirm --remote artifactory
+        conan upload "canyon/${{ needs.check-version.outputs.version }}:*" --confirm --remote artifactory
 
   build-release:
     if: github.repository == 'instinkt900/canyon' && needs.check-version.outputs.changed == 'true'
@@ -123,15 +126,15 @@ jobs:
       with:
         cache_packages: true
 
-    - name: Install dependencies
+    - name: Add conan remotes
       run: |
         conan remote add artifactory ${{ secrets.ARTIFACTORY_URL }} --force
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
-        conan install . -s compiler.cppstd=17 -s build_type=${{ matrix.build_type }} --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=true
 
     - name: Configure and build
       shell: bash
       run: |
+        conan install . -s compiler.cppstd=17 -s build_type=${{ matrix.build_type }} --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=true
         cmake --preset ${{ matrix.configure_preset }}
         cmake --build --preset ${{ matrix.build_preset }} --config ${{ matrix.build_type }}
 
@@ -143,33 +146,28 @@ jobs:
       if: matrix.os == 'windows'
       run: cmake --install build --config ${{ matrix.build_type }} --prefix staging
 
-    - name: Read version
-      id: version
-      shell: bash
-      run: echo "version=$(cat version.txt | tr -d '[:space:]')" >> $GITHUB_OUTPUT
-
     - name: Archive (Linux)
       if: matrix.os == 'linux'
       run: |
-        mv staging canyon-${{ steps.version.outputs.version }}
-        tar czf canyon-${{ steps.version.outputs.version }}-linux-${{ matrix.build_type }}.tar.gz canyon-${{ steps.version.outputs.version }}
+        mv staging canyon-${{ needs.check-version.outputs.version }}
+        tar czf canyon-${{ needs.check-version.outputs.version }}-linux-${{ matrix.build_type }}.tar.gz canyon-${{ needs.check-version.outputs.version }}
 
     - name: Archive (Windows)
       if: matrix.os == 'windows'
       shell: pwsh
       run: |
-        Rename-Item staging canyon-${{ steps.version.outputs.version }}
-        Compress-Archive -Path canyon-${{ steps.version.outputs.version }} -DestinationPath canyon-${{ steps.version.outputs.version }}-windows-${{ matrix.build_type }}.zip
+        Rename-Item staging canyon-${{ needs.check-version.outputs.version }}
+        Compress-Archive -Path canyon-${{ needs.check-version.outputs.version }} -DestinationPath canyon-${{ needs.check-version.outputs.version }}-windows-${{ matrix.build_type }}.zip
 
     - name: Upload archive as workflow artifact
       uses: actions/upload-artifact@v4
       with:
         name: canyon-${{ matrix.os }}-${{ matrix.build_type }}
-        path: canyon-${{ steps.version.outputs.version }}-*
+        path: canyon-${{ needs.check-version.outputs.version }}-*
         retention-days: 1
 
   tag-and-release:
-    if: github.repository == 'instinkt900/canyon' && needs.check-version.outputs.changed == 'true'
+    if: github.repository == 'instinkt900/canyon' && needs.check-version.outputs.changed == 'true' && github.event.inputs.test != 'true'
     needs: [check-version, build-release]
     runs-on: ubuntu-latest
     steps:
@@ -177,10 +175,6 @@ jobs:
         with:
           fetch-depth: 0
           ref: master
-
-      - name: Read version
-        id: version
-        run: echo "version=$(cat version.txt | tr -d '[:space:]')" >> $GITHUB_OUTPUT
 
       - name: Configure git
         run: |
@@ -190,7 +184,7 @@ jobs:
       - name: Create version tag
         uses: rickstaa/action-create-tag@v1
         with:
-          tag: ${{ steps.version.outputs.version }}
+          tag: ${{ needs.check-version.outputs.version }}
           tag_exists_error: false
           force_push_tag: true
 
@@ -216,7 +210,7 @@ jobs:
       - name: Commit CHANGELOG.md to master
         run: |
           git add CHANGELOG.md
-          git diff --cached --quiet || git commit -m "chore(release): update CHANGELOG.md for ${{ steps.version.outputs.version }} [skip ci]"
+          git diff --cached --quiet || git commit -m "chore(release): update CHANGELOG.md for ${{ needs.check-version.outputs.version }} [skip ci]"
           git fetch origin master
           git rebase origin/master || { echo "Rebase failed; aborting to avoid overwriting remote history"; git rebase --abort; exit 1; }
           git push origin master
@@ -230,7 +224,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: "canyon ${{ steps.version.outputs.version }}"
+          tag_name: ${{ needs.check-version.outputs.version }}
+          name: "canyon ${{ needs.check-version.outputs.version }}"
           body_path: RELEASE_NOTES.md
           files: release-assets/*
