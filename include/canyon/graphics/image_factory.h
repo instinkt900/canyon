@@ -25,9 +25,13 @@ namespace canyon::graphics {
         /// @brief Release all cached textures and images.
         void FlushCache();
 
-        /// @brief Load a texture pack (atlas) from a JSON descriptor file.
-        /// @param path Path to the texture pack descriptor.
-        /// @returns @c true if the pack was loaded successfully.
+        /// @brief Load a texture pack from a JSON descriptor file.
+        ///
+        /// The descriptor lists one or more atlas PNGs and the images packed into
+        /// each one. All referenced PNGs are loaded and their images registered in
+        /// the cache. See moth_packer for the descriptor format.
+        /// @param path Path to the pack descriptor JSON (e.g. @c ui.json).
+        /// @returns @c true if at least the descriptor was parsed successfully.
         bool LoadTexturePack(std::filesystem::path const& path);
 
         /// @brief Load or retrieve a cached image by file path.

@@ -70,7 +70,7 @@ jobs:
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
 
     - name: Install dependencies
-      run: conan install . --profile conan/profiles/${{ matrix.os }}_profile --build=missing -s build_type=${{ matrix.build_type }}
+      run: conan install . -s compiler.cppstd=17 -s build_type=${{ matrix.build_type }} --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=true
 
     - name: Configure and build
       shell: bash
@@ -80,4 +80,4 @@ jobs:
 
     - name: Build example
       working-directory: example
-      run: conan create . --profile ../conan/profiles/${{ matrix.os }}_profile --build=missing -s build_type=${{ matrix.build_type }}
+      run: conan create . -s compiler.cppstd=17 -s build_type=${{ matrix.build_type }} --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=true

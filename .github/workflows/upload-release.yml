@@ -68,6 +68,11 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Read version
+      id: version
+      shell: bash
+      run: echo "version=$(cat version.txt | tr -d '[:space:]')" >> $GITHUB_OUTPUT
+
     - name: Setup Conan
       uses: conan-io/setup-conan@v1
       with:
@@ -77,8 +82,8 @@ jobs:
       run: |
         conan remote add artifactory ${{ secrets.ARTIFACTORY_URL }} --force
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
-        conan create . --profile conan/profiles/${{ matrix.os }}_profile --build=missing
-        conan upload canyon --confirm --remote artifactory
+        conan create . -s compiler.cppstd=17 -s build_type=Release --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=true
+        conan upload "canyon/${{ steps.version.outputs.version }}:*" --confirm --remote artifactory
 
   build-release:
     if: github.repository == 'instinkt900/canyon' && needs.check-version.outputs.changed == 'true'
@@ -122,7 +127,7 @@ jobs:
       run: |
         conan remote add artifactory ${{ secrets.ARTIFACTORY_URL }} --force
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
-        conan install . --profile conan/profiles/${{ matrix.os }}_profile --build=missing -s build_type=${{ matrix.build_type }}
+        conan install . -s compiler.cppstd=17 -s build_type=${{ matrix.build_type }} --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=true
 
     - name: Configure and build
       shell: bash
