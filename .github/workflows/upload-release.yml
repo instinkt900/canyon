@@ -77,7 +77,7 @@ jobs:
       run: |
         conan remote add artifactory ${{ secrets.ARTIFACTORY_URL }} --force
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
-        conan create . --profile conan/profiles/${{ matrix.os }}_profile --build=missing
+        conan create . --build=missing
         conan upload canyon --confirm --remote artifactory
 
   build-release:
@@ -122,7 +122,7 @@ jobs:
       run: |
         conan remote add artifactory ${{ secrets.ARTIFACTORY_URL }} --force
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
-        conan install . --profile conan/profiles/${{ matrix.os }}_profile --build=missing -s build_type=${{ matrix.build_type }}
+        conan install . --build=missing -s build_type=${{ matrix.build_type }}
 
     - name: Configure and build
       shell: bash

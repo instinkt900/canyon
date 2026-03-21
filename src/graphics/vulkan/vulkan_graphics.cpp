@@ -215,13 +215,13 @@ namespace canyon::graphics::vulkan {
         uint8_t const* data = static_cast<uint8_t const*>(stagingImage->Map());
         std::vector<uint8_t> dataCopy(targetWidth * targetHeight * 4);
         for (uint32_t row = 0; row < targetHeight; ++row) {
-            uint8_t const* src = data + row * rowPitch;
-            uint8_t* dst = dataCopy.data() + row * targetWidth * 4;
+            uint8_t const* src = data + (row * rowPitch);
+            uint8_t* dst = dataCopy.data() + (row * targetWidth * 4);
             for (uint32_t col = 0; col < targetWidth; ++col) {
-                dst[col * 4 + 0] = src[col * 4 + 2];
-                dst[col * 4 + 1] = src[col * 4 + 1];
-                dst[col * 4 + 2] = src[col * 4 + 0];
-                dst[col * 4 + 3] = src[col * 4 + 3];
+                dst[(col * 4) + 0] = src[(col * 4) + 2];
+                dst[(col * 4) + 1] = src[(col * 4) + 1];
+                dst[(col * 4) + 2] = src[(col * 4) + 0];
+                dst[(col * 4) + 3] = src[(col * 4) + 3];
             }
         }
         stbi_write_png(path.string().c_str(), static_cast<int>(targetWidth), static_cast<int>(targetHeight), 4, dataCopy.data(), static_cast<int>(targetWidth) * 4);

@@ -210,8 +210,6 @@ python3 -m venv .venv
 pip install conan
 ```
 
-Conan profiles for both platforms are provided in `conan/profiles/`.
-
 ### Linux
 
 SDL2, SDL_image, SDL_ttf, GLFW, FreeType, and HarfBuzz must come from the system package manager on Linux (mixing Conan-built and system copies of these libraries causes runtime conflicts via GTK3/GDK-Pixbuf):
@@ -220,10 +218,10 @@ SDL2, SDL_image, SDL_ttf, GLFW, FreeType, and HarfBuzz must come from the system
 sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libglfw3-dev libfreetype-dev libharfbuzz-dev
 ```
 
-`conan install` will also install these automatically when `tools.system.package_manager:mode=install` is set in the profile (already configured in `conan/profiles/linux_profile`).
+`conan install` will also install these automatically when `tools.system.package_manager:mode=install` is set in the profile (already configured in `.conan/profiles/linux-ci`).
 
 ```bash
-conan install . --profile conan/profiles/linux_profile --build=missing -s build_type=Release
+conan install . --build=missing -s build_type=Release
 cmake --preset conan-release
 cmake --build --preset conan-release
 ```
@@ -233,7 +231,7 @@ For a Debug build replace `Release` / `conan-release` with `Debug` / `conan-debu
 ### Windows
 
 ```bash
-conan install . --profile conan/profiles/windows_profile --build=missing -s build_type=Release
+conan install . --build=missing -s build_type=Release
 cmake --preset conan-default
 cmake --build --preset conan-release
 ```
@@ -245,13 +243,13 @@ Both backends are enabled by default. Pass `disable_vulkan=True` or `disable_sdl
 **Vulkan only** (no SDL2 dependency):
 
 ```bash
-conan install . --profile conan/profiles/linux_profile --build=missing -s build_type=Release -o canyon/*:disable_sdl=True
+conan install . --build=missing -s build_type=Release -o canyon/*:disable_sdl=True
 ```
 
 **SDL only** (no Vulkan/GLFW/FreeType/HarfBuzz dependency):
 
 ```bash
-conan install . --profile conan/profiles/linux_profile --build=missing -s build_type=Release -o canyon/*:disable_vulkan=True
+conan install . --build=missing -s build_type=Release -o canyon/*:disable_vulkan=True
 ```
 
 When a backend is disabled, the corresponding compile definition is propagated to all consumers:
@@ -285,7 +283,7 @@ cmake --install build --config Release --prefix=<install_path>
 To publish via Conan:
 
 ```bash
-conan create . --profile conan/profiles/linux_profile --build=missing -s build_type=Release
+conan create . --build=missing -s build_type=Release
 ```
 
 Consumers can then depend on `canyon/<version>` in their own `conanfile.py`.

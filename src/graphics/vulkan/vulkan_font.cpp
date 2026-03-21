@@ -127,8 +127,8 @@ namespace canyon::graphics::vulkan {
         while (gindex != 0) {
             FT_CHECK(FT_Load_Glyph(face, gindex, FT_LOAD_RENDER));
 
-            const int glyphWidth = static_cast<int>(face->glyph->bitmap.width) + BorderPixels * 2;
-            const int glyphHeight = static_cast<int>(face->glyph->bitmap.rows) + BorderPixels * 2;
+            const int glyphWidth = static_cast<int>(face->glyph->bitmap.width) + (BorderPixels * 2);
+            const int glyphHeight = static_cast<int>(face->glyph->bitmap.rows) + (BorderPixels * 2);
 
             minGlyphWidth = std::min(minGlyphWidth, glyphWidth);
             minGlyphHeight = std::min(minGlyphHeight, glyphHeight);
@@ -169,8 +169,8 @@ namespace canyon::graphics::vulkan {
             int const glyphStride = face->glyph->bitmap.pitch;
             int const glyphPosX = rect.x + BorderPixels;
             int const glyphPosY = rect.y + BorderPixels;
-            int const glyphWidth = rect.w - BorderPixels * 2;
-            int const glyphHeight = rect.h - BorderPixels * 2;
+            int const glyphWidth = rect.w - (BorderPixels * 2);
+            int const glyphHeight = rect.h - (BorderPixels * 2);
             int const targetPosX = rect.x;
             int const targetPosY = rect.y;
             int const targetWidth = rect.w;
@@ -186,7 +186,7 @@ namespace canyon::graphics::vulkan {
                     packData[dataIdx + 2] = 0xFF;
                     if (gx >= 0 && gx < glyphWidth && gy >= 0 && gy < glyphHeight) {
                         // glyph pixels
-                        packData[dataIdx + 3] = face->glyph->bitmap.buffer[gx + gy * glyphStride];
+                        packData[dataIdx + 3] = face->glyph->bitmap.buffer[gx + (gy * glyphStride)];
                     } else {
                         // border pixels
                         packData[dataIdx + 3] = 0x0;
