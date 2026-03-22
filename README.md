@@ -1,10 +1,10 @@
-# Canyon
+# moth_graphics
 
-[![Build Status](https://github.com/instinkt900/canyon/actions/workflows/build-test.yml/badge.svg)](https://github.com/instinkt900/canyon/actions/workflows/build-test.yml)
-[![Upload Status](https://github.com/instinkt900/canyon/actions/workflows/upload-release.yml/badge.svg)](https://github.com/instinkt900/canyon/actions/workflows/upload-release.yml)
+[![Build Status](https://github.com/instinkt900/moth_graphics/actions/workflows/build-test.yml/badge.svg)](https://github.com/instinkt900/moth_graphics/actions/workflows/build-test.yml)
+[![Upload Status](https://github.com/instinkt900/moth_graphics/actions/workflows/upload-release.yml/badge.svg)](https://github.com/instinkt900/moth_graphics/actions/workflows/upload-release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A C++ application and graphics framework built on top of [moth_ui](https://github.com/instinkt900/moth_ui). canyon provides a platform abstraction layer (windowing, event loop), two graphics backends (SDL2 and Vulkan), and the glue that connects moth_ui's UI system to a runnable application.
+A C++ application and graphics framework built on top of [moth_ui](https://github.com/instinkt900/moth_ui). moth_graphics provides a platform abstraction layer (windowing, event loop), two graphics backends (SDL2 and Vulkan), and the glue that connects moth_ui's UI system to a runnable application.
 
 ---
 
@@ -33,11 +33,11 @@ A C++ application and graphics framework built on top of [moth_ui](https://githu
 
 ## Overview
 
-canyon provides:
+moth_graphics provides:
 
 - **Platform backends** — SDL2 and GLFW window/event loop implementations
 - **Graphics backends** — SDL2 renderer and Vulkan (with SPIR-V shaders, render targets, font rendering via FreeType + HarfBuzz)
-- **moth_ui integration** — bridges canyon's rendering to moth_ui's layout and animation system
+- **moth_ui integration** — bridges moth_graphics's rendering to moth_ui's layout and animation system
 - **Asset factories** — cached image and font loading with texture pack (atlas) support
 - **ImGui integration** — docking and multi-viewport support via the Vulkan backend
 - **spdlog logging** — structured logging throughout initialisation and window lifecycle
@@ -138,7 +138,7 @@ auto sprite = imageFactory.GetImage("assets/sprites/player.png"); // sourced fro
 
 ### moth_ui integration
 
-canyon bridges its rendering to moth_ui automatically. Push a `moth_ui::Layer` onto the window's layer stack and the animation and event systems work out of the box.
+moth_graphics bridges its rendering to moth_ui automatically. Push a `moth_ui::Layer` onto the window's layer stack and the animation and event systems work out of the box.
 
 ---
 
@@ -161,34 +161,34 @@ canyon bridges its rendering to moth_ui automatically. Push a `moth_ui::Layer` o
 
 ## Using with Conan
 
-Add canyon as a dependency in your `conanfile.py`:
+Add moth_graphics as a dependency in your `conanfile.py`:
 
 ```python
 def requirements(self):
-    self.requires("canyon/<version>")
+    self.requires("moth_graphics/<version>")
 ```
 
-Then link against the `canyon` target in CMake:
+Then link against the `moth_graphics` target in CMake:
 
 ```cmake
-find_package(canyon REQUIRED)
-target_link_libraries(my_app PRIVATE canyon::canyon)
+find_package(moth_graphics REQUIRED)
+target_link_libraries(my_app PRIVATE moth_graphics::moth_graphics)
 ```
 
-Pass backend options at install time to control which backends are compiled into the canyon package your project links against:
+Pass backend options at install time to control which backends are compiled into the moth_graphics package your project links against:
 
 ```bash
-conan install . -o canyon/*:disable_sdl=True
+conan install . -o moth_graphics/*:disable_sdl=True
 ```
 
 Or pin them permanently in your own `conanfile.py`:
 
 ```python
 def configure(self):
-    self.options["canyon"].disable_sdl = True
+    self.options["moth_graphics"].disable_sdl = True
 ```
 
-The `CANYON_DISABLE_SDL` / `CANYON_DISABLE_VULKAN` compile definitions are propagated **automatically** to any target that links against canyon (they are declared `PUBLIC`). Your own `#if` guards stay in sync with how canyon was built without any extra steps.
+The `CANYON_DISABLE_SDL` / `CANYON_DISABLE_VULKAN` compile definitions are propagated **automatically** to any target that links against moth_graphics (they are declared `PUBLIC`). Your own `#if` guards stay in sync with how moth_graphics was built without any extra steps.
 
 ---
 
@@ -243,13 +243,13 @@ Both backends are enabled by default. Pass `disable_vulkan=True` or `disable_sdl
 **Vulkan only** (no SDL2 dependency):
 
 ```bash
-conan install . -s compiler.cppstd=17 -s build_type=Release --build=missing -o canyon/*:disable_sdl=True
+conan install . -s compiler.cppstd=17 -s build_type=Release --build=missing -o moth_graphics/*:disable_sdl=True
 ```
 
 **SDL only** (no Vulkan/GLFW/FreeType/HarfBuzz dependency):
 
 ```bash
-conan install . -s compiler.cppstd=17 -s build_type=Release --build=missing -o canyon/*:disable_vulkan=True
+conan install . -s compiler.cppstd=17 -s build_type=Release --build=missing -o moth_graphics/*:disable_vulkan=True
 ```
 
 When a backend is disabled, the corresponding compile definition is propagated to all consumers:
@@ -286,7 +286,7 @@ To publish via Conan:
 conan create . -s compiler.cppstd=17 -s build_type=Release --build=missing
 ```
 
-Consumers can then depend on `canyon/<version>` in their own `conanfile.py`.
+Consumers can then depend on `moth_graphics/<version>` in their own `conanfile.py`.
 
 ---
 
@@ -295,7 +295,7 @@ Consumers can then depend on `canyon/<version>` in their own `conanfile.py`.
 | Project | Description |
 |---|---|
 | [moth_ui](https://github.com/instinkt900/moth_ui) | Core UI library — node graph, keyframe animation, and event system |
-| canyon | *(this project)* Graphics and application framework built on moth_ui — SDL2 and Vulkan backends, window management, and a layer stack |
+| moth_graphics | *(this project)* Graphics and application framework built on moth_ui — SDL2 and Vulkan backends, window management, and a layer stack |
 | [moth_editor](https://github.com/instinkt900/moth_editor) | Visual layout and animation editor — Flash-like authoring tool for creating moth_ui layout files |
 | [moth_packer](https://github.com/instinkt900/moth_packer) | Command-line texture atlas packer for images and moth_ui layouts |
 

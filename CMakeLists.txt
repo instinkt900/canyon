@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" VERSION_STR)
 string(STRIP "${VERSION_STR}" PROJECT_VERSION)
 
-project(canyon VERSION ${PROJECT_VERSION} DESCRIPTION "A basic graphical framework.")
+project(moth_graphics VERSION ${PROJECT_VERSION} DESCRIPTION "A basic graphical framework.")
 
 message("Building with CMake version: ${CMAKE_VERSION}")
 

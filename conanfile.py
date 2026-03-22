@@ -4,11 +4,11 @@ from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.files import load
 from conan.tools.system.package_manager import Apt
 
-class canyon(ConanFile):
-    name = "canyon"
+class MothGraphics(ConanFile):
+    name = "moth_graphics"
 
     license = "MIT"
-    url = "https://github.com/instinkt900/canyon"
+    url = "https://github.com/instinkt900/moth_graphics"
     description = "A basic graphical application framework that uses moth_ui"
 
     settings = "os", "compiler", "build_type", "arch"
@@ -102,7 +102,7 @@ class canyon(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["canyon"]
+        self.cpp_info.libs = ["moth_graphics"]
         self.cpp_info.libdirs = ["lib"]
         self.cpp_info.includedirs = ["include", "external/imgui"]
         self.cpp_info.defines = ["IMGUI_DEFINE_MATH_OPERATORS"]

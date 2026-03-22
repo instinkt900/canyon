@@ -60,7 +60,7 @@ jobs:
         run: echo "version=$(cat version.txt | tr -d '[:space:]')" >> $GITHUB_OUTPUT
 
   conan-upload:
-    if: github.repository == 'instinkt900/canyon'
+    if: github.repository == 'instinkt900/moth_graphics'
     needs: check-version
     runs-on: ${{ matrix.runs_on }}
     strategy:
@@ -86,10 +86,10 @@ jobs:
         conan remote add artifactory ${{ vars.ARTIFACTORY_URL }} --force
         conan remote login artifactory ci -p ${{ secrets.ARTIFACTS_TOKEN }}
         conan create . -s compiler.cppstd=17 -s build_type=Release --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=true
-        conan upload "canyon/${{ needs.check-version.outputs.version }}:*" --confirm --remote artifactory
+        conan upload "moth_graphics/${{ needs.check-version.outputs.version }}:*" --confirm --remote artifactory
 
   build-release:
-    if: github.repository == 'instinkt900/canyon' && needs.check-version.outputs.changed == 'true'
+    if: github.repository == 'instinkt900/moth_graphics' && needs.check-version.outputs.changed == 'true'
     needs: check-version
     runs-on: ${{ matrix.runs_on }}
     strategy:
@@ -149,25 +149,25 @@ jobs:
     - name: Archive (Linux)
       if: matrix.os == 'linux'
       run: |
-        mv staging canyon-${{ needs.check-version.outputs.version }}
-        tar czf canyon-${{ needs.check-version.outputs.version }}-linux-${{ matrix.build_type }}.tar.gz canyon-${{ needs.check-version.outputs.version }}
+        mv staging moth_graphics-${{ needs.check-version.outputs.version }}
+        tar czf moth_graphics-${{ needs.check-version.outputs.version }}-linux-${{ matrix.build_type }}.tar.gz moth_graphics-${{ needs.check-version.outputs.version }}
 
     - name: Archive (Windows)
       if: matrix.os == 'windows'
       shell: pwsh
       run: |
-        Rename-Item staging canyon-${{ needs.check-version.outputs.version }}
-        Compress-Archive -Path canyon-${{ needs.check-version.outputs.version }} -DestinationPath canyon-${{ needs.check-version.outputs.version }}-windows-${{ matrix.build_type }}.zip
+        Rename-Item staging moth_graphics-${{ needs.check-version.outputs.version }}
+        Compress-Archive -Path moth_graphics-${{ needs.check-version.outputs.version }} -DestinationPath moth_graphics-${{ needs.check-version.outputs.version }}-windows-${{ matrix.build_type }}.zip
 
     - name: Upload archive as workflow artifact
       uses: actions/upload-artifact@v4
       with:
-        name: canyon-${{ matrix.os }}-${{ matrix.build_type }}
-        path: canyon-${{ needs.check-version.outputs.version }}-*
+        name: moth_graphics-${{ matrix.os }}-${{ matrix.build_type }}
+        path: moth_graphics-${{ needs.check-version.outputs.version }}-*
         retention-days: 1
 
   tag-and-release:
-    if: github.repository == 'instinkt900/canyon' && needs.check-version.outputs.changed == 'true' && github.event.inputs.test != 'true'
+    if: github.repository == 'instinkt900/moth_graphics' && needs.check-version.outputs.changed == 'true' && github.event.inputs.test != 'true'
     needs: [check-version, build-release]
     runs-on: ubuntu-latest
     steps:
@@ -225,6 +225,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.check-version.outputs.version }}
-          name: "canyon ${{ needs.check-version.outputs.version }}"
+          name: "moth_graphics ${{ needs.check-version.outputs.version }}"
           body_path: RELEASE_NOTES.md
           files: release-assets/*
