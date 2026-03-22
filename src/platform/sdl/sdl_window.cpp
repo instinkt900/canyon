@@ -1,9 +1,9 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "common.h"
-#include "canyon/platform/sdl/sdl_window.h"
-#include "canyon/graphics/sdl/sdl_surface_context.h"
-#include "canyon/platform/sdl/sdl_events.h"
-#include "canyon/graphics/sdl/sdl_graphics.h"
+#include "moth_graphics/platform/sdl/sdl_window.h"
+#include "moth_graphics/graphics/sdl/sdl_surface_context.h"
+#include "moth_graphics/platform/sdl/sdl_events.h"
+#include "moth_graphics/graphics/sdl/sdl_graphics.h"
 
 #include <stdexcept>
 
@@ -60,7 +60,7 @@ namespace {
     }
 }
 
-namespace canyon::platform::sdl {
+namespace moth_graphics::platform::sdl {
     Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {

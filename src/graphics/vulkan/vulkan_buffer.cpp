@@ -1,8 +1,8 @@
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_buffer.h"
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_buffer.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     Buffer::Buffer(SurfaceContext& context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
         : m_context(context)
         , m_vkBuffer(VK_NULL_HANDLE)

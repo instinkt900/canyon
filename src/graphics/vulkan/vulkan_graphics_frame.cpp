@@ -1,9 +1,9 @@
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_graphics.h"
-#include "canyon/graphics/vulkan/vulkan_command_buffer.h"
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
+#include "moth_graphics/graphics/vulkan/vulkan_command_buffer.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     // Allocated size of the vertex buffer.
     static constexpr uint32_t kVertexBufferCapacity = 1024;
     // Maximum number of font glyphs that can be submitted in a single frame.

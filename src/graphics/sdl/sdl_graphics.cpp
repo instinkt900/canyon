@@ -1,15 +1,15 @@
 #include "common.h"
-#include "canyon/graphics/sdl/sdl_graphics.h"
-#include "canyon/graphics/sdl/sdl_font.h"
-#include "canyon/graphics/sdl/sdl_image.h"
-#include "canyon/graphics/sdl/sdl_utils.hpp"
-#include "canyon/platform/sdl/sdl_window.h"
+#include "moth_graphics/graphics/sdl/sdl_graphics.h"
+#include "moth_graphics/graphics/sdl/sdl_font.h"
+#include "moth_graphics/graphics/sdl/sdl_image.h"
+#include "moth_graphics/graphics/sdl/sdl_utils.hpp"
+#include "moth_graphics/platform/sdl/sdl_window.h"
 #include "../utils.h"
 
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_sdlrenderer2.h"
 
-namespace canyon::graphics::sdl {
+namespace moth_graphics::graphics::sdl {
     Graphics::Graphics(SurfaceContext& context)
         : m_surfaceContext(context)
         , m_drawColor(graphics::BasicColors::White) {
@@ -23,14 +23,14 @@ namespace canyon::graphics::sdl {
         }
     }
 
-    void Graphics::InitImgui(canyon::platform::Window const& window) {
+    void Graphics::InitImgui(moth_graphics::platform::Window const& window) {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         auto& io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         ImGui::StyleColorsDark();
 
-        const auto& sdlWindow = dynamic_cast<canyon::platform::sdl::Window const&>(window);
+        const auto& sdlWindow = dynamic_cast<moth_graphics::platform::sdl::Window const&>(window);
         m_imguiWindow = sdlWindow.GetSDLWindow();
         ImGui_ImplSDL2_InitForSDLRenderer(sdlWindow.GetSDLWindow(), sdlWindow.GetSDLRenderer());
         ImGui_ImplSDLRenderer2_Init(sdlWindow.GetSDLRenderer());

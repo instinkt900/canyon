@@ -1,11 +1,11 @@
 #pragma once
 
-#include "canyon/graphics/color.h"
-#include "canyon/utils/rect.h"
+#include "moth_graphics/graphics/color.h"
+#include "moth_graphics/utils/rect.h"
 
 #include <moth_ui/utils/color.h>
 
-namespace canyon {
+namespace moth_graphics {
     // returns a rect with the coordinates of b within a
     inline IntRect MergeRects(IntRect const& a, IntRect const& b) {
         IntRect c;

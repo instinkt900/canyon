@@ -1,6 +1,6 @@
 #include "common.h"
-#include "canyon/platform/sdl/sdl_events.h"
-#include "canyon/events/event_window.h"
+#include "moth_graphics/platform/sdl/sdl_events.h"
+#include "moth_graphics/events/event_window.h"
 
 #include <moth_ui/events/event_key.h>
 #include <moth_ui/events/event_mouse.h>
@@ -271,7 +271,7 @@ namespace {
     }
 }
 
-namespace canyon::platform::sdl {
+namespace moth_graphics::platform::sdl {
     std::unique_ptr<moth_ui::Event> FromSDL(SDL_Event const& event) {
         switch (event.type) {
         case SDL_WINDOWEVENT: {

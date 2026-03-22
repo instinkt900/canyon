@@ -1,8 +1,8 @@
 #include "common.h"
-#include "canyon/platform/glfw/glfw_platform.h"
-#include "canyon/platform/glfw/glfw_window.h"
+#include "moth_graphics/platform/glfw/glfw_platform.h"
+#include "moth_graphics/platform/glfw/glfw_window.h"
 
-namespace canyon::platform::glfw {
+namespace moth_graphics::platform::glfw {
     bool Platform::Startup() {
         if (glfwInit() == 0) {
             spdlog::error("GLFW: initialization failed");
@@ -22,7 +22,7 @@ namespace canyon::platform::glfw {
         return *m_context;
     }
 
-    std::unique_ptr<canyon::platform::Window> Platform::CreateWindow(std::string const& title, int width, int height) {
+    std::unique_ptr<moth_graphics::platform::Window> Platform::CreateWindow(std::string const& title, int width, int height) {
         return std::make_unique<platform::glfw::Window>(*m_context, title, width, height);
     }
 }

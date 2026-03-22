@@ -1,6 +1,6 @@
 #include "common.h"
-#include "canyon/graphics/font_factory.h"
-namespace canyon::graphics {
+#include "moth_graphics/graphics/font_factory.h"
+namespace moth_graphics::graphics {
     FontFactory::FontFactory(AssetContext& context)
         : m_context(context) {
     }

@@ -1,14 +1,14 @@
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_texture.h"
-#include "canyon/graphics/vulkan/vulkan_command_buffer.h"
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_texture.h"
+#include "moth_graphics/graphics/vulkan/vulkan_command_buffer.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 #include "stb_image.h"
 
 namespace {
     uint32_t NextTextureId = 1; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 }
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     std::unique_ptr<Texture> Texture::FromFile(SurfaceContext& context, std::filesystem::path const& path) {
         if (std::filesystem::exists(path)) {
             int texWidth = 0;

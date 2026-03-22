@@ -1,10 +1,10 @@
 #include "common.h"
-#include "canyon/graphics/moth_ui/moth_font_factory.h"
-#include "canyon/graphics/font_factory.h"
-#include "canyon/graphics/moth_ui/moth_font.h"
+#include "moth_graphics/graphics/moth_ui/moth_font_factory.h"
+#include "moth_graphics/graphics/font_factory.h"
+#include "moth_graphics/graphics/moth_ui/moth_font.h"
 
-namespace canyon::graphics {
-    MothFontFactory::MothFontFactory(std::shared_ptr<canyon::graphics::FontFactory> factoryImpl)
+namespace moth_graphics::graphics {
+    MothFontFactory::MothFontFactory(std::shared_ptr<moth_graphics::graphics::FontFactory> factoryImpl)
         : m_factoryImpl(factoryImpl) {
     }
 

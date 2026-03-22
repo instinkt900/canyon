@@ -54,24 +54,24 @@ AI agents (primarily Claude) are used as tools in this project for tasks such as
 
 `IPlatform` initialises the windowing system and creates `Window` instances. Two implementations are provided:
 
-- `canyon::platform::sdl::Platform` — SDL2 backend, uses the SDL renderer
-- `canyon::platform::glfw::Platform` — GLFW backend, uses the Vulkan renderer
+- `moth_graphics::platform::sdl::Platform` — SDL2 backend, uses the SDL renderer
+- `moth_graphics::platform::glfw::Platform` — GLFW backend, uses the Vulkan renderer
 
 ### Application
 
 `Application` ties a platform, a window, and a fixed-timestep loop together. Subclass it and override the lifecycle hooks:
 
 ```cpp
-#include <canyon/platform/application.h>
-#if !CANYON_DISABLE_VULKAN
-#include <canyon/platform/glfw/glfw_platform.h>
+#include <moth_graphics/platform/application.h>
+#if !MOTH_GRAPHICS_DISABLE_VULKAN
+#include <moth_graphics/platform/glfw/glfw_platform.h>
 #else
-#include <canyon/platform/sdl/sdl_platform.h>
+#include <moth_graphics/platform/sdl/sdl_platform.h>
 #endif
 
-class MyApp : public canyon::platform::Application {
+class MyApp : public moth_graphics::platform::Application {
 public:
-    MyApp(canyon::platform::IPlatform& platform)
+    MyApp(moth_graphics::platform::IPlatform& platform)
         : Application(platform, "My Window", 1280, 720) {}
 
 protected:
@@ -81,10 +81,10 @@ protected:
 };
 
 int main() {
-#if !CANYON_DISABLE_VULKAN
-    canyon::platform::glfw::Platform platform;
+#if !MOTH_GRAPHICS_DISABLE_VULKAN
+    moth_graphics::platform::glfw::Platform platform;
 #else
-    canyon::platform::sdl::Platform platform;
+    moth_graphics::platform::sdl::Platform platform;
 #endif
     platform.Startup();
     MyApp app(platform);
@@ -131,7 +131,7 @@ auto font  = assets.FontFromFile("assets/fonts/roboto.ttf", 16);
 For cached, atlas-aware loading use `ImageFactory` directly:
 
 ```cpp
-canyon::graphics::ImageFactory imageFactory(window.GetSurfaceContext().GetAssetContext());
+moth_graphics::graphics::ImageFactory imageFactory(window.GetSurfaceContext().GetAssetContext());
 imageFactory.LoadTexturePack("assets/sprites.json");
 auto sprite = imageFactory.GetImage("assets/sprites/player.png"); // sourced from atlas
 ```
@@ -188,7 +188,7 @@ def configure(self):
     self.options["moth_graphics"].disable_sdl = True
 ```
 
-The `CANYON_DISABLE_SDL` / `CANYON_DISABLE_VULKAN` compile definitions are propagated **automatically** to any target that links against moth_graphics (they are declared `PUBLIC`). Your own `#if` guards stay in sync with how moth_graphics was built without any extra steps.
+The `MOTH_GRAPHICS_DISABLE_SDL` / `MOTH_GRAPHICS_DISABLE_VULKAN` compile definitions are propagated **automatically** to any target that links against moth_graphics (they are declared `PUBLIC`). Your own `#if` guards stay in sync with how moth_graphics was built without any extra steps.
 
 ---
 
@@ -256,17 +256,17 @@ When a backend is disabled, the corresponding compile definition is propagated t
 
 | Option | Definition |
 |---|---|
-| `disable_vulkan=True` | `CANYON_DISABLE_VULKAN=1` |
-| `disable_sdl=True` | `CANYON_DISABLE_SDL=1` |
+| `disable_vulkan=True` | `MOTH_GRAPHICS_DISABLE_VULKAN=1` |
+| `disable_sdl=True` | `MOTH_GRAPHICS_DISABLE_SDL=1` |
 
 Use these in your own code to guard backend-specific includes:
 
 ```cpp
-#if !CANYON_DISABLE_VULKAN
-#include <canyon/platform/glfw/glfw_platform.h>
+#if !MOTH_GRAPHICS_DISABLE_VULKAN
+#include <moth_graphics/platform/glfw/glfw_platform.h>
 #endif
-#if !CANYON_DISABLE_SDL
-#include <canyon/platform/sdl/sdl_platform.h>
+#if !MOTH_GRAPHICS_DISABLE_SDL
+#include <moth_graphics/platform/sdl/sdl_platform.h>
 #endif
 ```
 

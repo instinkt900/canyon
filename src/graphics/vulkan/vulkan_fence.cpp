@@ -1,8 +1,8 @@
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_fence.h"
+#include "moth_graphics/graphics/vulkan/vulkan_fence.h"
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     Fence::Fence(SurfaceContext& context)
         : m_context(context)
         , m_vkFence(VK_NULL_HANDLE) {

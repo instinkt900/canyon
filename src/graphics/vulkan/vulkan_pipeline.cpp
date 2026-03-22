@@ -1,8 +1,8 @@
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_pipeline.h"
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_pipeline.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     Pipeline::Pipeline(uint32_t hash, VkDevice device, VkPipeline pipeline, std::shared_ptr<Shader> shader)
         : m_hash(hash)
         , m_device(device)

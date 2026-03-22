@@ -88,8 +88,8 @@ class MothGraphics(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
-        tc.cache_variables["CANYON_DISABLE_VULKAN"] = bool(self.options.disable_vulkan)
-        tc.cache_variables["CANYON_DISABLE_SDL"] = bool(self.options.disable_sdl)
+        tc.cache_variables["MOTH_GRAPHICS_DISABLE_VULKAN"] = bool(self.options.disable_vulkan)
+        tc.cache_variables["MOTH_GRAPHICS_DISABLE_SDL"] = bool(self.options.disable_sdl)
         tc.generate()
 
     def build(self):
@@ -106,8 +106,8 @@ class MothGraphics(ConanFile):
         self.cpp_info.libdirs = ["lib"]
         self.cpp_info.includedirs = ["include", "external/imgui"]
         self.cpp_info.defines = ["IMGUI_DEFINE_MATH_OPERATORS"]
-        self.cpp_info.defines.append("CANYON_DISABLE_VULKAN={}".format(1 if self.options.disable_vulkan else 0))
-        self.cpp_info.defines.append("CANYON_DISABLE_SDL={}".format(1 if self.options.disable_sdl else 0))
+        self.cpp_info.defines.append("MOTH_GRAPHICS_DISABLE_VULKAN={}".format(1 if self.options.disable_vulkan else 0))
+        self.cpp_info.defines.append("MOTH_GRAPHICS_DISABLE_SDL={}".format(1 if self.options.disable_sdl else 0))
         if self.settings.os == "Linux":
             # System SDL2/SDL_image/SDL_ttf/GLFW — propagate link flags and
             # include paths to all consumers. Paths are detected via

@@ -1,16 +1,16 @@
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 #include "common.h"
-#include "canyon/platform/glfw/glfw_window.h"
-#include "canyon/graphics/vulkan/vulkan_graphics.h"
-#include "canyon/graphics/vulkan/vulkan_surface_context.h"
-#include "canyon/platform/glfw/glfw_events.h"
-#include "canyon/events/event_window.h"
-#include "canyon/graphics/moth_ui/utils.h"
+#include "moth_graphics/platform/glfw/glfw_window.h"
+#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
+#include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
+#include "moth_graphics/platform/glfw/glfw_events.h"
+#include "moth_graphics/events/event_window.h"
+#include "moth_graphics/graphics/moth_ui/utils.h"
 #include <moth_ui/events/event_mouse.h>
 
-namespace canyon::platform::glfw {
+namespace moth_graphics::platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
-        : canyon::platform::Window(title, width, height)
+        : moth_graphics::platform::Window(title, width, height)
         , m_context(context) {
         if (CreateWindow()) {
             PostCreate();

@@ -1,8 +1,8 @@
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_shader.h"
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_shader.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     Shader::Shader(uint32_t hash)
         : m_hash(hash)
         , m_device(VK_NULL_HANDLE)

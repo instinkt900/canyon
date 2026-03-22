@@ -1,15 +1,15 @@
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_graphics.h"
-#include "canyon/graphics/vulkan/vulkan_command_buffer.h"
-#include "canyon/graphics/vulkan/vulkan_font.h"
-#include "canyon/graphics/vulkan/vulkan_texture.h"
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
+#include "moth_graphics/graphics/vulkan/vulkan_command_buffer.h"
+#include "moth_graphics/graphics/vulkan/vulkan_font.h"
+#include "moth_graphics/graphics/vulkan/vulkan_texture.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 #include "stb_image_write.h"
 
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     Graphics::Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
         : m_surfaceContext(context)
         , m_vkPipelineCache(VK_NULL_HANDLE) {

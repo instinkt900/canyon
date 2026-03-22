@@ -1,5 +1,5 @@
 #include "common.h"
-#include "canyon/platform/glfw/glfw_events.h"
+#include "moth_graphics/platform/glfw/glfw_events.h"
 #include <moth_ui/events/event_key.h>
 #include <moth_ui/events/event_mouse.h>
 #include <moth_ui/events/event.h>
@@ -229,7 +229,7 @@ namespace {
     }
 }
 
-namespace canyon::platform::glfw {
+namespace moth_graphics::platform::glfw {
     std::unique_ptr<moth_ui::Event> FromGLFW(int key, int scancode, int action, int mods) {
         moth_ui::KeyAction keyAction = action == GLFW_RELEASE ? moth_ui::KeyAction::Up : moth_ui::KeyAction::Down;
         int keyMods = 0;

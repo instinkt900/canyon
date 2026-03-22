@@ -1,9 +1,9 @@
 #include "example_layer.h"
-#include "canyon/events/event_window.h"
+#include "moth_graphics/events/event_window.h"
 #include <moth_ui/events/event_dispatch.h>
 #include <moth_ui/layers/layer_stack.h>
 
-ExampleLayer::ExampleLayer(canyon::graphics::IGraphics& graphics, canyon::graphics::AssetContext& assets)
+ExampleLayer::ExampleLayer(moth_graphics::graphics::IGraphics& graphics, moth_graphics::graphics::AssetContext& assets)
     : m_graphics(graphics)
     , m_font(assets.FontFromFile("assets/fonts/The-Retropus.ttf", 64)) {
 }
@@ -22,18 +22,18 @@ void ExampleLayer::Draw() {
     m_graphics.Clear();
 
     if (m_font) {
-        m_graphics.SetColor(canyon::graphics::BasicColors::White);
-        canyon::IntRect const rect{ { 0, 0 }, { GetWidth(), GetHeight() } };
+        m_graphics.SetColor(moth_graphics::graphics::BasicColors::White);
+        moth_graphics::IntRect const rect{ { 0, 0 }, { GetWidth(), GetHeight() } };
         m_graphics.DrawText("Hello, Canyon!", *m_font, rect,
-            canyon::graphics::TextHorizAlignment::Center,
-            canyon::graphics::TextVertAlignment::Middle);
+            moth_graphics::graphics::TextHorizAlignment::Center,
+            moth_graphics::graphics::TextVertAlignment::Middle);
     }
 }
 
 bool ExampleLayer::OnKey(moth_ui::EventKey const& event) {
     if (event.GetAction() == moth_ui::KeyAction::Down && event.GetKey() == moth_ui::Key::Escape) {
         if (m_layerStack) {
-            m_layerStack->FireEvent(canyon::EventRequestQuit{});
+            m_layerStack->FireEvent(moth_graphics::EventRequestQuit{});
             return true;
         }
     }

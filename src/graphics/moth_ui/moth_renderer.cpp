@@ -1,11 +1,11 @@
 #include "common.h"
-#include "canyon/graphics/moth_ui/moth_renderer.h"
-#include "canyon/graphics/igraphics.h"
-#include "canyon/graphics/moth_ui/moth_font.h"
-#include "canyon/graphics/moth_ui/moth_image.h"
-#include "canyon/graphics/moth_ui/utils.h"
+#include "moth_graphics/graphics/moth_ui/moth_renderer.h"
+#include "moth_graphics/graphics/igraphics.h"
+#include "moth_graphics/graphics/moth_ui/moth_font.h"
+#include "moth_graphics/graphics/moth_ui/moth_image.h"
+#include "moth_graphics/graphics/moth_ui/utils.h"
 
-namespace canyon::graphics {
+namespace moth_graphics::graphics {
     MothRenderer::MothRenderer(IGraphics& graphics)
         : m_graphics(graphics) {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });

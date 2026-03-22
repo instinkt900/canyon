@@ -1,8 +1,8 @@
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_context.h"
+#include "moth_graphics/graphics/vulkan/vulkan_context.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 
 #include <spdlog/spdlog.h>
 
@@ -79,7 +79,7 @@ namespace {
     while (0)               \
         ;
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     Context::Context() {
         spdlog::info("Vulkan: initializing context");
 

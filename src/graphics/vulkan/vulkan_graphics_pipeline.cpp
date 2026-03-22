@@ -1,8 +1,8 @@
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_graphics.h"
+#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
 #include <stdexcept>
-#include "canyon/graphics/vulkan/vulkan_command_buffer.h"
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_command_buffer.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 #include "shaders/vulkan_shaders.h"
 
 namespace {
@@ -10,7 +10,7 @@ namespace {
         VkVertexInputBindingDescription vertexBindingDesc{};
 
         vertexBindingDesc.binding = 0;
-        vertexBindingDesc.stride = sizeof(canyon::graphics::vulkan::Graphics::Vertex);
+        vertexBindingDesc.stride = sizeof(moth_graphics::graphics::vulkan::Graphics::Vertex);
         vertexBindingDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
         return vertexBindingDesc;
@@ -22,17 +22,17 @@ namespace {
         vertexAttributeDescs[0].binding = 0;
         vertexAttributeDescs[0].location = 0;
         vertexAttributeDescs[0].format = VK_FORMAT_R32G32_SFLOAT;
-        vertexAttributeDescs[0].offset = offsetof(canyon::graphics::vulkan::Graphics::Vertex, xy);
+        vertexAttributeDescs[0].offset = offsetof(moth_graphics::graphics::vulkan::Graphics::Vertex, xy);
 
         vertexAttributeDescs[1].binding = 0;
         vertexAttributeDescs[1].location = 1;
         vertexAttributeDescs[1].format = VK_FORMAT_R32G32_SFLOAT;
-        vertexAttributeDescs[1].offset = offsetof(canyon::graphics::vulkan::Graphics::Vertex, uv);
+        vertexAttributeDescs[1].offset = offsetof(moth_graphics::graphics::vulkan::Graphics::Vertex, uv);
 
         vertexAttributeDescs[2].binding = 0;
         vertexAttributeDescs[2].location = 2;
         vertexAttributeDescs[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        vertexAttributeDescs[2].offset = offsetof(canyon::graphics::vulkan::Graphics::Vertex, color);
+        vertexAttributeDescs[2].offset = offsetof(moth_graphics::graphics::vulkan::Graphics::Vertex, color);
 
         return vertexAttributeDescs;
     }
@@ -41,7 +41,7 @@ namespace {
         VkVertexInputBindingDescription vertexBindingDesc{};
 
         vertexBindingDesc.binding = 0;
-        vertexBindingDesc.stride = sizeof(canyon::graphics::vulkan::Graphics::FontGlyphInstance);
+        vertexBindingDesc.stride = sizeof(moth_graphics::graphics::vulkan::Graphics::FontGlyphInstance);
         vertexBindingDesc.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
 
         return vertexBindingDesc;
@@ -53,23 +53,23 @@ namespace {
         vertexAttributeDescs[0].binding = 0;
         vertexAttributeDescs[0].location = 0;
         vertexAttributeDescs[0].format = VK_FORMAT_R32G32_SFLOAT;
-        vertexAttributeDescs[0].offset = offsetof(canyon::graphics::vulkan::Graphics::FontGlyphInstance, pos);
+        vertexAttributeDescs[0].offset = offsetof(moth_graphics::graphics::vulkan::Graphics::FontGlyphInstance, pos);
 
         vertexAttributeDescs[1].binding = 0;
         vertexAttributeDescs[1].location = 1;
         vertexAttributeDescs[1].format = VK_FORMAT_R32_UINT;
-        vertexAttributeDescs[1].offset = offsetof(canyon::graphics::vulkan::Graphics::FontGlyphInstance, glyphIndex);
+        vertexAttributeDescs[1].offset = offsetof(moth_graphics::graphics::vulkan::Graphics::FontGlyphInstance, glyphIndex);
 
         vertexAttributeDescs[2].binding = 0;
         vertexAttributeDescs[2].location = 2;
         vertexAttributeDescs[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        vertexAttributeDescs[2].offset = offsetof(canyon::graphics::vulkan::Graphics::FontGlyphInstance, color);
+        vertexAttributeDescs[2].offset = offsetof(moth_graphics::graphics::vulkan::Graphics::FontGlyphInstance, color);
 
         return vertexAttributeDescs;
     }
 }
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     VkDescriptorSet Graphics::GetDescriptorSet(Texture& image) {
         return m_drawingShader->GetDescriptorSet(image);
     }

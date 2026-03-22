@@ -1,8 +1,8 @@
 #include "common.h"
-#include "canyon/graphics/moth_ui/moth_image_factory.h"
-#include "canyon/graphics/moth_ui/moth_image.h"
+#include "moth_graphics/graphics/moth_ui/moth_image_factory.h"
+#include "moth_graphics/graphics/moth_ui/moth_image.h"
 
-namespace canyon::graphics {
+namespace moth_graphics::graphics {
     MothImageFactory::MothImageFactory(std::shared_ptr<graphics::ImageFactory> factoryImpl)
         : m_factoryImpl(factoryImpl) {
     }

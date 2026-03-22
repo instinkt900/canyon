@@ -1,11 +1,11 @@
 #include "common.h"
-#include "canyon/graphics/sdl/sdl_asset_context.h"
-#include "canyon/graphics/sdl/sdl_surface_context.h"
-#include "canyon/graphics/sdl/sdl_font.h"
-#include "canyon/graphics/sdl/sdl_image.h"
-#include "canyon/graphics/sdl/sdl_texture.h"
+#include "moth_graphics/graphics/sdl/sdl_asset_context.h"
+#include "moth_graphics/graphics/sdl/sdl_surface_context.h"
+#include "moth_graphics/graphics/sdl/sdl_font.h"
+#include "moth_graphics/graphics/sdl/sdl_image.h"
+#include "moth_graphics/graphics/sdl/sdl_texture.h"
 
-namespace canyon::graphics::sdl {
+namespace moth_graphics::graphics::sdl {
     AssetContext::AssetContext(SurfaceContext& context)
         : m_context(context) {
     }

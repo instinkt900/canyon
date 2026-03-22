@@ -1,10 +1,10 @@
 #include "common.h"
-#include "canyon/platform/application.h"
-#include "canyon/platform/window.h"
+#include "moth_graphics/platform/application.h"
+#include "moth_graphics/platform/window.h"
 
 #include <stdexcept>
 
-namespace canyon::platform {
+namespace moth_graphics::platform {
     Application::Application(platform::IPlatform& platform, std::string const& title, int width, int height)
         : m_platform(platform)
         , m_mainWindowTitle(title)

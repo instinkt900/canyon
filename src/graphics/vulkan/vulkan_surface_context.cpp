@@ -1,7 +1,7 @@
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_surface_context.h"
-#include "canyon/graphics/vulkan/vulkan_context.h"
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
+#include "moth_graphics/graphics/vulkan/vulkan_context.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 
 namespace {
     char const* const deviceExtensions[] = {
@@ -9,7 +9,7 @@ namespace {
     };
 }
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     SurfaceContext::SurfaceContext(Context& context)
         : m_context(context)
         , m_assetContext(*this) {

@@ -1,7 +1,7 @@
 #include "common.h"
-#include "canyon/platform/glfw/glfw_window.h"
-#include "canyon/graphics/vulkan/vulkan_graphics.h"
-#include "canyon/graphics/vulkan/vulkan_utils.h"
+#include "moth_graphics/platform/glfw/glfw_window.h"
+#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
+#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
@@ -12,13 +12,13 @@ namespace {
     }
 }
 
-namespace canyon::graphics::vulkan {
-    void Graphics::InitImgui(canyon::platform::Window const& window) {
+namespace moth_graphics::graphics::vulkan {
+    void Graphics::InitImgui(moth_graphics::platform::Window const& window) {
         if (m_imguiInitialized) {
             return;
         }
 
-        auto const* glfwWindowPtr = dynamic_cast<canyon::platform::glfw::Window const*>(&window);
+        auto const* glfwWindowPtr = dynamic_cast<moth_graphics::platform::glfw::Window const*>(&window);
         if (glfwWindowPtr == nullptr) {
             spdlog::error("Vulkan: InitImgui called with non-GLFW window");
             return;

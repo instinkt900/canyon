@@ -1,8 +1,8 @@
 #include "common.h"
-#include "canyon/graphics/sdl/sdl_surface_context.h"
-#include "canyon/graphics/sdl/sdl_image.h"
+#include "moth_graphics/graphics/sdl/sdl_surface_context.h"
+#include "moth_graphics/graphics/sdl/sdl_image.h"
 
-namespace canyon::graphics::sdl {
+namespace moth_graphics::graphics::sdl {
     Image::Image(std::shared_ptr<Texture> texture)
         : m_texture(texture) {
         m_sourceRect = IntRect{ { 0, 0 }, { m_texture->GetWidth(), m_texture->GetHeight() } };
@@ -25,7 +25,7 @@ namespace canyon::graphics::sdl {
         return m_texture;
     }
 
-    void Image::ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0, canyon::FloatVec2 const& uv1) const {
+    void Image::ImGui(moth_graphics::IntVec2 const& size, moth_graphics::FloatVec2 const& uv0, moth_graphics::FloatVec2 const& uv1) const {
         ImGui::Image(m_texture ? m_texture->GetSDLTexture()->GetImpl() : nullptr,
                      ImVec2(static_cast<float>(size.x), static_cast<float>(size.y)),
                      ImVec2(uv0.x, uv0.y),

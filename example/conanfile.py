@@ -10,7 +10,7 @@ class MothGraphicsExample(ConanFile):
     package_type = "application"
 
     def requirements(self):
-        self.requires("moth_graphics/0.6.0")
+        self.requires("moth_graphics/0.7.0")
 
     def build_requirements(self):
         self.tool_requires("cmake/3.27.0")

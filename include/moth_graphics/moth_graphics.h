@@ -1,0 +1,69 @@
+#pragma once
+
+// Export macro — currently a no-op (static library build).
+// See canyon_fwd.h for forward declarations.
+#if defined(_WIN32) || defined(__CYGWIN__)
+  #if defined(MOTH_GRAPHICS_BUILD_SHARED)
+    #if defined(MOTH_GRAPHICS_BUILD)
+      #define MOTH_GRAPHICS_API __declspec(dllexport)
+    #else
+      #define MOTH_GRAPHICS_API __declspec(dllimport)
+    #endif
+  #else
+    #define MOTH_GRAPHICS_API
+  #endif
+#else
+  #if defined(MOTH_GRAPHICS_BUILD_SHARED)
+    #if defined(MOTH_GRAPHICS_BUILD)
+      #define MOTH_GRAPHICS_API __attribute__((visibility("default")))
+    #else
+      #define MOTH_GRAPHICS_API
+    #endif
+  #else
+    #define MOTH_GRAPHICS_API
+  #endif
+#endif
+
+// events
+#include "moth_graphics/events/canyon_events.h"
+#include "moth_graphics/events/event_emitter.h"
+#include "moth_graphics/events/event_window.h"
+
+// graphics — interfaces and core
+#include "moth_graphics/graphics/asset_context.h"
+#include "moth_graphics/graphics/blend_mode.h"
+#include "moth_graphics/graphics/color.h"
+#include "moth_graphics/graphics/context.h"
+#include "moth_graphics/graphics/font_factory.h"
+#include "moth_graphics/graphics/ifont.h"
+#include "moth_graphics/graphics/igraphics.h"
+#include "moth_graphics/graphics/iimage.h"
+#include "moth_graphics/graphics/image_factory.h"
+#include "moth_graphics/graphics/image_scale_type.h"
+#include "moth_graphics/graphics/itarget.h"
+#include "moth_graphics/graphics/itexture.h"
+#include "moth_graphics/graphics/surface_context.h"
+#include "moth_graphics/graphics/text_alignment.h"
+#include "moth_graphics/graphics/texture_address_mode.h"
+#include "moth_graphics/graphics/texture_filter.h"
+
+// graphics — moth_ui bridge
+#include "moth_graphics/graphics/moth_ui/moth_font.h"
+#include "moth_graphics/graphics/moth_ui/moth_font_factory.h"
+#include "moth_graphics/graphics/moth_ui/moth_image.h"
+#include "moth_graphics/graphics/moth_ui/moth_image_factory.h"
+#include "moth_graphics/graphics/moth_ui/moth_renderer.h"
+#include "moth_graphics/graphics/moth_ui/utils.h"
+
+// platform
+#include "moth_graphics/platform/application.h"
+#include "moth_graphics/platform/iplatform.h"
+#include "moth_graphics/platform/window.h"
+
+// utils
+#include "moth_graphics/utils/math_utils.h"
+#include "moth_graphics/utils/moth_ui_format.h"
+#include "moth_graphics/utils/rect.h"
+#include "moth_graphics/utils/rect_format.h"
+#include "moth_graphics/utils/ticker.h"
+#include "moth_graphics/utils/vector.h"

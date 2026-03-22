@@ -1,8 +1,8 @@
 #include "common.h"
-#include "canyon/graphics/vulkan/vulkan_image.h"
-#include "canyon/graphics/vulkan/vulkan_graphics.h"
+#include "moth_graphics/graphics/vulkan/vulkan_image.h"
+#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
 
-namespace canyon::graphics::vulkan {
+namespace moth_graphics::graphics::vulkan {
     Image::Image(std::shared_ptr<Texture> texture)
     : m_texture(texture) 
     , m_sourceRect({{ 0, 0 }, { texture->GetWidth(), texture->GetHeight() }}) {
@@ -29,7 +29,7 @@ namespace canyon::graphics::vulkan {
         return m_texture;
     }
 
-    void Image::ImGui(canyon::IntVec2 const& size, canyon::FloatVec2 const& uv0, canyon::FloatVec2 const& uv1) const {
+    void Image::ImGui(moth_graphics::IntVec2 const& size, moth_graphics::FloatVec2 const& uv0, moth_graphics::FloatVec2 const& uv1) const {
         if (m_texture) {
             ImGui::Image(m_texture->GetDescriptorSet(),
                             ImVec2(static_cast<float>(size.x), static_cast<float>(size.y)),

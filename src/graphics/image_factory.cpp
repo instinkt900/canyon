@@ -1,10 +1,10 @@
 #include "common.h"
-#include "canyon/graphics/image_factory.h"
-#include "canyon/graphics/itexture.h"
+#include "moth_graphics/graphics/image_factory.h"
+#include "moth_graphics/graphics/itexture.h"
 
 //NOLINTBEGIN(readability-function-cognitive-complexity)
 
-namespace canyon::graphics {
+namespace moth_graphics::graphics {
     ImageFactory::ImageFactory(AssetContext& context)
         : m_context(context) {
     }
