@@ -294,8 +294,10 @@ Consumers can then depend on `canyon/<version>` in their own `conanfile.py`.
 
 | Project | Description |
 |---|---|
-| [moth_ui](https://github.com/instinkt900/moth_ui) | Core UI library — node graph, keyframe animation, and event system that canyon builds on |
-| [moth_editor](https://github.com/instinkt900/moth_editor) | Visual layout and animation editor — Flash-like authoring tool for creating `.mothui` layout files |
+| [moth_ui](https://github.com/instinkt900/moth_ui) | Core UI library — node graph, keyframe animation, and event system |
+| canyon | *(this project)* Graphics and application framework built on moth_ui — SDL2 and Vulkan backends, window management, and a layer stack |
+| [moth_editor](https://github.com/instinkt900/moth_editor) | Visual layout and animation editor — Flash-like authoring tool for creating moth_ui layout files |
+| [moth_packer](https://github.com/instinkt900/moth_packer) | Command-line texture atlas packer for images and moth_ui layouts |
 
 ---
 
