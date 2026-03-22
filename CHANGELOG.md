@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
+## [0.7.0] - 2026-03-22
+### Bug Fixes
+- Fix build warnings and example dependency
+
+### Changes
+- Update build and upload workflows
+- Use repository variable for ARTIFACTORY_URL
+
+### Documentation
+- Add full ecosystem table to Related Projects
+
+### Miscellaneous
+- Removed unused conan profiles
+
+### Refactoring
+- Rename project from canyon to moth_graphics
+- Rename canyon namespace and headers to moth_graphics
+
 ## [0.6.0] - 2026-03-21
 ### Changes
 - Updating ci actions to simplify build
