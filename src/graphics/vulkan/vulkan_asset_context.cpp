@@ -34,6 +34,10 @@ namespace moth_graphics::graphics::vulkan {
         return Texture::FromFile(m_context, path);
     }
 
+    std::unique_ptr<ITexture> AssetContext::TextureFromPixels(int width, int height, uint8_t const* pixels) {
+        return Texture::FromRGBA(m_context, width, height, pixels);
+    }
+
     std::unique_ptr<IImage> AssetContext::ImageFromFile(std::filesystem::path const& path) {
         auto texture = TextureFromFile(path);
         if (!texture) {

@@ -36,5 +36,12 @@ namespace moth_graphics::graphics {
         /// @brief Load an image directly from a file, combining texture load and image wrap.
         /// @returns Loaded image, or @c nullptr on failure.
         virtual std::unique_ptr<IImage> ImageFromFile(std::filesystem::path const& path) = 0;
+
+        /// @brief Create a texture from raw RGBA pixel data (4 bytes per pixel: R, G, B, A).
+        /// @param width Texture width in pixels.
+        /// @param height Texture height in pixels.
+        /// @param pixels Pointer to @c width * height * 4 bytes of RGBA data.
+        /// @returns Loaded texture, or @c nullptr on failure.
+        virtual std::unique_ptr<ITexture> TextureFromPixels(int width, int height, uint8_t const* pixels) = 0;
     };
 }

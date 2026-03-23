@@ -65,6 +65,9 @@ namespace moth_graphics::platform {
         /// @brief Returns the moth_ui layer stack for this window.
         moth_ui::LayerStack& GetLayerStack() const { return *m_layerStack; }
 
+        /// @brief Returns the image factory for this window.
+        graphics::ImageFactory& GetImageFactory() const { return *m_imageFactory; }
+
     protected:
         /// @brief Called after the native window and graphics objects are created.
         void PostCreate();

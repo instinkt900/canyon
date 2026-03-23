@@ -102,7 +102,17 @@ namespace moth_graphics::graphics {
             m_cachedImages.insert(std::make_pair(key, cacheDesc));
             return m_context.NewImage(texture, sourceRect);
         }
+        if (m_fallbackDesc) {
+            spdlog::warn("ImageFactory: '{}' not found, using fallback", path.string());
+            return m_context.NewImage(m_fallbackDesc->m_texture, m_fallbackDesc->m_sourceRect);
+        }
+        spdlog::error("ImageFactory: '{}' not found and no fallback set", path.string());
         return nullptr;
+    }
+
+    void ImageFactory::SetFallbackImage(std::shared_ptr<ITexture> texture) {
+        IntRect const sourceRect{ { 0, 0 }, { texture->GetWidth(), texture->GetHeight() } };
+        m_fallbackDesc = ImageDesc{ texture, sourceRect, {} };
     }
 }
 

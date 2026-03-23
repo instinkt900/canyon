@@ -22,6 +22,7 @@ namespace moth_graphics::graphics::vulkan {
         std::unique_ptr<IFont> FontFromFile(std::filesystem::path const& path, uint32_t size) override;
         std::unique_ptr<ITexture> TextureFromFile(std::filesystem::path const& path) override;
         std::unique_ptr<IImage> ImageFromFile(std::filesystem::path const& path) override;
+        std::unique_ptr<ITexture> TextureFromPixels(int width, int height, uint8_t const* pixels) override;
 
     private:
         SurfaceContext& m_context;
