@@ -6,6 +6,7 @@
 #include "moth_graphics/utils/rect.h"
 
 #include <unordered_map>
+#include <optional>
 #include <string>
 #include <memory>
 #include <filesystem>
@@ -38,9 +39,14 @@ namespace moth_graphics::graphics {
         ///
         /// If a texture pack has been loaded and contains the given path, the
         /// image is sourced from the atlas. Otherwise the file is loaded directly.
+        /// Returns the fallback image if the path cannot be loaded and one has been set.
         /// @param path Path to the image file.
         /// @returns A new image handle, or @c nullptr on failure.
         std::unique_ptr<IImage> GetImage(std::filesystem::path const& path);
+
+        /// @brief Register a texture to return as a fallback when an image cannot be loaded.
+        /// @param texture Texture to use for the fallback; covers the full texture dimensions.
+        void SetFallbackImage(std::shared_ptr<ITexture> texture);
 
     private:
         struct ImageDesc {
@@ -51,5 +57,6 @@ namespace moth_graphics::graphics {
 
         AssetContext& m_context;
         std::unordered_map<std::string, ImageDesc> m_cachedImages;
+        std::optional<ImageDesc> m_fallbackDesc;
     };
 }

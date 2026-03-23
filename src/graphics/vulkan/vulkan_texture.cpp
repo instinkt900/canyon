@@ -10,35 +10,19 @@ namespace {
 
 namespace moth_graphics::graphics::vulkan {
     std::unique_ptr<Texture> Texture::FromFile(SurfaceContext& context, std::filesystem::path const& path) {
-        if (std::filesystem::exists(path)) {
-            int texWidth = 0;
-            int texHeight = 0;
-            int texChannels = 0;
-            stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-            VkDeviceSize imageSize = texWidth * texHeight * 4;
-            if (pixels != nullptr) {
-                auto stagingBuffer = std::make_unique<Buffer>(context, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-                void* data = stagingBuffer->Map();
-                memcpy(data, pixels, static_cast<size_t>(imageSize));
-                stagingBuffer->Unmap();
-
-                stbi_image_free(pixels);
-
-                VkFormat const format = VK_FORMAT_R8G8B8A8_UNORM;
-                auto newImage = std::make_unique<Texture>(context, texWidth, texHeight, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
-
-                auto commandBuffer = std::make_unique<CommandBuffer>(context);
-                commandBuffer->BeginRecord();
-                commandBuffer->TransitionImageLayout(*newImage, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-                commandBuffer->CopyBufferToImage(*newImage, *stagingBuffer);
-                commandBuffer->TransitionImageLayout(*newImage, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-                commandBuffer->SubmitAndWait();
-
-                return newImage;
-            }
+        if (!std::filesystem::exists(path)) {
+            return nullptr;
         }
-        return nullptr;
+        int texWidth = 0;
+        int texHeight = 0;
+        int texChannels = 0;
+        stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+        if (pixels == nullptr) {
+            return nullptr;
+        }
+        auto texture = FromRGBA(context, texWidth, texHeight, pixels);
+        stbi_image_free(pixels);
+        return texture;
     }
 
     std::unique_ptr<Texture> Texture::FromRGBA(SurfaceContext& context, int width, int height, unsigned char const* pixels) {

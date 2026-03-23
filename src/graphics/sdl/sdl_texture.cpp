@@ -26,10 +26,15 @@ namespace moth_graphics::graphics::sdl {
     }
 
     std::unique_ptr<Texture> Texture::FromFile(SDL_Renderer* renderer, std::filesystem::path const& path) {
-        if (auto texture = CreateTextureRef(renderer, path)) {
-            return std::make_unique<Texture>(texture);
+        auto surface = CreateSurfaceRef(path);
+        if (!surface) {
+            return nullptr;
         }
-        return nullptr;
+        auto texture = CreateTextureRef(renderer, surface);
+        if (!texture || texture->GetImpl() == nullptr) {
+            return nullptr;
+        }
+        return std::make_unique<Texture>(texture);
     }
 
 }
