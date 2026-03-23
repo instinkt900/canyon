@@ -111,6 +111,10 @@ namespace moth_graphics::graphics {
     }
 
     void ImageFactory::SetFallbackImage(std::shared_ptr<ITexture> texture) {
+        if (!texture) {
+            m_fallbackDesc.reset();
+            return;
+        }
         IntRect const sourceRect{ { 0, 0 }, { texture->GetWidth(), texture->GetHeight() } };
         m_fallbackDesc = ImageDesc{ texture, sourceRect, {} };
     }
