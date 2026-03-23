@@ -4,7 +4,7 @@
 [![Upload Status](https://github.com/instinkt900/moth_graphics/actions/workflows/upload-release.yml/badge.svg)](https://github.com/instinkt900/moth_graphics/actions/workflows/upload-release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A C++ application and graphics framework built on top of [moth_ui](https://github.com/instinkt900/moth_ui). moth_graphics provides a platform abstraction layer (windowing, event loop), two graphics backends (SDL2 and Vulkan), and the glue that connects moth_ui's UI system to a runnable application.
+A C++17 application and graphics framework built on top of [moth_ui](https://github.com/instinkt900/moth_ui). moth_graphics provides a platform abstraction layer (windowing, event loop), two graphics backends (SDL2 and Vulkan), and the glue that connects moth_ui's UI system to a runnable application.
 
 ---
 
@@ -210,20 +210,24 @@ python3 -m venv .venv
 pip install conan
 ```
 
+**C++17 is required.** A `.conan/profile` is provided that sets `compiler.cppstd=17` and configures Conan to install system packages automatically (`tools.system.package_manager:mode=install`). This profile is used in CI and can be used directly or as a reference when building locally.
+
 ### Linux
 
-SDL2, SDL_image, SDL_ttf, GLFW, FreeType, and HarfBuzz must come from the system package manager on Linux (mixing Conan-built and system copies of these libraries causes runtime conflicts via GTK3/GDK-Pixbuf):
+SDL2, SDL_image, SDL_ttf, GLFW, FreeType, and HarfBuzz must come from the system package manager on Linux (mixing Conan-built and system copies of these libraries causes runtime conflicts via GTK3/GDK-Pixbuf).
+
+Using `.conan/profile`, Conan will install these automatically via `apt`:
+
+```bash
+conan install . -pr .conan/profile -s build_type=Release --build=missing
+cmake --preset conan-release
+cmake --build --preset conan-release
+```
+
+If you'd rather install them yourself first:
 
 ```bash
 sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libglfw3-dev libfreetype-dev libharfbuzz-dev
-```
-
-`conan install` will also install these automatically when `tools.system.package_manager:mode=install` is set in the profile (already configured in `conan/profiles/linux_profile`).
-
-```bash
-conan install . -s compiler.cppstd=17 -s build_type=Release --build=missing
-cmake --preset conan-release
-cmake --build --preset conan-release
 ```
 
 For a Debug build replace `Release` / `conan-release` with `Debug` / `conan-debug`.
@@ -231,7 +235,7 @@ For a Debug build replace `Release` / `conan-release` with `Debug` / `conan-debu
 ### Windows
 
 ```bash
-conan install . -s compiler.cppstd=17 -s build_type=Release --build=missing
+conan install . -pr .conan/profile -s build_type=Release --build=missing
 cmake --preset conan-default
 cmake --build --preset conan-release
 ```
@@ -243,13 +247,13 @@ Both backends are enabled by default. Pass `disable_vulkan=True` or `disable_sdl
 **Vulkan only** (no SDL2 dependency):
 
 ```bash
-conan install . -s compiler.cppstd=17 -s build_type=Release --build=missing -o moth_graphics/*:disable_sdl=True
+conan install . -pr .conan/profile -s build_type=Release --build=missing -o moth_graphics/*:disable_sdl=True
 ```
 
 **SDL only** (no Vulkan/GLFW/FreeType/HarfBuzz dependency):
 
 ```bash
-conan install . -s compiler.cppstd=17 -s build_type=Release --build=missing -o moth_graphics/*:disable_vulkan=True
+conan install . -pr .conan/profile -s build_type=Release --build=missing -o moth_graphics/*:disable_vulkan=True
 ```
 
 When a backend is disabled, the corresponding compile definition is propagated to all consumers:
@@ -283,7 +287,7 @@ cmake --install build --config Release --prefix=<install_path>
 To publish via Conan:
 
 ```bash
-conan create . -s compiler.cppstd=17 -s build_type=Release --build=missing
+conan create . -pr .conan/profile -s build_type=Release --build=missing
 ```
 
 Consumers can then depend on `moth_graphics/<version>` in their own `conanfile.py`.
