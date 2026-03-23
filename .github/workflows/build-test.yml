@@ -63,4 +63,4 @@ jobs:
     - name: Build example
       shell: bash
       working-directory: example
-      run: conan create . -pr .conan/profile -s build_type=Release --build=missing
+      run: conan create . -pr ../.conan/profile -s build_type=Release --build=missing
