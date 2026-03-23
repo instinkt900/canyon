@@ -35,6 +35,9 @@ namespace moth_graphics::graphics::sdl {
     }
 
     std::unique_ptr<ITexture> AssetContext::TextureFromPixels(int width, int height, uint8_t const* pixels) {
+        if (pixels == nullptr) {
+            return nullptr;
+        }
         // Use a streaming texture so we can lock and write the pixel data directly.
         // SDL_PIXELFORMAT_ABGR8888 stores bytes as R,G,B,A in memory on little-endian
         // systems, matching our input layout.
@@ -54,6 +57,8 @@ namespace moth_graphics::graphics::sdl {
             SDL_UnlockTexture(tex);
         } else {
             spdlog::error("TextureFromPixels: SDL_LockTexture failed: {}", SDL_GetError());
+            SDL_DestroyTexture(tex);
+            return nullptr;
         }
         return std::make_unique<Texture>(CreateTextureRef(tex));
     }
