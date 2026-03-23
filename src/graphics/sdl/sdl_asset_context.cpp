@@ -39,9 +39,9 @@ namespace moth_graphics::graphics::sdl {
             return nullptr;
         }
         // Use a streaming texture so we can lock and write the pixel data directly.
-        // SDL_PIXELFORMAT_ABGR8888 stores bytes as R,G,B,A in memory on little-endian
-        // systems, matching our input layout.
-        SDL_Texture* tex = SDL_CreateTexture(m_context.GetRenderer(), SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+        // SDL_PIXELFORMAT_RGBA32 is an endian-neutral alias that always matches
+        // pixels laid out in memory as R, G, B, A bytes.
+        SDL_Texture* tex = SDL_CreateTexture(m_context.GetRenderer(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, width, height);
         if (tex == nullptr) {
             return nullptr;
         }
