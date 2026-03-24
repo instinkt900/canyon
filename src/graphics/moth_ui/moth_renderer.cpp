@@ -1,9 +1,7 @@
-#include "common.h"
 #include "moth_graphics/graphics/moth_ui/moth_renderer.h"
 #include "moth_graphics/graphics/igraphics.h"
 #include "moth_graphics/graphics/moth_ui/moth_font.h"
 #include "moth_graphics/graphics/moth_ui/moth_image.h"
-#include "moth_graphics/graphics/moth_ui/utils.h"
 
 namespace moth_graphics::graphics {
     MothRenderer::MothRenderer(IGraphics& graphics)
@@ -42,6 +40,14 @@ namespace moth_graphics::graphics {
         return result;
     }
 
+    void MothRenderer::PushTransform(moth_ui::FloatMat4x4 const& transform) {
+        m_graphics.PushTransform(transform);
+    }
+
+    void MothRenderer::PopTransform() {
+        m_graphics.PopTransform();
+    }
+
     void MothRenderer::PushClip(moth_ui::IntRect const& rect) {
         if (m_clip.empty()) {
             m_clip.push(rect);
@@ -66,17 +72,15 @@ namespace moth_graphics::graphics {
     }
 
     void MothRenderer::RenderRect(moth_ui::IntRect const& rect) {
-        auto const floatRect = static_cast<FloatRect>(rect);
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
-        m_graphics.DrawRectF(floatRect);
+        m_graphics.DrawRectF(static_cast<FloatRect>(rect));
     }
 
     void MothRenderer::RenderFilledRect(moth_ui::IntRect const& rect) {
-        auto const floatRect = static_cast<FloatRect>(rect);
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
-        m_graphics.DrawFillRectF(floatRect);
+        m_graphics.DrawFillRectF(static_cast<FloatRect>(rect));
     }
 
     void MothRenderer::RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) {
@@ -93,8 +97,9 @@ namespace moth_graphics::graphics {
         }
         auto& internalImage = *internalImagePtr;
         auto const srcRect = sourceRect;
+
         if (scaleType == moth_ui::ImageScaleType::Stretch) {
-            m_graphics.DrawImage(internalImage, destRect, &srcRect, 0);
+            m_graphics.DrawImage(internalImage, destRect, &srcRect);
         } else if (scaleType == moth_ui::ImageScaleType::Tile) {
             m_graphics.DrawImageTiled(internalImage, destRect, &srcRect, scale);
         }

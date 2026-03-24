@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(canyon-example VERSION 1.0 DESCRIPTION "An example of how to use canyon.")
+project(moth_graphics-example VERSION 1.0 DESCRIPTION "An example of how to use moth_graphics.")
 
 message("Building with CMake version: ${CMAKE_VERSION}")
 
@@ -19,12 +19,12 @@ set(SOURCES ${SOURCES}
 	src/example_layer.cpp
 )
 
-find_package(canyon REQUIRED)
+find_package(moth_graphics REQUIRED)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
-target_link_libraries(${PROJECT_NAME} canyon::canyon)
+target_link_libraries(${PROJECT_NAME} moth_graphics::moth_graphics)
 
 if (MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ignore:4099")

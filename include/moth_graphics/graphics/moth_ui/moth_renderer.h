@@ -23,6 +23,9 @@ namespace moth_graphics::graphics {
         void PushColor(moth_ui::Color const& color) override;
         void PopColor() override;
 
+        void PushTransform(moth_ui::FloatMat4x4 const& transform) override;
+        void PopTransform() override;
+
         void PushClip(moth_ui::IntRect const& rect) override;
         void PopClip() override;
 
