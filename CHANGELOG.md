@@ -3,13 +3,44 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
+## [0.8.0] - 2026-03-25
+### Features
+- Add ImageFactory fallback image support and TextureFromPixels API
+- Move transform stack into IGraphics; remove rotation param from DrawImage
+
+### Bug Fixes
+- Fetch tags after creation so git-cliff --current finds the tag
+- Force-refresh tags on fetch to avoid stale refs on retry
+- Use ../.conan/profile in example subdirectory
+- Validate pixels pointer and destroy texture on SDL_LockTexture failure in TextureFromPixels
+- Use SDL_PIXELFORMAT_RGBA32 instead of hardcoded ABGR8888 in TextureFromPixels
+- Rotate text glyphs correctly in SDL and Vulkan backends
+- PushTransform replaces rather than composes the active transform
+- Restore external linkage for shader bytecode symbols
+- Forward backend options to CMake and add validation in example recipe
+
+### Refactoring
+- Use kDegToRad/kRadToDeg from moth_ui namespace; re-export in moth_graphics
+- Build example via add_subdirectory instead of conan package
+
+### Performance
+- Reuse scratch texture for rotated text; const shader bytecode
+
+### Miscellaneous
+- Bumping moth_ui dep version
+
+### Changes
+- Fix capitalization in project title
+- Update src/graphics/image_factory.cpp
+- Bump version from 0.7.0 to 0.8.0
+
 ## [0.7.0] - 2026-03-22
 ### Bug Fixes
 - Fix build warnings and example dependency
 
-### Changes
-- Update build and upload workflows
-- Use repository variable for ARTIFACTORY_URL
+### Refactoring
+- Rename project from canyon to moth_graphics
+- Rename canyon namespace and headers to moth_graphics
 
 ### Documentation
 - Add full ecosystem table to Related Projects
@@ -17,14 +48,7 @@ Entries are generated automatically from git history using [git-cliff](https://g
 ### Miscellaneous
 - Removed unused conan profiles
 
-### Refactoring
-- Rename project from canyon to moth_graphics
-- Rename canyon namespace and headers to moth_graphics
-
 ## [0.6.0] - 2026-03-21
-### Changes
-- Updating ci actions to simplify build
-
 ### Features
 - Updated loading of texture packs
 
@@ -33,9 +57,6 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Bump version
 
 ## [0.5.1] - 2026-03-19
-### Changes
-- Correct repository name from 'canyon' to 'Canyon'
-
 ### Documentation
 - Add build, upload, and licence badges to README
 - Add AI disclosure and table of contents to README
@@ -44,7 +65,13 @@ Entries are generated automatically from git history using [git-cliff](https://g
 ### Miscellaneous
 - Bumping moth_ui dependency
 
+### Changes
+- Correct repository name from 'canyon' to 'Canyon'
+
 ## [0.5.0] - 2026-03-19
+### Features
+- Add canyon.h catch-all include and canyon_fwd.h forward declarations
+
 ### Bug Fixes
 - Chunk oversized vertex submissions instead of dropping them
 - Correct copy vs reference bugs in FontFactory and ImageFactory
@@ -53,14 +80,8 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Harden ImageFactory JSON validation and normalise cache keys
 - Normalise cache keys with lexically_normal to prevent atlas lookup misses
 
-### Changes
-- Standardize workflows to match moth_ui
-- Enable precompiled headers using src/common.h
-- Simplify to a minimal how-to application
-- Clang-tidy in build-test, README asset loading, nested ternary
-
-### Features
-- Add canyon.h catch-all include and canyon_fwd.h forward declarations
+### Refactoring
+- Separate AssetContext from SurfaceContext
 
 ### Miscellaneous
 - Updating .clangd to ignore unused includes in catchall headers
@@ -69,27 +90,27 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Bumped version to 0.5.0
 - Removed unused variable
 
-### Refactoring
-- Separate AssetContext from SurfaceContext
+### Changes
+- Enable precompiled headers using src/common.h
+- Simplify to a minimal how-to application
 
 ## [0.4.0] - 2026-03-15
+### Features
+- Add moth_ui_format.h with fmt formatters for all moth_ui types
+
 ### Bug Fixes
 - MothImage::ImGui was a no-op, breaking image preview in properties panel
 - MothImage::ImGui was a no-op, breaking image preview in properties panel
 
-### Changes
-- Updates from moth_ui release. Bringing into better state.
-- Add [skip ci] to CHANGELOG commit to prevent re-triggering upload-lib
-- Revert "fix: MothImage::ImGui was a no-op, breaking image preview in properties panel"
-
-### Features
-- Add moth_ui_format.h with fmt formatters for all moth_ui types
+### Refactoring
+- Include type name in enum formatter output
 
 ### Miscellaneous
 - Add git-cliff changelog automation and expand TODO
 
-### Refactoring
-- Include type name in enum formatter output
+### Changes
+- Updates from moth_ui release. Bringing into better state.
+- Revert "fix: MothImage::ImGui was a no-op, breaking image preview in properties panel"
 
 ## [0.3.0] - 2026-03-04
 ### Bug Fixes
@@ -104,6 +125,10 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Frame-slot
 
 ## [0.2.0] - 2025-05-10
+### Features
+- Updated moth renderer to have logical size support.
+- Adding back imgui image rendering
+
 ### Bug Fixes
 - Fix: Fixed font loading for moth font factory.
 - Fix: Fixed the incorrect rendering of images in vulkan.
@@ -114,6 +139,36 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Fixing windows builds.
 - Updating some header exposures
 - Fixing upload action
+
+### Refactoring
+- Refactor(font_factory): Adding new moth font factory.
+- Refactor(font_factory): Removing api specific font factories.
+- Refactor(font_factory): Internal implementation of font factory.
+- Refactor(image_factory): Moth image factory now just a wrapper.
+- Refactor(factories): Removed old implementation specific factories.
+- Refactor(moth_ui/wrapper): Unified ui_renderer
+- Refactor(graphics/utilities): Cleaning up some utility conversions.
+- Refactor(graphics/vulkan): Misc vulkan cleanups.
+- Refactor(platform): Cleaning up platform, application, window layout.
+- Refactor(main): SDL portion working.
+- Refactor(font/vulkan): Font no longer needs graphics.
+- Refactor(graphics): Moving asset loading out of graphics.
+- Renamed ui_renerer to MothRenderer
+- Small adjustments to how events are defined
+- Added graphics contexts to windows.
+- The moth context is now passed into the ui node tree.
+- Just some formatting stuff and minor cleanups.
+- Moved example code into its own location
+- Moved the button widget
+- Added an example main function that draws two windows
+- Removed canyon layers in favor of moth_ui layers.
+
+### Miscellaneous
+- Updated build file list
+- Updated notes
+- Chore(cleanup): Deleting unneeded files.
+- Misc things before refactor.
+- Making compile define private
 
 ### Changes
 - Added SDL and GLFW abstractions to creating a window. Will be changing how this works soon
@@ -149,39 +204,5 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Cleaning up building and packaging.
 - Adding actions to build and upload artifacts.
 - Updates for moth_ui api change.
-
-### Features
-- Updated moth renderer to have logical size support.
-- Adding back imgui image rendering
-
-### Miscellaneous
-- Updated build file list
-- Updated notes
-- Chore(cleanup): Deleting unneeded files.
-- Misc things before refactor.
-- Making compile define private
-
-### Refactoring
-- Refactor(font_factory): Adding new moth font factory.
-- Refactor(font_factory): Removing api specific font factories.
-- Refactor(font_factory): Internal implementation of font factory.
-- Refactor(image_factory): Moth image factory now just a wrapper.
-- Refactor(factories): Removed old implementation specific factories.
-- Refactor(moth_ui/wrapper): Unified ui_renderer
-- Refactor(graphics/utilities): Cleaning up some utility conversions.
-- Refactor(graphics/vulkan): Misc vulkan cleanups.
-- Refactor(platform): Cleaning up platform, application, window layout.
-- Refactor(main): SDL portion working.
-- Refactor(font/vulkan): Font no longer needs graphics.
-- Refactor(graphics): Moving asset loading out of graphics.
-- Renamed ui_renerer to MothRenderer
-- Small adjustments to how events are defined
-- Added graphics contexts to windows.
-- The moth context is now passed into the ui node tree.
-- Just some formatting stuff and minor cleanups.
-- Moved example code into its own location
-- Moved the button widget
-- Added an example main function that draws two windows
-- Removed canyon layers in favor of moth_ui layers.
 
 
