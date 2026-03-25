@@ -117,7 +117,7 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     void Graphics::PushTransform(FloatMat4x4 const& transform) {
-        m_transformStack.push(CurrentTransform() * transform);
+        m_transformStack.push(transform);
     }
 
     void Graphics::PopTransform() {
