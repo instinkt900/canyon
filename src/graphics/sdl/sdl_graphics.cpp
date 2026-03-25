@@ -273,13 +273,18 @@ namespace moth_graphics::graphics::sdl {
                                                      static_cast<float>(destRect.topLeft.y) + y });
             FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), worldPos.x, worldPos.y, destWidth, effect, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
         } else {
-            // Rotation path: render text to a temp texture, then draw that texture rotated.
-            auto tempTex = CreateTextureRef(SDL_CreateTexture(m_surfaceContext.GetRenderer(),
-                SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destWidth, destHeight));
-            SDL_SetTextureBlendMode(tempTex->GetImpl(), SDL_BLENDMODE_BLEND);
+            // Rotation path: render text to a scratch texture, then draw it rotated.
+            // Grow the scratch texture only when the current one is too small.
+            if (!m_textScratchTexture || destWidth > m_textScratchWidth || destHeight > m_textScratchHeight) {
+                m_textScratchWidth  = std::max(destWidth,  m_textScratchWidth);
+                m_textScratchHeight = std::max(destHeight, m_textScratchHeight);
+                m_textScratchTexture = CreateTextureRef(SDL_CreateTexture(m_surfaceContext.GetRenderer(),
+                    SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, m_textScratchWidth, m_textScratchHeight));
+                SDL_SetTextureBlendMode(m_textScratchTexture->GetImpl(), SDL_BLENDMODE_BLEND);
+            }
 
             SDL_Texture* prevTarget = SDL_GetRenderTarget(m_surfaceContext.GetRenderer());
-            SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), tempTex->GetImpl());
+            SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), m_textScratchTexture->GetImpl());
             SDL_SetRenderDrawColor(m_surfaceContext.GetRenderer(), 0, 0, 0, 0);
             SDL_RenderClear(m_surfaceContext.GetRenderer());
 
@@ -287,19 +292,20 @@ namespace moth_graphics::graphics::sdl {
 
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), prevTarget);
 
-            // Draw the texture at the world-space centre of destRect, rotated.
+            // Draw the scratch texture at the world-space centre of destRect, rotated.
             float const localCenterX = static_cast<float>(destWidth) * 0.5f;
             float const localCenterY = static_cast<float>(destHeight) * 0.5f;
             auto const worldCenter = t.TransformPoint({ static_cast<float>(destRect.topLeft.x) + localCenterX,
                                                         static_cast<float>(destRect.topLeft.y) + localCenterY });
+            SDL_Rect const srcRect{ 0, 0, destWidth, destHeight };
             SDL_Rect const dstRect{
                 static_cast<int>(worldCenter.x - localCenterX),
                 static_cast<int>(worldCenter.y - localCenterY),
                 destWidth,
                 destHeight,
             };
-            SDL_RenderCopyEx(m_surfaceContext.GetRenderer(), tempTex->GetImpl(),
-                             nullptr, &dstRect, rotation, nullptr, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(m_surfaceContext.GetRenderer(), m_textScratchTexture->GetImpl(),
+                             &srcRect, &dstRect, rotation, nullptr, SDL_FLIP_NONE);
         }
     }
 

@@ -11,6 +11,8 @@
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/vector.h"
 
+#include "moth_graphics/graphics/sdl/smart_sdl.hpp"
+
 #include <SDL_video.h>
 #include <filesystem>
 #include <memory>
@@ -61,5 +63,8 @@ namespace moth_graphics::graphics::sdl {
         ITarget* m_currentRenderTarget = nullptr;
         SDL_Window* m_imguiWindow = nullptr;
         std::stack<FloatMat4x4> m_transformStack;
+        SDLTextureRef m_textScratchTexture;
+        int m_textScratchWidth = 0;
+        int m_textScratchHeight = 0;
     };
 }
