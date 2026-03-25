@@ -297,6 +297,8 @@ namespace moth_graphics::graphics::vulkan {
         FontGlyphInstance* glyphInstances = static_cast<FontGlyphInstance*>(context->m_fontInstanceStagingBuffer->Map());
 
         auto const t = CurrentTransform();
+        static constexpr float kDegToRad = 3.14159265358979f / 180.0f;
+        float const rotationRad = t.GetRotationDegrees() * kDegToRad;
         // use this to actually submit characters at a position
         auto SubmitCharacter = [&](uint32_t glyphIndex, FloatVec2 const& pos) {
             if (context->m_glyphCount >= 1024) {
@@ -307,6 +309,7 @@ namespace moth_graphics::graphics::vulkan {
             FontGlyphInstance* inst = &glyphInstances[context->m_glyphCount];
             inst->pos = pos;
             inst->glyphIndex = glyphIndex;
+            inst->rotation = rotationRad;
             inst->color = context->m_currentColor;
 
             context->m_glyphCount++;

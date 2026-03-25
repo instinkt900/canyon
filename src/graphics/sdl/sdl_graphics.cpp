@@ -233,31 +233,30 @@ namespace moth_graphics::graphics::sdl {
         auto const destHeight = destRect.bottomRight.y - destRect.topLeft.y;
         auto const textHeight = FC_GetColumnHeight(fcFont.get(), destWidth, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
 
-        auto x = static_cast<float>(destRect.topLeft.x);
+        // local x/y: position within destRect for the text origin, accounting for alignment
+        auto x = 0.0f;
         switch (horizontalAlignment) {
         case graphics::TextHorizAlignment::Left:
             break;
         case graphics::TextHorizAlignment::Center:
-            x = x + (static_cast<float>(destWidth) / 2.0f);
+            x = static_cast<float>(destWidth) / 2.0f;
             break;
         case graphics::TextHorizAlignment::Right:
-            x = x + static_cast<float>(destWidth);
+            x = static_cast<float>(destWidth);
             break;
         }
 
-        auto y = static_cast<float>(destRect.topLeft.y);
+        auto y = 0.0f;
         switch (verticalAlignment) {
         case graphics::TextVertAlignment::Top:
             break;
         case graphics::TextVertAlignment::Middle:
-            y = y + ((static_cast<float>(destHeight) - static_cast<float>(textHeight)) / 2.0f);
+            y = (static_cast<float>(destHeight) - static_cast<float>(textHeight)) / 2.0f;
             break;
         case graphics::TextVertAlignment::Bottom:
-            y = y + static_cast<float>(destHeight) - static_cast<float>(textHeight);
+            y = static_cast<float>(destHeight) - static_cast<float>(textHeight);
             break;
         }
-
-        auto const worldPos = CurrentTransform().TransformPoint({ x, y });
 
         FC_Effect effect;
         effect.alignment = ToSDL(horizontalAlignment);
@@ -265,7 +264,43 @@ namespace moth_graphics::graphics::sdl {
         effect.scale.x = 1.0f;
         effect.scale.y = 1.0f;
 
-        FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), worldPos.x, worldPos.y, destWidth, effect, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
+        auto const t = CurrentTransform();
+        double const rotation = static_cast<double>(t.GetRotationDegrees());
+
+        if (rotation == 0.0) {
+            // Fast path: no rotation — draw directly at the transformed world position.
+            auto const worldPos = t.TransformPoint({ static_cast<float>(destRect.topLeft.x) + x,
+                                                     static_cast<float>(destRect.topLeft.y) + y });
+            FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), worldPos.x, worldPos.y, destWidth, effect, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
+        } else {
+            // Rotation path: render text to a temp texture, then draw that texture rotated.
+            auto tempTex = CreateTextureRef(SDL_CreateTexture(m_surfaceContext.GetRenderer(),
+                SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destWidth, destHeight));
+            SDL_SetTextureBlendMode(tempTex->GetImpl(), SDL_BLENDMODE_BLEND);
+
+            SDL_Texture* prevTarget = SDL_GetRenderTarget(m_surfaceContext.GetRenderer());
+            SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), tempTex->GetImpl());
+            SDL_SetRenderDrawColor(m_surfaceContext.GetRenderer(), 0, 0, 0, 0);
+            SDL_RenderClear(m_surfaceContext.GetRenderer());
+
+            FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), x, y, destWidth, effect, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
+
+            SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), prevTarget);
+
+            // Draw the texture at the world-space centre of destRect, rotated.
+            float const localCenterX = static_cast<float>(destWidth) * 0.5f;
+            float const localCenterY = static_cast<float>(destHeight) * 0.5f;
+            auto const worldCenter = t.TransformPoint({ static_cast<float>(destRect.topLeft.x) + localCenterX,
+                                                        static_cast<float>(destRect.topLeft.y) + localCenterY });
+            SDL_Rect const dstRect{
+                static_cast<int>(worldCenter.x - localCenterX),
+                static_cast<int>(worldCenter.y - localCenterY),
+                destWidth,
+                destHeight,
+            };
+            SDL_RenderCopyEx(m_surfaceContext.GetRenderer(), tempTex->GetImpl(),
+                             nullptr, &dstRect, rotation, nullptr, SDL_FLIP_NONE);
+        }
     }
 
     void Graphics::SetClip(IntRect const* rect) {

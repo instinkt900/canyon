@@ -56,6 +56,7 @@ namespace moth_graphics::graphics::vulkan {
         struct FontGlyphInstance {
             FloatVec2 pos;
             uint32_t glyphIndex;
+            float rotation; // radians, clockwise
             Color color;
         };
 
