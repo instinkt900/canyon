@@ -48,7 +48,7 @@ namespace {
     }
 
     std::vector<VkVertexInputAttributeDescription> getFontVertexAttributeDescriptions() {
-        std::vector<VkVertexInputAttributeDescription> vertexAttributeDescs(3);
+        std::vector<VkVertexInputAttributeDescription> vertexAttributeDescs(4);
 
         vertexAttributeDescs[0].binding = 0;
         vertexAttributeDescs[0].location = 0;
@@ -62,8 +62,13 @@ namespace {
 
         vertexAttributeDescs[2].binding = 0;
         vertexAttributeDescs[2].location = 2;
-        vertexAttributeDescs[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        vertexAttributeDescs[2].offset = offsetof(moth_graphics::graphics::vulkan::Graphics::FontGlyphInstance, color);
+        vertexAttributeDescs[2].format = VK_FORMAT_R32_SFLOAT;
+        vertexAttributeDescs[2].offset = offsetof(moth_graphics::graphics::vulkan::Graphics::FontGlyphInstance, rotation);
+
+        vertexAttributeDescs[3].binding = 0;
+        vertexAttributeDescs[3].location = 3;
+        vertexAttributeDescs[3].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        vertexAttributeDescs[3].offset = offsetof(moth_graphics::graphics::vulkan::Graphics::FontGlyphInstance, color);
 
         return vertexAttributeDescs;
     }
@@ -303,6 +308,7 @@ namespace moth_graphics::graphics::vulkan {
                                  .AddVertexAttribute(vertexAttributeBindings[0])
                                  .AddVertexAttribute(vertexAttributeBindings[1])
                                  .AddVertexAttribute(vertexAttributeBindings[2])
+                                 .AddVertexAttribute(vertexAttributeBindings[3])
                                  .AddColorBlendAttachment(blendAttachment)
                                  .AddDynamicState(VK_DYNAMIC_STATE_VIEWPORT)
                                  .AddDynamicState(VK_DYNAMIC_STATE_SCISSOR)

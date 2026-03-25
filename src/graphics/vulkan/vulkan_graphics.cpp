@@ -109,7 +109,24 @@ namespace moth_graphics::graphics::vulkan {
         DrawFillRectF({ { 0, 0 }, { static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height) } });
     }
 
-    void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) {
+    FloatMat4x4 Graphics::CurrentTransform() const {
+        if (m_transformStack.empty()) {
+            return FloatMat4x4::Identity();
+        }
+        return m_transformStack.top();
+    }
+
+    void Graphics::PushTransform(FloatMat4x4 const& transform) {
+        m_transformStack.push(transform);
+    }
+
+    void Graphics::PopTransform() {
+        if (!m_transformStack.empty()) {
+            m_transformStack.pop();
+        }
+    }
+
+    void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto* context = CurrentContext();
         auto& vulkanImage = dynamic_cast<Image&>(image);
         auto texture = vulkanImage.m_texture;
@@ -127,36 +144,28 @@ namespace moth_graphics::graphics::vulkan {
         imageRect += static_cast<FloatVec2>(vulkanImage.m_sourceRect.topLeft);
         imageRect /= textureDimensions;
 
+        auto const t = CurrentTransform();
         Vertex vertices[6];
 
-        vertices[0].xy = { fDestRect.topLeft.x, fDestRect.topLeft.y };
+        vertices[0].xy = t.TransformPoint({ fDestRect.topLeft.x, fDestRect.topLeft.y });
         vertices[0].uv = { imageRect.topLeft.x, imageRect.topLeft.y };
         vertices[0].color = context->m_currentColor;
-        vertices[1].xy = { fDestRect.bottomRight.x, fDestRect.topLeft.y };
+        vertices[1].xy = t.TransformPoint({ fDestRect.bottomRight.x, fDestRect.topLeft.y });
         vertices[1].uv = { imageRect.bottomRight.x, imageRect.topLeft.y };
         vertices[1].color = context->m_currentColor;
-        vertices[2].xy = { fDestRect.topLeft.x, fDestRect.bottomRight.y };
+        vertices[2].xy = t.TransformPoint({ fDestRect.topLeft.x, fDestRect.bottomRight.y });
         vertices[2].uv = { imageRect.topLeft.x, imageRect.bottomRight.y };
         vertices[2].color = context->m_currentColor;
 
-        vertices[3].xy = { fDestRect.topLeft.x, fDestRect.bottomRight.y };
+        vertices[3].xy = t.TransformPoint({ fDestRect.topLeft.x, fDestRect.bottomRight.y });
         vertices[3].uv = { imageRect.topLeft.x, imageRect.bottomRight.y };
         vertices[3].color = context->m_currentColor;
-        vertices[4].xy = { fDestRect.bottomRight.x, fDestRect.bottomRight.y };
+        vertices[4].xy = t.TransformPoint({ fDestRect.bottomRight.x, fDestRect.bottomRight.y });
         vertices[4].uv = { imageRect.bottomRight.x, imageRect.bottomRight.y };
         vertices[4].color = context->m_currentColor;
-        vertices[5].xy = { fDestRect.bottomRight.x, fDestRect.topLeft.y };
+        vertices[5].xy = t.TransformPoint({ fDestRect.bottomRight.x, fDestRect.topLeft.y });
         vertices[5].uv = { imageRect.bottomRight.x, imageRect.topLeft.y };
         vertices[5].color = context->m_currentColor;
-
-        if (rotation != 0) {
-            auto const center = static_cast<FloatVec2>(destRect.topLeft + IntVec2{ destRect.w() / 2, destRect.h() / 2 });
-            for (int i = 0; i < 6; ++i) {
-                auto const translated = Translate(vertices[i].xy, -center);
-                auto const rotated = Rotate2D(translated, rotation);
-                vertices[i].xy = Translate(rotated, center);
-            }
-        }
 
         VkDescriptorSet descriptorSet = m_drawingShader->GetDescriptorSet(*texture);
         SubmitVertices(vertices, 6, ETopologyType::Triangles, descriptorSet);
@@ -172,7 +181,7 @@ namespace moth_graphics::graphics::vulkan {
         for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
             for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
                 IntRect const tiledDstRect{ { x, y }, { x + imageWidth, y + imageHeight } };
-                DrawImage(image, tiledDstRect, sourceRect, 0);
+                DrawImage(image, tiledDstRect, sourceRect);
             }
         }
     }
@@ -230,76 +239,51 @@ namespace moth_graphics::graphics::vulkan {
 
     void Graphics::DrawRectF(FloatRect const& rect) {
         auto* context = CurrentContext();
+        auto const t = CurrentTransform();
+        auto const tl = t.TransformPoint({ rect.topLeft.x,     rect.topLeft.y });
+        auto const tr = t.TransformPoint({ rect.bottomRight.x, rect.topLeft.y });
+        auto const br = t.TransformPoint({ rect.bottomRight.x, rect.bottomRight.y });
+        auto const bl = t.TransformPoint({ rect.topLeft.x,     rect.bottomRight.y });
         Vertex vertices[8];
 
-        vertices[0].xy = { rect.topLeft.x, rect.topLeft.y };
-        vertices[0].uv = { 0, 0 };
-        vertices[0].color = context->m_currentColor;
-        vertices[1].xy = { rect.bottomRight.x, rect.topLeft.y };
-        vertices[1].uv = { 0, 0 };
-        vertices[1].color = context->m_currentColor;
-
-        vertices[2].xy = { rect.bottomRight.x, rect.topLeft.y };
-        vertices[2].uv = { 0, 0 };
-        vertices[2].color = context->m_currentColor;
-        vertices[3].xy = { rect.bottomRight.x, rect.bottomRight.y };
-        vertices[3].uv = { 0, 0 };
-        vertices[3].color = context->m_currentColor;
-
-        vertices[4].xy = { rect.bottomRight.x, rect.bottomRight.y };
-        vertices[4].uv = { 0, 0 };
-        vertices[4].color = context->m_currentColor;
-        vertices[5].xy = { rect.topLeft.x, rect.bottomRight.y };
-        vertices[5].uv = { 0, 0 };
-        vertices[5].color = context->m_currentColor;
-
-        vertices[6].xy = { rect.topLeft.x, rect.bottomRight.y };
-        vertices[6].uv = { 0, 0 };
-        vertices[6].color = context->m_currentColor;
-        vertices[7].xy = { rect.topLeft.x, rect.topLeft.y };
-        vertices[7].uv = { 0, 0 };
-        vertices[7].color = context->m_currentColor;
+        vertices[0].xy = tl; vertices[0].uv = { 0, 0 }; vertices[0].color = context->m_currentColor;
+        vertices[1].xy = tr; vertices[1].uv = { 0, 0 }; vertices[1].color = context->m_currentColor;
+        vertices[2].xy = tr; vertices[2].uv = { 0, 0 }; vertices[2].color = context->m_currentColor;
+        vertices[3].xy = br; vertices[3].uv = { 0, 0 }; vertices[3].color = context->m_currentColor;
+        vertices[4].xy = br; vertices[4].uv = { 0, 0 }; vertices[4].color = context->m_currentColor;
+        vertices[5].xy = bl; vertices[5].uv = { 0, 0 }; vertices[5].color = context->m_currentColor;
+        vertices[6].xy = bl; vertices[6].uv = { 0, 0 }; vertices[6].color = context->m_currentColor;
+        vertices[7].xy = tl; vertices[7].uv = { 0, 0 }; vertices[7].color = context->m_currentColor;
 
         SubmitVertices(vertices, 8, ETopologyType::Lines);
     }
 
     void Graphics::DrawFillRectF(FloatRect const& rect) {
         auto* context = CurrentContext();
+        auto const t = CurrentTransform();
+        auto const tl = t.TransformPoint({ rect.topLeft.x,     rect.topLeft.y });
+        auto const tr = t.TransformPoint({ rect.bottomRight.x, rect.topLeft.y });
+        auto const br = t.TransformPoint({ rect.bottomRight.x, rect.bottomRight.y });
+        auto const bl = t.TransformPoint({ rect.topLeft.x,     rect.bottomRight.y });
         Vertex vertices[6];
 
-        vertices[0].xy = { rect.topLeft.x, rect.topLeft.y };
-        vertices[0].uv = { 0, 0 };
-        vertices[0].color = context->m_currentColor;
-        vertices[1].xy = { rect.bottomRight.x, rect.topLeft.y };
-        vertices[1].uv = { 0, 0 };
-        vertices[1].color = context->m_currentColor;
-        vertices[2].xy = { rect.topLeft.x, rect.bottomRight.y };
-        vertices[2].uv = { 0, 0 };
-        vertices[2].color = context->m_currentColor;
-
-        vertices[3].xy = { rect.topLeft.x, rect.bottomRight.y };
-        vertices[3].uv = { 0, 0 };
-        vertices[3].color = context->m_currentColor;
-        vertices[4].xy = { rect.bottomRight.x, rect.bottomRight.y };
-        vertices[4].uv = { 0, 0 };
-        vertices[4].color = context->m_currentColor;
-        vertices[5].xy = { rect.bottomRight.x, rect.topLeft.y };
-        vertices[5].uv = { 0, 0 };
-        vertices[5].color = context->m_currentColor;
+        vertices[0].xy = tl; vertices[0].uv = { 0, 0 }; vertices[0].color = context->m_currentColor;
+        vertices[1].xy = tr; vertices[1].uv = { 0, 0 }; vertices[1].color = context->m_currentColor;
+        vertices[2].xy = bl; vertices[2].uv = { 0, 0 }; vertices[2].color = context->m_currentColor;
+        vertices[3].xy = bl; vertices[3].uv = { 0, 0 }; vertices[3].color = context->m_currentColor;
+        vertices[4].xy = br; vertices[4].uv = { 0, 0 }; vertices[4].color = context->m_currentColor;
+        vertices[5].xy = tr; vertices[5].uv = { 0, 0 }; vertices[5].color = context->m_currentColor;
 
         SubmitVertices(vertices, 6, ETopologyType::Triangles);
     }
 
     void Graphics::DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) {
         auto* context = CurrentContext();
+        auto const t = CurrentTransform();
         Vertex vertices[2];
 
-        vertices[0].xy = { p0.x, p0.y };
-        vertices[0].uv = { 0, 0 };
-        vertices[0].color = context->m_currentColor;
-        vertices[1].xy = { p1.x, p1.y };
-        vertices[1].uv = { 0, 0 };
-        vertices[1].color = context->m_currentColor;
+        vertices[0].xy = t.TransformPoint(p0); vertices[0].uv = { 0, 0 }; vertices[0].color = context->m_currentColor;
+        vertices[1].xy = t.TransformPoint(p1); vertices[1].uv = { 0, 0 }; vertices[1].color = context->m_currentColor;
 
         SubmitVertices(vertices, 2, ETopologyType::Lines);
     }
@@ -312,6 +296,8 @@ namespace moth_graphics::graphics::vulkan {
         uint32_t const glyphStart = context->m_glyphCount;
         FontGlyphInstance* glyphInstances = static_cast<FontGlyphInstance*>(context->m_fontInstanceStagingBuffer->Map());
 
+        auto const t = CurrentTransform();
+        float const rotationRad = t.GetRotationDegrees() * kDegToRad;
         // use this to actually submit characters at a position
         auto SubmitCharacter = [&](uint32_t glyphIndex, FloatVec2 const& pos) {
             if (context->m_glyphCount >= 1024) {
@@ -322,6 +308,7 @@ namespace moth_graphics::graphics::vulkan {
             FontGlyphInstance* inst = &glyphInstances[context->m_glyphCount];
             inst->pos = pos;
             inst->glyphIndex = glyphIndex;
+            inst->rotation = rotationRad;
             inst->color = context->m_currentColor;
 
             context->m_glyphCount++;
@@ -368,7 +355,7 @@ namespace moth_graphics::graphics::vulkan {
                 if (info.glyphIndex >= 0) {
                     auto const bearing = static_cast<FloatVec2>(vulkanFont.GetGlyphBearing(info.glyphIndex));
                     auto const offset = static_cast<FloatVec2>(info.offset);
-                    auto const glyphPos = penPos + bearing + offset;
+                    auto const glyphPos = t.TransformPoint(penPos + bearing + offset);
                     SubmitCharacter(static_cast<uint32_t>(info.glyphIndex), glyphPos);
                 }
                 penPos.x += static_cast<float>(info.advance.x);

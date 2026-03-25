@@ -26,7 +26,8 @@ layout(push_constant) uniform uPushConstant
 
 layout(location = 0) in vec2 inPos;
 layout(location = 1) in uint inGlyphIndex;
-layout(location = 2) in vec4 inColor;
+layout(location = 2) in float inRotation;
+layout(location = 3) in vec4 inColor;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec2 outTexCoord;
@@ -35,7 +36,7 @@ void main()
 {
     GlyphInfo gi = glyph_buffer.glyphs[inGlyphIndex];
 
-    vec2 pos[4] = vec2[](
+    vec2 corners[4] = vec2[](
         vec2(0.0, 0.0),             vec2(gi.glyph_size.x,   0.0),
         vec2(0.0, gi.glyph_size.y), vec2(gi.glyph_size.x,   gi.glyph_size.y)
     );
@@ -47,8 +48,14 @@ void main()
         vec2(gi.uv.z, gi.uv.w)
     );
 
-    //gl_Position = vec4(pos[gl_VertexIndex] * gi.glyph_size + inPos, 0.0, 1.0);
-    gl_Position = vec4((pos[gl_VertexIndex] + inPos) * pc.xyScale + pc.xyOffset, 0.0, 1.0);
+    // Rotate the local glyph corner offset around (0,0) then translate to inPos.
+    float c = cos(inRotation);
+    float s = sin(inRotation);
+    vec2 localOffset = corners[gl_VertexIndex];
+    vec2 rotatedOffset = vec2(c * localOffset.x - s * localOffset.y,
+                              s * localOffset.x + c * localOffset.y);
+
+    gl_Position = vec4((rotatedOffset + inPos) * pc.xyScale + pc.xyOffset, 0.0, 1.0);
     outColor = inColor;
     outTexCoord = uv[gl_VertexIndex];
 }

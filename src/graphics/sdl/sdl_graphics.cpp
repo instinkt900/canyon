@@ -80,7 +80,24 @@ namespace moth_graphics::graphics::sdl {
         SDL_RenderClear(m_surfaceContext.GetRenderer());
     }
 
-    void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) {
+    FloatMat4x4 Graphics::CurrentTransform() const {
+        if (m_transformStack.empty()) {
+            return FloatMat4x4::Identity();
+        }
+        return m_transformStack.top();
+    }
+
+    void Graphics::PushTransform(FloatMat4x4 const& transform) {
+        m_transformStack.push(transform);
+    }
+
+    void Graphics::PopTransform() {
+        if (!m_transformStack.empty()) {
+            m_transformStack.pop();
+        }
+    }
+
+    void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto& sdlImage = dynamic_cast<Image&>(image);
         auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
         if (!sdlTexture) {
@@ -94,7 +111,6 @@ namespace moth_graphics::graphics::sdl {
         SDL_SetTextureAlphaMod(sdlTexture->GetSDLTexture()->GetImpl(), components.a);
 
         SDL_Rect sdlSrcRect = ToSDL(sourceRect != nullptr ? *sourceRect : textureSourceRect);
-        SDL_Rect sdlDstRect = ToSDL(destRect);
 
         // Negative src dimensions mean the caller wants a mirrored draw.
         // SDL doesn't support negative-dimension rects; normalise and flip instead.
@@ -119,6 +135,20 @@ namespace moth_graphics::graphics::sdl {
             flip = SDL_FLIP_VERTICAL;
         }
 
+        auto const t = CurrentTransform();
+        float const localCenterX = static_cast<float>(destRect.topLeft.x + destRect.bottomRight.x) * 0.5f;
+        float const localCenterY = static_cast<float>(destRect.topLeft.y + destRect.bottomRight.y) * 0.5f;
+        auto const worldCenter = t.TransformPoint({ localCenterX, localCenterY });
+        float const w = static_cast<float>(destRect.bottomRight.x - destRect.topLeft.x);
+        float const h = static_cast<float>(destRect.bottomRight.y - destRect.topLeft.y);
+        SDL_Rect const sdlDstRect{
+            static_cast<int>(worldCenter.x - (w * 0.5f)),
+            static_cast<int>(worldCenter.y - (h * 0.5f)),
+            static_cast<int>(w),
+            static_cast<int>(h),
+        };
+        double const rotation = static_cast<double>(t.GetRotationDegrees());
+
         SDL_RenderCopyEx(m_surfaceContext.GetRenderer(),
                          sdlTexture->GetSDLTexture()->GetImpl(),
                          &sdlSrcRect,
@@ -129,31 +159,13 @@ namespace moth_graphics::graphics::sdl {
     }
 
     void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
-        auto& sdlImage = dynamic_cast<Image&>(image);
-        auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
-        if (!sdlTexture) {
-            return;
-        }
-        auto const& textureSourceRect = sdlImage.GetSourceRect();
-
-        ColorComponents const components{ m_drawColor };
-        SDL_SetTextureBlendMode(sdlTexture->GetSDLTexture()->GetImpl(), ToSDL(m_blendMode));
-        SDL_SetTextureColorMod(sdlTexture->GetSDLTexture()->GetImpl(), components.r, components.g, components.b);
-        SDL_SetTextureAlphaMod(sdlTexture->GetSDLTexture()->GetImpl(), components.a);
-
-        SDL_Rect sdlSrcRect = ToSDL(sourceRect != nullptr ? *sourceRect : textureSourceRect);
-
         auto const imageWidth = static_cast<int>(static_cast<float>(image.GetWidth()) * scale);
         auto const imageHeight = static_cast<int>(static_cast<float>(image.GetHeight()) * scale);
-        auto const sdlTotalDestRect{ ToSDL(destRect) };
-        SDL_RenderSetClipRect(m_surfaceContext.GetRenderer(), &sdlTotalDestRect);
         for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
             for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
-                SDL_Rect sdlDstRect{ x, y, imageWidth, imageHeight };
-                SDL_RenderCopy(m_surfaceContext.GetRenderer(), sdlTexture->GetSDLTexture()->GetImpl(), &sdlSrcRect, &sdlDstRect);
+                DrawImage(image, IntRect{ { x, y }, { x + imageWidth, y + imageHeight } }, sourceRect);
             }
         }
-        SDL_RenderSetClipRect(m_surfaceContext.GetRenderer(), nullptr);
     }
 
     void Graphics::DrawToPNG(IImage& image, std::filesystem::path const& path) {
@@ -177,17 +189,41 @@ namespace moth_graphics::graphics::sdl {
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {
-        auto const sdlRectF = ToSDL(rect);
-        SDL_RenderDrawRectF(m_surfaceContext.GetRenderer(), &sdlRectF);
+        auto const t = CurrentTransform();
+        auto const tl = t.TransformPoint({ rect.topLeft.x,     rect.topLeft.y });
+        auto const tr = t.TransformPoint({ rect.bottomRight.x, rect.topLeft.y });
+        auto const br = t.TransformPoint({ rect.bottomRight.x, rect.bottomRight.y });
+        auto const bl = t.TransformPoint({ rect.topLeft.x,     rect.bottomRight.y });
+        SDL_FPoint const pts[5] = {
+            { tl.x, tl.y }, { tr.x, tr.y }, { br.x, br.y }, { bl.x, bl.y }, { tl.x, tl.y },
+        };
+        SDL_RenderDrawLinesF(m_surfaceContext.GetRenderer(), pts, 5);
     }
 
     void Graphics::DrawFillRectF(FloatRect const& rect) {
-        auto const sdlRectF = ToSDL(rect);
-        SDL_RenderFillRectF(m_surfaceContext.GetRenderer(), &sdlRectF);
+        auto const t = CurrentTransform();
+        auto const tl = t.TransformPoint({ rect.topLeft.x,     rect.topLeft.y });
+        auto const tr = t.TransformPoint({ rect.bottomRight.x, rect.topLeft.y });
+        auto const br = t.TransformPoint({ rect.bottomRight.x, rect.bottomRight.y });
+        auto const bl = t.TransformPoint({ rect.topLeft.x,     rect.bottomRight.y });
+        ColorComponents const components{ m_drawColor };
+        SDL_Color const sdlColor{ components.r, components.g, components.b, components.a };
+        SDL_Vertex const sdlVertices[6] = {
+            { { tl.x, tl.y }, sdlColor, { 0.0f, 0.0f } },
+            { { tr.x, tr.y }, sdlColor, { 0.0f, 0.0f } },
+            { { bl.x, bl.y }, sdlColor, { 0.0f, 0.0f } },
+            { { tr.x, tr.y }, sdlColor, { 0.0f, 0.0f } },
+            { { br.x, br.y }, sdlColor, { 0.0f, 0.0f } },
+            { { bl.x, bl.y }, sdlColor, { 0.0f, 0.0f } },
+        };
+        SDL_RenderGeometry(m_surfaceContext.GetRenderer(), nullptr, sdlVertices, 6, nullptr, 0);
     }
 
     void Graphics::DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) {
-        SDL_RenderDrawLineF(m_surfaceContext.GetRenderer(), p0.x, p0.y, p1.x, p1.y);
+        auto const t = CurrentTransform();
+        auto const wp0 = t.TransformPoint(p0);
+        auto const wp1 = t.TransformPoint(p1);
+        SDL_RenderDrawLineF(m_surfaceContext.GetRenderer(), wp0.x, wp0.y, wp1.x, wp1.y);
     }
 
     void Graphics::DrawText(std::string const& text, graphics::IFont& font, IntRect const& destRect, graphics::TextHorizAlignment horizontalAlignment, graphics::TextVertAlignment verticalAlignment) {
@@ -197,27 +233,28 @@ namespace moth_graphics::graphics::sdl {
         auto const destHeight = destRect.bottomRight.y - destRect.topLeft.y;
         auto const textHeight = FC_GetColumnHeight(fcFont.get(), destWidth, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
 
-        auto x = static_cast<float>(destRect.topLeft.x);
+        // local x/y: position within destRect for the text origin, accounting for alignment
+        auto x = 0.0f;
         switch (horizontalAlignment) {
         case graphics::TextHorizAlignment::Left:
             break;
         case graphics::TextHorizAlignment::Center:
-            x = x + static_cast<float>(destWidth) / 2.0f;
+            x = static_cast<float>(destWidth) / 2.0f;
             break;
         case graphics::TextHorizAlignment::Right:
-            x = x + static_cast<float>(destWidth);
+            x = static_cast<float>(destWidth);
             break;
         }
 
-        auto y = static_cast<float>(destRect.topLeft.y);
+        auto y = 0.0f;
         switch (verticalAlignment) {
         case graphics::TextVertAlignment::Top:
             break;
         case graphics::TextVertAlignment::Middle:
-            y = y + (static_cast<float>(destHeight) - static_cast<float>(textHeight)) / 2.0f;
+            y = (static_cast<float>(destHeight) - static_cast<float>(textHeight)) / 2.0f;
             break;
         case graphics::TextVertAlignment::Bottom:
-            y = y + static_cast<float>(destHeight) - static_cast<float>(textHeight);
+            y = static_cast<float>(destHeight) - static_cast<float>(textHeight);
             break;
         }
 
@@ -227,7 +264,49 @@ namespace moth_graphics::graphics::sdl {
         effect.scale.x = 1.0f;
         effect.scale.y = 1.0f;
 
-        FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), x, y, destWidth, effect, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
+        auto const t = CurrentTransform();
+        double const rotation = static_cast<double>(t.GetRotationDegrees());
+
+        if (rotation == 0.0) {
+            // Fast path: no rotation — draw directly at the transformed world position.
+            auto const worldPos = t.TransformPoint({ static_cast<float>(destRect.topLeft.x) + x,
+                                                     static_cast<float>(destRect.topLeft.y) + y });
+            FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), worldPos.x, worldPos.y, destWidth, effect, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
+        } else {
+            // Rotation path: render text to a scratch texture, then draw it rotated.
+            // Grow the scratch texture only when the current one is too small.
+            if (!m_textScratchTexture || destWidth > m_textScratchWidth || destHeight > m_textScratchHeight) {
+                m_textScratchWidth  = std::max(destWidth,  m_textScratchWidth);
+                m_textScratchHeight = std::max(destHeight, m_textScratchHeight);
+                m_textScratchTexture = CreateTextureRef(SDL_CreateTexture(m_surfaceContext.GetRenderer(),
+                    SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, m_textScratchWidth, m_textScratchHeight));
+                SDL_SetTextureBlendMode(m_textScratchTexture->GetImpl(), SDL_BLENDMODE_BLEND);
+            }
+
+            SDL_Texture* prevTarget = SDL_GetRenderTarget(m_surfaceContext.GetRenderer());
+            SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), m_textScratchTexture->GetImpl());
+            SDL_SetRenderDrawColor(m_surfaceContext.GetRenderer(), 0, 0, 0, 0);
+            SDL_RenderClear(m_surfaceContext.GetRenderer());
+
+            FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), x, y, destWidth, effect, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
+
+            SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), prevTarget);
+
+            // Draw the scratch texture at the world-space centre of destRect, rotated.
+            float const localCenterX = static_cast<float>(destWidth) * 0.5f;
+            float const localCenterY = static_cast<float>(destHeight) * 0.5f;
+            auto const worldCenter = t.TransformPoint({ static_cast<float>(destRect.topLeft.x) + localCenterX,
+                                                        static_cast<float>(destRect.topLeft.y) + localCenterY });
+            SDL_Rect const srcRect{ 0, 0, destWidth, destHeight };
+            SDL_Rect const dstRect{
+                static_cast<int>(worldCenter.x - localCenterX),
+                static_cast<int>(worldCenter.y - localCenterY),
+                destWidth,
+                destHeight,
+            };
+            SDL_RenderCopyEx(m_surfaceContext.GetRenderer(), m_textScratchTexture->GetImpl(),
+                             &srcRect, &dstRect, rotation, nullptr, SDL_FLIP_NONE);
+        }
     }
 
     void Graphics::SetClip(IntRect const* rect) {

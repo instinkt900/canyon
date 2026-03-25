@@ -7,6 +7,7 @@
 #include "moth_graphics/graphics/itarget.h"
 #include "moth_graphics/graphics/text_alignment.h"
 #include "moth_graphics/utils/rect.h"
+#include "moth_graphics/utils/transform.h"
 #include "moth_graphics/utils/vector.h"
 
 #include <filesystem>
@@ -52,12 +53,18 @@ namespace moth_graphics::graphics {
         /// @brief Fill the entire render target with the current colour.
         virtual void Clear() = 0;
 
-        /// @brief Draw an image into a destination rectangle.
+        /// @brief Push a transform onto the transform stack. Draw calls will apply the active transform to all coordinates.
+        /// @param transform Local-to-world transform for subsequent draw calls.
+        virtual void PushTransform(FloatMat4x4 const& transform) = 0;
+
+        /// @brief Pop the top transform, restoring the previous one.
+        virtual void PopTransform() = 0;
+
+        /// @brief Draw an image into a destination rectangle in local space. The active transform is applied.
         /// @param image The image to draw.
-        /// @param destRect Destination rectangle in logical pixels.
+        /// @param destRect Destination rectangle in local (pre-transform) space.
         /// @param sourceRect Sub-region of the image to sample, or @c nullptr for the full image.
-        /// @param rotation Clockwise rotation in degrees about the centre of @p destRect.
-        virtual void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect = nullptr, float rotation = 0.0f) = 0;
+        virtual void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect = nullptr) = 0;
 
         /// @brief Tile an image to fill a destination rectangle.
         /// @param image The image to tile.

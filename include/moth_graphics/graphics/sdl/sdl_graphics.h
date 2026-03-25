@@ -11,9 +11,12 @@
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/vector.h"
 
+#include "moth_graphics/graphics/sdl/smart_sdl.hpp"
+
 #include <SDL_video.h>
 #include <filesystem>
 #include <memory>
+#include <stack>
 #include <string>
 
 namespace moth_graphics::graphics::sdl {
@@ -34,7 +37,9 @@ namespace moth_graphics::graphics::sdl {
         // void SetColorMod(std::shared_ptr<graphics::IImage> target, graphics::Color const& color) override;
         void SetColor(Color const& color) override;
         void Clear() override;
-        void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) override;
+        void PushTransform(FloatMat4x4 const& transform) override;
+        void PopTransform() override;
+        void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) override;
         void DrawImageTiled(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
         void DrawToPNG(IImage& image, std::filesystem::path const& path) override;
         void DrawRectF(FloatRect const& rect) override;
@@ -50,10 +55,16 @@ namespace moth_graphics::graphics::sdl {
         void SetLogicalSize(IntVec2 const& logicalSize) override;
 
     private:
+        FloatMat4x4 CurrentTransform() const;
+
         sdl::SurfaceContext& m_surfaceContext;
         Color m_drawColor;
         BlendMode m_blendMode = BlendMode::Replace;
         ITarget* m_currentRenderTarget = nullptr;
         SDL_Window* m_imguiWindow = nullptr;
+        std::stack<FloatMat4x4> m_transformStack;
+        SDLTextureRef m_textScratchTexture;
+        int m_textScratchWidth = 0;
+        int m_textScratchHeight = 0;
     };
 }

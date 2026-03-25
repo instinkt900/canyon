@@ -56,6 +56,7 @@ namespace moth_graphics::graphics::vulkan {
         struct FontGlyphInstance {
             FloatVec2 pos;
             uint32_t glyphIndex;
+            float rotation; // radians, clockwise
             Color color;
         };
 
@@ -67,7 +68,9 @@ namespace moth_graphics::graphics::vulkan {
         // void SetColorMod(std::shared_ptr<IImage> target, Color const& color) override;
         void SetColor(Color const& color) override;
         void Clear() override;
-        void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float rotation) override;
+        void PushTransform(FloatMat4x4 const& transform) override;
+        void PopTransform() override;
+        void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) override;
         void DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
         void DrawToPNG(IImage& image, std::filesystem::path const& path) override;
         void DrawRectF(FloatRect const& rect) override;
@@ -98,8 +101,11 @@ namespace moth_graphics::graphics::vulkan {
         void OnResize(VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
 
     private:
+        FloatMat4x4 CurrentTransform() const;
+
         bool m_imguiInitialized = false;
         SurfaceContext& m_surfaceContext;
+        std::stack<FloatMat4x4> m_transformStack;
 
         struct PushConstants {
             FloatVec2 xyScale;
