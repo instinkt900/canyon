@@ -1,5 +1,6 @@
 from conan import ConanFile
-from conan.tools.cmake import cmake_layout
+from conan.errors import ConanInvalidConfiguration
+from conan.tools.cmake import CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.system.package_manager import Apt
 
 
@@ -8,7 +9,6 @@ class MothGraphicsExample(ConanFile):
     description = "An example for how to use moth_graphics."
     version = "1.0"
     settings = "os", "compiler", "build_type", "arch"
-    generators = "CMakeToolchain", "CMakeDeps"
     package_type = "application"
 
     options = {
@@ -19,6 +19,10 @@ class MothGraphicsExample(ConanFile):
         "disable_vulkan": False,
         "disable_sdl": False,
     }
+
+    def validate(self):
+        if self.options.disable_vulkan and self.options.disable_sdl:
+            raise ConanInvalidConfiguration("disable_vulkan and disable_sdl cannot both be True")
 
     def requirements(self):
         # moth_graphics is built from source via add_subdirectory; list its
@@ -53,6 +57,14 @@ class MothGraphicsExample(ConanFile):
 
     def build_requirements(self):
         self.tool_requires("cmake/3.27.0")
+
+    def generate(self):
+        deps = CMakeDeps(self)
+        deps.generate()
+        tc = CMakeToolchain(self)
+        tc.cache_variables["MOTH_GRAPHICS_DISABLE_VULKAN"] = bool(self.options.disable_vulkan)
+        tc.cache_variables["MOTH_GRAPHICS_DISABLE_SDL"] = bool(self.options.disable_sdl)
+        tc.generate()
 
     def layout(self):
         cmake_layout(self)
