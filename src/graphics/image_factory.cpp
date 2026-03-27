@@ -74,9 +74,14 @@ namespace moth_graphics::graphics {
                     ImageDesc desc;
                     desc.m_texture = sharedTexture;
                     desc.m_path = absPath;
-                    imageJson.at("rect").get_to(desc.m_sourceRect);
+                    auto const& rectJson = imageJson.at("rect");
+                    int const x = rectJson.at("x").get<int>();
+                    int const y = rectJson.at("y").get<int>();
+                    int const w = rectJson.at("w").get<int>();
+                    int const h = rectJson.at("h").get<int>();
+                    desc.m_sourceRect = moth_graphics::MakeRect(x, y, w, h);
                     m_cachedImages.insert(std::make_pair(absPath.string(), desc));
-                } catch (std::exception&) {
+                } catch (std::exception& e) {
                     continue;
                 }
             }
