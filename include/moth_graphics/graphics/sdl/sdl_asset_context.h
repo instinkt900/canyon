@@ -1,6 +1,8 @@
 #pragma once
 
 #include "moth_graphics/graphics/asset_context.h"
+#include "moth_graphics/graphics/font_factory.h"
+#include "moth_graphics/graphics/image_factory.h"
 #include "moth_graphics/graphics/ifont.h"
 #include "moth_graphics/graphics/iimage.h"
 #include "moth_graphics/graphics/itexture.h"
@@ -17,6 +19,9 @@ namespace moth_graphics::graphics::sdl {
         explicit AssetContext(SurfaceContext& context);
         ~AssetContext() override = default;
 
+        graphics::ImageFactory& GetImageFactory() override { return m_imageFactory; }
+        graphics::FontFactory& GetFontFactory() override { return m_fontFactory; }
+
         std::unique_ptr<IImage> NewImage(std::shared_ptr<ITexture> texture) override;
         std::unique_ptr<IImage> NewImage(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) override;
         std::unique_ptr<IFont> FontFromFile(std::filesystem::path const& path, uint32_t size) override;
@@ -26,5 +31,7 @@ namespace moth_graphics::graphics::sdl {
 
     private:
         SurfaceContext& m_context;
+        graphics::ImageFactory m_imageFactory;
+        graphics::FontFactory m_fontFactory;
     };
 }
