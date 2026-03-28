@@ -64,8 +64,7 @@ namespace moth_graphics::graphics {
                 spdlog::error("LoadTexturePack: failed to load atlas texture '{}'", atlasAbsPath.string());
                 continue;
             }
-            auto sharedTexture = std::shared_ptr<ITexture>(texture.release());
-
+            auto sharedTexture = std::shared_ptr<ITexture>(std::move(texture));
             for (auto&& imageJson : atlasJson["images"]) {
                 if (!imageJson.is_object()) {
                     spdlog::error("LoadTexturePack: '{}': image entry is not an object", atlasAbsPath.string());
