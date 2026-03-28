@@ -19,9 +19,11 @@ namespace moth_graphics::platform {
 
     /// @brief A platform window and its associated rendering resources.
     ///
-    /// Owns the @c IGraphics instance, the moth_ui @c LayerStack, and the asset
-    /// factories for images and fonts. Subclasses handle the platform-specific
-    /// window creation (see @c sdl::Window and @c glfw::Window).
+    /// Owns the @c IGraphics instance, the moth_ui @c LayerStack, and the
+    /// @c MothImageFactory / @c MothFontFactory adapter wrappers. The underlying
+    /// image and font factories are owned by the @c AssetContext. Subclasses
+    /// handle the platform-specific window creation (see @c sdl::Window and
+    /// @c glfw::Window).
     class Window : public EventEmitter {
     public:
         /// @param windowTitle Initial title bar text.

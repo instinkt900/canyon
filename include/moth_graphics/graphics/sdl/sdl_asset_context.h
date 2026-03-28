@@ -19,6 +19,11 @@ namespace moth_graphics::graphics::sdl {
         explicit AssetContext(SurfaceContext& context);
         ~AssetContext() override = default;
 
+        AssetContext(AssetContext const&) = delete;
+        AssetContext& operator=(AssetContext const&) = delete;
+        AssetContext(AssetContext&&) = delete;
+        AssetContext& operator=(AssetContext&&) = delete;
+
         graphics::ImageFactory& GetImageFactory() override { return m_imageFactory; }
         graphics::FontFactory& GetFontFactory() override { return m_fontFactory; }
 

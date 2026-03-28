@@ -40,6 +40,7 @@ namespace moth_graphics::graphics {
             return false;
         }
 
+        bool anyCached = false;
         for (auto&& atlasJson : json["atlases"]) {
             if (!atlasJson.is_object()) {
                 spdlog::error("LoadTexturePack: '{}': atlas entry is not an object", path.string());
@@ -92,6 +93,7 @@ namespace moth_graphics::graphics {
                     int const h = rectJson.at("h").get<int>();
                     desc.m_sourceRect = moth_graphics::MakeRect(x, y, w, h);
                     m_cachedImages.insert(std::make_pair(absPath.string(), desc));
+                    anyCached = true;
                 } catch (std::exception& e) {
                     spdlog::error("LoadTexturePack: '{}': failed to load image entry: {}", atlasAbsPath.string(), e.what());
                     continue;
@@ -99,7 +101,7 @@ namespace moth_graphics::graphics {
             }
         }
 
-        return true;
+        return anyCached;
     }
 
     std::unique_ptr<IImage> ImageFactory::GetImage(std::filesystem::path const& path) {
