@@ -127,6 +127,13 @@ namespace moth_graphics::graphics::vulkan {
     SurfaceContext::~SurfaceContext() {
         spdlog::info("Vulkan: destroying surface context");
         vkDeviceWaitIdle(m_vkDevice);
+        // Flush factory caches before tearing down VMA. The factories are owned
+        // by m_assetContext (a value member), which is destroyed after this
+        // destructor body completes — too late for the VMA allocator. Explicitly
+        // releasing cached textures here ensures all VMA allocations are freed
+        // while the allocator is still alive.
+        m_assetContext.GetImageFactory().FlushCache();
+        m_assetContext.GetFontFactory().ClearFonts();
         vkDestroyDescriptorPool(m_vkDevice, m_vkDescriptorPool, nullptr);
         vkDestroyCommandPool(m_vkDevice, m_vkCommandPool, nullptr);
         vmaDestroyAllocator(m_vmaAllocator);
