@@ -1,9 +1,7 @@
 #pragma once
 
 #include "moth_graphics/events/event_emitter.h"
-#include "moth_graphics/graphics/font_factory.h"
 #include "moth_graphics/graphics/igraphics.h"
-#include "moth_graphics/graphics/image_factory.h"
 #include "moth_graphics/graphics/moth_ui/moth_font_factory.h"
 #include "moth_graphics/graphics/moth_ui/moth_image_factory.h"
 #include "moth_graphics/graphics/moth_ui/moth_renderer.h"
@@ -21,9 +19,11 @@ namespace moth_graphics::platform {
 
     /// @brief A platform window and its associated rendering resources.
     ///
-    /// Owns the @c IGraphics instance, the moth_ui @c LayerStack, and the asset
-    /// factories for images and fonts. Subclasses handle the platform-specific
-    /// window creation (see @c sdl::Window and @c glfw::Window).
+    /// Owns the @c IGraphics instance, the moth_ui @c LayerStack, and the
+    /// @c MothImageFactory / @c MothFontFactory adapter wrappers. The underlying
+    /// image and font factories are owned by the @c AssetContext. Subclasses
+    /// handle the platform-specific window creation (see @c sdl::Window and
+    /// @c glfw::Window).
     class Window : public EventEmitter {
     public:
         /// @param windowTitle Initial title bar text.
@@ -66,7 +66,7 @@ namespace moth_graphics::platform {
         moth_ui::LayerStack& GetLayerStack() const { return *m_layerStack; }
 
         /// @brief Returns the image factory for this window.
-        graphics::ImageFactory& GetImageFactory() const { return *m_imageFactory; }
+        graphics::ImageFactory& GetImageFactory() const;
 
     protected:
         /// @brief Called after the native window and graphics objects are created.
@@ -84,9 +84,6 @@ namespace moth_graphics::platform {
 
         std::unique_ptr<graphics::IGraphics> m_graphics;
         std::unique_ptr<moth_ui::LayerStack> m_layerStack;
-
-        std::shared_ptr<graphics::ImageFactory> m_imageFactory;
-        std::shared_ptr<graphics::FontFactory> m_fontFactory;
 
         std::unique_ptr<graphics::MothImageFactory> m_mothImageFactory;
         std::unique_ptr<graphics::MothFontFactory> m_mothFontFactory;

@@ -7,7 +7,9 @@
 
 namespace moth_graphics::graphics::vulkan {
     AssetContext::AssetContext(SurfaceContext& context)
-        : m_context(context) {
+        : m_context(context)
+        , m_imageFactory(*this)
+        , m_fontFactory(*this) {
     }
 
     std::unique_ptr<IImage> AssetContext::NewImage(std::shared_ptr<ITexture> texture) {

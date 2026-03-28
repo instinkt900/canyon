@@ -11,7 +11,7 @@
 namespace moth_graphics::graphics {
     class MothImageFactory : public moth_ui::IImageFactory {
     public:
-        explicit MothImageFactory(std::shared_ptr<graphics::ImageFactory> factoryImpl);
+        explicit MothImageFactory(graphics::ImageFactory& factoryImpl);
         ~MothImageFactory() override = default;
 
         void FlushCache() override;
@@ -19,7 +19,7 @@ namespace moth_graphics::graphics {
         std::unique_ptr<moth_ui::IImage> GetImage(std::filesystem::path const& path) override;
 
     private:
-        std::shared_ptr<graphics::ImageFactory> m_factoryImpl;
+        graphics::ImageFactory& m_factoryImpl;
     };
 }
 
