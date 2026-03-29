@@ -131,7 +131,7 @@ namespace moth_graphics::graphics::vulkan {
         auto const imageHeight = image.GetHeight();
         auto const offsetX = static_cast<int>(static_cast<float>(imageWidth) * pivot.x);
         auto const offsetY = static_cast<int>(static_cast<float>(imageHeight) * pivot.y);
-        IntRect destRect = MakeRect(pos.x, pos.y, pos.x + imageWidth, pos.y + imageHeight);
+        IntRect destRect = MakeRect(pos.x, pos.y, imageWidth, imageHeight);
         DrawImage(image, destRect - IntVec2{ offsetX, offsetY }, nullptr);
     }
 
