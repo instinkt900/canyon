@@ -97,6 +97,15 @@ namespace moth_graphics::graphics::sdl {
         }
     }
 
+    void Graphics::DrawImage(IImage& image, IntVec2 const& pos, FloatVec2 const& pivot) {
+        auto const imageWidth = image.GetWidth();
+        auto const imageHeight = image.GetHeight();
+        auto const offsetX = static_cast<int>(static_cast<float>(imageWidth) * pivot.x);
+        auto const offsetY = static_cast<int>(static_cast<float>(imageHeight) * pivot.y);
+        IntRect destRect = MakeRect(pos.x, pos.y, pos.x + imageWidth, pos.y + imageHeight);
+        DrawImage(image, destRect - IntVec2{ offsetX, offsetY }, nullptr);
+    }
+
     void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto& sdlImage = dynamic_cast<Image&>(image);
         auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
@@ -190,22 +199,26 @@ namespace moth_graphics::graphics::sdl {
 
     void Graphics::DrawRectF(FloatRect const& rect) {
         auto const t = CurrentTransform();
-        auto const tl = t.TransformPoint({ rect.topLeft.x,     rect.topLeft.y });
+        auto const tl = t.TransformPoint({ rect.topLeft.x, rect.topLeft.y });
         auto const tr = t.TransformPoint({ rect.bottomRight.x, rect.topLeft.y });
         auto const br = t.TransformPoint({ rect.bottomRight.x, rect.bottomRight.y });
-        auto const bl = t.TransformPoint({ rect.topLeft.x,     rect.bottomRight.y });
+        auto const bl = t.TransformPoint({ rect.topLeft.x, rect.bottomRight.y });
         SDL_FPoint const pts[5] = {
-            { tl.x, tl.y }, { tr.x, tr.y }, { br.x, br.y }, { bl.x, bl.y }, { tl.x, tl.y },
+            { tl.x, tl.y },
+            { tr.x, tr.y },
+            { br.x, br.y },
+            { bl.x, bl.y },
+            { tl.x, tl.y },
         };
         SDL_RenderDrawLinesF(m_surfaceContext.GetRenderer(), pts, 5);
     }
 
     void Graphics::DrawFillRectF(FloatRect const& rect) {
         auto const t = CurrentTransform();
-        auto const tl = t.TransformPoint({ rect.topLeft.x,     rect.topLeft.y });
+        auto const tl = t.TransformPoint({ rect.topLeft.x, rect.topLeft.y });
         auto const tr = t.TransformPoint({ rect.bottomRight.x, rect.topLeft.y });
         auto const br = t.TransformPoint({ rect.bottomRight.x, rect.bottomRight.y });
-        auto const bl = t.TransformPoint({ rect.topLeft.x,     rect.bottomRight.y });
+        auto const bl = t.TransformPoint({ rect.topLeft.x, rect.bottomRight.y });
         ColorComponents const components{ m_drawColor };
         SDL_Color const sdlColor{ components.r, components.g, components.b, components.a };
         SDL_Vertex const sdlVertices[6] = {
@@ -276,10 +289,10 @@ namespace moth_graphics::graphics::sdl {
             // Rotation path: render text to a scratch texture, then draw it rotated.
             // Grow the scratch texture only when the current one is too small.
             if (!m_textScratchTexture || destWidth > m_textScratchWidth || destHeight > m_textScratchHeight) {
-                m_textScratchWidth  = std::max(destWidth,  m_textScratchWidth);
+                m_textScratchWidth = std::max(destWidth, m_textScratchWidth);
                 m_textScratchHeight = std::max(destHeight, m_textScratchHeight);
                 m_textScratchTexture = CreateTextureRef(SDL_CreateTexture(m_surfaceContext.GetRenderer(),
-                    SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, m_textScratchWidth, m_textScratchHeight));
+                                                                          SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, m_textScratchWidth, m_textScratchHeight));
                 SDL_SetTextureBlendMode(m_textScratchTexture->GetImpl(), SDL_BLENDMODE_BLEND);
             }
 

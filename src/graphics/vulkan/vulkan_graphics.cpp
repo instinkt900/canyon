@@ -126,6 +126,15 @@ namespace moth_graphics::graphics::vulkan {
         }
     }
 
+    void Graphics::DrawImage(IImage& image, IntVec2 const& pos, FloatVec2 const& pivot) {
+        auto const imageWidth = image.GetWidth();
+        auto const imageHeight = image.GetHeight();
+        auto const offsetX = static_cast<int>(static_cast<float>(imageWidth) * pivot.x);
+        auto const offsetY = static_cast<int>(static_cast<float>(imageHeight) * pivot.y);
+        IntRect destRect = MakeRect(pos.x, pos.y, pos.x + imageWidth, pos.y + imageHeight);
+        DrawImage(image, destRect - IntVec2{ offsetX, offsetY }, nullptr);
+    }
+
     void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto* context = CurrentContext();
         auto& vulkanImage = dynamic_cast<Image&>(image);
@@ -240,20 +249,36 @@ namespace moth_graphics::graphics::vulkan {
     void Graphics::DrawRectF(FloatRect const& rect) {
         auto* context = CurrentContext();
         auto const t = CurrentTransform();
-        auto const tl = t.TransformPoint({ rect.topLeft.x,     rect.topLeft.y });
+        auto const tl = t.TransformPoint({ rect.topLeft.x, rect.topLeft.y });
         auto const tr = t.TransformPoint({ rect.bottomRight.x, rect.topLeft.y });
         auto const br = t.TransformPoint({ rect.bottomRight.x, rect.bottomRight.y });
-        auto const bl = t.TransformPoint({ rect.topLeft.x,     rect.bottomRight.y });
+        auto const bl = t.TransformPoint({ rect.topLeft.x, rect.bottomRight.y });
         Vertex vertices[8];
 
-        vertices[0].xy = tl; vertices[0].uv = { 0, 0 }; vertices[0].color = context->m_currentColor;
-        vertices[1].xy = tr; vertices[1].uv = { 0, 0 }; vertices[1].color = context->m_currentColor;
-        vertices[2].xy = tr; vertices[2].uv = { 0, 0 }; vertices[2].color = context->m_currentColor;
-        vertices[3].xy = br; vertices[3].uv = { 0, 0 }; vertices[3].color = context->m_currentColor;
-        vertices[4].xy = br; vertices[4].uv = { 0, 0 }; vertices[4].color = context->m_currentColor;
-        vertices[5].xy = bl; vertices[5].uv = { 0, 0 }; vertices[5].color = context->m_currentColor;
-        vertices[6].xy = bl; vertices[6].uv = { 0, 0 }; vertices[6].color = context->m_currentColor;
-        vertices[7].xy = tl; vertices[7].uv = { 0, 0 }; vertices[7].color = context->m_currentColor;
+        vertices[0].xy = tl;
+        vertices[0].uv = { 0, 0 };
+        vertices[0].color = context->m_currentColor;
+        vertices[1].xy = tr;
+        vertices[1].uv = { 0, 0 };
+        vertices[1].color = context->m_currentColor;
+        vertices[2].xy = tr;
+        vertices[2].uv = { 0, 0 };
+        vertices[2].color = context->m_currentColor;
+        vertices[3].xy = br;
+        vertices[3].uv = { 0, 0 };
+        vertices[3].color = context->m_currentColor;
+        vertices[4].xy = br;
+        vertices[4].uv = { 0, 0 };
+        vertices[4].color = context->m_currentColor;
+        vertices[5].xy = bl;
+        vertices[5].uv = { 0, 0 };
+        vertices[5].color = context->m_currentColor;
+        vertices[6].xy = bl;
+        vertices[6].uv = { 0, 0 };
+        vertices[6].color = context->m_currentColor;
+        vertices[7].xy = tl;
+        vertices[7].uv = { 0, 0 };
+        vertices[7].color = context->m_currentColor;
 
         SubmitVertices(vertices, 8, ETopologyType::Lines);
     }
@@ -261,18 +286,30 @@ namespace moth_graphics::graphics::vulkan {
     void Graphics::DrawFillRectF(FloatRect const& rect) {
         auto* context = CurrentContext();
         auto const t = CurrentTransform();
-        auto const tl = t.TransformPoint({ rect.topLeft.x,     rect.topLeft.y });
+        auto const tl = t.TransformPoint({ rect.topLeft.x, rect.topLeft.y });
         auto const tr = t.TransformPoint({ rect.bottomRight.x, rect.topLeft.y });
         auto const br = t.TransformPoint({ rect.bottomRight.x, rect.bottomRight.y });
-        auto const bl = t.TransformPoint({ rect.topLeft.x,     rect.bottomRight.y });
+        auto const bl = t.TransformPoint({ rect.topLeft.x, rect.bottomRight.y });
         Vertex vertices[6];
 
-        vertices[0].xy = tl; vertices[0].uv = { 0, 0 }; vertices[0].color = context->m_currentColor;
-        vertices[1].xy = tr; vertices[1].uv = { 0, 0 }; vertices[1].color = context->m_currentColor;
-        vertices[2].xy = bl; vertices[2].uv = { 0, 0 }; vertices[2].color = context->m_currentColor;
-        vertices[3].xy = bl; vertices[3].uv = { 0, 0 }; vertices[3].color = context->m_currentColor;
-        vertices[4].xy = br; vertices[4].uv = { 0, 0 }; vertices[4].color = context->m_currentColor;
-        vertices[5].xy = tr; vertices[5].uv = { 0, 0 }; vertices[5].color = context->m_currentColor;
+        vertices[0].xy = tl;
+        vertices[0].uv = { 0, 0 };
+        vertices[0].color = context->m_currentColor;
+        vertices[1].xy = tr;
+        vertices[1].uv = { 0, 0 };
+        vertices[1].color = context->m_currentColor;
+        vertices[2].xy = bl;
+        vertices[2].uv = { 0, 0 };
+        vertices[2].color = context->m_currentColor;
+        vertices[3].xy = bl;
+        vertices[3].uv = { 0, 0 };
+        vertices[3].color = context->m_currentColor;
+        vertices[4].xy = br;
+        vertices[4].uv = { 0, 0 };
+        vertices[4].color = context->m_currentColor;
+        vertices[5].xy = tr;
+        vertices[5].uv = { 0, 0 };
+        vertices[5].color = context->m_currentColor;
 
         SubmitVertices(vertices, 6, ETopologyType::Triangles);
     }
@@ -282,8 +319,12 @@ namespace moth_graphics::graphics::vulkan {
         auto const t = CurrentTransform();
         Vertex vertices[2];
 
-        vertices[0].xy = t.TransformPoint(p0); vertices[0].uv = { 0, 0 }; vertices[0].color = context->m_currentColor;
-        vertices[1].xy = t.TransformPoint(p1); vertices[1].uv = { 0, 0 }; vertices[1].color = context->m_currentColor;
+        vertices[0].xy = t.TransformPoint(p0);
+        vertices[0].uv = { 0, 0 };
+        vertices[0].color = context->m_currentColor;
+        vertices[1].xy = t.TransformPoint(p1);
+        vertices[1].uv = { 0, 0 };
+        vertices[1].color = context->m_currentColor;
 
         SubmitVertices(vertices, 2, ETopologyType::Lines);
     }

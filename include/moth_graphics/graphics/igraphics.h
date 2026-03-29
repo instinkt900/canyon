@@ -66,6 +66,13 @@ namespace moth_graphics::graphics {
         /// @param sourceRect Sub-region of the image to sample, or @c nullptr for the full image.
         virtual void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect = nullptr) = 0;
 
+        /// @brief Draw an image at a position, offset so that @p pivot within the image aligns with @p pos.
+        /// @param image  The image to draw at natural size.
+        /// @param pos    Destination point in logical pixels.
+        /// @param pivot  Normalised pivot within the image: {0,0} = top-left, {0.5,0.5} = centre,
+        ///               {1,1} = bottom-right. Defaults to center.
+        virtual void DrawImage(IImage& image, IntVec2 const& pos, FloatVec2 const& pivot = { 0.5f, 0.5f }) = 0;
+
         /// @brief Tile an image to fill a destination rectangle.
         /// @param image The image to tile.
         /// @param destRect Destination rectangle in logical pixels.

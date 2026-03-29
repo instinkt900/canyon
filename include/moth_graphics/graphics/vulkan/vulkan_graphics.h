@@ -70,6 +70,7 @@ namespace moth_graphics::graphics::vulkan {
         void Clear() override;
         void PushTransform(FloatMat4x4 const& transform) override;
         void PopTransform() override;
+        void DrawImage(IImage& image, IntVec2 const& pos, FloatVec2 const& pivot) override;
         void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) override;
         void DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
         void DrawToPNG(IImage& image, std::filesystem::path const& path) override;
