@@ -52,7 +52,7 @@ AI agents (primarily Claude) are used as tools in this project for tasks such as
 
 ### Platform layer
 
-`IPlatform` initialises the windowing system and creates `Window` instances. Two implementations are provided:
+`IPlatform` initializes the windowing system and creates `Window` instances. Two implementations are provided:
 
 - `moth_graphics::platform::sdl::Platform` — SDL2 backend, uses the SDL renderer
 - `moth_graphics::platform::glfw::Platform` — GLFW backend, uses the Vulkan renderer

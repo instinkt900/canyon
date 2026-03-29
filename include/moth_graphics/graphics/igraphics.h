@@ -23,13 +23,13 @@ namespace moth_graphics::graphics {
     /// @brief Abstract 2D rendering interface.
     ///
     /// All drawing operations are batched between a @c Begin() / @c End() pair.
-    /// State (colour, blend mode, clip rect, render target) is set before issuing
+    /// State (color, blend mode, clip rect, render target) is set before issuing
     /// draw calls and remains active until changed.
     class IGraphics {
     public:
         virtual ~IGraphics() {}
 
-        /// @brief Initialise the ImGui backend for the given window.
+        /// @brief Initialize the ImGui backend for the given window.
         /// @param window The window whose native handle ImGui will attach to.
         virtual void InitImgui(moth_graphics::platform::Window const& window) = 0;
 
@@ -46,11 +46,11 @@ namespace moth_graphics::graphics {
         /// @param mode The blend mode to apply.
         virtual void SetBlendMode(BlendMode mode) = 0;
 
-        /// @brief Set the active draw colour for subsequent draw calls.
-        /// @param color The colour to use (also modulates image draws).
+        /// @brief Set the active draw color for subsequent draw calls.
+        /// @param color The color to use (also modulates image draws).
         virtual void SetColor(Color const& color) = 0;
 
-        /// @brief Fill the entire render target with the current colour.
+        /// @brief Fill the entire render target with the current color.
         virtual void Clear() = 0;
 
         /// @brief Push a transform onto the transform stack. Draw calls will apply the active transform to all coordinates.
@@ -69,7 +69,7 @@ namespace moth_graphics::graphics {
         /// @brief Draw an image at a position, offset so that @p pivot within the image aligns with @p pos.
         /// @param image  The image to draw at natural size.
         /// @param pos    Destination point in logical pixels.
-        /// @param pivot  Normalised pivot within the image: {0,0} = top-left, {0.5,0.5} = centre,
+        /// @param pivot  Normalized pivot within the image: {0,0} = top-left, {0.5,0.5} = center,
         ///               {1,1} = bottom-right. Defaults to center.
         virtual void DrawImage(IImage& image, IntVec2 const& pos, FloatVec2 const& pivot = { 0.5f, 0.5f }) = 0;
 
@@ -85,15 +85,15 @@ namespace moth_graphics::graphics {
         /// @param path Destination file path.
         virtual void DrawToPNG(IImage& image, std::filesystem::path const& path) = 0;
 
-        /// @brief Draw an axis-aligned rectangle outline using the current colour.
+        /// @brief Draw an axis-aligned rectangle outline using the current color.
         /// @param rect Rectangle in logical pixels.
         virtual void DrawRectF(FloatRect const& rect) = 0;
 
-        /// @brief Draw a filled axis-aligned rectangle using the current colour.
+        /// @brief Draw a filled axis-aligned rectangle using the current color.
         /// @param rect Rectangle in logical pixels.
         virtual void DrawFillRectF(FloatRect const& rect) = 0;
 
-        /// @brief Draw a line segment using the current colour.
+        /// @brief Draw a line segment using the current color.
         /// @param p0 Start point in logical pixels.
         /// @param p1 End point in logical pixels.
         virtual void DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) = 0;

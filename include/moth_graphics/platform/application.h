@@ -17,8 +17,8 @@ namespace moth_graphics::platform {
     ///
     /// Drives the main loop via @c Ticker, owns the primary @c Window, and
     /// routes platform events to the layer stack. Subclass and override
-    /// @c Startup(), @c PostCreateWindow(), and @c Shutdown() to customise
-    /// application lifecycle behaviour.
+    /// @c Startup(), @c PostCreateWindow(), and @c Shutdown() to customize
+    /// application lifecycle behavior.
     class Application : public Ticker, public moth_ui::EventListener {
     public:
         /// @param platform The platform backend to use (SDL or GLFW).
@@ -28,7 +28,7 @@ namespace moth_graphics::platform {
         Application(IPlatform& platform, std::string const& title, int width, int height);
         ~Application() override = default;
 
-        /// @brief Initialise the platform, create the window, and set up ImGui.
+        /// @brief Initialize the platform, create the window, and set up ImGui.
         void Init();
 
         /// @brief Run the main loop until the application is asked to quit.

@@ -122,7 +122,7 @@ namespace moth_graphics::graphics::sdl {
         SDL_Rect sdlSrcRect = ToSDL(sourceRect != nullptr ? *sourceRect : textureSourceRect);
 
         // Negative src dimensions mean the caller wants a mirrored draw.
-        // SDL doesn't support negative-dimension rects; normalise and flip instead.
+        // SDL doesn't support negative-dimension rects; normalize and flip instead.
         bool flipH = false;
         bool flipV = false;
         if (sdlSrcRect.w < 0) {
@@ -305,7 +305,7 @@ namespace moth_graphics::graphics::sdl {
 
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), prevTarget);
 
-            // Draw the scratch texture at the world-space centre of destRect, rotated.
+            // Draw the scratch texture at the world-space center of destRect, rotated.
             float const localCenterX = static_cast<float>(destWidth) * 0.5f;
             float const localCenterY = static_cast<float>(destHeight) * 0.5f;
             auto const worldCenter = t.TransformPoint({ static_cast<float>(destRect.topLeft.x) + localCenterX,

@@ -10,15 +10,15 @@ namespace moth_graphics::platform {
 
     /// @brief Abstract platform backend.
     ///
-    /// Responsible for initialising the underlying windowing system (SDL, GLFW,
+    /// Responsible for initializing the underlying windowing system (SDL, GLFW,
     /// etc.) and creating windows. Implement this interface to port canyon to a
     /// new platform.
     class IPlatform {
     public:
         virtual ~IPlatform() = default;
 
-        /// @brief Initialise the platform layer.
-        /// @returns @c true on success, @c false if initialisation failed.
+        /// @brief Initialize the platform layer.
+        /// @returns @c true on success, @c false if initialization failed.
         virtual bool Startup() = 0;
 
         /// @brief Tear down the platform layer. Called after all windows are destroyed.
