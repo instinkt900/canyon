@@ -2,18 +2,6 @@ name: Build and Test
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ master ]
-    paths:
-      - 'src/**'
-      - 'include/**'
-      - 'external/**'
-      - 'CMakeLists.txt'
-      - 'conanfile.py'
-      - 'conan/**'
-      - 'version.txt'
-      - '.conan/**'
-      - '.github/workflows/**'
   pull_request:
     branches: [ master ]
     paths:
