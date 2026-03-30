@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
+## [0.9.0] - 2026-03-30
+### Features
+- Add spdlog error logging to all LoadTexturePack failure points
+- Add pivot-based DrawImage overload and fix pivot offset sign
+
+### Bug Fixes
+- Parse moth_packer x/y/w/h rect format in LoadTexturePack
+- Delete copy/move on AssetContext, fix LoadTexturePack return, update Window doc
+- Flush factory caches before vmaDestroyAllocator in SurfaceContext destructor
+- Correct MakeRect args in pivot-based DrawImage (width/height not x2/y2)
+
+### Refactoring
+- Move ImageFactory and FontFactory ownership into AssetContext
+
+### Miscellaneous
+- Standardize to US English spelling throughout
+
+### Changes
+- Update src/graphics/image_factory.cpp
+- Bump version from 0.8.0 to 0.9.0
+
 ## [0.8.0] - 2026-03-25
 ### Features
 - Add ImageFactory fallback image support and TextureFromPixels API
