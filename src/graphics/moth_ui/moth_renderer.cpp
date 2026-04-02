@@ -83,11 +83,11 @@ namespace moth_graphics::graphics {
         m_graphics.DrawFillRectF(static_cast<FloatRect>(rect));
     }
 
-    void MothRenderer::RenderImage(moth_ui::IImage& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) {
+    void MothRenderer::RenderImage(moth_ui::IImage const& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) {
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
 
-        auto* mothImagePtr = dynamic_cast<MothImage*>(&image);
+        auto const* mothImagePtr = dynamic_cast<MothImage const*>(&image);
         if (mothImagePtr == nullptr) {
             return;
         }
