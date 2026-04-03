@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
+## [0.10.0] - 2026-04-03
+### Features
+- Add SpriteSheet/SpriteSheetFactory and MothFlipbook/MothFlipbookFactory
+- Add Sprite class with SpriteSheet, DrawSprite, and manual frame control
+- Expose SpriteSheetFactory on AssetContext; add Sprite width/height accessors
+- Add IFont::Measure and update DrawText to accept string_view
+
+### Bug Fixes
+- Update MothRenderer and MothImage to match IRenderer const change
+- Remove spurious override on LoadTexturePack in MothImageFactory
+- Flush SpriteSheetFactory cache and fallback image before VMA teardown
+- Null-guard sprites, fix spriteRightPos width, batch Update, validate spritesheet JSON, fix GetCurrentFrameRect return type
+- Clear m_playing on empty SetClip; add type and bounds checks in SpriteSheetFactory
+- Use error_code filesystem calls and validate MaxFrames against sheet capacity
+- Open spritesheet file and log errors using absPath consistently
+
+### Refactoring
+- Remove FlushCache override from MothImageFactory
+
+### Miscellaneous
+- Update example to use two sprites with Measure-based positioning
+- Bumping moth_ui version dep
+- Bounding moth_ui deps
+
+### Changes
+- Bump version from 0.9.0 to 0.10.0
+
 ## [0.9.0] - 2026-03-30
 ### Features
 - Add spdlog error logging to all LoadTexturePack failure points
