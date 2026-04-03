@@ -28,7 +28,7 @@ class MothGraphicsExample(ConanFile):
         # moth_graphics is built from source via add_subdirectory; list its
         # external Conan dependencies here so they are resolved by this profile.
         self.requires("spdlog/[~1.14]", transitive_headers=True)
-        self.requires("moth_ui/[>=1.6.0]", transitive_headers=True)
+        self.requires("moth_ui/[>=1.6.0 <2.0.0]", transitive_headers=True)
         if not self.options.disable_sdl and self.settings.os == "Windows":
             self.requires("sdl/[~2.28]", override=True, transitive_headers=True)
             self.requires("sdl_image/[~2.0]")
