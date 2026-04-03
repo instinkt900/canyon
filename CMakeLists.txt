@@ -25,8 +25,13 @@ set(SOURCES
     external/imgui/imgui_draw.cpp
     external/imgui/imgui_tables.cpp
     external/imgui/imgui_widgets.cpp
+    src/graphics/sprite.cpp
+    src/graphics/spritesheet.cpp
+    src/graphics/spritesheet_factory.cpp
     src/graphics/font_factory.cpp
     src/graphics/image_factory.cpp
+    src/graphics/moth_ui/moth_flipbook.cpp
+    src/graphics/moth_ui/moth_flipbook_factory.cpp
     src/graphics/moth_ui/moth_font_factory.cpp
     src/graphics/moth_ui/moth_image.cpp
     src/graphics/moth_ui/moth_image_factory.cpp

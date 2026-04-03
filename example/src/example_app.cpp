@@ -6,7 +6,7 @@
 #include "moth_graphics/platform/window.h"
 
 void startExampleApp(moth_graphics::platform::IPlatform& platform) {
-    auto application = std::make_unique<moth_graphics::platform::Application>(platform, "Canyon Example", 640, 480);
+    auto application = std::make_unique<moth_graphics::platform::Application>(platform, "Moth Graphics Example", 640, 480);
     application->Init();
 
     auto* window = application->GetWindow();

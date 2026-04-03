@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <system_error>
 #include <list>
 #include <memory>
 #include <stack>

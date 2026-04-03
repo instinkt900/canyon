@@ -29,6 +29,8 @@ namespace moth_graphics::graphics::vulkan {
         static std::unique_ptr<Font> Load(std::filesystem::path const& path, int size, SurfaceContext& context);
         virtual ~Font();
 
+        IntVec2 Measure(std::string_view text) const override;
+
         int32_t GetLineHeight() const { return m_lineHeight; }
         int32_t GetAscent() const { return m_ascent; }
         int32_t GetDescent() const { return m_descent; }

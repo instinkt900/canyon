@@ -11,6 +11,7 @@ namespace moth_graphics::graphics {
 
     void ImageFactory::FlushCache() {
         m_cachedImages.clear();
+        m_fallbackDesc.reset();
     }
 
     bool ImageFactory::LoadTexturePack(std::filesystem::path const& path) {

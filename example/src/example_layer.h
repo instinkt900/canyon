@@ -19,4 +19,6 @@ private:
 
     moth_graphics::graphics::IGraphics& m_graphics;
     std::unique_ptr<moth_graphics::graphics::IFont> m_font;
+    std::unique_ptr<moth_graphics::graphics::Sprite> m_spriteLeft;
+    std::unique_ptr<moth_graphics::graphics::Sprite> m_spriteRight;
 };

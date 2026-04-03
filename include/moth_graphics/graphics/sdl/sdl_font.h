@@ -13,9 +13,9 @@ namespace moth_graphics::graphics::sdl {
         explicit Font(CachedFontRef fontObj);
         ~Font() override = default;
 
-        CachedFontRef GetFontObj() const {
-            return m_fontObj;
-        }
+        CachedFontRef GetFontObj() const { return m_fontObj; }
+
+        IntVec2 Measure(std::string_view text) const override;
 
         static std::unique_ptr<IFont> Load(SDL_Renderer& renderer, const std::filesystem::path& path, int size);
 
