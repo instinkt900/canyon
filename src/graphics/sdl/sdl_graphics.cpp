@@ -239,12 +239,13 @@ namespace moth_graphics::graphics::sdl {
         SDL_RenderDrawLineF(m_surfaceContext.GetRenderer(), wp0.x, wp0.y, wp1.x, wp1.y);
     }
 
-    void Graphics::DrawText(std::string const& text, graphics::IFont& font, IntRect const& destRect, graphics::TextHorizAlignment horizontalAlignment, graphics::TextVertAlignment verticalAlignment) {
+    void Graphics::DrawText(std::string_view text, graphics::IFont& font, IntRect const& destRect, graphics::TextHorizAlignment horizontalAlignment, graphics::TextVertAlignment verticalAlignment) {
+        std::string const textStr(text);
         auto const fcFont = dynamic_cast<Font&>(font).GetFontObj();
 
         auto const destWidth = destRect.bottomRight.x - destRect.topLeft.x;
         auto const destHeight = destRect.bottomRight.y - destRect.topLeft.y;
-        auto const textHeight = FC_GetColumnHeight(fcFont.get(), destWidth, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
+        auto const textHeight = FC_GetColumnHeight(fcFont.get(), destWidth, "%s", textStr.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
 
         // local x/y: position within destRect for the text origin, accounting for alignment
         auto x = 0.0f;
@@ -284,7 +285,7 @@ namespace moth_graphics::graphics::sdl {
             // Fast path: no rotation — draw directly at the transformed world position.
             auto const worldPos = t.TransformPoint({ static_cast<float>(destRect.topLeft.x) + x,
                                                      static_cast<float>(destRect.topLeft.y) + y });
-            FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), worldPos.x, worldPos.y, destWidth, effect, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
+            FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), worldPos.x, worldPos.y, destWidth, effect, "%s", textStr.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
         } else {
             // Rotation path: render text to a scratch texture, then draw it rotated.
             // Grow the scratch texture only when the current one is too small.
@@ -301,7 +302,7 @@ namespace moth_graphics::graphics::sdl {
             SDL_SetRenderDrawColor(m_surfaceContext.GetRenderer(), 0, 0, 0, 0);
             SDL_RenderClear(m_surfaceContext.GetRenderer());
 
-            FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), x, y, destWidth, effect, "%s", text.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
+            FC_DrawColumnEffect(fcFont.get(), m_surfaceContext.GetRenderer(), x, y, destWidth, effect, "%s", textStr.c_str()); // NOLINT(cppcoreguidelines-pro-type-vararg)
 
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), prevTarget);
 

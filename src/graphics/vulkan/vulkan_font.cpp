@@ -244,6 +244,10 @@ namespace moth_graphics::graphics::vulkan {
         return width;
     }
 
+    IntVec2 Font::Measure(std::string_view text) const {
+        return { GetStringWidth(text), m_lineHeight };
+    }
+
     int32_t Font::GetColumnHeight(std::string const& str, int32_t width) const {
         auto const lines = WrapString(str, width);
         return static_cast<int32_t>(m_lineHeight * lines.size());

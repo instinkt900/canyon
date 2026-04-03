@@ -329,7 +329,8 @@ namespace moth_graphics::graphics::vulkan {
         SubmitVertices(vertices, 2, ETopologyType::Lines);
     }
 
-    void Graphics::DrawText(std::string const& text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment) {
+    void Graphics::DrawText(std::string_view text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment) {
+        std::string const textStr(text);
         auto* context = CurrentContext();
         context->m_currentBlendMode = BlendMode::Alpha; // force alpha blending for text
         Font& vulkanFont = dynamic_cast<Font&>(font);
@@ -355,7 +356,7 @@ namespace moth_graphics::graphics::vulkan {
             context->m_glyphCount++;
         };
 
-        auto const lines = vulkanFont.WrapString(text, destRect.w());
+        auto const lines = vulkanFont.WrapString(textStr, destRect.w());
         auto const singleLineHeight = vulkanFont.GetLineHeight();
         auto const singleLineDescent = vulkanFont.GetDescent();
         auto const linesHeight = static_cast<int32_t>(lines.size() * singleLineHeight);

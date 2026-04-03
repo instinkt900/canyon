@@ -136,7 +136,7 @@ namespace moth_graphics::graphics {
         /// @param destRect Bounding rectangle in logical pixels.
         /// @param horizontalAlignment Horizontal alignment within @p destRect.
         /// @param verticalAlignment Vertical alignment within @p destRect.
-        virtual void DrawText(std::string const& text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment = TextHorizAlignment::Left, TextVertAlignment verticalAlignment = TextVertAlignment::Top) = 0;
+        virtual void DrawText(std::string_view text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment = TextHorizAlignment::Left, TextVertAlignment verticalAlignment = TextVertAlignment::Top) = 0;
 
         /// @brief Set the scissor clip rectangle. Pass @c nullptr to clear clipping.
         /// @param rect Clip rectangle in logical pixels, or @c nullptr to disable.
