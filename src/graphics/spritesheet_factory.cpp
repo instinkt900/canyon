@@ -37,9 +37,9 @@ namespace moth_graphics::graphics {
             return nullptr;
         }
 
-        std::ifstream ifile(path);
+        std::ifstream ifile(absPath);
         if (!ifile.is_open()) {
-            spdlog::error("SpriteSheetFactory: failed to open '{}'", path.string());
+            spdlog::error("SpriteSheetFactory: failed to open '{}'", absPath.string());
             return nullptr;
         }
 
