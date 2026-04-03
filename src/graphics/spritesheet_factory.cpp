@@ -14,14 +14,25 @@ namespace moth_graphics::graphics {
     }
 
     std::shared_ptr<SpriteSheet> SpriteSheetFactory::GetSpriteSheet(std::filesystem::path const& path) {
-        auto const key = std::filesystem::absolute(path).lexically_normal().string();
+        std::error_code ec;
+        auto const absPath = std::filesystem::absolute(path, ec);
+        if (ec) {
+            spdlog::error("SpriteSheetFactory: failed to resolve path '{}': {}", path.string(), ec.message());
+            return nullptr;
+        }
+        auto const key = absPath.lexically_normal().string();
 
         auto const cacheIt = m_cache.find(key);
         if (cacheIt != std::end(m_cache)) {
             return cacheIt->second;
         }
 
-        if (!std::filesystem::exists(path)) {
+        bool const fileExists = std::filesystem::exists(absPath, ec);
+        if (ec) {
+            spdlog::error("SpriteSheetFactory: failed to check existence of '{}': {}", path.string(), ec.message());
+            return nullptr;
+        }
+        if (!fileExists) {
             spdlog::error("SpriteSheetFactory: '{}' does not exist", path.string());
             return nullptr;
         }
@@ -59,8 +70,13 @@ namespace moth_graphics::graphics {
             return nullptr;
         }
 
+        ec = {};
         auto const imageAbsPath = std::filesystem::absolute(
-            rootPath / json["image"].get<std::string>()).lexically_normal();
+            rootPath / json["image"].get<std::string>(), ec).lexically_normal();
+        if (ec) {
+            spdlog::error("SpriteSheetFactory: '{}' failed to resolve image path: {}", path.string(), ec.message());
+            return nullptr;
+        }
 
         auto image = m_context.ImageFromFile(imageAbsPath);
         if (!image) {
@@ -95,6 +111,12 @@ namespace moth_graphics::graphics {
         }
         if (sheetDesc.MaxFrames < 0) {
             spdlog::error("SpriteSheetFactory: '{}' max_frames must be >= 0 (got {})", path.string(), sheetDesc.MaxFrames);
+            return nullptr;
+        }
+        int const capacity = sheetDesc.SheetCells.x * sheetDesc.SheetCells.y;
+        if (sheetDesc.MaxFrames > capacity) {
+            spdlog::error("SpriteSheetFactory: '{}' max_frames ({}) exceeds sheet capacity ({}x{}={})",
+                          path.string(), sheetDesc.MaxFrames, sheetDesc.SheetCells.x, sheetDesc.SheetCells.y, capacity);
             return nullptr;
         }
 

@@ -17,6 +17,12 @@ namespace moth_graphics::graphics {
                           desc.FrameDimensions.x, desc.FrameDimensions.y);
             return nullptr;
         }
+        int const capacity = desc.SheetCells.x * desc.SheetCells.y;
+        if (desc.MaxFrames > capacity) {
+            spdlog::error("Sprite::Create: MaxFrames ({}) exceeds sheet capacity ({}x{}={})",
+                          desc.MaxFrames, desc.SheetCells.x, desc.SheetCells.y, capacity);
+            return nullptr;
+        }
 
         return std::unique_ptr<Sprite>(new Sprite(std::move(spriteSheet), desc));
     }
