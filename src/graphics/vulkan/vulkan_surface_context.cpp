@@ -134,6 +134,7 @@ namespace moth_graphics::graphics::vulkan {
         // while the allocator is still alive.
         m_assetContext.GetImageFactory().FlushCache();
         m_assetContext.GetFontFactory().ClearFonts();
+        m_assetContext.GetSpriteSheetFactory().FlushCache();
         vkDestroyDescriptorPool(m_vkDevice, m_vkDescriptorPool, nullptr);
         vkDestroyCommandPool(m_vkDevice, m_vkCommandPool, nullptr);
         vmaDestroyAllocator(m_vmaAllocator);
