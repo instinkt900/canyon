@@ -3,17 +3,17 @@
 
 namespace moth_graphics::graphics {
     namespace {
-        moth_ui::IFlipbook::LoopType ToMothLoopType(graphics::ISpriteSheet::LoopType t) {
+        moth_ui::IFlipbook::LoopType ToMothLoopType(graphics::SpriteSheet::LoopType t) {
             switch (t) {
-            case graphics::ISpriteSheet::LoopType::Stop:  return moth_ui::IFlipbook::LoopType::Stop;
-            case graphics::ISpriteSheet::LoopType::Reset: return moth_ui::IFlipbook::LoopType::Reset;
-            case graphics::ISpriteSheet::LoopType::Loop:  return moth_ui::IFlipbook::LoopType::Loop;
+            case graphics::SpriteSheet::LoopType::Stop:  return moth_ui::IFlipbook::LoopType::Stop;
+            case graphics::SpriteSheet::LoopType::Reset: return moth_ui::IFlipbook::LoopType::Reset;
+            case graphics::SpriteSheet::LoopType::Loop:  return moth_ui::IFlipbook::LoopType::Loop;
             default:                                      return moth_ui::IFlipbook::LoopType::Stop;
             }
         }
     }
 
-    MothFlipbook::MothFlipbook(std::shared_ptr<graphics::ISpriteSheet> spriteSheet)
+    MothFlipbook::MothFlipbook(std::shared_ptr<graphics::SpriteSheet> spriteSheet)
         : m_spriteSheet(std::move(spriteSheet))
         , m_image(m_spriteSheet->GetImage()) {
     }
@@ -23,7 +23,7 @@ namespace moth_graphics::graphics {
     }
 
     void MothFlipbook::GetSheetDesc(moth_ui::IFlipbook::SheetDesc& outDesc) const {
-        graphics::ISpriteSheet::SheetDesc internal;
+        graphics::SpriteSheet::SheetDesc internal;
         m_spriteSheet->GetSheetDesc(internal);
         outDesc.FrameDimensions = internal.FrameDimensions;
         outDesc.SheetCells      = internal.SheetCells;
@@ -36,7 +36,7 @@ namespace moth_graphics::graphics {
     }
 
     bool MothFlipbook::GetClipDesc(std::string_view name, moth_ui::IFlipbook::ClipDesc& outDesc) const {
-        graphics::ISpriteSheet::ClipDesc internal;
+        graphics::SpriteSheet::ClipDesc internal;
         if (!m_spriteSheet->GetClipDesc(name, internal)) {
             return false;
         }

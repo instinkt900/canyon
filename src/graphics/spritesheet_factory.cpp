@@ -13,7 +13,7 @@ namespace moth_graphics::graphics {
         m_cache.clear();
     }
 
-    std::shared_ptr<ISpriteSheet> SpriteSheetFactory::GetSpriteSheet(std::filesystem::path const& path) {
+    std::shared_ptr<SpriteSheet> SpriteSheetFactory::GetSpriteSheet(std::filesystem::path const& path) {
         auto const key = std::filesystem::absolute(path).lexically_normal().string();
 
         auto const cacheIt = m_cache.find(key);
@@ -64,7 +64,7 @@ namespace moth_graphics::graphics {
         }
         auto sharedImage = std::shared_ptr<IImage>(std::move(image));
 
-        ISpriteSheet::SheetDesc sheetDesc;
+        SpriteSheet::SheetDesc sheetDesc;
         sheetDesc.FrameDimensions.x = json["frame_width"].get<int>();
         sheetDesc.FrameDimensions.y = json["frame_height"].get<int>();
         sheetDesc.SheetCells.x      = json["frame_cols"].get<int>();
@@ -91,11 +91,11 @@ namespace moth_graphics::graphics {
                     loopStr = clipJson["loop"].get<std::string>();
                 }
                 if (loopStr == "stop") {
-                    entry.desc.Loop = ISpriteSheet::LoopType::Stop;
+                    entry.desc.Loop = SpriteSheet::LoopType::Stop;
                 } else if (loopStr == "reset") {
-                    entry.desc.Loop = ISpriteSheet::LoopType::Reset;
+                    entry.desc.Loop = SpriteSheet::LoopType::Reset;
                 } else {
-                    entry.desc.Loop = ISpriteSheet::LoopType::Loop;
+                    entry.desc.Loop = SpriteSheet::LoopType::Loop;
                 }
 
                 clips.push_back(std::move(entry));

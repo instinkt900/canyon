@@ -1,7 +1,7 @@
 #pragma once
 
 #include "moth_graphics/graphics/asset_context.h"
-#include "moth_graphics/graphics/ispritesheet.h"
+#include "moth_graphics/graphics/spritesheet.h"
 
 #include <filesystem>
 #include <memory>
@@ -26,10 +26,10 @@ namespace moth_graphics::graphics {
         /// @brief Load or retrieve a cached sprite sheet by descriptor path.
         /// @param path Path to the .flipbook.json descriptor file.
         /// @return Loaded sprite sheet, or @c nullptr on failure.
-        std::shared_ptr<ISpriteSheet> GetSpriteSheet(std::filesystem::path const& path);
+        std::shared_ptr<SpriteSheet> GetSpriteSheet(std::filesystem::path const& path);
 
     private:
         AssetContext& m_context;
-        std::unordered_map<std::string, std::shared_ptr<ISpriteSheet>> m_cache;
+        std::unordered_map<std::string, std::shared_ptr<SpriteSheet>> m_cache;
     };
 }

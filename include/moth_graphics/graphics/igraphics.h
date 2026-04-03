@@ -5,6 +5,7 @@
 #include "moth_graphics/graphics/ifont.h"
 #include "moth_graphics/graphics/iimage.h"
 #include "moth_graphics/graphics/itarget.h"
+#include "moth_graphics/graphics/sprite.h"
 #include "moth_graphics/graphics/text_alignment.h"
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/transform.h"
@@ -59,6 +60,37 @@ namespace moth_graphics::graphics {
 
         /// @brief Pop the top transform, restoring the previous one.
         virtual void PopTransform() = 0;
+
+        /// @brief Draw the current frame of a sprite into a destination rectangle. The active transform is applied.
+        /// @param sprite  The sprite to draw; must be loaded with a valid clip set.
+        /// @param destRect Destination rectangle in local (pre-transform) space.
+        void DrawSprite(Sprite& sprite, IntRect const& destRect) {
+            if (auto* image = sprite.GetImage()) {
+                auto const frameRect = sprite.GetCurrentFrameRect();
+                DrawImage(*image, destRect, frameRect ? &*frameRect : nullptr);
+            }
+        }
+
+        /// @brief Draw the current frame of a sprite at a position, offset by @p pivot.
+        /// @param sprite The sprite to draw at its natural frame size.
+        /// @param pos    Destination point in logical pixels.
+        /// @param pivot  Normalized pivot within the frame: {0,0} = top-left, {0.5,0.5} = center,
+        ///               {1,1} = bottom-right. Defaults to center.
+        void DrawSprite(Sprite& sprite, IntVec2 const& pos, FloatVec2 const& pivot = { 0.5f, 0.5f }) {
+            if (auto* image = sprite.GetImage()) {
+                auto const frameRect = sprite.GetCurrentFrameRect();
+                if (frameRect) {
+                    IntRect const destRect = MakeRect(
+                        pos.x - static_cast<int>(pivot.x * static_cast<float>(frameRect->w())),
+                        pos.y - static_cast<int>(pivot.y * static_cast<float>(frameRect->h())),
+                        frameRect->w(),
+                        frameRect->h());
+                    DrawImage(*image, destRect, &*frameRect);
+                } else {
+                    DrawImage(*image, pos, pivot);
+                }
+            }
+        }
 
         /// @brief Draw an image into a destination rectangle in local space. The active transform is applied.
         /// @param image The image to draw.
