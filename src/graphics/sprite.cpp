@@ -32,12 +32,17 @@ namespace moth_graphics::graphics {
         m_currentClip.reset();
         m_currentClipName.clear();
 
+        if (name.empty()) {
+            m_playing = false;
+            return;
+        }
+
         SpriteSheet::ClipDesc clipDesc;
         if (m_spriteSheet->GetClipDesc(name, clipDesc)) {
             m_currentClip = clipDesc;
             m_currentClipName = name;
             m_currentFrame = m_currentClip->Start;
-        } else if (!name.empty()) {
+        } else {
             spdlog::warn("Sprite::SetClip: clip '{}' not found", name);
             m_playing = false;
         }

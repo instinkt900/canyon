@@ -52,6 +52,12 @@ namespace moth_graphics::graphics {
             spdlog::error("SpriteSheetFactory: '{}' missing required frame layout fields", path.string());
             return nullptr;
         }
+        if (!json["frame_width"].is_number_integer() || !json["frame_height"].is_number_integer() ||
+            !json["frame_cols"].is_number_integer()  || !json["frame_rows"].is_number_integer()   ||
+            !json["max_frames"].is_number_integer()) {
+            spdlog::error("SpriteSheetFactory: '{}' frame layout fields must be integers", path.string());
+            return nullptr;
+        }
 
         auto const imageAbsPath = std::filesystem::absolute(
             rootPath / json["image"].get<std::string>()).lexically_normal();
@@ -92,6 +98,10 @@ namespace moth_graphics::graphics {
             return nullptr;
         }
 
+        int const totalFrames = sheetDesc.MaxFrames > 0
+            ? sheetDesc.MaxFrames
+            : sheetDesc.SheetCells.x * sheetDesc.SheetCells.y;
+
         std::vector<SpriteSheet::ClipEntry> clips;
         if (json.contains("clips") && json["clips"].is_array()) {
             for (auto const& clipJson : json["clips"]) {
@@ -101,11 +111,33 @@ namespace moth_graphics::graphics {
                                  path.string());
                     continue;
                 }
+                if (!clipJson["name"].is_string()) {
+                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip: 'name' must be a string", path.string());
+                    continue;
+                }
+                if (!clipJson["start"].is_number_integer() || !clipJson["end"].is_number_integer() ||
+                    !clipJson["fps"].is_number_integer()) {
+                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip '{}': start/end/fps must be integers",
+                                 path.string(), clipJson["name"].get<std::string>());
+                    continue;
+                }
+
                 SpriteSheet::ClipEntry entry;
                 entry.name       = clipJson["name"].get<std::string>();
                 entry.desc.Start = clipJson["start"].get<int>();
                 entry.desc.End   = clipJson["end"].get<int>();
                 entry.desc.FPS   = clipJson["fps"].get<int>();
+
+                if (entry.desc.Start < 0 || entry.desc.End < entry.desc.Start || entry.desc.End >= totalFrames) {
+                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip '{}': start={} end={} out of range [0, {})",
+                                 path.string(), entry.name, entry.desc.Start, entry.desc.End, totalFrames);
+                    continue;
+                }
+                if (entry.desc.FPS <= 0) {
+                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip '{}': fps must be > 0 (got {})",
+                                 path.string(), entry.name, entry.desc.FPS);
+                    continue;
+                }
 
                 std::string loopStr = "loop";
                 if (clipJson.contains("loop") && clipJson["loop"].is_string()) {
