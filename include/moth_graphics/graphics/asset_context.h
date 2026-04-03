@@ -12,6 +12,7 @@
 namespace moth_graphics::graphics {
     class FontFactory;
     class ImageFactory;
+    class SpriteSheetFactory;
 
     /// @brief Per-window asset loading interface.
     ///
@@ -28,6 +29,9 @@ namespace moth_graphics::graphics {
 
         /// @brief Returns the cached font factory for this context.
         virtual FontFactory& GetFontFactory() = 0;
+
+        /// @brief Returns the cached sprite sheet factory for this context.
+        virtual SpriteSheetFactory& GetSpriteSheetFactory() = 0;
 
         /// @brief Wrap an existing texture in a new image covering the full texture.
         virtual std::unique_ptr<IImage> NewImage(std::shared_ptr<ITexture> texture) = 0;

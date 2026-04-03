@@ -17,13 +17,13 @@ namespace moth_graphics::graphics {
     /// current frame.
     ///
     /// A Sprite must always have an associated sprite sheet. Use Create() to
-    /// construct one; it returns @c std::nullopt if the sheet descriptor is invalid.
+    /// construct one; it returns @c nullptr if the sheet descriptor is invalid.
     class Sprite {
     public:
         /// @brief Attempt to create a Sprite from a sprite sheet.
         /// @param spriteSheet The sprite sheet to animate. Must not be null.
-        /// @return A Sprite on success, or @c std::nullopt if the sheet descriptor is invalid.
-        static std::optional<Sprite> Create(std::shared_ptr<SpriteSheet> spriteSheet);
+        /// @return A Sprite on success, or @c nullptr if the sheet descriptor is invalid.
+        static std::unique_ptr<Sprite> Create(std::shared_ptr<SpriteSheet> spriteSheet);
 
         Sprite(Sprite&&) = default;
         Sprite& operator=(Sprite&&) = default;
@@ -62,6 +62,12 @@ namespace moth_graphics::graphics {
 
         /// @brief Returns the source rect of the current frame within the sheet image.
         std::optional<IntRect> GetCurrentFrameRect() const;
+
+        /// @brief Returns the frame width in pixels.
+        int GetWidth() const { return m_sheetDesc.FrameDimensions.x; }
+
+        /// @brief Returns the frame height in pixels.
+        int GetHeight() const { return m_sheetDesc.FrameDimensions.y; }
 
         /// @brief Returns the underlying sprite sheet image.
         IImage* GetImage() const;

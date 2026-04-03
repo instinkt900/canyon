@@ -2,10 +2,10 @@
 #include "moth_graphics/graphics/sprite.h"
 
 namespace moth_graphics::graphics {
-    std::optional<Sprite> Sprite::Create(std::shared_ptr<SpriteSheet> spriteSheet) {
+    std::unique_ptr<Sprite> Sprite::Create(std::shared_ptr<SpriteSheet> spriteSheet) {
         if (!spriteSheet) {
             spdlog::error("Sprite::Create: spriteSheet must not be null");
-            return std::nullopt;
+            return nullptr;
         }
 
         SpriteSheet::SheetDesc desc;
@@ -15,10 +15,10 @@ namespace moth_graphics::graphics {
             spdlog::error("Sprite::Create: invalid sheet descriptor (cells={}x{} frame={}x{})",
                           desc.SheetCells.x, desc.SheetCells.y,
                           desc.FrameDimensions.x, desc.FrameDimensions.y);
-            return std::nullopt;
+            return nullptr;
         }
 
-        return Sprite(std::move(spriteSheet), desc);
+        return std::unique_ptr<Sprite>(new Sprite(std::move(spriteSheet), desc));
     }
 
     Sprite::Sprite(std::shared_ptr<SpriteSheet> spriteSheet, SpriteSheet::SheetDesc sheetDesc)
