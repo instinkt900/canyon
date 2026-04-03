@@ -67,7 +67,7 @@ namespace moth_graphics::graphics {
         void DrawSprite(Sprite& sprite, IntRect const& destRect) {
             if (auto* image = sprite.GetImage()) {
                 auto const frameRect = sprite.GetCurrentFrameRect();
-                DrawImage(*image, destRect, frameRect ? &*frameRect : nullptr);
+                DrawImage(*image, destRect, &frameRect);
             }
         }
 
@@ -79,16 +79,12 @@ namespace moth_graphics::graphics {
         void DrawSprite(Sprite& sprite, IntVec2 const& pos, FloatVec2 const& pivot = { 0.5f, 0.5f }) {
             if (auto* image = sprite.GetImage()) {
                 auto const frameRect = sprite.GetCurrentFrameRect();
-                if (frameRect) {
-                    IntRect const destRect = MakeRect(
-                        pos.x - static_cast<int>(pivot.x * static_cast<float>(frameRect->w())),
-                        pos.y - static_cast<int>(pivot.y * static_cast<float>(frameRect->h())),
-                        frameRect->w(),
-                        frameRect->h());
-                    DrawImage(*image, destRect, &*frameRect);
-                } else {
-                    DrawImage(*image, pos, pivot);
-                }
+                IntRect const destRect = MakeRect(
+                    pos.x - static_cast<int>(pivot.x * static_cast<float>(frameRect.w())),
+                    pos.y - static_cast<int>(pivot.y * static_cast<float>(frameRect.h())),
+                    frameRect.w(),
+                    frameRect.h());
+                DrawImage(*image, destRect, &frameRect);
             }
         }
 

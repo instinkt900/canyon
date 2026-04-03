@@ -61,7 +61,7 @@ namespace moth_graphics::graphics {
         void SetFrame(int frame);
 
         /// @brief Returns the source rect of the current frame within the sheet image.
-        std::optional<IntRect> GetCurrentFrameRect() const;
+        IntRect GetCurrentFrameRect() const;
 
         /// @brief Returns the frame width in pixels.
         int GetWidth() const { return m_sheetDesc.FrameDimensions.x; }

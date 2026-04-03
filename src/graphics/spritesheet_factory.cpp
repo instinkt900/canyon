@@ -71,6 +71,27 @@ namespace moth_graphics::graphics {
         sheetDesc.SheetCells.y      = json["frame_rows"].get<int>();
         sheetDesc.MaxFrames         = json["max_frames"].get<int>();
 
+        if (sheetDesc.FrameDimensions.x <= 0) {
+            spdlog::error("SpriteSheetFactory: '{}' frame_width must be > 0 (got {})", path.string(), sheetDesc.FrameDimensions.x);
+            return nullptr;
+        }
+        if (sheetDesc.FrameDimensions.y <= 0) {
+            spdlog::error("SpriteSheetFactory: '{}' frame_height must be > 0 (got {})", path.string(), sheetDesc.FrameDimensions.y);
+            return nullptr;
+        }
+        if (sheetDesc.SheetCells.x <= 0) {
+            spdlog::error("SpriteSheetFactory: '{}' frame_cols must be > 0 (got {})", path.string(), sheetDesc.SheetCells.x);
+            return nullptr;
+        }
+        if (sheetDesc.SheetCells.y <= 0) {
+            spdlog::error("SpriteSheetFactory: '{}' frame_rows must be > 0 (got {})", path.string(), sheetDesc.SheetCells.y);
+            return nullptr;
+        }
+        if (sheetDesc.MaxFrames < 0) {
+            spdlog::error("SpriteSheetFactory: '{}' max_frames must be >= 0 (got {})", path.string(), sheetDesc.MaxFrames);
+            return nullptr;
+        }
+
         std::vector<SpriteSheet::ClipEntry> clips;
         if (json.contains("clips") && json["clips"].is_array()) {
             for (auto const& clipJson : json["clips"]) {

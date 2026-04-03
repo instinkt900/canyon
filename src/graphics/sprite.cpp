@@ -70,33 +70,37 @@ namespace moth_graphics::graphics {
         float const frameDurationMs = 1000.0f / static_cast<float>(m_currentClip->FPS);
         m_accumulatedMs += static_cast<float>(ticks);
 
-        while (m_playing && m_accumulatedMs >= frameDurationMs) {
-            m_accumulatedMs -= frameDurationMs;
-            ++m_currentFrame;
-            if (m_currentFrame > m_currentClip->End) {
-                switch (m_currentClip->Loop) {
-                case SpriteSheet::LoopType::Loop:
-                    m_currentFrame = m_currentClip->Start;
-                    break;
-                case SpriteSheet::LoopType::Reset:
-                    m_accumulatedMs = 0.0f;
-                    m_currentFrame = m_currentClip->Start;
-                    m_playing = false;
-                    break;
-                case SpriteSheet::LoopType::Stop:
-                    m_accumulatedMs = 0.0f;
-                    m_currentFrame = m_currentClip->End;
-                    m_playing = false;
-                    break;
-                default:
-                    m_playing = false;
-                    break;
-                }
+        int const framesToAdvance = static_cast<int>(m_accumulatedMs / frameDurationMs);
+        if (framesToAdvance == 0) {
+            return;
+        }
+        m_accumulatedMs -= static_cast<float>(framesToAdvance) * frameDurationMs;
+
+        m_currentFrame += framesToAdvance;
+        if (m_currentFrame > m_currentClip->End) {
+            int const clipLength = m_currentClip->End - m_currentClip->Start + 1;
+            switch (m_currentClip->Loop) {
+            case SpriteSheet::LoopType::Loop:
+                m_currentFrame = m_currentClip->Start + (m_currentFrame - m_currentClip->Start) % clipLength;
+                break;
+            case SpriteSheet::LoopType::Reset:
+                m_accumulatedMs = 0.0f;
+                m_currentFrame = m_currentClip->Start;
+                m_playing = false;
+                break;
+            case SpriteSheet::LoopType::Stop:
+                m_accumulatedMs = 0.0f;
+                m_currentFrame = m_currentClip->End;
+                m_playing = false;
+                break;
+            default:
+                m_playing = false;
+                break;
             }
         }
     }
 
-    std::optional<IntRect> Sprite::GetCurrentFrameRect() const {
+    IntRect Sprite::GetCurrentFrameRect() const {
         int const col = m_currentFrame % m_sheetDesc.SheetCells.x;
         int const row = m_currentFrame / m_sheetDesc.SheetCells.x;
         return MakeRect(col * m_sheetDesc.FrameDimensions.x,
