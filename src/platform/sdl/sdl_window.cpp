@@ -33,13 +33,48 @@ namespace {
         }
     }
 
+    // Patch windowID for keyboard/mouse events that SDL reports with windowID == 0
+    // (common when no window has focus). SDL2 guarantees windowID sits at the same
+    // struct offset across all event types, so event.window.windowID is a valid
+    // read regardless of which union member is active.
+    void ResolveInputEventWindowID(SDL_Event& event) {
+        auto focusedId = [](SDL_Window* w) -> Uint32 { return w ? SDL_GetWindowID(w) : 0; };
+        switch (event.type) {
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+            if (event.key.windowID == 0) { event.key.windowID = focusedId(SDL_GetKeyboardFocus()); }
+            break;
+        case SDL_TEXTINPUT:
+            if (event.text.windowID == 0) { event.text.windowID = focusedId(SDL_GetKeyboardFocus()); }
+            break;
+        case SDL_TEXTEDITING:
+            if (event.edit.windowID == 0) { event.edit.windowID = focusedId(SDL_GetKeyboardFocus()); }
+            break;
+        case SDL_MOUSEMOTION:
+            if (event.motion.windowID == 0) { event.motion.windowID = focusedId(SDL_GetMouseFocus()); }
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+            if (event.button.windowID == 0) { event.button.windowID = focusedId(SDL_GetMouseFocus()); }
+            break;
+        case SDL_MOUSEWHEEL:
+            if (event.wheel.windowID == 0) { event.wheel.windowID = focusedId(SDL_GetMouseFocus()); }
+            break;
+        default:
+            break;
+        }
+    }
+
     bool CollectSDLEventsForWindow(uint32_t windowId, std::vector<SDL_Event>* outEvents) {
         std::lock_guard lock(EventFetchMutex);
 
         SDL_Event event{};
         while (SDL_PollEvent(&event) != 0) {
-            // Retain window-targeted events, input events (which may have windowID == 0
-            // when unfocused), and SDL_QUIT. Other non-window events are discarded.
+            if (IsInputEvent(event)) {
+                ResolveInputEventWindowID(event);
+            }
+            // Retain window-targeted events, resolved input events, and SDL_QUIT.
+            // Touch/controller events have no windowID and keep windowID == 0.
             if (event.window.windowID != 0 || event.type == SDL_QUIT || IsInputEvent(event)) {
                 PendingEvents.push_back(event);
             }
@@ -47,7 +82,10 @@ namespace {
 
         bool found_event = false;
         for (auto it = PendingEvents.begin(); it != PendingEvents.end(); /* manually iterate */) {
-            if (it->window.windowID == windowId || it->type == SDL_QUIT || IsInputEvent(*it)) {
+            // Deliver to this window, or broadcast SDL_QUIT and unresolvable input
+            // events (touch/controller, windowID still 0 after resolution attempt).
+            bool const isUnresolvableInput = IsInputEvent(*it) && it->window.windowID == 0;
+            if (it->window.windowID == windowId || it->type == SDL_QUIT || isUnresolvableInput) {
                 outEvents->push_back(*it);
                 found_event = true;
                 it = PendingEvents.erase(it);

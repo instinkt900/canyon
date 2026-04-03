@@ -4,26 +4,6 @@ Issues identified during code review. Work through each by verifying against cur
 
 ---
 
-## SDL Multi-Window Input Routing
-
-Input events (keyboard, mouse, etc.) are collected via a shared static
-`PendingEvents` list in `sdl_window.cpp`. Each call to
-`CollectSDLEventsForWindow()` polls SDL, dumps everything into the shared list,
-then extracts events matching the calling window's ID and removes them.
-
-The problem: input events have `windowID == 0` (or the focused window's ID) and
-are matched and removed by whichever window calls `Update()` first. In a
-multi-window setup the second window never sees keyboard/mouse input.
-
-Proposed fix: route input events to the window that currently has SDL focus.
-`SDL_GetKeyboardFocus()` and `SDL_GetMouseFocus()` return the focused
-`SDL_Window*`; use `SDL_GetWindowID()` on that to resolve the correct target
-before dispatching. Alternatively, deliver input events to all windows and let
-each decide relevance — consistent with how most windowing systems broadcast
-input to the foreground window only.
-
----
-
 ## Test Suite
 
 There are no automated tests. The example app exercises the library manually but
