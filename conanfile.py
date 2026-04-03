@@ -26,7 +26,8 @@ class MothGraphics(ConanFile):
     exports_sources = "CMakeLists.txt", "version.txt", "include/*", "src/*", "external/imgui/*", "external/murmurhash.c/*", "external/stb/*"
 
     def set_version(self):
-        self.version = load(self, "version.txt").strip()
+        if not self.version:
+            self.version = load(self, "version.txt").strip()
 
     def validate(self):
         if self.options.disable_vulkan and self.options.disable_sdl:
