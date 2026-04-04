@@ -2,6 +2,7 @@
 
 #include "moth_graphics/events/event_emitter.h"
 #include "moth_graphics/graphics/igraphics.h"
+#include "moth_graphics/graphics/moth_ui/moth_flipbook_factory.h"
 #include "moth_graphics/graphics/moth_ui/moth_font_factory.h"
 #include "moth_graphics/graphics/moth_ui/moth_image_factory.h"
 #include "moth_graphics/graphics/moth_ui/moth_renderer.h"
@@ -87,6 +88,7 @@ namespace moth_graphics::platform {
 
         std::unique_ptr<graphics::MothImageFactory> m_mothImageFactory;
         std::unique_ptr<graphics::MothFontFactory> m_mothFontFactory;
+        std::unique_ptr<graphics::MothFlipbookFactory> m_mothFlipbookFactory;
         std::unique_ptr<graphics::MothRenderer> m_uiRenderer;
         std::shared_ptr<moth_ui::Context> m_mothContext;
     };
