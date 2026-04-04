@@ -38,7 +38,7 @@ namespace {
     // struct offset across all event types, so event.window.windowID is a valid
     // read regardless of which union member is active.
     void ResolveInputEventWindowID(SDL_Event& event) {
-        auto focusedId = [](SDL_Window* w) -> Uint32 { return w ? SDL_GetWindowID(w) : 0; };
+        auto focusedId = [](SDL_Window* w) -> Uint32 { return (w != nullptr) ? SDL_GetWindowID(w) : 0; };
         switch (event.type) {
         case SDL_KEYDOWN:
         case SDL_KEYUP:
