@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
+## [0.10.1] - 2026-04-04
+### Features
+- Register MothFlipbookFactory with moth_ui Context in Window::PostCreate
+
+### Bug Fixes
+- Route SDL input events to focused window in multi-window setups
+- Use explicit nullptr check to suppress implicit-bool-conversion warning
+
+### Changes
+- Bump version from 0.10.0 to 0.10.1
+
 ## [0.10.0] - 2026-04-03
 ### Features
 - Add SpriteSheet/SpriteSheetFactory and MothFlipbook/MothFlipbookFactory
