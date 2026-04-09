@@ -65,6 +65,9 @@ namespace moth_graphics::graphics {
         /// @brief Returns the source rect of the current atlas frame within the sheet image.
         IntRect GetCurrentFrameRect() const;
 
+        /// @brief Returns the pivot of the current atlas frame in pixels, relative to the frame's top-left corner.
+        IntVec2 GetCurrentFramePivot() const;
+
         /// @brief Returns the width of the current frame in pixels.
         int GetWidth() const;
 

@@ -88,6 +88,22 @@ namespace moth_graphics::graphics {
             }
         }
 
+        /// @brief Draw the current frame of a sprite at @p pos, with the frame's own per-frame pivot aligned to that point.
+        /// @param sprite The sprite to draw at its natural frame size.
+        /// @param pos    The screen point that the frame's pivot should land on.
+        void DrawSpriteAtPivot(Sprite& sprite, IntVec2 const& pos) {
+            if (auto* image = sprite.GetImage()) {
+                auto const frameRect  = sprite.GetCurrentFrameRect();
+                auto const framePivot = sprite.GetCurrentFramePivot();
+                IntRect const destRect = MakeRect(
+                    pos.x - framePivot.x,
+                    pos.y - framePivot.y,
+                    frameRect.w(),
+                    frameRect.h());
+                DrawImage(*image, destRect, &frameRect);
+            }
+        }
+
         /// @brief Draw an image into a destination rectangle in local space. The active transform is applied.
         /// @param image The image to draw.
         /// @param destRect Destination rectangle in local (pre-transform) space.

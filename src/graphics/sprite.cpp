@@ -103,6 +103,14 @@ namespace moth_graphics::graphics {
         return {};
     }
 
+    IntVec2 Sprite::GetCurrentFramePivot() const {
+        SpriteSheet::FrameEntry entry;
+        if (m_spriteSheet->GetFrameDesc(GetCurrentFrame(), entry)) {
+            return entry.pivot;
+        }
+        return {};
+    }
+
     int Sprite::GetWidth() const {
         SpriteSheet::FrameEntry entry;
         if (m_spriteSheet->GetFrameDesc(GetCurrentFrame(), entry)) {
