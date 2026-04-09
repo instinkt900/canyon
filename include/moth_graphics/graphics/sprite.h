@@ -13,16 +13,15 @@ namespace moth_graphics::graphics {
     ///
     /// Manages clip selection, frame advancement, and loop behaviour independently
     /// of any rendering layer. Call Update() each frame with the elapsed time in
-    /// milliseconds, then pass the Sprite to IGraphics::DrawSprite() to render the
-    /// current frame.
+    /// milliseconds, then use GetCurrentFrameRect() and GetImage() to render.
     ///
     /// A Sprite must always have an associated sprite sheet. Use Create() to
-    /// construct one; it returns @c nullptr if the sheet descriptor is invalid.
+    /// construct one; it returns @c nullptr if the sheet has no frames.
     class Sprite {
     public:
         /// @brief Attempt to create a Sprite from a sprite sheet.
         /// @param spriteSheet The sprite sheet to animate. Must not be null.
-        /// @return A Sprite on success, or @c nullptr if the sheet descriptor is invalid.
+        /// @return A Sprite on success, or @c nullptr if the sheet has no frames.
         static std::unique_ptr<Sprite> Create(std::shared_ptr<SpriteSheet> spriteSheet);
 
         Sprite(Sprite&&) = default;
@@ -33,7 +32,7 @@ namespace moth_graphics::graphics {
         /// @brief Returns the sprite sheet backing this sprite.
         SpriteSheet const& GetSpriteSheet() const { return *m_spriteSheet; }
 
-        /// @brief Activate a named clip and reset playback to its first frame.
+        /// @brief Activate a named clip and reset playback to its first step.
         ///
         /// The sprite will not animate until a clip has been set. If the name is
         /// not found the current clip is cleared and playback stops.
@@ -53,33 +52,35 @@ namespace moth_graphics::graphics {
         /// @brief Returns the name of the currently active clip, or empty if none.
         std::string_view GetCurrentClipName() const { return m_currentClipName; }
 
-        /// @brief Returns the current frame index within the full sheet grid.
-        int GetCurrentFrame() const { return m_currentFrame; }
+        /// @brief Returns the atlas frame index currently being displayed.
+        ///
+        /// When a clip is active this is the frame index from the current clip step.
+        /// When no clip is active (after SetFrame()) this is the raw atlas frame index.
+        int GetCurrentFrame() const;
 
-        /// @brief Manually set the current frame index, stopping any active clip playback.
-        /// @param frame Frame index within the full sheet grid. Clamped to [0, MaxFrames).
+        /// @brief Display a specific atlas frame, stopping any active clip playback.
+        /// @param frame Atlas frame index. Clamped to [0, GetFrameCount()).
         void SetFrame(int frame);
 
-        /// @brief Returns the source rect of the current frame within the sheet image.
+        /// @brief Returns the source rect of the current atlas frame within the sheet image.
         IntRect GetCurrentFrameRect() const;
 
-        /// @brief Returns the frame width in pixels.
-        int GetWidth() const { return m_sheetDesc.FrameDimensions.x; }
+        /// @brief Returns the width of the current frame in pixels.
+        int GetWidth() const;
 
-        /// @brief Returns the frame height in pixels.
-        int GetHeight() const { return m_sheetDesc.FrameDimensions.y; }
+        /// @brief Returns the height of the current frame in pixels.
+        int GetHeight() const;
 
         /// @brief Returns the underlying sprite sheet image.
         IImage* GetImage() const;
 
     private:
-        Sprite(std::shared_ptr<SpriteSheet> spriteSheet, SpriteSheet::SheetDesc sheetDesc);
+        explicit Sprite(std::shared_ptr<SpriteSheet> spriteSheet);
 
         std::shared_ptr<SpriteSheet> m_spriteSheet;
-        SpriteSheet::SheetDesc m_sheetDesc;
         std::optional<SpriteSheet::ClipDesc> m_currentClip;
         std::string m_currentClipName;
-        int m_currentFrame = 0;
+        int m_currentFrame = 0;    ///< Clip-sequence position when clip is active; raw atlas index otherwise.
         float m_accumulatedMs = 0.0f;
         bool m_playing = false;
     };
