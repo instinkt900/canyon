@@ -8,26 +8,18 @@
 ExampleLayer::ExampleLayer(moth_graphics::graphics::IGraphics& graphics, moth_graphics::graphics::AssetContext& assets)
     : m_graphics(graphics)
     , m_font(assets.FontFromFile("assets/fonts/The-Retropus.ttf", 64)) {
-    auto sheet = assets.GetSpriteSheetFactory().GetSpriteSheet("assets/sprites/character.flipbook.json");
+    auto sheet = assets.GetSpriteSheetFactory().GetSpriteSheet("assets/sprites/mm.flipbook.json");
     if (!sheet) {
         spdlog::error("ExampleLayer: failed to load sprite sheet");
         return;
     }
 
-    m_spriteLeft = moth_graphics::graphics::Sprite::Create(sheet);
-    if (!m_spriteLeft) {
+    m_sprite = moth_graphics::graphics::Sprite::Create(sheet);
+    if (!m_sprite) {
         spdlog::error("ExampleLayer: failed to create left sprite");
     } else {
-        m_spriteLeft->SetClip("run_left");
-        m_spriteLeft->SetPlaying(true);
-    }
-
-    m_spriteRight = moth_graphics::graphics::Sprite::Create(sheet);
-    if (!m_spriteRight) {
-        spdlog::error("ExampleLayer: failed to create right sprite");
-    } else {
-        m_spriteRight->SetClip("run_forward");
-        m_spriteRight->SetPlaying(true);
+        m_sprite->SetClip("run");
+        m_sprite->SetPlaying(true);
     }
 }
 
@@ -38,25 +30,12 @@ bool ExampleLayer::OnEvent(moth_ui::Event const& event) {
 }
 
 void ExampleLayer::Update(uint32_t ticks) {
-    if (m_spriteLeft) { m_spriteLeft->Update(ticks); }
-    if (m_spriteRight) { m_spriteRight->Update(ticks); }
+    if (m_sprite) { m_sprite->Update(ticks); }
 }
 
 void ExampleLayer::Draw() {
     m_graphics.SetColor({ 0.1f, 0.1f, 0.2f, 1.0f });
     m_graphics.Clear();
-
-    moth_graphics::IntVec2 spriteLeftPos;
-    if (m_spriteLeft) {
-        spriteLeftPos.x = m_spriteLeft->GetWidth() / 2;
-        spriteLeftPos.y = GetHeight() / 2;
-    }
-
-    moth_graphics::IntVec2 spriteRightPos;
-    if (m_spriteRight) {
-        spriteRightPos.x = GetWidth() - (m_spriteRight->GetWidth() / 2);
-        spriteRightPos.y = GetHeight() / 2;
-    }
 
     if (m_font) {
         m_graphics.SetColor(moth_graphics::graphics::BasicColors::White);
@@ -65,18 +44,9 @@ void ExampleLayer::Draw() {
         m_graphics.DrawText(message, *m_font, rect,
                             moth_graphics::graphics::TextHorizAlignment::Center,
                             moth_graphics::graphics::TextVertAlignment::Middle);
-
-        auto const stringSize = m_font->Measure(message);
-        if (m_spriteLeft) {
-            spriteLeftPos.x = (GetWidth() - stringSize.x - m_spriteLeft->GetWidth()) / 2;
-        }
-        if (m_spriteRight) {
-            spriteRightPos.x = (GetWidth() + stringSize.x + m_spriteRight->GetWidth()) / 2;
-        }
     }
 
-    if (m_spriteLeft) { m_graphics.DrawSprite(*m_spriteLeft, spriteLeftPos); }
-    if (m_spriteRight) { m_graphics.DrawSprite(*m_spriteRight, spriteRightPos); }
+    if (m_sprite) { m_graphics.DrawSprite(*m_sprite, {GetWidth() / 2, (GetHeight() / 2) + 200}); }
 }
 
 bool ExampleLayer::OnKey(moth_ui::EventKey const& event) {
