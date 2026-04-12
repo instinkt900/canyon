@@ -1,4 +1,5 @@
 #include "moth_graphics/graphics/spritesheet.h"
+#include "moth_graphics/graphics/iimage.h"
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/vector.h"
 
@@ -9,10 +10,20 @@
 using namespace moth_graphics;
 using namespace moth_graphics::graphics;
 
-// SpriteSheet doesn't need a real image for pure data-model tests.
-// Pass nullptr — no drawing happens here.
-
 namespace {
+    // Minimal IImage stub — no GPU resources, satisfies the constructor's non-null invariant.
+    class DummyImage : public IImage {
+    public:
+        int GetWidth() const override { return 64; }
+        int GetHeight() const override { return 64; }
+        std::shared_ptr<ITexture> GetTexture() const override { return nullptr; }
+        void ImGui(IntVec2 const&, FloatVec2 const&, FloatVec2 const&) const override {}
+    };
+
+    std::shared_ptr<IImage> MakeDummyImage() {
+        return std::make_shared<DummyImage>();
+    }
+
     SpriteSheet::FrameEntry MakeFrame(int x, int y, int w, int h, int px = 0, int py = 0) {
         return { MakeRect(x, y, w, h), IntVec2{ px, py } };
     }
@@ -25,12 +36,12 @@ namespace {
 }
 
 TEST_CASE("SpriteSheet reports correct frame count", "[spritesheet]") {
-    SpriteSheet sheet(nullptr, { MakeFrame(0, 0, 16, 16), MakeFrame(16, 0, 16, 16) }, {});
+    SpriteSheet sheet(MakeDummyImage(), { MakeFrame(0, 0, 16, 16), MakeFrame(16, 0, 16, 16) }, {});
     REQUIRE(sheet.GetFrameCount() == 2);
 }
 
 TEST_CASE("SpriteSheet GetFrameDesc returns correct rect and pivot", "[spritesheet]") {
-    SpriteSheet sheet(nullptr, { MakeFrame(4, 8, 32, 16, 5, 3) }, {});
+    SpriteSheet sheet(MakeDummyImage(), { MakeFrame(4, 8, 32, 16, 5, 3) }, {});
 
     SpriteSheet::FrameEntry entry{};
     REQUIRE(sheet.GetFrameDesc(0, entry));
@@ -43,7 +54,7 @@ TEST_CASE("SpriteSheet GetFrameDesc returns correct rect and pivot", "[spriteshe
 }
 
 TEST_CASE("SpriteSheet GetFrameDesc returns false for out-of-range index", "[spritesheet]") {
-    SpriteSheet sheet(nullptr, { MakeFrame(0, 0, 8, 8) }, {});
+    SpriteSheet sheet(MakeDummyImage(), { MakeFrame(0, 0, 8, 8) }, {});
 
     SpriteSheet::FrameEntry entry{};
     REQUIRE_FALSE(sheet.GetFrameDesc(-1, entry));
@@ -55,7 +66,7 @@ TEST_CASE("SpriteSheet reports correct clip count", "[spritesheet]") {
         MakeClip("run",  { { 0, 100 }, { 1, 100 } }),
         MakeClip("idle", { { 0, 200 } }),
     };
-    SpriteSheet sheet(nullptr, { MakeFrame(0, 0, 8, 8), MakeFrame(8, 0, 8, 8) }, clips);
+    SpriteSheet sheet(MakeDummyImage(), { MakeFrame(0, 0, 8, 8), MakeFrame(8, 0, 8, 8) }, clips);
     REQUIRE(sheet.GetClipCount() == 2);
 }
 
@@ -64,7 +75,7 @@ TEST_CASE("SpriteSheet GetClipName returns names in order", "[spritesheet]") {
         MakeClip("alpha", { { 0, 100 } }),
         MakeClip("beta",  { { 0, 100 } }),
     };
-    SpriteSheet sheet(nullptr, { MakeFrame(0, 0, 8, 8) }, clips);
+    SpriteSheet sheet(MakeDummyImage(), { MakeFrame(0, 0, 8, 8) }, clips);
     REQUIRE(sheet.GetClipName(0) == "alpha");
     REQUIRE(sheet.GetClipName(1) == "beta");
     REQUIRE(sheet.GetClipName(2).empty());
@@ -75,7 +86,7 @@ TEST_CASE("SpriteSheet GetClipDesc returns correct clip data", "[spritesheet]") 
     std::vector<SpriteSheet::ClipEntry> clips{
         MakeClip("walk", steps, SpriteSheet::LoopType::Loop),
     };
-    SpriteSheet sheet(nullptr, { MakeFrame(0, 0, 8, 8), MakeFrame(8, 0, 8, 8) }, clips);
+    SpriteSheet sheet(MakeDummyImage(), { MakeFrame(0, 0, 8, 8), MakeFrame(8, 0, 8, 8) }, clips);
 
     SpriteSheet::ClipDesc desc{};
     REQUIRE(sheet.GetClipDesc("walk", desc));
@@ -88,12 +99,13 @@ TEST_CASE("SpriteSheet GetClipDesc returns correct clip data", "[spritesheet]") 
 }
 
 TEST_CASE("SpriteSheet GetClipDesc returns false for unknown clip name", "[spritesheet]") {
-    SpriteSheet sheet(nullptr, { MakeFrame(0, 0, 8, 8) }, {});
+    SpriteSheet sheet(MakeDummyImage(), { MakeFrame(0, 0, 8, 8) }, {});
     SpriteSheet::ClipDesc desc{};
     REQUIRE_FALSE(sheet.GetClipDesc("missing", desc));
 }
 
 TEST_CASE("SpriteSheet GetImage returns the image passed at construction", "[spritesheet]") {
-    SpriteSheet sheet(nullptr, { MakeFrame(0, 0, 8, 8) }, {});
-    REQUIRE(sheet.GetImage() == nullptr);
+    auto img = MakeDummyImage();
+    SpriteSheet sheet(img, { MakeFrame(0, 0, 8, 8) }, {});
+    REQUIRE(sheet.GetImage() == img);
 }

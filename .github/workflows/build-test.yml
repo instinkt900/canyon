@@ -64,9 +64,13 @@ jobs:
           - os: windows
             runs_on: windows-latest
             configure_preset: conan-default
+            build_preset: conan-debug
+            test_preset: conan-debug
           - os: linux
             runs_on: ubuntu-latest
             configure_preset: conan-debug
+            build_preset: conan-debug
+            test_preset: conan-debug
 
     steps:
     - uses: actions/checkout@v4
@@ -89,5 +93,5 @@ jobs:
       run: |
         conan install . -pr ../.conan/profile -s build_type=Debug --build=missing
         cmake --preset ${{ matrix.configure_preset }}
-        cmake --build --preset conan-debug
-        ctest --preset conan-debug --output-on-failure
+        cmake --build --preset ${{ matrix.build_preset }}
+        ctest --preset ${{ matrix.test_preset }} --output-on-failure

@@ -1,5 +1,6 @@
 #include "moth_graphics/graphics/sprite.h"
 #include "moth_graphics/graphics/spritesheet.h"
+#include "moth_graphics/graphics/iimage.h"
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/vector.h"
 
@@ -15,6 +16,15 @@ using namespace moth_graphics::graphics;
 // ---------------------------------------------------------------------------
 
 namespace {
+    // Minimal IImage stub — no GPU resources, satisfies SpriteSheet's non-null invariant.
+    class DummyImage : public IImage {
+    public:
+        int GetWidth() const override { return 64; }
+        int GetHeight() const override { return 64; }
+        std::shared_ptr<ITexture> GetTexture() const override { return nullptr; }
+        void ImGui(IntVec2 const&, FloatVec2 const&, FloatVec2 const&) const override {}
+    };
+
     SpriteSheet::FrameEntry MakeFrame(int x, int y, int w, int h, int px = 0, int py = 0) {
         return { MakeRect(x, y, w, h), IntVec2{ px, py } };
     }
@@ -28,7 +38,7 @@ namespace {
         for (int i = 0; i < numFrames; ++i) {
             frames.push_back(MakeFrame(i * 8, 0, 8, 8, i, i));
         }
-        return std::make_shared<SpriteSheet>(nullptr, std::move(frames), std::move(clips));
+        return std::make_shared<SpriteSheet>(std::make_shared<DummyImage>(), std::move(frames), std::move(clips));
     }
 
     // Build a two-frame clip entry with equal step durations.
