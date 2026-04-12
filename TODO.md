@@ -1,6 +1,6 @@
 # TODO
 
-### Test Suite
+## Test Suite
 
 **Effort:** Medium
 
@@ -23,7 +23,7 @@ for headless CI.
 
 ---
 
-### Shared Library Support
+## Shared Library Support
 
 **Effort:** Large
 
@@ -44,7 +44,7 @@ version bump in `version.txt`.
 
 ---
 
-### Documentation
+## Documentation
 
 **Effort:** Small
 

@@ -32,10 +32,13 @@ namespace moth_graphics::graphics {
         /// @brief Returns the sprite sheet backing this sprite.
         SpriteSheet const& GetSpriteSheet() const { return *m_spriteSheet; }
 
-        /// @brief Activate a named clip and reset playback to its first step.
+        /// @brief Select a named clip and reset its playback position to the first step.
         ///
-        /// The sprite will not animate until a clip has been set. If the name is
-        /// not found the current clip is cleared and playback stops.
+        /// This method only selects the clip; it does not change @c m_playing. The
+        /// animation will not advance until @c SetPlaying(true) is called, regardless
+        /// of whether a clip is active. If the name is not found the current clip is
+        /// cleared (equivalent to passing an empty string) and the playing state is
+        /// unchanged.
         /// @param name Clip name as defined in the descriptor, or empty to clear.
         void SetClip(std::string_view name);
 

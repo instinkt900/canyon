@@ -49,6 +49,15 @@ namespace moth_graphics::graphics {
             ClipDesc desc;
         };
 
+        /// @brief Constructs a sprite sheet.
+        /// @param image  Atlas image. Must not be null.
+        /// @param frames Per-frame rects and pivots. Must not be empty; each frame's
+        ///               width and height must be > 0.
+        /// @param clips  Named animation clips. Each clip's @c frames list must be
+        ///               non-empty, every @c frameIndex must be in [0, frames.size()),
+        ///               and every @c durationMs must be > 0. These are the same
+        ///               invariants enforced by SpriteSheetFactory when loading from
+        ///               a descriptor file.
         SpriteSheet(std::shared_ptr<IImage> image,
                     std::vector<FrameEntry> frames,
                     std::vector<ClipEntry> clips);

@@ -16,7 +16,7 @@ ExampleLayer::ExampleLayer(moth_graphics::graphics::IGraphics& graphics, moth_gr
 
     m_sprite = moth_graphics::graphics::Sprite::Create(sheet);
     if (!m_sprite) {
-        spdlog::error("ExampleLayer: failed to create left sprite");
+        spdlog::error("ExampleLayer: failed to create sprite");
     } else {
         m_sprite->SetClip("run");
         m_sprite->SetPlaying(true);

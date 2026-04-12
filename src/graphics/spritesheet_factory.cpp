@@ -83,21 +83,26 @@ namespace moth_graphics::graphics {
         for (auto const& frameJson : json["frames"]) {
             if (!frameJson.contains("x") || !frameJson.contains("y") ||
                 !frameJson.contains("w") || !frameJson.contains("h")) {
-                spdlog::warn("SpriteSheetFactory: '{}' skipping frame with missing x/y/w/h fields",
-                             path.string());
-                continue;
+                spdlog::error("SpriteSheetFactory: '{}' frame {} missing x/y/w/h fields — aborting",
+                              path.string(), frameJson.dump());
+                return nullptr;
             }
             if (!frameJson["x"].is_number_integer() || !frameJson["y"].is_number_integer() ||
                 !frameJson["w"].is_number_integer() || !frameJson["h"].is_number_integer()) {
-                spdlog::warn("SpriteSheetFactory: '{}' skipping frame: x/y/w/h must be integers",
-                             path.string());
-                continue;
+                spdlog::error("SpriteSheetFactory: '{}' frame {} x/y/w/h must be integers — aborting",
+                              path.string(), frameJson.dump());
+                return nullptr;
             }
-            SpriteSheet::FrameEntry entry;
             int const x = frameJson["x"].get<int>();
             int const y = frameJson["y"].get<int>();
             int const w = frameJson["w"].get<int>();
             int const h = frameJson["h"].get<int>();
+            if (w <= 0 || h <= 0) {
+                spdlog::error("SpriteSheetFactory: '{}' frame {} has non-positive w/h ({},{}) — aborting",
+                              path.string(), frameJson.dump(), w, h);
+                return nullptr;
+            }
+            SpriteSheet::FrameEntry entry;
             entry.rect = MakeRect(x, y, w, h);
             entry.pivot.x = frameJson.value("pivot_x", 0);
             entry.pivot.y = frameJson.value("pivot_y", 0);
@@ -105,8 +110,7 @@ namespace moth_graphics::graphics {
         }
 
         if (frames.empty()) {
-            spdlog::error("SpriteSheetFactory: '{}' frames array is empty or all entries were invalid",
-                          path.string());
+            spdlog::error("SpriteSheetFactory: '{}' frames array is empty", path.string());
             return nullptr;
         }
 
@@ -133,14 +137,16 @@ namespace moth_graphics::graphics {
                 bool valid = true;
                 for (auto const& stepJson : clipJson["frames"]) {
                     if (!stepJson.contains("frame") || !stepJson.contains("duration_ms")) {
-                        spdlog::warn("SpriteSheetFactory: '{}' clip '{}': skipping step with missing frame/duration_ms",
+                        spdlog::warn("SpriteSheetFactory: '{}' clip '{}': step missing frame/duration_ms",
                                      path.string(), entry.name);
-                        continue;
+                        valid = false;
+                        break;
                     }
                     if (!stepJson["frame"].is_number_integer() || !stepJson["duration_ms"].is_number_integer()) {
                         spdlog::warn("SpriteSheetFactory: '{}' clip '{}': frame/duration_ms must be integers",
                                      path.string(), entry.name);
-                        continue;
+                        valid = false;
+                        break;
                     }
                     SpriteSheet::ClipFrame step;
                     step.frameIndex = stepJson["frame"].get<int>();
