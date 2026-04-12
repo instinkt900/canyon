@@ -22,7 +22,7 @@ namespace {
         int GetWidth() const override { return 64; }
         int GetHeight() const override { return 64; }
         std::shared_ptr<ITexture> GetTexture() const override { return nullptr; }
-        void ImGui(IntVec2 const&, FloatVec2 const&, FloatVec2 const&) const override {}
+        void ImGui(IntVec2 const& /*size*/, FloatVec2 const& /*uv0*/, FloatVec2 const& /*uv1*/) const override {}
     };
 
     SpriteSheet::FrameEntry MakeFrame(int x, int y, int w, int h, int px = 0, int py = 0) {
@@ -59,7 +59,7 @@ TEST_CASE("Sprite::Create returns nullptr for null sheet", "[sprite][create]") {
 }
 
 TEST_CASE("Sprite::Create returns nullptr for empty sheet", "[sprite][create]") {
-    auto sheet = std::make_shared<SpriteSheet>(nullptr,
+    auto sheet = std::make_shared<SpriteSheet>(std::make_shared<DummyImage>(),
                                                std::vector<SpriteSheet::FrameEntry>{},
                                                std::vector<SpriteSheet::ClipEntry>{});
     REQUIRE(Sprite::Create(sheet) == nullptr);

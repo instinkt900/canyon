@@ -17,7 +17,7 @@ namespace {
         int GetWidth() const override { return 64; }
         int GetHeight() const override { return 64; }
         std::shared_ptr<ITexture> GetTexture() const override { return nullptr; }
-        void ImGui(IntVec2 const&, FloatVec2 const&, FloatVec2 const&) const override {}
+        void ImGui(IntVec2 const& /*size*/, FloatVec2 const& /*uv0*/, FloatVec2 const& /*uv1*/) const override {}
     };
 
     std::shared_ptr<IImage> MakeDummyImage() {
