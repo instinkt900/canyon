@@ -1,28 +1,7 @@
 #pragma once
 
-// Export macro — currently a no-op (static library build).
-// See canyon_fwd.h for forward declarations.
-#if defined(_WIN32) || defined(__CYGWIN__)
-  #if defined(MOTH_GRAPHICS_BUILD_SHARED)
-    #if defined(MOTH_GRAPHICS_BUILD)
-      #define MOTH_GRAPHICS_API __declspec(dllexport)
-    #else
-      #define MOTH_GRAPHICS_API __declspec(dllimport)
-    #endif
-  #else
-    #define MOTH_GRAPHICS_API
-  #endif
-#else
-  #if defined(MOTH_GRAPHICS_BUILD_SHARED)
-    #if defined(MOTH_GRAPHICS_BUILD)
-      #define MOTH_GRAPHICS_API __attribute__((visibility("default")))
-    #else
-      #define MOTH_GRAPHICS_API
-    #endif
-  #else
-    #define MOTH_GRAPHICS_API
-  #endif
-#endif
+// Static library — no export annotation needed.
+#define MOTH_GRAPHICS_API
 
 // events
 #include "moth_graphics/events/canyon_events.h"

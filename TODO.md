@@ -21,26 +21,6 @@ A lightweight framework (Catch2 or GoogleTest) can be added as a Conan dev depen
 affecting the shipped package. Backends requiring a display can be guarded with a CMake option
 for headless CI.
 
----
-
-## Shared Library Support
-
-**Effort:** Large
-
-`CANYON_API` export macros are already defined correctly for both Windows
-(`__declspec(dllexport/dllimport)`) and Linux (`__attribute__((visibility("default")))`), but
-are currently unused and the build is locked to static.
-
-Steps required:
-1. **`CMakeLists.txt`** — move `CANYON_BUILD` out of the `if(MSVC)` block so it is defined on
-   all platforms; without it the Linux visibility macro never triggers.
-2. **`conanfile.py`** — change `package_type = "static-library"` to `package_type = "library"`
-   and add a `shared` option.
-3. **Public headers** — annotate every public class declaration with `CANYON_API` across all
-   headers in `include/canyon/`. This is the bulk of the work.
-
-Note: this is a public API and ABI break — all consumers must be recompiled. Coordinate with a
-version bump in `version.txt`.
 
 ---
 
