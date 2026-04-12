@@ -75,13 +75,29 @@ namespace moth_graphics::graphics {
         /// @param sprite The sprite to draw at its natural frame size.
         /// @param pos    Destination point in logical pixels.
         /// @param pivot  Normalized pivot within the frame: {0,0} = top-left, {0.5,0.5} = center,
-        ///               {1,1} = bottom-right. Defaults to center.
-        void DrawSprite(Sprite& sprite, IntVec2 const& pos, FloatVec2 const& pivot = { 0.5f, 0.5f }) {
+        ///               {1,1} = bottom-right.
+        void DrawSprite(Sprite& sprite, IntVec2 const& pos, FloatVec2 const& pivot) {
             if (auto* image = sprite.GetImage()) {
                 auto const frameRect = sprite.GetCurrentFrameRect();
                 IntRect const destRect = MakeRect(
                     pos.x - static_cast<int>(pivot.x * static_cast<float>(frameRect.w())),
                     pos.y - static_cast<int>(pivot.y * static_cast<float>(frameRect.h())),
+                    frameRect.w(),
+                    frameRect.h());
+                DrawImage(*image, destRect, &frameRect);
+            }
+        }
+
+        /// @brief Draw the current frame of a sprite at @p pos, with the frame's own per-frame pivot aligned to that point.
+        /// @param sprite The sprite to draw at its natural frame size.
+        /// @param pos    The screen point that the frame's pivot should land on.
+        void DrawSprite(Sprite& sprite, IntVec2 const& pos) {
+            if (auto* image = sprite.GetImage()) {
+                auto const frameRect  = sprite.GetCurrentFrameRect();
+                auto const framePivot = sprite.GetCurrentFramePivot();
+                IntRect const destRect = MakeRect(
+                    pos.x - framePivot.x,
+                    pos.y - framePivot.y,
                     frameRect.w(),
                     frameRect.h());
                 DrawImage(*image, destRect, &frameRect);

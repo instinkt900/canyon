@@ -14,7 +14,9 @@ namespace moth_graphics::graphics {
         ~MothFlipbook() override = default;
 
         moth_ui::IImage const& GetImage() const override;
-        void GetSheetDesc(moth_ui::IFlipbook::SheetDesc& outDesc) const override;
+        int GetFrameCount() const override;
+        bool GetFrameDesc(int index, moth_ui::IFlipbook::FrameDesc& outDesc) const override;
+        int GetClipCount() const override;
         std::string_view GetClipName(int index) const override;
         bool GetClipDesc(std::string_view name, moth_ui::IFlipbook::ClipDesc& outDesc) const override;
 

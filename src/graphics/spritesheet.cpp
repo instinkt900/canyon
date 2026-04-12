@@ -3,20 +3,31 @@
 
 namespace moth_graphics::graphics {
     SpriteSheet::SpriteSheet(std::shared_ptr<IImage> image,
-                             SheetDesc sheetDesc,
+                             std::vector<FrameEntry> frames,
                              std::vector<ClipEntry> clips)
         : m_image(std::move(image))
-        , m_sheetDesc(sheetDesc)
+        , m_frames(std::move(frames))
         , m_clips(std::move(clips)) {
-        m_sheetDesc.NumClips = static_cast<int>(m_clips.size());
     }
 
     std::shared_ptr<IImage> SpriteSheet::GetImage() const {
         return m_image;
     }
 
-    void SpriteSheet::GetSheetDesc(SheetDesc& outDesc) const {
-        outDesc = m_sheetDesc;
+    int SpriteSheet::GetFrameCount() const {
+        return static_cast<int>(m_frames.size());
+    }
+
+    bool SpriteSheet::GetFrameDesc(int index, FrameEntry& outEntry) const {
+        if (index < 0 || index >= static_cast<int>(m_frames.size())) {
+            return false;
+        }
+        outEntry = m_frames[static_cast<size_t>(index)];
+        return true;
+    }
+
+    int SpriteSheet::GetClipCount() const {
+        return static_cast<int>(m_clips.size());
     }
 
     std::string_view SpriteSheet::GetClipName(int index) const {

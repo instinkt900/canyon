@@ -7,29 +7,15 @@ namespace moth_graphics::graphics {
             spdlog::error("Sprite::Create: spriteSheet must not be null");
             return nullptr;
         }
-
-        SpriteSheet::SheetDesc desc;
-        spriteSheet->GetSheetDesc(desc);
-        if (desc.SheetCells.x <= 0 || desc.SheetCells.y <= 0 ||
-            desc.FrameDimensions.x <= 0 || desc.FrameDimensions.y <= 0) {
-            spdlog::error("Sprite::Create: invalid sheet descriptor (cells={}x{} frame={}x{})",
-                          desc.SheetCells.x, desc.SheetCells.y,
-                          desc.FrameDimensions.x, desc.FrameDimensions.y);
+        if (spriteSheet->GetFrameCount() <= 0) {
+            spdlog::error("Sprite::Create: spriteSheet has no frames");
             return nullptr;
         }
-        int const capacity = desc.SheetCells.x * desc.SheetCells.y;
-        if (desc.MaxFrames > capacity) {
-            spdlog::error("Sprite::Create: MaxFrames ({}) exceeds sheet capacity ({}x{}={})",
-                          desc.MaxFrames, desc.SheetCells.x, desc.SheetCells.y, capacity);
-            return nullptr;
-        }
-
-        return std::unique_ptr<Sprite>(new Sprite(std::move(spriteSheet), desc));
+        return std::unique_ptr<Sprite>(new Sprite(std::move(spriteSheet)));
     }
 
-    Sprite::Sprite(std::shared_ptr<SpriteSheet> spriteSheet, SpriteSheet::SheetDesc sheetDesc)
-        : m_spriteSheet(std::move(spriteSheet))
-        , m_sheetDesc(sheetDesc) {
+    Sprite::Sprite(std::shared_ptr<SpriteSheet> spriteSheet)
+        : m_spriteSheet(std::move(spriteSheet)) {
     }
 
     void Sprite::SetClip(std::string_view name) {
@@ -45,9 +31,8 @@ namespace moth_graphics::graphics {
 
         SpriteSheet::ClipDesc clipDesc;
         if (m_spriteSheet->GetClipDesc(name, clipDesc)) {
-            m_currentClip = clipDesc;
+            m_currentClip = std::move(clipDesc);
             m_currentClipName = name;
-            m_currentFrame = m_currentClip->Start;
         } else {
             spdlog::warn("Sprite::SetClip: clip '{}' not found", name);
             m_playing = false;
@@ -59,9 +44,7 @@ namespace moth_graphics::graphics {
         m_currentClip.reset();
         m_currentClipName.clear();
         m_accumulatedMs = 0.0f;
-        int const maxFrames = m_sheetDesc.MaxFrames > 0 ? m_sheetDesc.MaxFrames
-                                                        : m_sheetDesc.SheetCells.x * m_sheetDesc.SheetCells.y;
-        m_currentFrame = std::clamp(frame, 0, maxFrames - 1);
+        m_currentFrame = std::clamp(frame, 0, m_spriteSheet->GetFrameCount() - 1);
     }
 
     void Sprite::SetPlaying(bool playing) {
@@ -71,53 +54,77 @@ namespace moth_graphics::graphics {
     }
 
     void Sprite::Update(uint32_t ticks) {
-        if (!m_playing || !m_currentClip.has_value()) {
-            return;
-        }
-        if (m_currentClip->FPS <= 0) {
+        if (!m_playing || !m_currentClip.has_value() || m_currentClip->frames.empty()) {
             return;
         }
 
-        float const frameDurationMs = 1000.0f / static_cast<float>(m_currentClip->FPS);
         m_accumulatedMs += static_cast<float>(ticks);
 
-        int const framesToAdvance = static_cast<int>(m_accumulatedMs / frameDurationMs);
-        if (framesToAdvance == 0) {
-            return;
-        }
-        m_accumulatedMs -= static_cast<float>(framesToAdvance) * frameDurationMs;
-
-        m_currentFrame += framesToAdvance;
-        if (m_currentFrame > m_currentClip->End) {
-            int const clipLength = m_currentClip->End - m_currentClip->Start + 1;
-            switch (m_currentClip->Loop) {
-            case SpriteSheet::LoopType::Loop:
-                m_currentFrame = m_currentClip->Start + (m_currentFrame - m_currentClip->Start) % clipLength;
+        while (m_playing) {
+            int const durationMs = m_currentClip->frames[static_cast<size_t>(m_currentFrame)].durationMs;
+            if (durationMs <= 0 || m_accumulatedMs < static_cast<float>(durationMs)) {
                 break;
-            case SpriteSheet::LoopType::Reset:
-                m_accumulatedMs = 0.0f;
-                m_currentFrame = m_currentClip->Start;
-                m_playing = false;
-                break;
-            case SpriteSheet::LoopType::Stop:
-                m_accumulatedMs = 0.0f;
-                m_currentFrame = m_currentClip->End;
-                m_playing = false;
-                break;
-            default:
-                m_playing = false;
-                break;
+            }
+            m_accumulatedMs -= static_cast<float>(durationMs);
+            ++m_currentFrame;
+            int const lastStep = static_cast<int>(m_currentClip->frames.size()) - 1;
+            if (m_currentFrame > lastStep) {
+                switch (m_currentClip->loop) {
+                case SpriteSheet::LoopType::Loop:
+                    m_currentFrame = 0;
+                    break;
+                case SpriteSheet::LoopType::Reset:
+                    m_accumulatedMs = 0.0f;
+                    m_currentFrame = 0;
+                    m_playing = false;
+                    break;
+                case SpriteSheet::LoopType::Stop:
+                    m_accumulatedMs = 0.0f;
+                    m_currentFrame = lastStep;
+                    m_playing = false;
+                    break;
+                }
             }
         }
     }
 
+    int Sprite::GetCurrentFrame() const {
+        if (m_currentClip.has_value() && !m_currentClip->frames.empty()) {
+            return m_currentClip->frames[static_cast<size_t>(m_currentFrame)].frameIndex;
+        }
+        return m_currentFrame;
+    }
+
     IntRect Sprite::GetCurrentFrameRect() const {
-        int const col = m_currentFrame % m_sheetDesc.SheetCells.x;
-        int const row = m_currentFrame / m_sheetDesc.SheetCells.x;
-        return MakeRect(col * m_sheetDesc.FrameDimensions.x,
-                        row * m_sheetDesc.FrameDimensions.y,
-                        m_sheetDesc.FrameDimensions.x,
-                        m_sheetDesc.FrameDimensions.y);
+        SpriteSheet::FrameEntry entry;
+        if (m_spriteSheet->GetFrameDesc(GetCurrentFrame(), entry)) {
+            return entry.rect;
+        }
+        return {};
+    }
+
+    IntVec2 Sprite::GetCurrentFramePivot() const {
+        SpriteSheet::FrameEntry entry;
+        if (m_spriteSheet->GetFrameDesc(GetCurrentFrame(), entry)) {
+            return entry.pivot;
+        }
+        return {};
+    }
+
+    int Sprite::GetWidth() const {
+        SpriteSheet::FrameEntry entry;
+        if (m_spriteSheet->GetFrameDesc(GetCurrentFrame(), entry)) {
+            return entry.rect.bottomRight.x - entry.rect.topLeft.x;
+        }
+        return 0;
+    }
+
+    int Sprite::GetHeight() const {
+        SpriteSheet::FrameEntry entry;
+        if (m_spriteSheet->GetFrameDesc(GetCurrentFrame(), entry)) {
+            return entry.rect.bottomRight.y - entry.rect.topLeft.y;
+        }
+        return 0;
     }
 
     IImage* Sprite::GetImage() const {

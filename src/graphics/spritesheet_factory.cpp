@@ -57,16 +57,8 @@ namespace moth_graphics::graphics {
             spdlog::error("SpriteSheetFactory: '{}' missing 'image' string field", path.string());
             return nullptr;
         }
-        if (!json.contains("frame_width") || !json.contains("frame_height") ||
-            !json.contains("frame_cols")  || !json.contains("frame_rows")   ||
-            !json.contains("max_frames")) {
-            spdlog::error("SpriteSheetFactory: '{}' missing required frame layout fields", path.string());
-            return nullptr;
-        }
-        if (!json["frame_width"].is_number_integer() || !json["frame_height"].is_number_integer() ||
-            !json["frame_cols"].is_number_integer()  || !json["frame_rows"].is_number_integer()   ||
-            !json["max_frames"].is_number_integer()) {
-            spdlog::error("SpriteSheetFactory: '{}' frame layout fields must be integers", path.string());
+        if (!json.contains("frames") || !json["frames"].is_array()) {
+            spdlog::error("SpriteSheetFactory: '{}' missing 'frames' array", path.string());
             return nullptr;
         }
 
@@ -86,98 +78,117 @@ namespace moth_graphics::graphics {
         }
         auto sharedImage = std::shared_ptr<IImage>(std::move(image));
 
-        SpriteSheet::SheetDesc sheetDesc;
-        sheetDesc.FrameDimensions.x = json["frame_width"].get<int>();
-        sheetDesc.FrameDimensions.y = json["frame_height"].get<int>();
-        sheetDesc.SheetCells.x      = json["frame_cols"].get<int>();
-        sheetDesc.SheetCells.y      = json["frame_rows"].get<int>();
-        sheetDesc.MaxFrames         = json["max_frames"].get<int>();
-
-        if (sheetDesc.FrameDimensions.x <= 0) {
-            spdlog::error("SpriteSheetFactory: '{}' frame_width must be > 0 (got {})", path.string(), sheetDesc.FrameDimensions.x);
-            return nullptr;
-        }
-        if (sheetDesc.FrameDimensions.y <= 0) {
-            spdlog::error("SpriteSheetFactory: '{}' frame_height must be > 0 (got {})", path.string(), sheetDesc.FrameDimensions.y);
-            return nullptr;
-        }
-        if (sheetDesc.SheetCells.x <= 0) {
-            spdlog::error("SpriteSheetFactory: '{}' frame_cols must be > 0 (got {})", path.string(), sheetDesc.SheetCells.x);
-            return nullptr;
-        }
-        if (sheetDesc.SheetCells.y <= 0) {
-            spdlog::error("SpriteSheetFactory: '{}' frame_rows must be > 0 (got {})", path.string(), sheetDesc.SheetCells.y);
-            return nullptr;
-        }
-        if (sheetDesc.MaxFrames < 0) {
-            spdlog::error("SpriteSheetFactory: '{}' max_frames must be >= 0 (got {})", path.string(), sheetDesc.MaxFrames);
-            return nullptr;
-        }
-        int const capacity = sheetDesc.SheetCells.x * sheetDesc.SheetCells.y;
-        if (sheetDesc.MaxFrames > capacity) {
-            spdlog::error("SpriteSheetFactory: '{}' max_frames ({}) exceeds sheet capacity ({}x{}={})",
-                          path.string(), sheetDesc.MaxFrames, sheetDesc.SheetCells.x, sheetDesc.SheetCells.y, capacity);
-            return nullptr;
+        // Parse frames array
+        std::vector<SpriteSheet::FrameEntry> frames;
+        for (auto const& frameJson : json["frames"]) {
+            if (!frameJson.contains("x") || !frameJson.contains("y") ||
+                !frameJson.contains("w") || !frameJson.contains("h")) {
+                spdlog::error("SpriteSheetFactory: '{}' frame {} missing x/y/w/h fields — aborting",
+                              path.string(), frameJson.dump());
+                return nullptr;
+            }
+            if (!frameJson["x"].is_number_integer() || !frameJson["y"].is_number_integer() ||
+                !frameJson["w"].is_number_integer() || !frameJson["h"].is_number_integer()) {
+                spdlog::error("SpriteSheetFactory: '{}' frame {} x/y/w/h must be integers — aborting",
+                              path.string(), frameJson.dump());
+                return nullptr;
+            }
+            int const x = frameJson["x"].get<int>();
+            int const y = frameJson["y"].get<int>();
+            int const w = frameJson["w"].get<int>();
+            int const h = frameJson["h"].get<int>();
+            if (w <= 0 || h <= 0) {
+                spdlog::error("SpriteSheetFactory: '{}' frame {} has non-positive w/h ({},{}) — aborting",
+                              path.string(), frameJson.dump(), w, h);
+                return nullptr;
+            }
+            SpriteSheet::FrameEntry entry;
+            entry.rect = MakeRect(x, y, w, h);
+            entry.pivot.x = frameJson.value("pivot_x", 0);
+            entry.pivot.y = frameJson.value("pivot_y", 0);
+            frames.push_back(entry);
         }
 
-        int const totalFrames = sheetDesc.MaxFrames > 0
-            ? sheetDesc.MaxFrames
-            : sheetDesc.SheetCells.x * sheetDesc.SheetCells.y;
+        if (frames.empty()) {
+            spdlog::error("SpriteSheetFactory: '{}' frames array is empty", path.string());
+            return nullptr;
+        }
 
+        int const totalFrames = static_cast<int>(frames.size());
+
+        // Parse clips array (optional)
         std::vector<SpriteSheet::ClipEntry> clips;
         if (json.contains("clips") && json["clips"].is_array()) {
             for (auto const& clipJson : json["clips"]) {
-                if (!clipJson.contains("name") || !clipJson.contains("start") ||
-                    !clipJson.contains("end")  || !clipJson.contains("fps")) {
-                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip with missing fields",
+                if (!clipJson.contains("name") || !clipJson["name"].is_string()) {
+                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip with missing or non-string 'name'",
                                  path.string());
                     continue;
                 }
-                if (!clipJson["name"].is_string()) {
-                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip: 'name' must be a string", path.string());
-                    continue;
-                }
-                if (!clipJson["start"].is_number_integer() || !clipJson["end"].is_number_integer() ||
-                    !clipJson["fps"].is_number_integer()) {
-                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip '{}': start/end/fps must be integers",
+                if (!clipJson.contains("frames") || !clipJson["frames"].is_array()) {
+                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip '{}': missing 'frames' array",
                                  path.string(), clipJson["name"].get<std::string>());
                     continue;
                 }
 
                 SpriteSheet::ClipEntry entry;
-                entry.name       = clipJson["name"].get<std::string>();
-                entry.desc.Start = clipJson["start"].get<int>();
-                entry.desc.End   = clipJson["end"].get<int>();
-                entry.desc.FPS   = clipJson["fps"].get<int>();
+                entry.name = clipJson["name"].get<std::string>();
 
-                if (entry.desc.Start < 0 || entry.desc.End < entry.desc.Start || entry.desc.End >= totalFrames) {
-                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip '{}': start={} end={} out of range [0, {})",
-                                 path.string(), entry.name, entry.desc.Start, entry.desc.End, totalFrames);
+                bool valid = true;
+                for (auto const& stepJson : clipJson["frames"]) {
+                    if (!stepJson.contains("frame") || !stepJson.contains("duration_ms")) {
+                        spdlog::warn("SpriteSheetFactory: '{}' clip '{}': step missing frame/duration_ms",
+                                     path.string(), entry.name);
+                        valid = false;
+                        break;
+                    }
+                    if (!stepJson["frame"].is_number_integer() || !stepJson["duration_ms"].is_number_integer()) {
+                        spdlog::warn("SpriteSheetFactory: '{}' clip '{}': frame/duration_ms must be integers",
+                                     path.string(), entry.name);
+                        valid = false;
+                        break;
+                    }
+                    SpriteSheet::ClipFrame step;
+                    step.frameIndex = stepJson["frame"].get<int>();
+                    step.durationMs = stepJson["duration_ms"].get<int>();
+                    if (step.frameIndex < 0 || step.frameIndex >= totalFrames) {
+                        spdlog::warn("SpriteSheetFactory: '{}' clip '{}': frame index {} out of range [0, {})",
+                                     path.string(), entry.name, step.frameIndex, totalFrames);
+                        valid = false;
+                        break;
+                    }
+                    if (step.durationMs <= 0) {
+                        spdlog::warn("SpriteSheetFactory: '{}' clip '{}': duration_ms must be > 0 (got {})",
+                                     path.string(), entry.name, step.durationMs);
+                        valid = false;
+                        break;
+                    }
+                    entry.desc.frames.push_back(step);
+                }
+
+                if (!valid || entry.desc.frames.empty()) {
+                    spdlog::warn("SpriteSheetFactory: '{}' skipping empty or invalid clip '{}'",
+                                 path.string(), entry.name);
                     continue;
                 }
-                if (entry.desc.FPS <= 0) {
-                    spdlog::warn("SpriteSheetFactory: '{}' skipping clip '{}': fps must be > 0 (got {})",
-                                 path.string(), entry.name, entry.desc.FPS);
-                    continue;
-                }
 
-                std::string loopStr = "loop";
+                std::string loopStr = "stop";
                 if (clipJson.contains("loop") && clipJson["loop"].is_string()) {
                     loopStr = clipJson["loop"].get<std::string>();
                 }
-                if (loopStr == "stop") {
-                    entry.desc.Loop = SpriteSheet::LoopType::Stop;
+                if (loopStr == "loop") {
+                    entry.desc.loop = SpriteSheet::LoopType::Loop;
                 } else if (loopStr == "reset") {
-                    entry.desc.Loop = SpriteSheet::LoopType::Reset;
+                    entry.desc.loop = SpriteSheet::LoopType::Reset;
                 } else {
-                    entry.desc.Loop = SpriteSheet::LoopType::Loop;
+                    entry.desc.loop = SpriteSheet::LoopType::Stop;
                 }
 
                 clips.push_back(std::move(entry));
             }
         }
 
-        auto sheet = std::make_shared<SpriteSheet>(sharedImage, sheetDesc, std::move(clips));
+        auto sheet = std::make_shared<SpriteSheet>(sharedImage, std::move(frames), std::move(clips));
         m_cache.insert({ key, sheet });
         return sheet;
     }

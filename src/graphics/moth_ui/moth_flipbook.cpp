@@ -22,13 +22,22 @@ namespace moth_graphics::graphics {
         return m_image;
     }
 
-    void MothFlipbook::GetSheetDesc(moth_ui::IFlipbook::SheetDesc& outDesc) const {
-        graphics::SpriteSheet::SheetDesc internal;
-        m_spriteSheet->GetSheetDesc(internal);
-        outDesc.FrameDimensions = internal.FrameDimensions;
-        outDesc.SheetCells      = internal.SheetCells;
-        outDesc.MaxFrames       = internal.MaxFrames;
-        outDesc.NumClips        = internal.NumClips;
+    int MothFlipbook::GetFrameCount() const {
+        return m_spriteSheet->GetFrameCount();
+    }
+
+    bool MothFlipbook::GetFrameDesc(int index, moth_ui::IFlipbook::FrameDesc& outDesc) const {
+        graphics::SpriteSheet::FrameEntry entry;
+        if (!m_spriteSheet->GetFrameDesc(index, entry)) {
+            return false;
+        }
+        outDesc.rect  = entry.rect;
+        outDesc.pivot = entry.pivot;
+        return true;
+    }
+
+    int MothFlipbook::GetClipCount() const {
+        return m_spriteSheet->GetClipCount();
     }
 
     std::string_view MothFlipbook::GetClipName(int index) const {
@@ -40,10 +49,15 @@ namespace moth_graphics::graphics {
         if (!m_spriteSheet->GetClipDesc(name, internal)) {
             return false;
         }
-        outDesc.Start = internal.Start;
-        outDesc.End   = internal.End;
-        outDesc.FPS   = internal.FPS;
-        outDesc.Loop  = ToMothLoopType(internal.Loop);
+        outDesc.loop = ToMothLoopType(internal.loop);
+        outDesc.frames.clear();
+        outDesc.frames.reserve(internal.frames.size());
+        for (auto const& step : internal.frames) {
+            moth_ui::IFlipbook::ClipFrame f;
+            f.frameIndex = step.frameIndex;
+            f.durationMs = step.durationMs;
+            outDesc.frames.push_back(f);
+        }
         return true;
     }
 }
