@@ -60,7 +60,7 @@ struct fmt::formatter<moth_ui::Rect<T>> {
     constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.begin(); }
 
     auto format(moth_ui::Rect<T> const& r, fmt::format_context& ctx) const {
-        return fmt::format_to(ctx.out(), "[{} \u2192 {}]", r.topLeft, r.bottomRight);
+        return fmt::format_to(ctx.out(), "[{} -> {}]", r.topLeft, r.bottomRight);
     }
 };
 
