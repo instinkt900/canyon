@@ -36,17 +36,21 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(${PROJECT_NAME} PRIVATE moth_graphics Catch2::Catch2WithMain)
 
+if(WIN32 AND TARGET SDL2::SDL2main)
+    # Conan's SDL2::SDL2main package injects /SUBSYSTEM:WINDOWS via INTERFACE_LINK_OPTIONS,
+    # which makes WinMain the entry point and prevents Catch2's main from running.
+    # Clearing those options lets the binary default to /SUBSYSTEM:CONSOLE so the CRT
+    # calls Catch2's main directly.  WinMain and SDL_main then become dead code that exist
+    # only to satisfy SDL_windows_main.obj's linker references.
+    set_property(TARGET SDL2::SDL2main PROPERTY INTERFACE_LINK_OPTIONS "")
+endif()
+
 if(MSVC)
     # SDL_MAIN_HANDLED: prevent SDL2 from redefining main→SDL_main; Catch2 owns main.
     # /utf-8: interpret source files as UTF-8 so Unicode chars in headers (e.g. moth_ui_format.h) don't trigger C4566.
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS SDL_MAIN_HANDLED)
     target_compile_options(${PROJECT_NAME} PRIVATE /W3 /WX /utf-8)
-    # /SUBSYSTEM:CONSOLE: force console entry point so CRT calls Catch2's main directly.
-    # SDL2::SDL2main's Conan package injects /SUBSYSTEM:WINDOWS (WinMain entry); overriding
-    # it here means WinMain and SDL_main are dead code — they exist only to satisfy linker
-    # references in SDL_windows_main.obj and are never invoked at runtime.
-    # /ignore:4075: suppress LNK4075 "ignoring /SUBSYSTEM:WINDOWS due to /SUBSYSTEM:CONSOLE".
-    target_link_options(${PROJECT_NAME} PRIVATE /SUBSYSTEM:CONSOLE /ignore:4075 /ignore:4099)
+    target_link_options(${PROJECT_NAME} PRIVATE /ignore:4099)
 endif()
 
 include(CTest)
