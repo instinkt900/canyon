@@ -36,21 +36,19 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(${PROJECT_NAME} PRIVATE moth_graphics Catch2::Catch2WithMain)
 
-if(WIN32 AND TARGET SDL2::SDL2main)
-    # Conan's SDL2::SDL2main package injects /SUBSYSTEM:WINDOWS via INTERFACE_LINK_OPTIONS,
-    # which makes WinMain the entry point and prevents Catch2's main from running.
-    # Clearing those options lets the binary default to /SUBSYSTEM:CONSOLE so the CRT
-    # calls Catch2's main directly.  WinMain and SDL_main then become dead code that exist
-    # only to satisfy SDL_windows_main.obj's linker references.
-    set_property(TARGET SDL2::SDL2main PROPERTY INTERFACE_LINK_OPTIONS "")
-endif()
-
 if(MSVC)
     # SDL_MAIN_HANDLED: prevent SDL2 from redefining main→SDL_main; Catch2 owns main.
     # /utf-8: interpret source files as UTF-8 so Unicode chars in headers (e.g. moth_ui_format.h) don't trigger C4566.
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS SDL_MAIN_HANDLED)
     target_compile_options(${PROJECT_NAME} PRIVATE /W3 /WX /utf-8)
-    target_link_options(${PROJECT_NAME} PRIVATE /ignore:4099)
+    # /ENTRY:mainCRTStartup: directly set the binary's entry function to the console CRT
+    # startup, which calls Catch2's main().  This overrides any /SUBSYSTEM:WINDOWS injected
+    # by SDL2::SDL2main's Conan package (the injection happens via INTERFACE_LINK_OPTIONS
+    # and makes WinMain the entry point, causing the binary to call our SDL_main no-op
+    # stub and exit without ever running the tests).
+    # /SUBSYSTEM:CONSOLE kept for correctness alongside /ENTRY.
+    # /ignore:4075: suppress LNK4075 if a subsystem conflict warning fires.
+    target_link_options(${PROJECT_NAME} PRIVATE /ENTRY:mainCRTStartup /SUBSYSTEM:CONSOLE /ignore:4075 /ignore:4099)
 endif()
 
 include(CTest)
