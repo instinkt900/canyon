@@ -64,13 +64,15 @@ jobs:
           - os: windows
             runs_on: windows-latest
             configure_preset: conan-default
-            build_preset: conan-debug
-            test_preset: conan-debug
+            build_preset: conan-release
+            test_preset: conan-release
+            build_type: Release
           - os: linux
             runs_on: ubuntu-latest
             configure_preset: conan-debug
             build_preset: conan-debug
             test_preset: conan-debug
+            build_type: Debug
 
     steps:
     - uses: actions/checkout@v4
@@ -91,7 +93,7 @@ jobs:
       working-directory: tests
       shell: bash
       run: |
-        conan install . -pr ../.conan/profile -s build_type=Debug --build=missing
+        conan install . -pr ../.conan/profile -s build_type=${{ matrix.build_type }} --build=missing
         cmake --preset ${{ matrix.configure_preset }}
         cmake --build --preset ${{ matrix.build_preset }}
         ctest --preset ${{ matrix.test_preset }} --output-on-failure
