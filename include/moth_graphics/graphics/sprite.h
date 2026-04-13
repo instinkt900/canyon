@@ -34,11 +34,11 @@ namespace moth_graphics::graphics {
 
         /// @brief Select a named clip and reset its playback position to the first step.
         ///
-        /// This method only selects the clip; it does not change @c m_playing. The
-        /// animation will not advance until @c SetPlaying(true) is called, regardless
-        /// of whether a clip is active. If the name is not found the current clip is
-        /// cleared (equivalent to passing an empty string) and the playing state is
-        /// unchanged.
+        /// This method selects the clip and resets the sequence position. When a
+        /// valid clip is found the playing state is not changed — if the sprite was
+        /// already playing it will continue into the new clip. If the name is empty
+        /// or not found, the clip is cleared and playback is stopped (@c m_playing
+        /// is set to @c false).
         /// @param name Clip name as defined in the descriptor, or empty to clear.
         void SetClip(std::string_view name);
 

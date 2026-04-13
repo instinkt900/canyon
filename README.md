@@ -26,6 +26,7 @@ A C++17 application and graphics framework built on top of [moth_ui](https://git
   - [Windows](#windows)
   - [Disabling backends](#disabling-backends)
 - [Installing / Publishing](#installing--publishing)
+- [Known Limitations](#known-limitations)
 - [Related Projects](#related-projects)
 - [License](#license)
 
@@ -291,6 +292,18 @@ conan create . -pr .conan/profile -s build_type=Release --build=missing
 ```
 
 Consumers can then depend on `moth_graphics/<version>` in their own `conanfile.py`.
+
+---
+
+## Known Limitations
+
+- **Single primary window.** `Application` manages one window. Multiple windows can be created manually via `IPlatform::CreateWindow`, but they are not tracked by the application lifecycle and must be managed by the caller.
+
+- **Vulkan pixel format may be incorrect for sRGB content.** The pipeline uses `VK_FORMAT_B8G8R8A8_UNORM` (BGRA byte order, linear encoding). If sRGB-correct blending is needed, this should be changed to `VK_FORMAT_B8G8R8A8_SRGB` (same byte order, sRGB encoding). The `VK_FORMAT_R8G8B8A8_SRGB` variant was previously considered but would also require a byte-order swap. See `vulkan_graphics_pipeline.cpp`. This is unlikely to affect typical UI rendering.
+
+- **UI node trees are single-threaded.** This is a constraint inherited from moth_ui. Update, draw, and event dispatch on a `LayerStack` must all happen on the same thread. See the moth_ui documentation for the threading model of its other components.
+
+- **Linux system library constraint.** SDL2, SDL_image, SDL_ttf, GLFW, FreeType, and HarfBuzz must come from the system package manager on Linux (not Conan). See [Building → Linux](#linux) for details.
 
 ---
 
