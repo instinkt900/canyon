@@ -26,9 +26,9 @@ set(SOURCES
 )
 
 if(WIN32)
-    # SDL2main.lib (linked via SDL2::SDL2main) provides WinMain which calls SDL_main.
-    # Catch2WithMain owns main and does not define SDL_main.
-    # This stub satisfies the unresolved SDL_main symbol by forwarding to main.
+    # SDL2main.lib (linked via SDL2::SDL2main) provides WinMain which references SDL_main.
+    # Catch2WithMain owns main; this stub satisfies the SDL_main linker reference.
+    # WinMain is never called because we force /SUBSYSTEM:CONSOLE below.
     list(APPEND SOURCES src/sdl_main_stub.cpp)
 endif()
 
@@ -41,7 +41,12 @@ if(MSVC)
     # /utf-8: interpret source files as UTF-8 so Unicode chars in headers (e.g. moth_ui_format.h) don't trigger C4566.
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS SDL_MAIN_HANDLED)
     target_compile_options(${PROJECT_NAME} PRIVATE /W3 /WX /utf-8)
-    target_link_options(${PROJECT_NAME} PRIVATE /ignore:4099)
+    # /SUBSYSTEM:CONSOLE: force console entry point so CRT calls Catch2's main directly.
+    # SDL2::SDL2main's Conan package injects /SUBSYSTEM:WINDOWS (WinMain entry); overriding
+    # it here means WinMain and SDL_main are dead code — they exist only to satisfy linker
+    # references in SDL_windows_main.obj and are never invoked at runtime.
+    # /ignore:4075: suppress LNK4075 "ignoring /SUBSYSTEM:WINDOWS due to /SUBSYSTEM:CONSOLE".
+    target_link_options(${PROJECT_NAME} PRIVATE /SUBSYSTEM:CONSOLE /ignore:4075 /ignore:4099)
 endif()
 
 include(CTest)
