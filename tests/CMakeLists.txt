@@ -25,6 +25,13 @@ set(SOURCES
     src/api_surface_moth_bridge.cpp
 )
 
+if(WIN32)
+    # SDL2main.lib (linked via SDL2::SDL2main) provides WinMain which calls SDL_main.
+    # Catch2WithMain owns main and does not define SDL_main.
+    # This stub satisfies the unresolved SDL_main symbol by forwarding to main.
+    list(APPEND SOURCES src/sdl_main_stub.cpp)
+endif()
+
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(${PROJECT_NAME} PRIVATE moth_graphics Catch2::Catch2WithMain)
