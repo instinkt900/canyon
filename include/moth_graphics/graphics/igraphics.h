@@ -32,7 +32,11 @@ namespace moth_graphics::graphics {
 
         /// @brief Initialize the ImGui backend for the given window.
         /// @param window The window whose native handle ImGui will attach to.
-        virtual void InitImgui(moth_graphics::platform::Window const& window) = 0;
+        /// @param enableViewports If true, enables ImGui multi-viewport support (promotes
+        ///        floating windows to native OS windows). Not supported by the SDL2 renderer
+        ///        backend; ignored there. Avoid on tiling window managers (i3, sway) where
+        ///        new OS windows disrupt drag-and-drop.
+        virtual void InitImgui(moth_graphics::platform::Window const& window, bool enableViewports = false) = 0;
 
         /// @brief Returns the surface context that owns this graphics instance.
         virtual SurfaceContext& GetSurfaceContext() const = 0;

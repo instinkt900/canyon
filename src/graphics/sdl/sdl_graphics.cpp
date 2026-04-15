@@ -23,7 +23,7 @@ namespace moth_graphics::graphics::sdl {
         }
     }
 
-    void Graphics::InitImgui(moth_graphics::platform::Window const& window) {
+    void Graphics::InitImgui(moth_graphics::platform::Window const& window, bool /*enableViewports*/) {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         auto& io = ImGui::GetIO();

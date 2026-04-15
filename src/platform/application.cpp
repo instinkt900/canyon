@@ -25,7 +25,7 @@ namespace moth_graphics::platform {
         }
         m_window->AddEventListener(this);
         m_window->GetLayerStack().SetEventListener(this);
-        m_window->GetGraphics().InitImgui(*m_window);
+        m_window->GetGraphics().InitImgui(*m_window, m_imguiViewportsEnabled);
         PostCreateWindow();
         spdlog::info("Application: ready");
     }

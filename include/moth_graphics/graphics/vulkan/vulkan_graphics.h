@@ -36,7 +36,7 @@ namespace moth_graphics::graphics::vulkan {
         Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
         ~Graphics();
 
-        void InitImgui(moth_graphics::platform::Window const& window) override;
+        void InitImgui(moth_graphics::platform::Window const& window, bool enableViewports = false) override;
 
         SurfaceContext& GetSurfaceContext() const override { return m_surfaceContext; }
 

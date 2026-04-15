@@ -51,6 +51,11 @@ namespace moth_graphics::platform {
         /// @brief Returns the primary window, or @c nullptr before @c Init() is called.
         Window* GetWindow() { return m_window.get(); }
 
+        /// @brief Enable or disable ImGui multi-viewport support. Must be called before Init().
+        /// When enabled, floating ImGui windows are promoted to native OS windows.
+        /// Avoid on tiling window managers (i3, sway) — new OS windows disrupt drag-and-drop.
+        void SetImGuiViewportsEnabled(bool enabled) { m_imguiViewportsEnabled = enabled; }
+
         Application(Application const&) = delete;
         Application& operator=(Application const&) = delete;
         Application(Application&&) = delete;
@@ -72,6 +77,7 @@ namespace moth_graphics::platform {
         int m_mainWindowHeight;
         IntVec2 m_mainWindowPosition = { 0, 0 };
         bool m_mainWindowMaximized = false;
+        bool m_imguiViewportsEnabled = false;
         std::unique_ptr<Window> m_window;
     };
 }
