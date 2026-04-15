@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
+## [1.0.0-rc.1] - 2026-04-15
+### Features
+- Replace uniform-grid sheet model with per-frame rects and explicit clip steps
+- Expose per-frame pivot on Sprite and add DrawSpriteAtPivot
+- Add test suite for moth_graphics
+
+### Bug Fixes
+- Remove MothImage::ImGui() override following moth_ui IImage change
+- Harden spritesheet loading and fix stale log/doc issues
+- Address test suite review findings
+- Name ImGui stub parameters and fix empty-sheet test image
+- Removing unicode character from format
+- Fix Windows test build — SDL_MAIN_HANDLED and /utf-8
+- Provide SDL_main stub for Windows test build
+- Force /SUBSYSTEM:CONSOLE in test binary to break SDL_main/WinMain cycle
+- Clear SDL2::SDL2main INTERFACE_LINK_OPTIONS to prevent /SUBSYSTEM:WINDOWS
+- Use /ENTRY:mainCRTStartup to force console entry point on Windows
+- Use SDL main renaming instead of entry-point hacks on Windows
+- Loosen SetRunning ticker test to >= 3 fixed ticks
+- Allow pre-release suffix in cliff.toml tag_pattern
+
+### Refactoring
+- Rename DrawSpriteAtPivot to DrawSprite and drop default pivot
+
+### Documentation
+- Add known limitations to README, remove TODO
+
+### Miscellaneous
+- Resetting moth_ui dep version
+- Updating moth_ui dep to accept rc versions
+- Fixing moth_ui version dep. ranges dont work
+- Remove shared library scaffolding — static-only build
+- Updating version string parsing
+
+### Changes
+- Bump version to 1.0.0-rc.1
+
 ## [0.10.1] - 2026-04-04
 ### Features
 - Register MothFlipbookFactory with moth_ui Context in Window::PostCreate
