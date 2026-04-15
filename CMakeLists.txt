@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" VERSION_STR)
-string(STRIP "${VERSION_STR}" PROJECT_VERSION)
+string(STRIP "${VERSION_STR}" PROJECT_VERSION_FULL)
+string(REGEX REPLACE "[-+].*$" "" PROJECT_VERSION "${PROJECT_VERSION_FULL}")
 
 project(moth_graphics VERSION ${PROJECT_VERSION} DESCRIPTION "A basic graphical framework.")
 
