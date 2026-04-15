@@ -69,10 +69,10 @@ jobs:
             build_type: Release
           - os: linux
             runs_on: ubuntu-latest
-            configure_preset: conan-debug
-            build_preset: conan-debug
-            test_preset: conan-debug
-            build_type: Debug
+            configure_preset: conan-release
+            build_preset: conan-release
+            test_preset: conan-release
+            build_type: Release
 
     steps:
     - uses: actions/checkout@v4
