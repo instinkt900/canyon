@@ -36,7 +36,7 @@ namespace moth_graphics::graphics::vulkan {
         Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
         ~Graphics();
 
-        void InitImgui(moth_graphics::platform::Window const& window) override;
+        void InitImgui(moth_graphics::platform::Window const& window, bool enableViewports = false) override;
 
         SurfaceContext& GetSurfaceContext() const override { return m_surfaceContext; }
 
@@ -60,7 +60,7 @@ namespace moth_graphics::graphics::vulkan {
             Color color;
         };
 
-        void Begin() override;
+        bool Begin() override;
         void End() override;
 
         void SetBlendMode(BlendMode mode) override;
@@ -106,6 +106,7 @@ namespace moth_graphics::graphics::vulkan {
 
         bool m_imguiInitialized = false;
         SurfaceContext& m_surfaceContext;
+        VkSurfaceKHR m_vkSurface = VK_NULL_HANDLE;
         std::stack<FloatMat4x4> m_transformStack;
 
         struct PushConstants {

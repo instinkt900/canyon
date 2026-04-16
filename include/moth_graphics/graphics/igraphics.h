@@ -32,15 +32,24 @@ namespace moth_graphics::graphics {
 
         /// @brief Initialize the ImGui backend for the given window.
         /// @param window The window whose native handle ImGui will attach to.
-        virtual void InitImgui(moth_graphics::platform::Window const& window) = 0;
+        /// @param enableViewports If true, enables ImGui multi-viewport support (promotes
+        ///        floating windows to native OS windows). Not supported by the SDL2 renderer
+        ///        backend; ignored there. Avoid on tiling window managers (i3, sway) where
+        ///        new OS windows disrupt drag-and-drop.
+        virtual void InitImgui(moth_graphics::platform::Window const& window, bool enableViewports = false) = 0;
 
         /// @brief Returns the surface context that owns this graphics instance.
         virtual SurfaceContext& GetSurfaceContext() const = 0;
 
         /// @brief Begin a new frame. Must be called before any draw operations.
-        virtual void Begin() = 0;
+        /// @returns @c true if the frame can proceed, @c false if the swapchain was
+        ///          out-of-date and the frame should be skipped (e.g. the window is
+        ///          minimised or being resized). When @c false is returned, @c End()
+        ///          must NOT be called for this frame.
+        virtual bool Begin() = 0;
 
-        /// @brief End the current frame and present it.
+        /// @brief End the current frame and present it. Only call when @c Begin()
+        ///        returned @c true.
         virtual void End() = 0;
 
         /// @brief Set the active blend mode for subsequent draw calls.

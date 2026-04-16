@@ -13,7 +13,7 @@ namespace {
 }
 
 namespace moth_graphics::graphics::vulkan {
-    void Graphics::InitImgui(moth_graphics::platform::Window const& window) {
+    void Graphics::InitImgui(moth_graphics::platform::Window const& window, bool enableViewports) {
         if (m_imguiInitialized) {
             return;
         }
@@ -26,11 +26,14 @@ namespace moth_graphics::graphics::vulkan {
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        if (enableViewports) {
+            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        }
 
         ImGui::StyleColorsDark();
-        ImGuiStyle& style = ImGui::GetStyle();
-        if ((ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0) {
+        if (enableViewports) {
+            ImGuiStyle& style = ImGui::GetStyle();
             style.WindowRounding = 0;
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }

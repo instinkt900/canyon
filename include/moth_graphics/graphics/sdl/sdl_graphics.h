@@ -25,11 +25,11 @@ namespace moth_graphics::graphics::sdl {
         Graphics(SurfaceContext& context);
         ~Graphics() override;
 
-        void InitImgui(moth_graphics::platform::Window const& window) override;
+        void InitImgui(moth_graphics::platform::Window const& window, bool enableViewports = false) override;
 
         SurfaceContext& GetSurfaceContext() const override { return m_surfaceContext; }
 
-        void Begin() override;
+        bool Begin() override;
         void End() override;
 
         void SetBlendMode(BlendMode mode) override;

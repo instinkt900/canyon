@@ -4,10 +4,19 @@
 #include "moth_graphics/graphics/moth_ui/moth_image.h"
 
 namespace moth_graphics::graphics {
+    namespace {
+        TextureFilter ToGraphicsFilter(moth_ui::TextureFilter f) {
+            return f == moth_ui::TextureFilter::Nearest
+                ? TextureFilter::Nearest
+                : TextureFilter::Linear;
+        }
+    }
+
     MothRenderer::MothRenderer(IGraphics& graphics)
         : m_graphics(graphics) {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });
         m_blendMode.push(BlendMode::Replace);
+        m_textureFilter.push(moth_ui::TextureFilter::Linear);
     }
 
     void MothRenderer::PushBlendMode(moth_ui::BlendMode mode) {
@@ -71,6 +80,16 @@ namespace moth_graphics::graphics {
         }
     }
 
+    void MothRenderer::PushTextureFilter(moth_ui::TextureFilter filter) {
+        m_textureFilter.push(filter);
+    }
+
+    void MothRenderer::PopTextureFilter() {
+        if (m_textureFilter.size() > 1) {
+            m_textureFilter.pop();
+        }
+    }
+
     void MothRenderer::RenderRect(moth_ui::IntRect const& rect) {
         m_graphics.SetBlendMode(m_blendMode.top());
         m_graphics.SetColor(m_drawColor.top());
@@ -97,6 +116,11 @@ namespace moth_graphics::graphics {
         }
         auto& internalImage = *internalImagePtr;
         auto const srcRect = sourceRect;
+
+        if (auto texture = internalImage.GetTexture()) {
+            auto const gfxFilter = ToGraphicsFilter(m_textureFilter.top());
+            texture->SetFilter(gfxFilter, gfxFilter);
+        }
 
         if (scaleType == moth_ui::ImageScaleType::Stretch) {
             m_graphics.DrawImage(internalImage, destRect, &srcRect);

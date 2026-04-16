@@ -6,6 +6,7 @@ namespace moth_graphics::graphics::sdl {
     Texture::Texture(SDLTextureRef texture)
         : m_texture(texture) {
         SDL_QueryTexture(texture->GetImpl(), NULL, NULL, &m_textureDimensions.x, &m_textureDimensions.y);
+        Texture::SetFilter(TextureFilter::Linear, TextureFilter::Linear);
     }
 
     int Texture::GetWidth() const {

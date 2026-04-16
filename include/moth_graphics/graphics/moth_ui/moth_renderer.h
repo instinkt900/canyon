@@ -7,6 +7,7 @@
 
 #include <moth_ui/graphics/irenderer.h>
 #include <moth_ui/graphics/blend_mode.h>
+#include <moth_ui/graphics/texture_filter.h>
 #include <moth_ui/utils/color.h>
 #include <moth_ui/utils/rect.h>
 
@@ -29,6 +30,9 @@ namespace moth_graphics::graphics {
         void PushClip(moth_ui::IntRect const& rect) override;
         void PopClip() override;
 
+        void PushTextureFilter(moth_ui::TextureFilter filter) override;
+        void PopTextureFilter() override;
+
         void RenderRect(moth_ui::IntRect const& rect) override;
         void RenderFilledRect(moth_ui::IntRect const& rect) override;
         void RenderImage(moth_ui::IImage const& image, moth_ui::IntRect const& sourceRect, moth_ui::IntRect const& destRect, moth_ui::ImageScaleType scaleType, float scale) override;
@@ -41,5 +45,6 @@ namespace moth_graphics::graphics {
         std::stack<Color> m_drawColor;
         std::stack<BlendMode> m_blendMode;
         std::stack<IntRect> m_clip;
+        std::stack<moth_ui::TextureFilter> m_textureFilter;
     };
 }

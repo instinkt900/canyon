@@ -160,7 +160,9 @@ namespace moth_graphics::platform::sdl {
     }
 
     void Window::Draw() {
-        m_graphics->Begin();
+        if (!m_graphics->Begin()) {
+            return;
+        }
         m_layerStack->Draw();
         m_graphics->End();
         SDL_RenderPresent(m_renderer);

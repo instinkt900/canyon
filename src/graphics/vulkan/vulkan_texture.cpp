@@ -50,6 +50,7 @@ namespace moth_graphics::graphics::vulkan {
         , m_context(context)
         , m_vkExtent{}
         , m_vkFormat(VK_FORMAT_UNDEFINED) {
+        Texture::SetFilter(TextureFilter::Linear, TextureFilter::Linear);
     }
 
     Texture::Texture(SurfaceContext& context, VkImage image, VkImageView view, VkExtent2D extent, VkFormat format, bool owning)
@@ -60,6 +61,7 @@ namespace moth_graphics::graphics::vulkan {
         , m_vkImage(image)
         , m_vkView(view)
         , m_owningImage(owning) {
+        Texture::SetFilter(TextureFilter::Linear, TextureFilter::Linear);
     }
 
     Texture::Texture(SurfaceContext& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, bool owning)
@@ -69,8 +71,9 @@ namespace moth_graphics::graphics::vulkan {
         , m_vkFormat(format)
         , m_owningImage(owning) {
         CreateResource(tiling, usage, properties);
-        //CreateView();
-        //CreateDefaultSampler();
+        // CreateView();
+        // CreateDefaultSampler();
+        Texture::SetFilter(TextureFilter::Linear, TextureFilter::Linear);
     }
 
     Texture::~Texture() {
@@ -158,18 +161,27 @@ namespace moth_graphics::graphics::vulkan {
     namespace {
         VkSamplerAddressMode ToVkAddressMode(TextureAddressMode mode) {
             switch (mode) {
-                case TextureAddressMode::Repeat:         return VK_SAMPLER_ADDRESS_MODE_REPEAT;
-                case TextureAddressMode::MirroredRepeat: return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
-                case TextureAddressMode::ClampToEdge:    return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-                case TextureAddressMode::ClampToBorder:  return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+            case TextureAddressMode::Repeat:
+                return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            case TextureAddressMode::MirroredRepeat:
+                return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
+            case TextureAddressMode::ClampToEdge:
+                return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            case TextureAddressMode::ClampToBorder:
+                return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
             }
             return VK_SAMPLER_ADDRESS_MODE_REPEAT;
         }
     }
 
     void Texture::SetFilter(TextureFilter minFilter, TextureFilter magFilter) {
-        m_minFilter = (minFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
-        m_magFilter = (magFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        VkFilter const newMin = (minFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        VkFilter const newMag = (magFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        if (newMin == m_minFilter && newMag == m_magFilter) {
+            return;
+        }
+        m_minFilter = newMin;
+        m_magFilter = newMag;
         if (m_vkDescriptorSet != VK_NULL_HANDLE) {
             ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
             m_vkDescriptorSet = VK_NULL_HANDLE;
@@ -184,8 +196,13 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     void Texture::SetAddressMode(TextureAddressMode u, TextureAddressMode v) {
-        m_addressModeU = ToVkAddressMode(u);
-        m_addressModeV = ToVkAddressMode(v);
+        VkSamplerAddressMode const newU = ToVkAddressMode(u);
+        VkSamplerAddressMode const newV = ToVkAddressMode(v);
+        if (newU == m_addressModeU && newV == m_addressModeV) {
+            return;
+        }
+        m_addressModeU = newU;
+        m_addressModeV = newV;
         if (m_vkDescriptorSet != VK_NULL_HANDLE) {
             ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
             m_vkDescriptorSet = VK_NULL_HANDLE;

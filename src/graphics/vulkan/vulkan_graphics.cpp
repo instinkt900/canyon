@@ -12,6 +12,7 @@
 namespace moth_graphics::graphics::vulkan {
     Graphics::Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
         : m_surfaceContext(context)
+        , m_vkSurface(surface)
         , m_vkPipelineCache(VK_NULL_HANDLE) {
         CreateRenderPass();
         CreateShaders();
@@ -45,18 +46,36 @@ namespace moth_graphics::graphics::vulkan {
         vkDestroyPipelineCache(m_surfaceContext.GetVkDevice(), m_vkPipelineCache, nullptr);
     }
 
-    void Graphics::Begin() {
+    bool Graphics::Begin() {
+        m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
+        if (m_defaultContext.m_target == nullptr) {
+            // Swapchain is out-of-date (e.g. window was resized between Update and
+            // Draw).  Query the actual surface size from Vulkan, skip recreation
+            // entirely when the window is minimised (0×0 extent), and retry once.
+            VkSurfaceCapabilitiesKHR caps{};
+            vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+                m_surfaceContext.GetVkPhysicalDevice(), m_vkSurface, &caps);
+            if (caps.currentExtent.width == 0 || caps.currentExtent.height == 0) {
+                return false;
+            }
+            OnResize(m_vkSurface, caps.currentExtent.width, caps.currentExtent.height);
+            m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
+            if (m_defaultContext.m_target == nullptr) {
+                return false;
+            }
+        }
+
         if (m_imguiInitialized) {
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
         }
 
-        m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
         VkFence cmdFence = m_defaultContext.m_target->GetFence().GetVkFence();
         vkResetFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence);
 
         BeginContext(&m_defaultContext);
+        return true;
     }
 
     void Graphics::End() {
@@ -85,7 +104,15 @@ namespace moth_graphics::graphics::vulkan {
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapChains;
         presentInfo.pImageIndices = swapchainIndices;
-        vkQueuePresentKHR(m_surfaceContext.GetVkQueue(), &presentInfo);
+        VkResult presentResult = vkQueuePresentKHR(m_surfaceContext.GetVkQueue(), &presentInfo);
+        if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR) {
+            // Swapchain is no longer optimal.  The next Begin() will detect the
+            // out-of-date condition via vkAcquireNextImageKHR and recreate it.
+            spdlog::warn("Vulkan: swapchain present returned {} — swapchain will be recreated on next frame",
+                         static_cast<int>(presentResult));
+        } else if (presentResult != VK_SUCCESS) {
+            spdlog::error("Vulkan: vkQueuePresentKHR failed: {}", static_cast<int>(presentResult));
+        }
     }
 
     void Graphics::SetBlendMode(BlendMode mode) {
