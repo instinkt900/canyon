@@ -3,11 +3,13 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
-## [1.0.0-rc.1] - 2026-04-15
+## [1.0.0-rc.1] - 2026-04-16
 ### Features
 - Replace uniform-grid sheet model with per-frame rects and explicit clip steps
 - Expose per-frame pivot on Sprite and add DrawSpriteAtPivot
 - Add test suite for moth_graphics
+- Make ImGui multi-viewport opt-in via enableViewports param
+- Implement PushTextureFilter/PopTextureFilter in MothRenderer
 
 ### Bug Fixes
 - Remove MothImage::ImGui() override following moth_ui IImage change
@@ -23,9 +25,15 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Use SDL main renaming instead of entry-point hacks on Windows
 - Loosen SetRunning ticker test to >= 3 fixed ticks
 - Allow pre-release suffix in cliff.toml tag_pattern
+- Default texture filter to linear in SDL and Vulkan constructors
+- Handle Vulkan swapchain out-of-date on window resize
+- Update api_surface_graphics test to match current IGraphics signatures
 
 ### Refactoring
 - Rename DrawSpriteAtPivot to DrawSprite and drop default pivot
+
+### Performance
+- Skip sampler teardown in SetFilter/SetAddressMode when unchanged
 
 ### Documentation
 - Add known limitations to README, remove TODO
