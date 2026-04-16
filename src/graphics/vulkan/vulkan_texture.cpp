@@ -50,6 +50,7 @@ namespace moth_graphics::graphics::vulkan {
         , m_context(context)
         , m_vkExtent{}
         , m_vkFormat(VK_FORMAT_UNDEFINED) {
+        Texture::SetFilter(TextureFilter::Linear, TextureFilter::Linear);
     }
 
     Texture::Texture(SurfaceContext& context, VkImage image, VkImageView view, VkExtent2D extent, VkFormat format, bool owning)
@@ -60,6 +61,7 @@ namespace moth_graphics::graphics::vulkan {
         , m_vkImage(image)
         , m_vkView(view)
         , m_owningImage(owning) {
+        Texture::SetFilter(TextureFilter::Linear, TextureFilter::Linear);
     }
 
     Texture::Texture(SurfaceContext& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, bool owning)
@@ -69,8 +71,9 @@ namespace moth_graphics::graphics::vulkan {
         , m_vkFormat(format)
         , m_owningImage(owning) {
         CreateResource(tiling, usage, properties);
-        //CreateView();
-        //CreateDefaultSampler();
+        // CreateView();
+        // CreateDefaultSampler();
+        Texture::SetFilter(TextureFilter::Linear, TextureFilter::Linear);
     }
 
     Texture::~Texture() {
@@ -158,10 +161,14 @@ namespace moth_graphics::graphics::vulkan {
     namespace {
         VkSamplerAddressMode ToVkAddressMode(TextureAddressMode mode) {
             switch (mode) {
-                case TextureAddressMode::Repeat:         return VK_SAMPLER_ADDRESS_MODE_REPEAT;
-                case TextureAddressMode::MirroredRepeat: return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
-                case TextureAddressMode::ClampToEdge:    return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-                case TextureAddressMode::ClampToBorder:  return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+            case TextureAddressMode::Repeat:
+                return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            case TextureAddressMode::MirroredRepeat:
+                return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
+            case TextureAddressMode::ClampToEdge:
+                return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            case TextureAddressMode::ClampToBorder:
+                return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
             }
             return VK_SAMPLER_ADDRESS_MODE_REPEAT;
         }
