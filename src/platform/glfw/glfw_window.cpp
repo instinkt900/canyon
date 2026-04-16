@@ -34,7 +34,12 @@ namespace moth_graphics::platform::glfw {
     }
 
     void Window::Draw() {
-        m_graphics->Begin();
+        if (!m_graphics->Begin()) {
+            // Swapchain is out of date (e.g. minimised or mid-resize).
+            // Skip rendering this frame; Begin() has already triggered recreation
+            // if the surface extent was non-zero.
+            return;
+        }
         m_layerStack->Draw();
         m_graphics->End();
     }
@@ -157,13 +162,21 @@ namespace moth_graphics::platform::glfw {
     }
 
     void Window::OnResize() {
-        spdlog::info("GLFW: window '{}' resized to {}x{}", m_title, m_windowWidth, m_windowHeight);
+        int fbWidth = 0;
+        int fbHeight = 0;
+        glfwGetFramebufferSize(m_glfwWindow, &fbWidth, &fbHeight);
+        spdlog::info("GLFW: window '{}' resized to {}x{} (framebuffer {}x{})",
+                     m_title, m_windowWidth, m_windowHeight, fbWidth, fbHeight);
+        if (fbWidth == 0 || fbHeight == 0) {
+            // Window is minimised or has a zero dimension; skip swapchain recreation.
+            return;
+        }
         auto* graphics = dynamic_cast<graphics::vulkan::Graphics*>(m_graphics.get());
         if (graphics == nullptr) {
             spdlog::error("GLFW: OnResize called but graphics backend is not Vulkan");
             return;
         }
-        graphics->OnResize(m_customVkSurface, m_windowWidth, m_windowHeight);
+        graphics->OnResize(m_customVkSurface, static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight));
         m_layerStack->SetWindowSize({ m_windowWidth, m_windowHeight });
     }
 }

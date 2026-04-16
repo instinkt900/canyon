@@ -42,9 +42,14 @@ namespace moth_graphics::graphics {
         virtual SurfaceContext& GetSurfaceContext() const = 0;
 
         /// @brief Begin a new frame. Must be called before any draw operations.
-        virtual void Begin() = 0;
+        /// @returns @c true if the frame can proceed, @c false if the swapchain was
+        ///          out-of-date and the frame should be skipped (e.g. the window is
+        ///          minimised or being resized). When @c false is returned, @c End()
+        ///          must NOT be called for this frame.
+        virtual bool Begin() = 0;
 
-        /// @brief End the current frame and present it.
+        /// @brief End the current frame and present it. Only call when @c Begin()
+        ///        returned @c true.
         virtual void End() = 0;
 
         /// @brief Set the active blend mode for subsequent draw calls.

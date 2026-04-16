@@ -60,7 +60,7 @@ namespace moth_graphics::graphics::vulkan {
             Color color;
         };
 
-        void Begin() override;
+        bool Begin() override;
         void End() override;
 
         void SetBlendMode(BlendMode mode) override;
@@ -106,6 +106,7 @@ namespace moth_graphics::graphics::vulkan {
 
         bool m_imguiInitialized = false;
         SurfaceContext& m_surfaceContext;
+        VkSurfaceKHR m_vkSurface = VK_NULL_HANDLE;
         std::stack<FloatMat4x4> m_transformStack;
 
         struct PushConstants {

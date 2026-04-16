@@ -36,12 +36,13 @@ namespace moth_graphics::graphics::sdl {
         ImGui_ImplSDLRenderer2_Init(sdlWindow.GetSDLRenderer());
     }
 
-    void Graphics::Begin() {
+    bool Graphics::Begin() {
         if (m_imguiWindow != nullptr) {
             ImGui_ImplSDLRenderer2_NewFrame();
             ImGui_ImplSDL2_NewFrame();
             ImGui::NewFrame();
         }
+        return true;
     }
 
     void Graphics::End() {
