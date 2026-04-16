@@ -175,8 +175,13 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     void Texture::SetFilter(TextureFilter minFilter, TextureFilter magFilter) {
-        m_minFilter = (minFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
-        m_magFilter = (magFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        VkFilter const newMin = (minFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        VkFilter const newMag = (magFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        if (newMin == m_minFilter && newMag == m_magFilter) {
+            return;
+        }
+        m_minFilter = newMin;
+        m_magFilter = newMag;
         if (m_vkDescriptorSet != VK_NULL_HANDLE) {
             ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
             m_vkDescriptorSet = VK_NULL_HANDLE;
@@ -191,8 +196,13 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     void Texture::SetAddressMode(TextureAddressMode u, TextureAddressMode v) {
-        m_addressModeU = ToVkAddressMode(u);
-        m_addressModeV = ToVkAddressMode(v);
+        VkSamplerAddressMode const newU = ToVkAddressMode(u);
+        VkSamplerAddressMode const newV = ToVkAddressMode(v);
+        if (newU == m_addressModeU && newV == m_addressModeV) {
+            return;
+        }
+        m_addressModeU = newU;
+        m_addressModeV = newV;
         if (m_vkDescriptorSet != VK_NULL_HANDLE) {
             ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
             m_vkDescriptorSet = VK_NULL_HANDLE;
