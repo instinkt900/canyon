@@ -12,9 +12,9 @@ using namespace moth_graphics;
 using namespace moth_graphics::graphics;
 
 TEST_CASE("IGraphics method signatures are stable", "[api][graphics][igraphics]") {
-    void (IGraphics::*initImgui)(platform::Window const&)    = &IGraphics::InitImgui;
-    SurfaceContext& (IGraphics::*getSurface)() const          = &IGraphics::GetSurfaceContext;
-    void (IGraphics::*begin)()                                = &IGraphics::Begin;
+    void (IGraphics::*initImgui)(platform::Window const&, bool) = &IGraphics::InitImgui;
+    SurfaceContext& (IGraphics::*getSurface)() const            = &IGraphics::GetSurfaceContext;
+    bool (IGraphics::*begin)()                                  = &IGraphics::Begin;
     void (IGraphics::*end)()                                  = &IGraphics::End;
     void (IGraphics::*setBlend)(BlendMode)                    = &IGraphics::SetBlendMode;
     void (IGraphics::*setColor)(Color const&)                 = &IGraphics::SetColor;
