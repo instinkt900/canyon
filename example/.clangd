@@ -1,4 +1,0 @@
-# .clangd
-CompileFlags:
-   CompilationDatabase: ./build/Debug
-
