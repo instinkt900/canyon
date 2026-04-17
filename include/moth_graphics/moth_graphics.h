@@ -1,5 +1,7 @@
 #pragma once
 
+#include "moth_graphics/version.h"
+
 // Static library — no export annotation needed.
 #define MOTH_GRAPHICS_API
 

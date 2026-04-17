@@ -3,3 +3,4 @@
 build/
 imgui.ini
 CMakeUserPresets.json
+include/moth_graphics/version.h
