@@ -46,6 +46,8 @@ namespace moth_graphics::graphics {
         result.topLeft.y = std::max(parentRect.topLeft.y, childRect.topLeft.y);
         result.bottomRight.x = std::min(parentRect.bottomRight.x, childRect.bottomRight.x);
         result.bottomRight.y = std::min(parentRect.bottomRight.y, childRect.bottomRight.y);
+        result.bottomRight.x = std::max(result.topLeft.x, result.bottomRight.x);
+        result.bottomRight.y = std::max(result.topLeft.y, result.bottomRight.y);
         return result;
     }
 
