@@ -63,7 +63,7 @@ namespace moth_graphics::graphics::sdl {
             SDL_DestroyTexture(tex);
             return nullptr;
         }
-        return std::make_unique<Texture>(CreateTextureRef(tex));
+        return std::make_unique<Texture>(m_context.GetRenderer(), CreateTextureRef(tex));
     }
 
     std::unique_ptr<IImage> AssetContext::ImageFromFile(std::filesystem::path const& path) {

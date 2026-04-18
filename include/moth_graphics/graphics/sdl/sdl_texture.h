@@ -12,7 +12,7 @@
 namespace moth_graphics::graphics::sdl {
     class Texture : public ITexture {
     public:
-        explicit Texture(SDLTextureRef texture);
+        Texture(SDL_Renderer* renderer, SDLTextureRef texture);
         ~Texture() override = default;
 
         int GetWidth() const override;
@@ -25,6 +25,7 @@ namespace moth_graphics::graphics::sdl {
         static std::unique_ptr<Texture> FromFile(SDL_Renderer* renderer, std::filesystem::path const& path);
 
     private:
+        SDL_Renderer* m_renderer;
         SDLTextureRef m_texture;
         IntVec2 m_textureDimensions;
     };

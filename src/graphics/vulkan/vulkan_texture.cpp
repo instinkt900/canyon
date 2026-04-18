@@ -77,8 +77,14 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     Texture::~Texture() {
-        if (m_vkSampler != VK_NULL_HANDLE) {
-            vkDestroySampler(m_context.GetVkDevice(), m_vkSampler, nullptr);
+        if (m_vkDescriptorSet != VK_NULL_HANDLE) {
+            ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
+        }
+        if (m_vkSamplerLinear != VK_NULL_HANDLE) {
+            vkDestroySampler(m_context.GetVkDevice(), m_vkSamplerLinear, nullptr);
+        }
+        if (m_vkSamplerNearest != VK_NULL_HANDLE) {
+            vkDestroySampler(m_context.GetVkDevice(), m_vkSamplerNearest, nullptr);
         }
         if (m_vkView != VK_NULL_HANDLE) {
             vkDestroyImageView(m_context.GetVkDevice(), m_vkView, nullptr);
@@ -96,16 +102,24 @@ namespace moth_graphics::graphics::vulkan {
         return m_vkView;
     }
     VkSampler Texture::GetVkSampler() {
-        if (m_vkSampler == VK_NULL_HANDLE) {
-            CreateDefaultSampler();
+        bool const nearest = (m_minFilter == VK_FILTER_NEAREST || m_magFilter == VK_FILTER_NEAREST);
+        VkSampler& slot = nearest ? m_vkSamplerNearest : m_vkSamplerLinear;
+        if (slot == VK_NULL_HANDLE) {
+            slot = CreateSampler(m_minFilter, m_magFilter);
         }
-        return m_vkSampler;
+        return slot;
     }
 
     VkDescriptorSet Texture::GetDescriptorSet() {
-        if (m_vkDescriptorSet == VK_NULL_HANDLE) {
-            m_vkDescriptorSet = ImGui_ImplVulkan_AddTexture(GetVkSampler(), GetVkView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        VkSampler const currentSampler = GetVkSampler();
+        if (m_vkDescriptorSet != VK_NULL_HANDLE && m_vkDescriptorSetSampler == currentSampler) {
+            return m_vkDescriptorSet;
         }
+        if (m_vkDescriptorSet != VK_NULL_HANDLE) {
+            ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
+        }
+        m_vkDescriptorSet = ImGui_ImplVulkan_AddTexture(currentSampler, GetVkView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        m_vkDescriptorSetSampler = currentSampler;
         return m_vkDescriptorSet;
     }
 
@@ -175,24 +189,12 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     void Texture::SetFilter(TextureFilter minFilter, TextureFilter magFilter) {
-        VkFilter const newMin = (minFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
-        VkFilter const newMag = (magFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
-        if (newMin == m_minFilter && newMag == m_magFilter) {
-            return;
-        }
-        m_minFilter = newMin;
-        m_magFilter = newMag;
-        if (m_vkDescriptorSet != VK_NULL_HANDLE) {
-            ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
-            m_vkDescriptorSet = VK_NULL_HANDLE;
-        }
-        if (m_vkSampler != VK_NULL_HANDLE) {
-            // Wait for the GPU to finish before destroying the sampler — any
-            // in-flight descriptor set may still reference it.
-            vkDeviceWaitIdle(m_context.GetVkDevice());
-            vkDestroySampler(m_context.GetVkDevice(), m_vkSampler, nullptr);
-            m_vkSampler = VK_NULL_HANDLE;
-        }
+        // Just record the desired filter mode. Samplers are created lazily by
+        // GetVkSampler() and kept alive for the texture's entire lifetime, so
+        // switching filter mid-frame is safe — no sampler or descriptor set is
+        // destroyed while a command buffer may still reference it.
+        m_minFilter = (minFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+        m_magFilter = (magFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
     }
 
     void Texture::SetAddressMode(TextureAddressMode u, TextureAddressMode v) {
@@ -203,31 +205,36 @@ namespace moth_graphics::graphics::vulkan {
         }
         m_addressModeU = newU;
         m_addressModeV = newV;
+        // Address mode affects sampler state. Invalidate cached samplers so they
+        // are recreated with the new mode on next use. Safe to destroy here because
+        // SetAddressMode is not called during frame recording.
+        if (m_vkSamplerLinear != VK_NULL_HANDLE) {
+            vkDeviceWaitIdle(m_context.GetVkDevice());
+            vkDestroySampler(m_context.GetVkDevice(), m_vkSamplerLinear, nullptr);
+            m_vkSamplerLinear = VK_NULL_HANDLE;
+        }
+        if (m_vkSamplerNearest != VK_NULL_HANDLE) {
+            vkDestroySampler(m_context.GetVkDevice(), m_vkSamplerNearest, nullptr);
+            m_vkSamplerNearest = VK_NULL_HANDLE;
+        }
         if (m_vkDescriptorSet != VK_NULL_HANDLE) {
             ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
             m_vkDescriptorSet = VK_NULL_HANDLE;
-        }
-        if (m_vkSampler != VK_NULL_HANDLE) {
-            // Wait for the GPU to finish before destroying the sampler — any
-            // in-flight descriptor set may still reference it.
-            vkDeviceWaitIdle(m_context.GetVkDevice());
-            vkDestroySampler(m_context.GetVkDevice(), m_vkSampler, nullptr);
-            m_vkSampler = VK_NULL_HANDLE;
+            m_vkDescriptorSetSampler = VK_NULL_HANDLE;
         }
     }
 
-    void Texture::CreateDefaultSampler() {
+    VkSampler Texture::CreateSampler(VkFilter min, VkFilter mag) const {
         VkSamplerCreateInfo samplerInfo{};
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        samplerInfo.magFilter = m_magFilter;
-        samplerInfo.minFilter = m_minFilter;
+        samplerInfo.magFilter = mag;
+        samplerInfo.minFilter = min;
         samplerInfo.addressModeU = m_addressModeU;
         samplerInfo.addressModeV = m_addressModeV;
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        bool const useAnisotropy = (m_minFilter != VK_FILTER_NEAREST && m_magFilter != VK_FILTER_NEAREST);
+        bool const useAnisotropy = (min != VK_FILTER_NEAREST && mag != VK_FILTER_NEAREST);
         samplerInfo.anisotropyEnable = useAnisotropy ? VK_TRUE : VK_FALSE;
 
-        // todo can probably cache this
         VkPhysicalDeviceProperties properties{};
         vkGetPhysicalDeviceProperties(m_context.GetVkPhysicalDevice(), &properties);
 
@@ -241,6 +248,8 @@ namespace moth_graphics::graphics::vulkan {
         samplerInfo.minLod = 0.0f;
         samplerInfo.maxLod = 0.0f;
 
-        CHECK_VK_RESULT(vkCreateSampler(m_context.GetVkDevice(), &samplerInfo, nullptr, &m_vkSampler));
+        VkSampler sampler = VK_NULL_HANDLE;
+        CHECK_VK_RESULT(vkCreateSampler(m_context.GetVkDevice(), &samplerInfo, nullptr, &sampler));
+        return sampler;
     }
 }

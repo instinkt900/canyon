@@ -335,7 +335,7 @@ namespace moth_graphics::graphics::sdl {
 
     std::unique_ptr<graphics::ITarget> Graphics::CreateTarget(int width, int height) {
         auto sdlTexture = CreateTextureRef(SDL_CreateTexture(m_surfaceContext.GetRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height));
-        auto texture = std::make_shared<Texture>(sdlTexture);
+        auto texture = std::make_shared<Texture>(m_surfaceContext.GetRenderer(), sdlTexture);
         IntRect const sourceRect{ { 0, 0 }, { width, height } };
         return std::make_unique<Image>(texture, sourceRect);
     }

@@ -32,11 +32,9 @@ namespace moth_graphics::graphics::vulkan {
         VkDescriptorSet GetDescriptorSet(Texture& image);
         VkDescriptorSet CreateDescriptorSet(Texture& image);
 
-        struct CachedDescriptorSet {
-            VkSampler m_sampler;
-            VkDescriptorSet m_descriptorSet;
-        };
-        std::map<uint32_t, CachedDescriptorSet> m_descriptorSets;
+        // Keyed by (image_id, sampler) so that the same texture with two different
+        // filter modes can coexist without any descriptor set being freed mid-frame.
+        std::map<std::pair<uint32_t, VkSampler>, VkDescriptorSet> m_descriptorSets;
     };
 
     class ShaderBuilder {
