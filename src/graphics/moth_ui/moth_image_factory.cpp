@@ -17,6 +17,9 @@ namespace moth_graphics::graphics {
 
     std::unique_ptr<::moth_ui::IImage> MothImageFactory::GetImage(std::filesystem::path const& path) {
         std::shared_ptr<IImage> intlImage = m_factoryImpl.GetImage(path);
+        if (!intlImage) {
+            return nullptr;
+        }
         return std::make_unique<MothImage>(intlImage);
     }
 }
