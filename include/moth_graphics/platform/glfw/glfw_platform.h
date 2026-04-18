@@ -17,7 +17,7 @@ namespace moth_graphics::platform::glfw {
 
         moth_graphics::graphics::Context& GetGraphicsContext() override;
 
-        std::unique_ptr<moth_graphics::platform::Window> CreateWindow(std::string const& title, int width, int height) override;
+        std::unique_ptr<moth_graphics::platform::Window> CreateWindow(std::string_view title, int width, int height) override;
 
     private:
         std::unique_ptr<moth_graphics::graphics::vulkan::Context> m_context;

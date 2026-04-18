@@ -99,11 +99,11 @@ namespace {
 }
 
 namespace moth_graphics::platform::sdl {
-    Window::Window(graphics::sdl::Context& context, std::string const& title, int width, int height)
+    Window::Window(graphics::sdl::Context& context, std::string_view title, int width, int height)
         : platform::Window(title, width, height)
         , m_context(context) {
         if (!CreateWindow()) {
-            throw std::runtime_error("SDL: failed to create window '" + title + "'");
+            throw std::runtime_error("SDL: failed to create window '" + std::string(title) + "'");
         }
         PostCreate();
     }
@@ -154,7 +154,7 @@ namespace moth_graphics::platform::sdl {
         return true;
     }
 
-    void Window::SetWindowTitle(std::string const& title) {
+    void Window::SetWindowTitle(std::string_view title) {
         m_title = title;
         SDL_SetWindowTitle(m_window, m_title.c_str());
     }

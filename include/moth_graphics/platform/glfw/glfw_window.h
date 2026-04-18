@@ -10,17 +10,17 @@
 #include <vulkan/vulkan_core.h>
 
 #include <memory>
-#include <string>
+#include <string_view>
 #include <cstdint>
 
 namespace moth_graphics::platform::glfw {
     class Window : public moth_graphics::platform::Window {
     public:
-        Window(graphics::vulkan::Context& context, std::string const& title, int width, int height);
+        Window(graphics::vulkan::Context& context, std::string_view title, int width, int height);
         ~Window() override;
 
         graphics::SurfaceContext & GetSurfaceContext() const override { return *m_surfaceContext; }
-        void SetWindowTitle(std::string const& title) override;
+        void SetWindowTitle(std::string_view title) override;
         GLFWwindow* GetGLFWWindow() const { return m_glfwWindow; }
         VkSurfaceKHR GetVkSurface() const { return m_customVkSurface; }
 

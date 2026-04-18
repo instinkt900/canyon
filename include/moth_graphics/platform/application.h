@@ -11,6 +11,7 @@
 #include <memory>
 #include <cstdint>
 #include <string>
+#include <string_view>
 
 namespace moth_graphics::platform {
     /// @brief Base class for a canyon application.
@@ -25,7 +26,7 @@ namespace moth_graphics::platform {
         /// @param title Initial window title.
         /// @param width Initial window width in pixels.
         /// @param height Initial window height in pixels.
-        Application(IPlatform& platform, std::string const& title, int width, int height);
+        Application(IPlatform& platform, std::string_view title, int width, int height);
         ~Application() override = default;
 
         /// @brief Initialize the platform, create the window, and set up ImGui.

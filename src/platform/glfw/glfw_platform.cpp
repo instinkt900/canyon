@@ -22,7 +22,7 @@ namespace moth_graphics::platform::glfw {
         return *m_context;
     }
 
-    std::unique_ptr<moth_graphics::platform::Window> Platform::CreateWindow(std::string const& title, int width, int height) {
+    std::unique_ptr<moth_graphics::platform::Window> Platform::CreateWindow(std::string_view title, int width, int height) {
         return std::make_unique<platform::glfw::Window>(*m_context, title, width, height);
     }
 }

@@ -4,7 +4,7 @@
 #include "moth_graphics/graphics/surface_context.h"
 
 namespace moth_graphics::platform {
-    Window::Window(std::string const& title, int width, int height)
+    Window::Window(std::string_view title, int width, int height)
         : m_title(title)
         , m_windowWidth(width)
         , m_windowHeight(height) {

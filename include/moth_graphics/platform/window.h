@@ -13,6 +13,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <cstdint>
 
 namespace moth_graphics::platform {
@@ -30,7 +31,7 @@ namespace moth_graphics::platform {
         /// @param windowTitle Initial title bar text.
         /// @param width Initial width in pixels.
         /// @param height Initial height in pixels.
-        Window(std::string const& windowTitle, int width, int height);
+        Window(std::string_view windowTitle, int width, int height);
         ~Window() override;
 
         /// @brief Poll events and advance the UI layer stack by @p ticks milliseconds.
@@ -43,7 +44,7 @@ namespace moth_graphics::platform {
         virtual graphics::SurfaceContext& GetSurfaceContext() const = 0;
 
         /// @brief Update the window title bar text.
-        virtual void SetWindowTitle(std::string const& title) = 0;
+        virtual void SetWindowTitle(std::string_view title) = 0;
 
         /// @brief Returns @c true if the window is currently maximized.
         bool IsMaximized() const { return m_windowMaximized; }

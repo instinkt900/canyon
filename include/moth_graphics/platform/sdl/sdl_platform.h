@@ -16,7 +16,7 @@ namespace moth_graphics::platform::sdl {
 
         graphics::Context& GetGraphicsContext() override;
 
-        std::unique_ptr<platform::Window> CreateWindow(std::string const& title, int width, int height) override;
+        std::unique_ptr<platform::Window> CreateWindow(std::string_view title, int width, int height) override;
 
     private:
         std::unique_ptr<graphics::sdl::Context> m_context = nullptr;

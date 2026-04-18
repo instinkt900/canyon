@@ -9,7 +9,7 @@
 #include <moth_ui/events/event_mouse.h>
 
 namespace moth_graphics::platform::glfw {
-    Window::Window(graphics::vulkan::Context& context, std::string const& title, int width, int height)
+    Window::Window(graphics::vulkan::Context& context, std::string_view title, int width, int height)
         : moth_graphics::platform::Window(title, width, height)
         , m_context(context) {
         if (CreateWindow()) {
@@ -138,7 +138,7 @@ namespace moth_graphics::platform::glfw {
         return true;
     }
 
-    void Window::SetWindowTitle(std::string const& title) {
+    void Window::SetWindowTitle(std::string_view title) {
         m_title = title;
         glfwSetWindowTitle(m_glfwWindow, m_title.c_str());
     }

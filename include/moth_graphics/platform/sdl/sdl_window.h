@@ -10,17 +10,17 @@
 #include <SDL_render.h>
 
 #include <memory>
-#include <string>
+#include <string_view>
 #include <cstdint>
 
 namespace moth_graphics::platform::sdl {
     class Window : public platform::Window {
     public:
-        Window(graphics::sdl::Context& context, std::string const& applicationTitle, int width, int height);
+        Window(graphics::sdl::Context& context, std::string_view applicationTitle, int width, int height);
         ~Window() override;
 
         graphics::SurfaceContext & GetSurfaceContext() const override { return *m_surfaceContext; }
-        void SetWindowTitle(std::string const& title) override;
+        void SetWindowTitle(std::string_view title) override;
 
         SDL_Window* GetSDLWindow() const { return m_window; }
         SDL_Renderer* GetSDLRenderer() const { return m_renderer; }

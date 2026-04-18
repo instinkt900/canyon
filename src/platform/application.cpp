@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 namespace moth_graphics::platform {
-    Application::Application(platform::IPlatform& platform, std::string const& title, int width, int height)
+    Application::Application(platform::IPlatform& platform, std::string_view title, int width, int height)
         : m_platform(platform)
         , m_mainWindowTitle(title)
         , m_mainWindowWidth(width)

@@ -2,7 +2,7 @@
 
 #include "moth_graphics/graphics/context.h"
 
-#include <string>
+#include <string_view>
 #include <memory>
 
 namespace moth_graphics::platform {
@@ -31,6 +31,6 @@ namespace moth_graphics::platform {
         /// @param title Initial window title.
         /// @param width Initial window width in pixels.
         /// @param height Initial window height in pixels.
-        virtual std::unique_ptr<Window> CreateWindow(std::string const& title, int width, int height) = 0;
+        virtual std::unique_ptr<Window> CreateWindow(std::string_view title, int width, int height) = 0;
     };
 }

@@ -12,7 +12,7 @@ namespace moth_graphics::platform::sdl {
         return *m_context;
     }
 
-    std::unique_ptr<platform::Window> Platform::CreateWindow(std::string const& title, int width, int height) {
+    std::unique_ptr<platform::Window> Platform::CreateWindow(std::string_view title, int width, int height) {
         return std::make_unique<platform::sdl::Window>(*m_context, title, width, height);
     }
 
