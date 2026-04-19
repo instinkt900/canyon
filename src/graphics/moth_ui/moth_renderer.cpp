@@ -119,6 +119,10 @@ namespace moth_graphics::graphics {
         auto& internalImage = *internalImagePtr;
         auto const srcRect = sourceRect;
 
+        if (destRect.w() <= 0 || destRect.h() <= 0) {
+            return;
+        }
+
         if (auto texture = internalImage.GetTexture()) {
             auto const gfxFilter = ToGraphicsFilter(m_textureFilter.top());
             texture->SetFilter(gfxFilter, gfxFilter);
