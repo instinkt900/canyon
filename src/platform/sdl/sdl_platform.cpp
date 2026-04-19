@@ -21,6 +21,7 @@ namespace moth_graphics::platform::sdl {
             spdlog::error("SDL: initialization failed: {}", SDL_GetError());
             return false;
         }
+        SDL_EnableScreenSaver();
         spdlog::info("SDL: initialized");
         return true;
     }
