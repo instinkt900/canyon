@@ -1,5 +1,5 @@
 // Pins enum values for BlendMode, ImageScaleType, TextAlignment,
-// SpriteSheet::LoopType, and CanyonEventType.  Any rename, reorder, or
+// SpriteSheet::LoopType, and MothGraphicsEventType.  Any rename, reorder, or
 // renumber will fail to compile.
 
 #include "moth_graphics/moth_graphics.h"
@@ -53,14 +53,14 @@ TEST_CASE("SpriteSheet::LoopType enum values are stable", "[api][enums][loop_typ
     SUCCEED();
 }
 
-TEST_CASE("CanyonEventType constants are stable", "[api][enums][canyon_events]") {
-    // moth_ui::EVENTTYPE_USER0 == 1000; canyon types are offset from there.
+TEST_CASE("MothGraphicsEventType constants are stable", "[api][enums][moth_graphics_events]") {
+    // moth_ui::EVENTTYPE_USER0 == 1000; graphics types are offset from there.
     static_assert(EVENTTYPE_RENDERDEVICERESET == 1000);
     static_assert(EVENTTYPE_RENDERTARGETRESET == 1001);
     static_assert(EVENTTYPE_WINDOWSIZE        == 1002);
     static_assert(EVENTTYPE_REQUEST_QUIT      == 1003);
     static_assert(EVENTTYPE_QUIT              == 1004);
     // User extension point starts 100 above the base.
-    static_assert(EVENTTYPE_CANYONUSER0       == 1100);
+    static_assert(EVENTTYPE_GRAPHICSUSER0     == 1100);
     SUCCEED();
 }

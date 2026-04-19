@@ -3,13 +3,13 @@
 #include <moth_ui/events/event.h>
 
 namespace moth_graphics {
-    enum CanyonEventType : int {
+    enum MothGraphicsEventType : int {
         EVENTTYPE_RENDERDEVICERESET = moth_ui::EVENTTYPE_USER0,
         EVENTTYPE_RENDERTARGETRESET,
         EVENTTYPE_WINDOWSIZE,
         EVENTTYPE_REQUEST_QUIT,
         EVENTTYPE_QUIT,
 
-        EVENTTYPE_CANYONUSER0 = moth_ui::EVENTTYPE_USER0 + 100
+        EVENTTYPE_GRAPHICSUSER0 = moth_ui::EVENTTYPE_USER0 + 100
     };
 }
