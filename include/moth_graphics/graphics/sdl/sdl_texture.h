@@ -28,5 +28,6 @@ namespace moth_graphics::graphics::sdl {
         SDL_Renderer* m_renderer;
         SDLTextureRef m_texture;
         IntVec2 m_textureDimensions;
+        SDL_ScaleMode m_scaleMode = SDL_ScaleModeLinear;
     };
 }

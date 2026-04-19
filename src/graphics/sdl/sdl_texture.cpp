@@ -7,7 +7,7 @@ namespace moth_graphics::graphics::sdl {
         : m_renderer(renderer)
         , m_texture(texture) {
         SDL_QueryTexture(texture->GetImpl(), NULL, NULL, &m_textureDimensions.x, &m_textureDimensions.y);
-        Texture::SetFilter(TextureFilter::Linear, TextureFilter::Linear);
+        SDL_SetTextureScaleMode(m_texture->GetImpl(), m_scaleMode);
     }
 
     int Texture::GetWidth() const {
@@ -25,17 +25,18 @@ namespace moth_graphics::graphics::sdl {
                                        ? SDL_ScaleModeNearest
                                        : SDL_ScaleModeLinear;
 
+        if (m_scaleMode == mode) {
+            return;
+        }
+
         // SDL2's hardware renderer batches draw calls and applies per-texture state
         // (scale mode) at flush time, not at enqueue time. If two nodes share the same
         // SDL_Texture but need different scale modes, the last SetFilter call would win
         // for both. Flushing before a mode change forces any pending batched draws to
         // commit at the old mode before we switch it.
-        SDL_ScaleMode currentMode = SDL_ScaleModeLinear;
-        if (SDL_GetTextureScaleMode(m_texture->GetImpl(), &currentMode) == 0 && currentMode != mode) {
-            SDL_RenderFlush(m_renderer);
-        }
-
+        SDL_RenderFlush(m_renderer);
         SDL_SetTextureScaleMode(m_texture->GetImpl(), mode);
+        m_scaleMode = mode;
     }
 
     std::unique_ptr<Texture> Texture::FromFile(SDL_Renderer* renderer, std::filesystem::path const& path) {
