@@ -17,11 +17,11 @@ namespace moth_graphics::platform::sdl {
     }
 
     bool Platform::Startup() {
+        SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "1");
         if (0 > SDL_Init(SDL_INIT_EVERYTHING)) {
             spdlog::error("SDL: initialization failed: {}", SDL_GetError());
             return false;
         }
-        SDL_EnableScreenSaver();
         spdlog::info("SDL: initialized");
         return true;
     }
