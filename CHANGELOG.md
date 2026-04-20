@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
-## [1.0.0-rc.1] - 2026-04-16
+## [1.0.0-rc.1] - 2026-04-19
 ### Features
 - Replace uniform-grid sheet model with per-frame rects and explicit clip steps
 - Expose per-frame pivot on Sprite and add DrawSpriteAtPivot
@@ -28,12 +28,22 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Default texture filter to linear in SDL and Vulkan constructors
 - Handle Vulkan swapchain out-of-date on window resize
 - Update api_surface_graphics test to match current IGraphics signatures
+- Propagate nullptr from MothImageFactory when inner image load fails
+- Intersecting clips now no longer get negative bounds.
+- Correct per-node texture filtering when two nodes share the same image
+- Use DPI-aware font sizing on Vulkan/GLFW backend
+- Re-enable screensaver after SDL init
+- Set SDL_HINT_VIDEO_ALLOW_SCREENSAVER before SDL_Init to prevent screensaver suppression
+- Skip draw calls with zero or negative destination rect dimensions
 
 ### Refactoring
 - Rename DrawSpriteAtPivot to DrawSprite and drop default pivot
+- Use string_view for title and text parameters in public API
+- Rename CanyonEventType to MothGraphicsEventType
 
 ### Performance
 - Skip sampler teardown in SetFilter/SetAddressMode when unchanged
+- Cache SDL scale mode in Texture to avoid redundant flush+set calls
 
 ### Documentation
 - Add known limitations to README, remove TODO
@@ -44,6 +54,8 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Fixing moth_ui version dep. ranges dont work
 - Remove shared library scaffolding — static-only build
 - Updating version string parsing
+- Removed example. moth_example will take its place
+- Exposing version info in the api
 
 ### Changes
 - Bump version to 1.0.0-rc.1
