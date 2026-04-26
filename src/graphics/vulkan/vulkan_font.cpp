@@ -102,7 +102,7 @@ namespace moth_graphics::graphics::vulkan {
 
     Font::Font(FT_Face face, int size, SurfaceContext& context)
         : m_context(context) {
-        FT_CHECK(FT_Set_Char_Size(face, 0, size * 64, 0, static_cast<FT_UInt>(context.GetDPI())));
+        FT_CHECK(FT_Set_Pixel_Sizes(face, 0, size));
 
         m_hbFont = hb_ft_font_create(face, nullptr);
 

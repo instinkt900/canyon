@@ -5,6 +5,8 @@
 #include <catch2/catch_all.hpp>
 #include <memory>
 #include <string>
+#include <string_view>
+#include <type_traits>
 
 using namespace moth_graphics;
 using namespace moth_graphics::platform;
@@ -23,7 +25,7 @@ TEST_CASE("IPlatform method signatures are stable", "[api][platform][iplatform]"
     void (IPlatform::*shutdown)()                                         = &IPlatform::Shutdown;
     Context& (IPlatform::*getCtx)()                                       = &IPlatform::GetGraphicsContext;
     std::unique_ptr<Window> (IPlatform::*createWin)(
-        std::string const&, int, int)                                     = &IPlatform::CreateWindow;
+        std::string_view, int, int)                                       = &IPlatform::CreateWindow;
     (void)startup; (void)shutdown; (void)getCtx; (void)createWin;
     SUCCEED();
 }
@@ -36,22 +38,30 @@ TEST_CASE("Application method signatures are stable", "[api][platform][applicati
     SUCCEED();
 }
 
+TEST_CASE("Window inherits EventEmitter and EventListener", "[api][platform][window]") {
+    static_assert(std::is_base_of_v<EventEmitter, Window>);
+    static_assert(std::is_base_of_v<moth_ui::EventListener, Window>);
+    SUCCEED();
+}
+
 TEST_CASE("Window method signatures are stable", "[api][platform][window]") {
     void (Window::*update)(uint32_t)                            = &Window::Update;
     void (Window::*draw)()                                      = &Window::Draw;
     graphics::SurfaceContext& (Window::*getSurface)() const     = &Window::GetSurfaceContext;
-    void (Window::*setTitle)(std::string const&)                = &Window::SetWindowTitle;
+    void (Window::*setTitle)(std::string_view)                  = &Window::SetWindowTitle;
     bool (Window::*isMaximized)() const                         = &Window::IsMaximized;
     IntVec2 const& (Window::*getPos)() const                    = &Window::GetPosition;
     int  (Window::*getW)() const                                = &Window::GetWidth;
     int  (Window::*getH)() const                                = &Window::GetHeight;
     moth_ui::Context& (Window::*getMothCtx)() const             = &Window::GetMothContext;
     IGraphics& (Window::*getGraphics)() const                   = &Window::GetGraphics;
-    moth_ui::LayerStack& (Window::*getLayers)() const           = &Window::GetLayerStack;
     ImageFactory& (Window::*getImgFactory)() const              = &Window::GetImageFactory;
+    bool (Window::*onEvent)(moth_ui::Event const&)              = &Window::OnEvent;
+    void (Window::*pushLayer)(std::unique_ptr<moth_ui::Layer>&&)= &Window::PushLayer;
 
     (void)update; (void)draw; (void)getSurface; (void)setTitle;
     (void)isMaximized; (void)getPos; (void)getW; (void)getH;
-    (void)getMothCtx; (void)getGraphics; (void)getLayers; (void)getImgFactory;
+    (void)getMothCtx; (void)getGraphics; (void)getImgFactory;
+    (void)onEvent; (void)pushLayer;
     SUCCEED();
 }

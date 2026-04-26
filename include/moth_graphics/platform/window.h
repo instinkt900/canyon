@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <cassert>
 #include <cstdint>
 
 namespace moth_graphics::platform {
@@ -26,7 +27,7 @@ namespace moth_graphics::platform {
     /// image and font factories are owned by the @c AssetContext. Subclasses
     /// handle the platform-specific window creation (see @c sdl::Window and
     /// @c glfw::Window).
-    class Window : public EventEmitter {
+    class Window : public EventEmitter, public moth_ui::EventListener {
     public:
         /// @param windowTitle Initial title bar text.
         /// @param width Initial width in pixels.
@@ -64,13 +65,22 @@ namespace moth_graphics::platform {
         /// @brief Returns the graphics interface for this window.
         graphics::IGraphics& GetGraphics() const { return *m_graphics; }
 
-        /// @brief Returns the moth_ui layer stack for this window.
-        moth_ui::LayerStack& GetLayerStack() const { return *m_layerStack; }
-
         /// @brief Returns the image factory for this window.
         graphics::ImageFactory& GetImageFactory() const;
 
+        // -- EventListener: receives FireEvent from LayerStack, dispatches to layers
+        //    then rebroadcasts to external listeners via EmitEvent if unhandled.
+        bool OnEvent(moth_ui::Event const& event) override;
+
+        // Must be called after PostCreate (i.e. after the native window exists).
+        void PushLayer(std::unique_ptr<moth_ui::Layer>&& layer) {
+            assert(m_layerStack && "PushLayer called before PostCreate; layer stack not yet initialised");
+            m_layerStack->PushLayer(std::move(layer));
+        }
+
     protected:
+        /// @brief Returns the moth_ui layer stack. Only for internal/platform use.
+        moth_ui::LayerStack& GetLayerStack() const { return *m_layerStack; }
         /// @brief Called after the native window and graphics objects are created.
         void PostCreate();
 

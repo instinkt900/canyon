@@ -24,7 +24,6 @@ namespace moth_graphics::platform {
             throw;
         }
         m_window->AddEventListener(this);
-        m_window->GetLayerStack().SetEventListener(this);
         m_window->GetGraphics().InitImgui(*m_window, m_imguiViewportsEnabled);
         PostCreateWindow();
         spdlog::info("Application: ready");
@@ -40,7 +39,6 @@ namespace moth_graphics::platform {
     bool Application::OnEvent(moth_ui::Event const& event) {
         moth_ui::EventDispatch dispatch(event);
         dispatch.Dispatch(this, &Application::OnWindowSizeEvent);
-        dispatch.Dispatch(&m_window->GetLayerStack());
         dispatch.Dispatch(this, &Application::OnRequestQuitEvent);
         dispatch.Dispatch(this, &Application::OnQuitEvent);
         return dispatch.GetHandled();

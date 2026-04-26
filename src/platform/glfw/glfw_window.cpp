@@ -26,7 +26,7 @@ namespace moth_graphics::platform::glfw {
 
         if (glfwWindowShouldClose(m_glfwWindow) != 0) {
             glfwSetWindowShouldClose(m_glfwWindow, 0);
-            EmitEvent(EventRequestQuit());
+            OnEvent(EventRequestQuit());
         }
 
         m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
@@ -81,8 +81,8 @@ namespace moth_graphics::platform::glfw {
                 app->m_windowHeight = height;
             }
             app->OnResize();
-            const auto translatedEvent = std::make_unique<EventWindowSize>(width, height);
-            app->EmitEvent(*translatedEvent);
+            auto const translatedEvent = std::make_unique<EventWindowSize>(width, height);
+            app->OnEvent(*translatedEvent);
         });
 
         glfwSetKeyCallback(m_glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -91,7 +91,7 @@ namespace moth_graphics::platform::glfw {
                 return;
             }
             if (auto const translatedEvent = FromGLFW(key, scancode, action, mods)) {
-                app->EmitEvent(*translatedEvent);
+                app->OnEvent(*translatedEvent);
             }
         });
 
@@ -109,7 +109,7 @@ namespace moth_graphics::platform::glfw {
             app->m_haveMousePos = true;
             auto lastMousePos = static_cast<moth_ui::IntVec2>(app->m_lastMousePos);
             auto const translatedEvent = std::make_unique<moth_ui::EventMouseMove>(lastMousePos, mouseDelta);
-            app->EmitEvent(*translatedEvent);
+            app->OnEvent(*translatedEvent);
         });
 
         glfwSetMouseButtonCallback(m_glfwWindow, [](GLFWwindow* window, int button, int action, int mods) {
@@ -118,7 +118,7 @@ namespace moth_graphics::platform::glfw {
                 return;
             }
             if (auto const translatedEvent = FromGLFW(button, action, mods, static_cast<moth_ui::IntVec2>(app->m_lastMousePos))) {
-                app->EmitEvent(*translatedEvent);
+                app->OnEvent(*translatedEvent);
             }
         });
 
@@ -132,13 +132,6 @@ namespace moth_graphics::platform::glfw {
 
         CHECK_VK_RESULT(glfwCreateWindowSurface(m_context.GetInstance(), m_glfwWindow, nullptr, &m_customVkSurface));
         m_surfaceContext = std::make_unique<graphics::vulkan::SurfaceContext>(m_context);
-
-        {
-            float xscale = 1.0f;
-            float yscale = 1.0f;
-            glfwGetWindowContentScale(m_glfwWindow, &xscale, &yscale);
-            m_surfaceContext->SetDPI(static_cast<int>(xscale * 96.0f));
-        }
 
         m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight);
         spdlog::info("GLFW: window '{}' ready", m_title);

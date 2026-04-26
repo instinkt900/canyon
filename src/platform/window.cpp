@@ -17,6 +17,17 @@ namespace moth_graphics::platform {
         return GetSurfaceContext().GetAssetContext().GetImageFactory();
     }
 
+    bool Window::OnEvent(moth_ui::Event const& event) {
+        // FireEvent from layers: dispatch to all layers first, then external
+        // listeners if unhandled.
+        moth_ui::EventDispatch dispatch(event);
+        dispatch.Dispatch(m_layerStack.get());
+        if (!dispatch.GetHandled()) {
+            return EmitEvent(event);
+        }
+        return true;
+    }
+
     void Window::PostCreate() {
         auto& assetContext = GetSurfaceContext().GetAssetContext();
         m_uiRenderer = std::make_unique<moth_graphics::graphics::MothRenderer>(*m_graphics);
@@ -25,6 +36,7 @@ namespace moth_graphics::platform {
         m_mothFlipbookFactory = std::make_unique<moth_graphics::graphics::MothFlipbookFactory>(assetContext.GetSpriteSheetFactory());
         m_mothContext = std::make_shared<moth_ui::Context>(m_mothImageFactory.get(), m_mothFontFactory.get(), m_uiRenderer.get(), m_mothFlipbookFactory.get());
         m_layerStack = std::make_unique<moth_ui::LayerStack>(*m_uiRenderer, m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
+        m_layerStack->SetEventListener(this);
     }
 
     void Window::PreDestroy() {

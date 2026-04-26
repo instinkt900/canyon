@@ -29,8 +29,6 @@ namespace moth_graphics::graphics::vulkan {
         VmaAllocator const& GetVmaAllocator() const { return m_vmaAllocator; }
         VkPhysicalDeviceProperties const& GetVkPhysicalDeviceProperties() const { return m_vkDeviceProperties; }
 
-        int GetDPI() const { return m_dpi; }
-        void SetDPI(int dpi) { m_dpi = dpi; }
 
         VkCommandBuffer beginSingleTimeCommands();
         void endSingleTimeCommands(VkCommandBuffer commandBuffer);
@@ -51,7 +49,6 @@ namespace moth_graphics::graphics::vulkan {
         VmaAllocator m_vmaAllocator = VK_NULL_HANDLE;
         VkPhysicalDeviceProperties m_vkDeviceProperties = {};
 
-        int m_dpi = 96;
         AssetContext m_assetContext;
     };
 }

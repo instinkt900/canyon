@@ -120,6 +120,7 @@ namespace moth_graphics::platform::sdl {
             if (auto const translatedEvent = FromSDL(event)) {
                 moth_ui::EventDispatch dispatch(*translatedEvent);
                 dispatch.Dispatch(this, &Window::OnResizeEvent);
+                dispatch.Dispatch(m_layerStack.get());
                 if (!dispatch.GetHandled()) {
                     EmitEvent(*translatedEvent);
                 }

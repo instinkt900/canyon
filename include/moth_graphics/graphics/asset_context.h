@@ -39,7 +39,7 @@ namespace moth_graphics::graphics {
         /// @brief Wrap an existing texture in a new image covering a sub-region.
         virtual std::unique_ptr<IImage> NewImage(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) = 0;
 
-        /// @brief Load a font from a file at a given point size.
+        /// @brief Load a font from a file at a given pixel size.
         virtual std::unique_ptr<IFont> FontFromFile(std::filesystem::path const& path, uint32_t size) = 0;
 
         /// @brief Load a texture from an image file.
