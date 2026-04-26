@@ -47,11 +47,10 @@ TEST_CASE("Window method signatures are stable", "[api][platform][window]") {
     int  (Window::*getH)() const                                = &Window::GetHeight;
     moth_ui::Context& (Window::*getMothCtx)() const             = &Window::GetMothContext;
     IGraphics& (Window::*getGraphics)() const                   = &Window::GetGraphics;
-    moth_ui::LayerStack& (Window::*getLayers)() const           = &Window::GetLayerStack;
     ImageFactory& (Window::*getImgFactory)() const              = &Window::GetImageFactory;
 
     (void)update; (void)draw; (void)getSurface; (void)setTitle;
     (void)isMaximized; (void)getPos; (void)getW; (void)getH;
-    (void)getMothCtx; (void)getGraphics; (void)getLayers; (void)getImgFactory;
+    (void)getMothCtx; (void)getGraphics; (void)getImgFactory;
     SUCCEED();
 }

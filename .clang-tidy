@@ -1,6 +1,7 @@
 Checks: >
   cppcoreguidelines-*,
   readability-*,
+  -readability-function-cognitive-complexity,
   -readability-uppercase-literal-suffix,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -readability-identifier-length,

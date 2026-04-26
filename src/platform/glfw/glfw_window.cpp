@@ -26,7 +26,12 @@ namespace moth_graphics::platform::glfw {
 
         if (glfwWindowShouldClose(m_glfwWindow) != 0) {
             glfwSetWindowShouldClose(m_glfwWindow, 0);
-            EmitEvent(EventRequestQuit());
+            auto const event = EventRequestQuit();
+            moth_ui::EventDispatch dispatch(event);
+            dispatch.Dispatch(&GetLayerStack());
+            if (!dispatch.GetHandled()) {
+                EmitEvent(event);
+            }
         }
 
         m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
@@ -82,7 +87,11 @@ namespace moth_graphics::platform::glfw {
             }
             app->OnResize();
             const auto translatedEvent = std::make_unique<EventWindowSize>(width, height);
-            app->EmitEvent(*translatedEvent);
+            moth_ui::EventDispatch dispatch(*translatedEvent);
+            dispatch.Dispatch(&app->GetLayerStack());
+            if (!dispatch.GetHandled()) {
+                app->EmitEvent(*translatedEvent);
+            }
         });
 
         glfwSetKeyCallback(m_glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -91,7 +100,11 @@ namespace moth_graphics::platform::glfw {
                 return;
             }
             if (auto const translatedEvent = FromGLFW(key, scancode, action, mods)) {
-                app->EmitEvent(*translatedEvent);
+                moth_ui::EventDispatch dispatch(*translatedEvent);
+                dispatch.Dispatch(&app->GetLayerStack());
+                if (!dispatch.GetHandled()) {
+                    app->EmitEvent(*translatedEvent);
+                }
             }
         });
 
@@ -109,7 +122,11 @@ namespace moth_graphics::platform::glfw {
             app->m_haveMousePos = true;
             auto lastMousePos = static_cast<moth_ui::IntVec2>(app->m_lastMousePos);
             auto const translatedEvent = std::make_unique<moth_ui::EventMouseMove>(lastMousePos, mouseDelta);
-            app->EmitEvent(*translatedEvent);
+            moth_ui::EventDispatch dispatch(*translatedEvent);
+            dispatch.Dispatch(&app->GetLayerStack());
+            if (!dispatch.GetHandled()) {
+                app->EmitEvent(*translatedEvent);
+            }
         });
 
         glfwSetMouseButtonCallback(m_glfwWindow, [](GLFWwindow* window, int button, int action, int mods) {
@@ -118,7 +135,11 @@ namespace moth_graphics::platform::glfw {
                 return;
             }
             if (auto const translatedEvent = FromGLFW(button, action, mods, static_cast<moth_ui::IntVec2>(app->m_lastMousePos))) {
-                app->EmitEvent(*translatedEvent);
+                moth_ui::EventDispatch dispatch(*translatedEvent);
+                dispatch.Dispatch(&app->GetLayerStack());
+                if (!dispatch.GetHandled()) {
+                    app->EmitEvent(*translatedEvent);
+                }
             }
         });
 
