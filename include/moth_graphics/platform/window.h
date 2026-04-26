@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <cassert>
 #include <cstdint>
 
 namespace moth_graphics::platform {
@@ -71,7 +72,11 @@ namespace moth_graphics::platform {
         //    then rebroadcasts to external listeners via EmitEvent if unhandled.
         bool OnEvent(moth_ui::Event const& event) override;
 
-        void PushLayer(std::unique_ptr<moth_ui::Layer>&& layer) { m_layerStack->PushLayer(std::move(layer)); }
+        // Must be called after PostCreate (i.e. after the native window exists).
+        void PushLayer(std::unique_ptr<moth_ui::Layer>&& layer) {
+            assert(m_layerStack && "PushLayer called before PostCreate; layer stack not yet initialised");
+            m_layerStack->PushLayer(std::move(layer));
+        }
 
     protected:
         /// @brief Returns the moth_ui layer stack. Only for internal/platform use.
