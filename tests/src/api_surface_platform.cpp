@@ -5,6 +5,7 @@
 #include <catch2/catch_all.hpp>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 using namespace moth_graphics;
 using namespace moth_graphics::platform;
@@ -36,6 +37,12 @@ TEST_CASE("Application method signatures are stable", "[api][platform][applicati
     SUCCEED();
 }
 
+TEST_CASE("Window inherits EventEmitter and EventListener", "[api][platform][window]") {
+    static_assert(std::is_base_of_v<EventEmitter, Window>);
+    static_assert(std::is_base_of_v<moth_ui::EventListener, Window>);
+    SUCCEED();
+}
+
 TEST_CASE("Window method signatures are stable", "[api][platform][window]") {
     void (Window::*update)(uint32_t)                            = &Window::Update;
     void (Window::*draw)()                                      = &Window::Draw;
@@ -48,9 +55,12 @@ TEST_CASE("Window method signatures are stable", "[api][platform][window]") {
     moth_ui::Context& (Window::*getMothCtx)() const             = &Window::GetMothContext;
     IGraphics& (Window::*getGraphics)() const                   = &Window::GetGraphics;
     ImageFactory& (Window::*getImgFactory)() const              = &Window::GetImageFactory;
+    bool (Window::*onEvent)(moth_ui::Event const&)              = &Window::OnEvent;
+    void (Window::*pushLayer)(std::unique_ptr<moth_ui::Layer>&&)= &Window::PushLayer;
 
     (void)update; (void)draw; (void)getSurface; (void)setTitle;
     (void)isMaximized; (void)getPos; (void)getW; (void)getH;
     (void)getMothCtx; (void)getGraphics; (void)getImgFactory;
+    (void)onEvent; (void)pushLayer;
     SUCCEED();
 }
