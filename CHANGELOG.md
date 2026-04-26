@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
-## [1.0.0-rc.1] - 2026-04-19
+## [1.0.0-rc.1] - 2026-04-26
 ### Features
 - Replace uniform-grid sheet model with per-frame rects and explicit clip steps
 - Expose per-frame pivot on Sprite and add DrawSpriteAtPivot
@@ -35,11 +35,16 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Re-enable screensaver after SDL init
 - Set SDL_HINT_VIDEO_ALLOW_SCREENSAVER before SDL_Init to prevent screensaver suppression
 - Skip draw calls with zero or negative destination rect dimensions
+- Adding a bit of a fudge factor to vulkan font sizing
+- Update API surface tests for string_view parameter sweep
+- Guard PushLayer against pre-PostCreate use and deduplicate GLFW event dispatch
+- Use pixel sizing for Vulkan fonts to match SDL_ttf behaviour
 
 ### Refactoring
 - Rename DrawSpriteAtPivot to DrawSprite and drop default pivot
 - Use string_view for title and text parameters in public API
 - Rename CanyonEventType to MothGraphicsEventType
+- Route all events through LayerStack before external listeners
 
 ### Performance
 - Skip sampler teardown in SetFilter/SetAddressMode when unchanged
@@ -47,6 +52,10 @@ Entries are generated automatically from git history using [git-cliff](https://g
 
 ### Documentation
 - Add known limitations to README, remove TODO
+- Clarify font size parameter is pixels, not points
+
+### Testing
+- Pin Window EventListener base and new public methods
 
 ### Miscellaneous
 - Resetting moth_ui dep version
