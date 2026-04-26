@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <string_view>
 
 using namespace moth_graphics::graphics;
 
@@ -36,7 +37,7 @@ TEST_CASE("MothRenderer method signatures are stable", "[api][bridge][moth_rende
                                     moth_ui::IntRect const&,
                                     moth_ui::ImageScaleType,
                                     float)                           = &MothRenderer::RenderImage;
-    void (MothRenderer::*renderText)(std::string const&,
+    void (MothRenderer::*renderText)(std::string_view,
                                      moth_ui::IFont&,
                                      moth_ui::TextHorizAlignment,
                                      moth_ui::TextVertAlignment,

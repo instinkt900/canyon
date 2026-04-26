@@ -5,6 +5,7 @@
 #include <catch2/catch_all.hpp>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 using namespace moth_graphics;
@@ -24,7 +25,7 @@ TEST_CASE("IPlatform method signatures are stable", "[api][platform][iplatform]"
     void (IPlatform::*shutdown)()                                         = &IPlatform::Shutdown;
     Context& (IPlatform::*getCtx)()                                       = &IPlatform::GetGraphicsContext;
     std::unique_ptr<Window> (IPlatform::*createWin)(
-        std::string const&, int, int)                                     = &IPlatform::CreateWindow;
+        std::string_view, int, int)                                       = &IPlatform::CreateWindow;
     (void)startup; (void)shutdown; (void)getCtx; (void)createWin;
     SUCCEED();
 }
@@ -47,7 +48,7 @@ TEST_CASE("Window method signatures are stable", "[api][platform][window]") {
     void (Window::*update)(uint32_t)                            = &Window::Update;
     void (Window::*draw)()                                      = &Window::Draw;
     graphics::SurfaceContext& (Window::*getSurface)() const     = &Window::GetSurfaceContext;
-    void (Window::*setTitle)(std::string const&)                = &Window::SetWindowTitle;
+    void (Window::*setTitle)(std::string_view)                  = &Window::SetWindowTitle;
     bool (Window::*isMaximized)() const                         = &Window::IsMaximized;
     IntVec2 const& (Window::*getPos)() const                    = &Window::GetPosition;
     int  (Window::*getW)() const                                = &Window::GetWidth;
