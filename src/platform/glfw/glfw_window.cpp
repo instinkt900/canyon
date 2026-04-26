@@ -133,14 +133,6 @@ namespace moth_graphics::platform::glfw {
         CHECK_VK_RESULT(glfwCreateWindowSurface(m_context.GetInstance(), m_glfwWindow, nullptr, &m_customVkSurface));
         m_surfaceContext = std::make_unique<graphics::vulkan::SurfaceContext>(m_context);
 
-        {
-            float xscale = 1.0f;
-            float yscale = 1.0f;
-            glfwGetWindowContentScale(m_glfwWindow, &xscale, &yscale);
-            // TODO: this scaling factor was derived from comparing sdl and vulkan fonts pixel sizes
-            m_surfaceContext->SetDPI(static_cast<int>(xscale * 74.0f));
-        }
-
         m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight);
         spdlog::info("GLFW: window '{}' ready", m_title);
         return true;
