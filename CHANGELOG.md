@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
-## [1.0.0-rc.1] - 2026-04-26
+## [1.0.0-rc.1] - 2026-04-28
 ### Features
 - Replace uniform-grid sheet model with per-frame rects and explicit clip steps
 - Expose per-frame pivot on Sprite and add DrawSpriteAtPivot
@@ -45,6 +45,7 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Use string_view for title and text parameters in public API
 - Rename CanyonEventType to MothGraphicsEventType
 - Route all events through LayerStack before external listeners
+- EventListener -> IEventListener, remove m_ prefix from struct/public members
 
 ### Performance
 - Skip sampler teardown in SetFilter/SetAddressMode when unchanged
@@ -65,6 +66,7 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Updating version string parsing
 - Removed example. moth_example will take its place
 - Exposing version info in the api
+- Adding license file
 
 ### Changes
 - Bump version to 1.0.0-rc.1
