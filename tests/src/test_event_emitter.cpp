@@ -15,7 +15,7 @@ using namespace moth_ui;
 // ---------------------------------------------------------------------------
 
 namespace {
-    class CountingListener : public EventListener {
+    class CountingListener : public IEventListener {
     public:
         int count = 0;
 
@@ -25,7 +25,7 @@ namespace {
         }
     };
 
-    class ConsumingListener : public EventListener {
+    class ConsumingListener : public IEventListener {
     public:
         bool OnEvent(Event const& /*event*/) override {
             return true;

@@ -20,7 +20,7 @@ namespace moth_graphics::platform {
     /// routes platform events to the layer stack. Subclass and override
     /// @c Startup(), @c PostCreateWindow(), and @c Shutdown() to customize
     /// application lifecycle behavior.
-    class Application : public Ticker, public moth_ui::EventListener {
+    class Application : public Ticker, public moth_ui::IEventListener {
     public:
         /// @param platform The platform backend to use (SDL or GLFW).
         /// @param title Initial window title.

@@ -5,24 +5,24 @@
 namespace moth_graphics::graphics::vulkan {
     Image::Image(std::shared_ptr<Texture> texture)
     : m_texture(texture) 
-    , m_sourceRect({{ 0, 0 }, { texture->GetWidth(), texture->GetHeight() }}) {
+    , sourceRect({{ 0, 0 }, { texture->GetWidth(), texture->GetHeight() }}) {
 
     }
 
     Image::Image(std::shared_ptr<Texture> texture, IntRect const& sourceRect)
         : m_texture(texture)
-        , m_sourceRect(sourceRect) {
+        , sourceRect(sourceRect) {
     }
 
     Image::~Image() {
     }
 
     int Image::GetWidth() const {
-        return m_sourceRect.bottomRight.x - m_sourceRect.topLeft.x;
+        return sourceRect.bottomRight.x - sourceRect.topLeft.x;
     }
 
     int Image::GetHeight() const {
-        return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
+        return sourceRect.bottomRight.y - sourceRect.topLeft.y;
     }
 
     std::shared_ptr<ITexture> Image::GetTexture() const {

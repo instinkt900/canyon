@@ -23,13 +23,13 @@ namespace moth_graphics::graphics::sdl {
         void ImGui(moth_graphics::IntVec2 const& size, moth_graphics::FloatVec2 const& uv0 = { 0, 0 }, moth_graphics::FloatVec2 const& uv1 = { 1, 1 }) const override;
 
         IntRect const& GetSourceRect() const {
-            return m_sourceRect;
+            return sourceRect;
         }
 
         static std::unique_ptr<Image> Load(SurfaceContext& context, std::filesystem::path const& path);
 
     private:
         std::shared_ptr<Texture> m_texture;
-        IntRect m_sourceRect;
+        IntRect sourceRect;
     };
 }

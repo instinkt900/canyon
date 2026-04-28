@@ -24,6 +24,6 @@ namespace moth_graphics::graphics::vulkan {
         static std::unique_ptr<Image> Load(SurfaceContext& context, std::filesystem::path const& path);
 
         std::shared_ptr<Texture> m_texture;
-        IntRect m_sourceRect;
+        IntRect sourceRect;
     };
 }

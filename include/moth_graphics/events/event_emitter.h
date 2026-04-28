@@ -24,26 +24,26 @@ namespace moth_graphics {
         /// @c EventEmitter::AddEventListener (i.e. non-default-constructed).
         /// Does @e not reflect whether the listener is still registered;
         /// a handle remains non-zero after @c RemoveEventListener() is called.
-        bool IsValid() const { return m_id != 0; }
+        bool IsValid() const { return id != 0; }
 
     private:
         explicit LambdaHandle(uint32_t id)
-            : m_id(id) {}
-        uint32_t m_id = 0;
+            : id(id) {}
+        uint32_t id = 0;
     };
 
-    /// @internal Wraps a callable as an @c EventListener so it can be stored in
+    /// @internal Wraps a callable as an @c IEventListener so it can be stored in
     /// the listeners list.
-    class LambdaWrapper : public moth_ui::EventListener {
+    class LambdaWrapper : public moth_ui::IEventListener {
     public:
         LambdaWrapper(std::function<bool(moth_ui::Event const&)> const& lambda, uint32_t id)
             : m_lambda(lambda)
-            , m_id(id) {
+            , id(id) {
         }
 
         ~LambdaWrapper() override = default;
 
-        uint32_t GetID() const { return m_id; }
+        uint32_t GetID() const { return id; }
 
         bool OnEvent(moth_ui::Event const& event) override {
             return m_lambda(event);
@@ -51,12 +51,12 @@ namespace moth_graphics {
 
     private:
         std::function<bool(moth_ui::Event const&)> m_lambda;
-        uint32_t m_id;
+        uint32_t id;
     };
 
     /// @brief Broadcasts events to a list of registered listeners.
     ///
-    /// Listeners can be registered as raw @c EventListener pointers (caller
+    /// Listeners can be registered as raw @c IEventListener pointers (caller
     /// manages lifetime) or as lambdas (lifetime managed by this emitter via a
     /// @c LambdaHandle).
     class EventEmitter {
@@ -65,12 +65,12 @@ namespace moth_graphics {
         virtual ~EventEmitter() = default;
 
         /// @brief Register a listener. The caller must ensure @p listener outlives this emitter.
-        void AddEventListener(moth_ui::EventListener* listener) {
+        void AddEventListener(moth_ui::IEventListener* listener) {
             m_listeners.push_back(listener);
         }
 
         /// @brief Unregister a previously added pointer listener.
-        void RemoveEventListener(moth_ui::EventListener* listener) {
+        void RemoveEventListener(moth_ui::IEventListener* listener) {
             m_listeners.erase(std::remove(m_listeners.begin(), m_listeners.end(), listener), m_listeners.end());
         }
 
@@ -89,7 +89,7 @@ namespace moth_graphics {
             }
 
             auto it = std::find_if(m_owning.begin(), m_owning.end(), [&](std::unique_ptr<LambdaWrapper> const& ptr) {
-                return ptr->GetID() == handle.m_id;
+                return ptr->GetID() == handle.id;
             });
 
             if (it != m_owning.end()) {
@@ -102,7 +102,7 @@ namespace moth_graphics {
         /// @returns @c true if any listener handled the event.
         bool EmitEvent(moth_ui::Event const& event) {
             moth_ui::EventDispatch dispatch(event);
-            std::vector<moth_ui::EventListener*> snapshot(m_listeners);
+            std::vector<moth_ui::IEventListener*> snapshot(m_listeners);
             for (auto* listener : snapshot) {
                 // Listener may have been removed during a prior callback.
                 if (std::find(m_listeners.begin(), m_listeners.end(), listener) == m_listeners.end()) {
@@ -115,7 +115,7 @@ namespace moth_graphics {
 
     protected:
         uint32_t m_nextLambdaId = 0;
-        std::vector<moth_ui::EventListener*> m_listeners;
+        std::vector<moth_ui::IEventListener*> m_listeners;
         std::vector<std::unique_ptr<LambdaWrapper>> m_owning;
     };
 }

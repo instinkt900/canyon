@@ -45,6 +45,6 @@ namespace moth_graphics::graphics {
         std::stack<Color> m_drawColor;
         std::stack<BlendMode> m_blendMode;
         std::stack<IntRect> m_clip;
-        std::stack<moth_ui::TextureFilter> m_textureFilter;
+        std::stack<moth_ui::TextureFilter> textureFilter;
     };
 }

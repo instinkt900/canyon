@@ -7,7 +7,7 @@ namespace moth_graphics::graphics {
                              std::vector<ClipEntry> clips)
         : m_image(std::move(image))
         , m_frames(std::move(frames))
-        , m_clips(std::move(clips)) {
+        , clips(std::move(clips)) {
     }
 
     std::shared_ptr<IImage> SpriteSheet::GetImage() const {
@@ -27,18 +27,18 @@ namespace moth_graphics::graphics {
     }
 
     int SpriteSheet::GetClipCount() const {
-        return static_cast<int>(m_clips.size());
+        return static_cast<int>(clips.size());
     }
 
     std::string_view SpriteSheet::GetClipName(int index) const {
-        if (index < 0 || index >= static_cast<int>(m_clips.size())) {
+        if (index < 0 || index >= static_cast<int>(clips.size())) {
             return {};
         }
-        return m_clips[static_cast<size_t>(index)].name;
+        return clips[static_cast<size_t>(index)].name;
     }
 
     bool SpriteSheet::GetClipDesc(std::string_view name, ClipDesc& outDesc) const {
-        for (auto const& entry : m_clips) {
+        for (auto const& entry : clips) {
             if (entry.name == name) {
                 outDesc = entry.desc;
                 return true;

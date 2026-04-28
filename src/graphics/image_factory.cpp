@@ -91,7 +91,7 @@ namespace moth_graphics::graphics {
                     int const y = rectJson.at("y").get<int>();
                     int const w = rectJson.at("w").get<int>();
                     int const h = rectJson.at("h").get<int>();
-                    desc.m_sourceRect = moth_graphics::MakeRect(x, y, w, h);
+                    desc.sourceRect = moth_graphics::MakeRect(x, y, w, h);
                     m_cachedImages.insert(std::make_pair(absPath.string(), desc));
                     anyCached = true;
                 } catch (std::exception& e) {
@@ -109,21 +109,21 @@ namespace moth_graphics::graphics {
         auto const cacheIt = m_cachedImages.find(key);
         if (std::end(m_cachedImages) != cacheIt) {
             auto const& imageDesc = cacheIt->second;
-            return m_context.NewImage(imageDesc.m_texture, imageDesc.m_sourceRect);
+            return m_context.NewImage(imageDesc.m_texture, imageDesc.sourceRect);
         }
         if (std::shared_ptr<ITexture> texture = m_context.TextureFromFile(path)) {
             IntVec2 textureDimensions{ texture->GetWidth(), texture->GetHeight() };
             IntRect sourceRect{ { 0, 0 }, textureDimensions };
             ImageDesc cacheDesc;
             cacheDesc.m_path = key;
-            cacheDesc.m_sourceRect = sourceRect;
+            cacheDesc.sourceRect = sourceRect;
             cacheDesc.m_texture = texture;
             m_cachedImages.insert(std::make_pair(key, cacheDesc));
             return m_context.NewImage(texture, sourceRect);
         }
         if (m_fallbackDesc) {
             spdlog::warn("ImageFactory: '{}' not found, using fallback", path.string());
-            return m_context.NewImage(m_fallbackDesc->m_texture, m_fallbackDesc->m_sourceRect);
+            return m_context.NewImage(m_fallbackDesc->m_texture, m_fallbackDesc->sourceRect);
         }
         spdlog::error("ImageFactory: '{}' not found and no fallback set", path.string());
         return nullptr;

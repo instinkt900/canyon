@@ -5,20 +5,20 @@
 namespace moth_graphics::graphics::sdl {
     Image::Image(std::shared_ptr<Texture> texture)
         : m_texture(texture) {
-        m_sourceRect = IntRect{ { 0, 0 }, { m_texture->GetWidth(), m_texture->GetHeight() } };
+        sourceRect = IntRect{ { 0, 0 }, { m_texture->GetWidth(), m_texture->GetHeight() } };
     }
 
     Image::Image(std::shared_ptr<Texture> texture, IntRect const& sourceRect)
         : m_texture(texture)
-        , m_sourceRect(sourceRect) {
+        , sourceRect(sourceRect) {
     }
 
     int Image::GetWidth() const {
-        return m_sourceRect.bottomRight.x - m_sourceRect.topLeft.x;
+        return sourceRect.bottomRight.x - sourceRect.topLeft.x;
     }
 
     int Image::GetHeight() const {
-        return m_sourceRect.bottomRight.y - m_sourceRect.topLeft.y;
+        return sourceRect.bottomRight.y - sourceRect.topLeft.y;
     }
 
     std::shared_ptr<ITexture> Image::GetTexture() const {

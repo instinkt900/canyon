@@ -84,6 +84,6 @@ namespace moth_graphics::graphics {
     private:
         std::shared_ptr<IImage> m_image;
         std::vector<FrameEntry> m_frames;
-        std::vector<ClipEntry> m_clips;
+        std::vector<ClipEntry> clips;
     };
 }

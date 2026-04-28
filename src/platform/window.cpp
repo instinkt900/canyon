@@ -1,5 +1,6 @@
 #include "common.h"
 #include <moth_ui/context.h>
+#include <moth_ui/layers/layer.h>
 #include "moth_graphics/platform/window.h"
 #include "moth_graphics/graphics/surface_context.h"
 
@@ -26,6 +27,11 @@ namespace moth_graphics::platform {
             return EmitEvent(event);
         }
         return true;
+    }
+
+    void Window::PushLayer(std::unique_ptr<moth_ui::Layer> layer) {
+        assert(m_layerStack && "PushLayer called before PostCreate; layer stack not yet initialised");
+        m_layerStack->PushLayer(std::move(layer));
     }
 
     void Window::PostCreate() {

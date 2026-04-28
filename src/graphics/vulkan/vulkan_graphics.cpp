@@ -177,7 +177,7 @@ namespace moth_graphics::graphics::vulkan {
         }
 
         FloatVec2 textureDimensions = FloatVec2{ texture->GetVkExtent().width, texture->GetVkExtent().height };
-        imageRect += static_cast<FloatVec2>(vulkanImage.m_sourceRect.topLeft);
+        imageRect += static_cast<FloatVec2>(vulkanImage.sourceRect.topLeft);
         imageRect /= textureDimensions;
 
         auto const t = CurrentTransform();
