@@ -41,7 +41,7 @@ namespace moth_graphics::platform {
         m_mothFontFactory = std::make_unique<moth_graphics::graphics::MothFontFactory>(assetContext.GetFontFactory());
         m_mothFlipbookFactory = std::make_unique<moth_graphics::graphics::MothFlipbookFactory>(assetContext.GetSpriteSheetFactory());
         m_mothContext = std::make_shared<moth_ui::Context>(m_mothImageFactory.get(), m_mothFontFactory.get(), m_uiRenderer.get(), m_mothFlipbookFactory.get());
-        m_layerStack = std::make_unique<moth_ui::LayerStack>(*m_uiRenderer, m_windowWidth, m_windowHeight, m_windowWidth, m_windowHeight);
+        m_layerStack = std::make_unique<moth_ui::LayerStack>(*m_uiRenderer, IntVec2{ m_windowWidth, m_windowHeight }, IntVec2{ m_windowWidth, m_windowHeight });
         m_layerStack->SetEventListener(this);
     }
 
