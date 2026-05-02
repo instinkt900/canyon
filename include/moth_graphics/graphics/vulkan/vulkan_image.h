@@ -13,7 +13,7 @@ namespace moth_graphics::graphics::vulkan {
     public:
         explicit Image(std::shared_ptr<Texture> texture);
         Image(std::shared_ptr<Texture> texture, IntRect const& sourceRect);
-        virtual ~Image();
+        ~Image() override;
 
         int GetWidth() const override;
         int GetHeight() const override;
@@ -23,7 +23,11 @@ namespace moth_graphics::graphics::vulkan {
 
         static std::unique_ptr<Image> Load(SurfaceContext& context, std::filesystem::path const& path);
 
+        std::shared_ptr<Texture> const& GetVkTexture() const { return m_texture; }
+        IntRect const& GetSourceRect() const { return m_sourceRect; }
+
+    private:
         std::shared_ptr<Texture> m_texture;
-        IntRect sourceRect;
+        IntRect m_sourceRect;
     };
 }

@@ -165,7 +165,7 @@ namespace moth_graphics::graphics::vulkan {
     void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto* context = CurrentContext();
         auto& vulkanImage = dynamic_cast<Image&>(image);
-        auto texture = vulkanImage.m_texture;
+        auto texture = vulkanImage.GetVkTexture();
 
         FloatRect fDestRect = static_cast<FloatRect>(destRect);
 
@@ -177,7 +177,7 @@ namespace moth_graphics::graphics::vulkan {
         }
 
         FloatVec2 textureDimensions = FloatVec2{ texture->GetVkExtent().width, texture->GetVkExtent().height };
-        imageRect += static_cast<FloatVec2>(vulkanImage.sourceRect.topLeft);
+        imageRect += static_cast<FloatVec2>(vulkanImage.GetSourceRect().topLeft);
         imageRect /= textureDimensions;
 
         auto const t = CurrentTransform();
@@ -224,7 +224,7 @@ namespace moth_graphics::graphics::vulkan {
 
     void Graphics::DrawToPNG(IImage& image, std::filesystem::path const& path) {
         auto& srcVkImage = dynamic_cast<Image&>(image);
-        auto srcTexture = srcVkImage.m_texture;
+        auto srcTexture = srcVkImage.GetVkTexture();
         auto const srcFormat = srcTexture->GetVkFormat();
 
         auto const targetWidth = static_cast<uint32_t>(image.GetWidth());

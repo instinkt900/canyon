@@ -29,7 +29,7 @@ namespace moth_graphics::graphics::vulkan {
         CreateFramebufferResource(renderPass);
 
         m_commandBuffer->BeginRecord();
-        m_commandBuffer->TransitionImageLayout(*m_image->m_texture, m_image->m_texture->GetVkFormat(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        m_commandBuffer->TransitionImageLayout(*m_image->GetVkTexture(), m_image->GetVkTexture()->GetVkFormat(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         m_commandBuffer->SubmitAndWait();
     }
 
@@ -38,11 +38,11 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     VkExtent2D Framebuffer::GetVkExtent() const {
-        return m_image->m_texture->GetVkExtent();
+        return m_image->GetVkTexture()->GetVkExtent();
     }
 
     VkFormat Framebuffer::GetVkFormat() const {
-        return m_image->m_texture->GetVkFormat();
+        return m_image->GetVkTexture()->GetVkFormat();
     }
 
     Image& Framebuffer::GetVkImage() {
@@ -57,7 +57,7 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     void Framebuffer::CreateFramebufferResource(VkRenderPass renderPass) {
-        VkImageView attachments[] = { m_image->m_texture->GetVkView() };
+        VkImageView attachments[] = { m_image->GetVkTexture()->GetVkView() };
         VkFramebufferCreateInfo info{};
         info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         info.pNext = nullptr;

@@ -82,7 +82,7 @@ namespace moth_graphics::graphics::vulkan {
         commandBuffer->BeginRecord();
         for (uint32_t i = 0; i < imageCount; ++i) {
             m_framebuffers.push_back(std::make_unique<Framebuffer>(m_context, m_extent.width, m_extent.height, swapchainImages[i], swapchainImageViews[i], surfaceFormat.format, renderPass.GetRenderPass(), i));
-            commandBuffer->TransitionImageLayout(*m_framebuffers[i]->GetVkImage().m_texture, surfaceFormat.format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+            commandBuffer->TransitionImageLayout(*m_framebuffers[i]->GetVkImage().GetVkTexture(), surfaceFormat.format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
             auto slot = std::make_shared<FrameSlot>();
             VkSemaphoreCreateInfo semaphoreInfo{};
