@@ -16,7 +16,7 @@ namespace moth_graphics::graphics {
         : m_graphics(graphics) {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });
         m_blendMode.push(BlendMode::Replace);
-        textureFilter.push(moth_ui::TextureFilter::Linear);
+        m_textureFilter.push(moth_ui::TextureFilter::Linear);
     }
 
     void MothRenderer::PushBlendMode(moth_ui::BlendMode mode) {
@@ -73,6 +73,9 @@ namespace moth_graphics::graphics {
     }
 
     void MothRenderer::PopClip() {
+        if (m_clip.empty()) {
+            return;
+        }
         m_clip.pop();
 
         if (m_clip.empty()) {
@@ -83,12 +86,12 @@ namespace moth_graphics::graphics {
     }
 
     void MothRenderer::PushTextureFilter(moth_ui::TextureFilter filter) {
-        textureFilter.push(filter);
+        m_textureFilter.push(filter);
     }
 
     void MothRenderer::PopTextureFilter() {
-        if (textureFilter.size() > 1) {
-            textureFilter.pop();
+        if (m_textureFilter.size() > 1) {
+            m_textureFilter.pop();
         }
     }
 
@@ -124,7 +127,7 @@ namespace moth_graphics::graphics {
         }
 
         if (auto texture = internalImage.GetTexture()) {
-            auto const gfxFilter = ToGraphicsFilter(textureFilter.top());
+            auto const gfxFilter = ToGraphicsFilter(m_textureFilter.top());
             texture->SetFilter(gfxFilter, gfxFilter);
         }
 
