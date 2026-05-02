@@ -95,13 +95,13 @@ namespace moth_graphics::graphics::vulkan {
         }
     }
 
-    VkImageView Texture::GetVkView() {
+    VkImageView Texture::GetVkView() const {
         if (m_vkView == VK_NULL_HANDLE) {
             CreateView();
         }
         return m_vkView;
     }
-    VkSampler Texture::GetVkSampler() {
+    VkSampler Texture::GetVkSampler() const {
         bool const nearest = (m_minFilter == VK_FILTER_NEAREST || m_magFilter == VK_FILTER_NEAREST);
         VkSampler& slot = nearest ? m_vkSamplerNearest : m_vkSamplerLinear;
         if (slot == VK_NULL_HANDLE) {
@@ -110,7 +110,7 @@ namespace moth_graphics::graphics::vulkan {
         return slot;
     }
 
-    VkDescriptorSet Texture::GetDescriptorSet() {
+    VkDescriptorSet Texture::GetDescriptorSet() const {
         VkSampler const currentSampler = GetVkSampler();
         if (m_vkDescriptorSet != VK_NULL_HANDLE && m_vkDescriptorSetSampler == currentSampler) {
             return m_vkDescriptorSet;
@@ -157,7 +157,7 @@ namespace moth_graphics::graphics::vulkan {
         CHECK_VK_RESULT(vmaCreateImage(m_context.GetVmaAllocator(), &info, &allocInfo, &m_vkImage, &m_vmaAllocation, nullptr));
     }
 
-    void Texture::CreateView() {
+    void Texture::CreateView() const {
         VkImageViewCreateInfo info{};
         info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         info.viewType = VK_IMAGE_VIEW_TYPE_2D;
