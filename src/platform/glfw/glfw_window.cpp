@@ -150,15 +150,16 @@ namespace moth_graphics::platform::glfw {
             vkDeviceWaitIdle(m_surfaceContext->GetVkDevice());
         }
         PreDestroy();
-        // TODO: why do we do this in destroy?
-        m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
         m_graphics = nullptr;
         m_surfaceContext = nullptr;
-        if (m_customVkSurface != VK_NULL_HANDLE) {
-            vkDestroySurfaceKHR(m_context.GetInstance(), m_customVkSurface, nullptr);
-            m_customVkSurface = VK_NULL_HANDLE;
+        if (m_glfwWindow != nullptr) {
+            if (m_customVkSurface != VK_NULL_HANDLE) {
+                vkDestroySurfaceKHR(m_context.GetInstance(), m_customVkSurface, nullptr);
+                m_customVkSurface = VK_NULL_HANDLE;
+            }
+            glfwDestroyWindow(m_glfwWindow);
+            m_glfwWindow = nullptr;
         }
-        glfwDestroyWindow(m_glfwWindow);
     }
 
     void Window::OnResize() {
