@@ -12,7 +12,8 @@ namespace moth_graphics::graphics {
     public:
         virtual ~ITarget() = default;
 
-        /// @brief Returns the image representing the target's rendered content.
-        virtual IImage* GetImage() = 0;
+        /// @brief Returns an image view of the target's rendered content.
+        ///        The returned image shares the target's underlying texture.
+        virtual Image GetImage() const = 0;
     };
 }

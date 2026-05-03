@@ -1,7 +1,8 @@
 #include "common.h"
 #include "moth_graphics/graphics/sdl/sdl_graphics.h"
 #include "moth_graphics/graphics/sdl/sdl_font.h"
-#include "moth_graphics/graphics/sdl/sdl_image.h"
+#include "moth_graphics/graphics/sdl/sdl_target.h"
+#include "moth_graphics/graphics/sdl/sdl_texture.h"
 #include "moth_graphics/graphics/sdl/sdl_utils.hpp"
 #include "moth_graphics/platform/sdl/sdl_window.h"
 #include "../utils.h"
@@ -57,20 +58,6 @@ namespace moth_graphics::graphics::sdl {
         m_blendMode = mode;
     }
 
-    // void Graphics::SetBlendMode(std::shared_ptr<graphics::IImage> target, graphics::BlendMode mode) {
-    //     auto sdlImage = std::dynamic_pointer_cast<Image>(target);
-    //     auto sdlTexture = sdlImage->GetTexture();
-    //     SDL_SetTextureBlendMode(sdlTexture->GetImpl(), ToSDL(mode));
-    // }
-
-    // void SDLGraphics::SetColorMod(std::shared_ptr<graphics::IImage> target, graphics::Color const& color) {
-    //     auto sdlImage = std::dynamic_pointer_cast<Image>(target);
-    //     auto sdlTexture = sdlImage->GetTexture();
-    //     ColorComponents components(color);
-    //     SDL_SetTextureColorMod(sdlTexture->GetImpl(), components.r, components.g, components.b);
-    //     SDL_SetTextureAlphaMod(sdlTexture->GetImpl(), components.a);
-    // }
-
     void Graphics::SetColor(graphics::Color const& color) {
         ColorComponents components(color);
         SDL_SetRenderDrawColor(m_surfaceContext.GetRenderer(), components.r, components.g, components.b, components.a);
@@ -98,7 +85,7 @@ namespace moth_graphics::graphics::sdl {
         }
     }
 
-    void Graphics::DrawImage(IImage& image, IntVec2 const& pos, FloatVec2 const& pivot) {
+    void Graphics::DrawImage(Image const& image, IntVec2 const& pos, FloatVec2 const& pivot) {
         auto const imageWidth = image.GetWidth();
         auto const imageHeight = image.GetHeight();
         auto const offsetX = static_cast<int>(static_cast<float>(imageWidth) * pivot.x);
@@ -107,13 +94,12 @@ namespace moth_graphics::graphics::sdl {
         DrawImage(image, destRect - IntVec2{ offsetX, offsetY }, nullptr);
     }
 
-    void Graphics::DrawImage(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
-        auto& sdlImage = dynamic_cast<Image&>(image);
-        auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
+    void Graphics::DrawImage(Image const& image, IntRect const& destRect, IntRect const* sourceRect) {
+        auto sdlTexture = std::dynamic_pointer_cast<Texture>(image.GetTexture());
         if (!sdlTexture) {
             return;
         }
-        auto const& textureSourceRect = sdlImage.GetSourceRect();
+        auto const& textureSourceRect = image.GetSourceRect();
 
         ColorComponents const components{ m_drawColor };
         SDL_SetTextureBlendMode(sdlTexture->GetSDLTexture()->GetImpl(), ToSDL(m_blendMode));
@@ -168,34 +154,17 @@ namespace moth_graphics::graphics::sdl {
                          flip);
     }
 
-    void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
+    void Graphics::DrawImageTiled(Image const& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
         auto const imageWidth = static_cast<int>(static_cast<float>(image.GetWidth()) * scale);
         auto const imageHeight = static_cast<int>(static_cast<float>(image.GetHeight()) * scale);
+        if (imageWidth <= 0 || imageHeight <= 0) {
+            return;
+        }
         for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
             for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
                 DrawImage(image, IntRect{ { x, y }, { x + imageWidth, y + imageHeight } }, sourceRect);
             }
         }
-    }
-
-    void Graphics::DrawToPNG(IImage& image, std::filesystem::path const& path) {
-        auto& sdlImage = dynamic_cast<Image&>(image);
-        auto sdlTexture = std::dynamic_pointer_cast<Texture>(sdlImage.GetTexture());
-        if (!sdlTexture) {
-            return;
-        }
-        SDL_Texture* tex = sdlTexture->GetSDLTexture()->GetImpl();
-
-        SDL_Rect const srcRect = ToSDL(sdlImage.GetSourceRect());
-
-        SDL_Texture* prevTarget = SDL_GetRenderTarget(m_surfaceContext.GetRenderer());
-        SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), tex);
-
-        SurfaceRef surface = CreateSurfaceRef(SDL_CreateRGBSurface(0, srcRect.w, srcRect.h, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000));
-        SDL_RenderReadPixels(m_surfaceContext.GetRenderer(), &srcRect, surface->format->format, surface->pixels, surface->pitch);
-        IMG_SavePNG(surface.get(), path.string().c_str());
-
-        SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), prevTarget);
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {
@@ -336,8 +305,7 @@ namespace moth_graphics::graphics::sdl {
     std::unique_ptr<graphics::ITarget> Graphics::CreateTarget(int width, int height) {
         auto sdlTexture = CreateTextureRef(SDL_CreateTexture(m_surfaceContext.GetRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height));
         auto texture = std::make_shared<Texture>(m_surfaceContext.GetRenderer(), sdlTexture);
-        IntRect const sourceRect{ { 0, 0 }, { width, height } };
-        return std::make_unique<Image>(texture, sourceRect);
+        return std::make_unique<Target>(std::move(texture));
     }
 
     graphics::ITarget* Graphics::GetTarget() {
@@ -348,11 +316,9 @@ namespace moth_graphics::graphics::sdl {
         if (target == nullptr) {
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), nullptr);
         } else {
-            auto* image = dynamic_cast<Image*>(target);
-            assert(image != nullptr && "SetTarget: target is not an Image");
-            auto sdlImage = std::dynamic_pointer_cast<Texture>(image->GetTexture());
-            assert(sdlImage != nullptr && "SetTarget: texture is not an SDL Texture");
-            auto sdlTexture = sdlImage->GetSDLTexture();
+            auto* sdlTarget = dynamic_cast<Target*>(target);
+            assert(sdlTarget != nullptr && "SetTarget: target is not an SDL Target");
+            auto const& sdlTexture = sdlTarget->GetSDLTexture()->GetSDLTexture();
             SDL_SetRenderTarget(m_surfaceContext.GetRenderer(), sdlTexture->GetImpl());
         }
         m_currentRenderTarget = target;

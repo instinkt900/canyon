@@ -22,7 +22,7 @@ TEST_CASE("SpriteSheet method signatures are stable", "[api][sprite][spritesheet
                                  SpriteSheet::LoopType>);
 
     // Method signatures
-    std::shared_ptr<IImage> (SpriteSheet::*getImg)() const                          = &SpriteSheet::GetImage;
+    Image const& (SpriteSheet::*getImg)() const                                      = &SpriteSheet::GetImage;
     int  (SpriteSheet::*getFrameCount)() const                                       = &SpriteSheet::GetFrameCount;
     bool (SpriteSheet::*getFrameDesc)(int, SpriteSheet::FrameEntry&) const           = &SpriteSheet::GetFrameDesc;
     int  (SpriteSheet::*getClipCount)() const                                        = &SpriteSheet::GetClipCount;
@@ -48,7 +48,7 @@ TEST_CASE("Sprite method signatures are stable", "[api][sprite][sprite]") {
     IntVec2 (Sprite::*getFramePivot)() const              = &Sprite::GetCurrentFramePivot;
     int  (Sprite::*getWidth)() const                      = &Sprite::GetWidth;
     int  (Sprite::*getHeight)() const                     = &Sprite::GetHeight;
-    IImage* (Sprite::*getImage)() const                   = &Sprite::GetImage;
+    Image const& (Sprite::*getImage)() const              = &Sprite::GetImage;
 
     (void)getSheet; (void)setClip; (void)setPlaying; (void)update;
     (void)isPlaying; (void)getClipName; (void)getCurrentFrame; (void)setFrame;

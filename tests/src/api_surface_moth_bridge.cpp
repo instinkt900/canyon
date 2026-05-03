@@ -15,7 +15,7 @@ TEST_CASE("MothImage method signatures are stable", "[api][bridge][moth_image]")
     int  (MothImage::*getW)() const                                  = &MothImage::GetWidth;
     int  (MothImage::*getH)() const                                  = &MothImage::GetHeight;
     moth_ui::IntVec2 (MothImage::*getDims)() const                   = &MothImage::GetDimensions;
-    std::shared_ptr<moth_graphics::graphics::IImage>
+    moth_graphics::graphics::Image const&
          (MothImage::*getImg)() const                                = &MothImage::GetImage;
     (void)getW; (void)getH; (void)getDims; (void)getImg;
     SUCCEED();

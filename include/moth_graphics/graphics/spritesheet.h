@@ -58,11 +58,11 @@ namespace moth_graphics::graphics {
         ///               and every @c durationMs must be > 0. These are the same
         ///               invariants enforced by SpriteSheetFactory when loading from
         ///               a descriptor file.
-        SpriteSheet(std::shared_ptr<IImage> image,
+        SpriteSheet(Image image,
                     std::vector<FrameEntry> frames,
                     std::vector<ClipEntry> clips);
 
-        std::shared_ptr<IImage> GetImage() const;
+        Image const& GetImage() const;
 
         /// @brief Returns the total number of frames in the atlas.
         int GetFrameCount() const;
@@ -82,7 +82,7 @@ namespace moth_graphics::graphics {
         bool GetClipDesc(std::string_view name, ClipDesc& outDesc) const;
 
     private:
-        std::shared_ptr<IImage> m_image;
+        Image m_image;
         std::vector<FrameEntry> m_frames;
         std::vector<ClipEntry> m_clips;
     };

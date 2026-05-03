@@ -1,5 +1,6 @@
 #include "moth_graphics/graphics/spritesheet.h"
 #include "moth_graphics/graphics/iimage.h"
+#include "moth_graphics/graphics/itexture.h"
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/vector.h"
 
@@ -11,17 +12,17 @@ using namespace moth_graphics;
 using namespace moth_graphics::graphics;
 
 namespace {
-    // Minimal IImage stub — no GPU resources, satisfies the constructor's non-null invariant.
-    class DummyImage : public IImage {
-    public:
+    struct MockTexture : ITexture {
         int GetWidth() const override { return 64; }
         int GetHeight() const override { return 64; }
-        std::shared_ptr<ITexture> GetTexture() const override { return nullptr; }
-        void ImGui(IntVec2 const& /*size*/, FloatVec2 const& /*uv0*/, FloatVec2 const& /*uv1*/) const override {}
+        void SetFilter(TextureFilter, TextureFilter) override {}
+        void SetAddressMode(TextureAddressMode, TextureAddressMode) override {}
+        void DrawImGui(IntVec2 const&, FloatVec2 const&, FloatVec2 const&) const override {}
+        void SaveToPNG(std::filesystem::path const&, IntRect const&) override {}
     };
 
-    std::shared_ptr<IImage> MakeDummyImage() {
-        return std::make_shared<DummyImage>();
+    Image MakeDummyImage() {
+        return Image{};
     }
 
     SpriteSheet::FrameEntry MakeFrame(int x, int y, int w, int h, int px = 0, int py = 0) {
@@ -105,7 +106,10 @@ TEST_CASE("SpriteSheet GetClipDesc returns false for unknown clip name", "[sprit
 }
 
 TEST_CASE("SpriteSheet GetImage returns the image passed at construction", "[spritesheet]") {
-    auto img = MakeDummyImage();
-    SpriteSheet sheet(img, { MakeFrame(0, 0, 8, 8) }, {});
-    REQUIRE(sheet.GetImage() == img);
+    auto tex = std::make_shared<MockTexture>();
+    Image sentinel{ tex };
+    SpriteSheet sheet(sentinel, { MakeFrame(0, 0, 8, 8) }, {});
+    REQUIRE(sheet.GetImage().GetTexture() == tex);
+    REQUIRE(sheet.GetImage().GetWidth() == 64);
+    REQUIRE(sheet.GetImage().GetHeight() == 64);
 }

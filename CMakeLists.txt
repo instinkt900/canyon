@@ -31,11 +31,12 @@ set(SOURCES
     external/imgui/imgui_draw.cpp
     external/imgui/imgui_tables.cpp
     external/imgui/imgui_widgets.cpp
+    src/graphics/image.cpp
     src/graphics/sprite.cpp
     src/graphics/spritesheet.cpp
     src/graphics/spritesheet_factory.cpp
     src/graphics/font_factory.cpp
-    src/graphics/image_factory.cpp
+    src/graphics/texture_factory.cpp
     src/graphics/moth_ui/moth_flipbook.cpp
     src/graphics/moth_ui/moth_flipbook_factory.cpp
     src/graphics/moth_ui/moth_font_factory.cpp
@@ -58,7 +59,7 @@ if(NOT MOTH_GRAPHICS_DISABLE_SDL)
         src/graphics/sdl/sdl_context.cpp
         src/graphics/sdl/sdl_font.cpp
         src/graphics/sdl/sdl_graphics.cpp
-        src/graphics/sdl/sdl_image.cpp
+        src/graphics/sdl/sdl_target.cpp
         src/graphics/sdl/sdl_asset_context.cpp
         src/graphics/sdl/sdl_surface_context.cpp
         src/graphics/sdl/sdl_texture.cpp
@@ -85,7 +86,6 @@ if(NOT MOTH_GRAPHICS_DISABLE_VULKAN)
         src/graphics/vulkan/vulkan_graphics_frame.cpp
         src/graphics/vulkan/vulkan_graphics_imgui.cpp
         src/graphics/vulkan/vulkan_graphics_pipeline.cpp
-        src/graphics/vulkan/vulkan_image.cpp
         src/graphics/vulkan/vulkan_pipeline.cpp
         src/graphics/vulkan/vulkan_renderpass.cpp
         src/graphics/vulkan/vulkan_shader.cpp

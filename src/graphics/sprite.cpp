@@ -127,7 +127,7 @@ namespace moth_graphics::graphics {
         return 0;
     }
 
-    IImage* Sprite::GetImage() const {
-        return m_spriteSheet->GetImage().get();
+    Image const& Sprite::GetImage() const {
+        return m_spriteSheet->GetImage();
     }
 }

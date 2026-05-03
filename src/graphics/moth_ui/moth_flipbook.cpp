@@ -14,8 +14,8 @@ namespace moth_graphics::graphics {
     }
 
     MothFlipbook::MothFlipbook(std::shared_ptr<graphics::SpriteSheet> spriteSheet)
-        : m_spriteSheet(std::move(spriteSheet))
-        , m_image(m_spriteSheet->GetImage()) {
+        : m_spriteSheet(spriteSheet)
+        , m_image(spriteSheet->GetImage()) {
     }
 
     moth_ui::IImage const& MothFlipbook::GetImage() const {

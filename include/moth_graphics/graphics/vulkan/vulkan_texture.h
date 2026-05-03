@@ -38,6 +38,8 @@ namespace moth_graphics::graphics::vulkan {
         int GetHeight() const override { return m_vkExtent.height; }
         void SetFilter(TextureFilter minFilter, TextureFilter magFilter) override;
         void SetAddressMode(TextureAddressMode u, TextureAddressMode v) override;
+        void DrawImGui(IntVec2 const& size, FloatVec2 const& uv0, FloatVec2 const& uv1) const override;
+        void SaveToPNG(std::filesystem::path const& path, IntRect const& sourceRect) override;
 
     protected:
         uint32_t id;

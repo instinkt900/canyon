@@ -16,20 +16,12 @@ using namespace moth_graphics::graphics;
 // ---------------------------------------------------------------------------
 
 namespace {
-    // Minimal IImage stub — no GPU resources, satisfies SpriteSheet's non-null invariant.
-    class DummyImage : public IImage {
-    public:
-        int GetWidth() const override { return 64; }
-        int GetHeight() const override { return 64; }
-        std::shared_ptr<ITexture> GetTexture() const override { return nullptr; }
-        void ImGui(IntVec2 const& /*size*/, FloatVec2 const& /*uv0*/, FloatVec2 const& /*uv1*/) const override {}
-    };
-
     SpriteSheet::FrameEntry MakeFrame(int x, int y, int w, int h, int px = 0, int py = 0) {
         return { MakeRect(x, y, w, h), IntVec2{ px, py } };
     }
 
     // Build a SpriteSheet with N atlas frames (8x8 each) and the given clips.
+    // Image is empty (no GPU texture) — sufficient for tests that don't render.
     std::shared_ptr<SpriteSheet> MakeSheet(
         int numFrames,
         std::vector<SpriteSheet::ClipEntry> clips = {}) {
@@ -38,7 +30,7 @@ namespace {
         for (int i = 0; i < numFrames; ++i) {
             frames.push_back(MakeFrame(i * 8, 0, 8, 8, i, i));
         }
-        return std::make_shared<SpriteSheet>(std::make_shared<DummyImage>(), std::move(frames), std::move(clips));
+        return std::make_shared<SpriteSheet>(Image{}, std::move(frames), std::move(clips));
     }
 
     // Build a two-frame clip entry with equal step durations.
@@ -59,7 +51,7 @@ TEST_CASE("Sprite::Create returns nullptr for null sheet", "[sprite][create]") {
 }
 
 TEST_CASE("Sprite::Create returns nullptr for empty sheet", "[sprite][create]") {
-    auto sheet = std::make_shared<SpriteSheet>(std::make_shared<DummyImage>(),
+    auto sheet = std::make_shared<SpriteSheet>(Image{},
                                                std::vector<SpriteSheet::FrameEntry>{},
                                                std::vector<SpriteSheet::ClipEntry>{});
     REQUIRE(Sprite::Create(sheet) == nullptr);

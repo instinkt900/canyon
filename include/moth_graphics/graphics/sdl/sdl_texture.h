@@ -19,6 +19,8 @@ namespace moth_graphics::graphics::sdl {
         int GetHeight() const override;
         void SetFilter(TextureFilter minFilter, TextureFilter magFilter) override;
         void SetAddressMode(TextureAddressMode u, TextureAddressMode v) override {} // not supported in SDL2
+        void DrawImGui(IntVec2 const& size, FloatVec2 const& uv0, FloatVec2 const& uv1) const override;
+        void SaveToPNG(std::filesystem::path const& path, IntRect const& sourceRect) override;
 
         SDLTextureRef GetSDLTexture() const { return m_texture; }
 

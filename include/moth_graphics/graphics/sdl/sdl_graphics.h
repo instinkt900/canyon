@@ -33,16 +33,13 @@ namespace moth_graphics::graphics::sdl {
         void End() override;
 
         void SetBlendMode(BlendMode mode) override;
-        // void SetBlendMode(std::shared_ptr<graphics::IImage> target, graphics::BlendMode mode);
-        // void SetColorMod(std::shared_ptr<graphics::IImage> target, graphics::Color const& color) override;
         void SetColor(Color const& color) override;
         void Clear() override;
         void PushTransform(FloatMat4x4 const& transform) override;
         void PopTransform() override;
-        void DrawImage(IImage& image, IntVec2 const& pos, FloatVec2 const& pivot) override;
-        void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) override;
-        void DrawImageTiled(IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
-        void DrawToPNG(IImage& image, std::filesystem::path const& path) override;
+        void DrawImage(Image const& image, IntVec2 const& pos, FloatVec2 const& pivot) override;
+        void DrawImage(Image const& image, IntRect const& destRect, IntRect const* sourceRect) override;
+        void DrawImageTiled(Image const& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
         void DrawRectF(FloatRect const& rect) override;
         void DrawFillRectF(FloatRect const& rect) override;
         void DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) override;

@@ -65,8 +65,8 @@ namespace moth_graphics::platform {
         /// @brief Returns the graphics interface for this window.
         graphics::IGraphics& GetGraphics() const { return *m_graphics; }
 
-        /// @brief Returns the image factory for this window.
-        graphics::ImageFactory& GetImageFactory() const;
+        /// @brief Returns the texture factory for this window.
+        graphics::TextureFactory& GetTextureFactory() const;
 
         // -- IEventListener: receives FireEvent from LayerStack, dispatches to layers
         //    then rebroadcasts to external listeners via EmitEvent if unhandled.

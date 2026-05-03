@@ -3,6 +3,7 @@
 #include "moth_graphics/graphics/vulkan/vulkan_command_buffer.h"
 #include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 #include "stb_image.h"
+#include "stb_image_write.h"
 
 namespace {
     uint32_t NextTextureId = 1; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
@@ -195,6 +196,79 @@ namespace moth_graphics::graphics::vulkan {
         // destroyed while a command buffer may still reference it.
         m_minFilter = (minFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
         m_magFilter = (magFilter == TextureFilter::Nearest) ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+    }
+
+    void Texture::DrawImGui(IntVec2 const& size, FloatVec2 const& uv0, FloatVec2 const& uv1) const {
+        ImGui::Image(GetDescriptorSet(),
+                     ImVec2(static_cast<float>(size.x), static_cast<float>(size.y)),
+                     ImVec2(uv0.x, uv0.y),
+                     ImVec2(uv1.x, uv1.y));
+    }
+
+    void Texture::SaveToPNG(std::filesystem::path const& path, IntRect const& sourceRect) {
+        auto const targetWidth = static_cast<uint32_t>(sourceRect.w());
+        auto const targetHeight = static_cast<uint32_t>(sourceRect.h());
+        auto const targetFormat = VK_FORMAT_R8G8B8A8_UNORM;
+        auto stagingImage = std::make_unique<Texture>(
+            m_context, targetWidth, targetHeight,
+            targetFormat, VK_IMAGE_TILING_LINEAR,
+            VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+        VkImageLayout const srcLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        auto commandBuffer = std::make_unique<CommandBuffer>(m_context);
+        commandBuffer->BeginRecord();
+        commandBuffer->TransitionImageLayout(*this, m_vkFormat, srcLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        commandBuffer->TransitionImageLayout(*stagingImage, targetFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+        VkImageCopy region{};
+        region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.srcSubresource.layerCount = 1;
+        region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.dstSubresource.layerCount = 1;
+        region.srcOffset = { static_cast<int32_t>(sourceRect.topLeft.x), static_cast<int32_t>(sourceRect.topLeft.y), 0 };
+        region.extent.width = targetWidth;
+        region.extent.height = targetHeight;
+        region.extent.depth = 1;
+        vkCmdCopyImage(commandBuffer->GetVkCommandBuffer(), m_vkImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                       stagingImage->GetVkImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+
+        commandBuffer->TransitionImageLayout(*stagingImage, targetFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL);
+        commandBuffer->TransitionImageLayout(*this, m_vkFormat, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, srcLayout);
+        commandBuffer->SubmitAndWait();
+
+        VkImageSubresource subresource{};
+        subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        VkSubresourceLayout subLayout{};
+        vkGetImageSubresourceLayout(m_context.GetVkDevice(), stagingImage->GetVkImage(), &subresource, &subLayout);
+        auto const rowPitch = static_cast<uint32_t>(subLayout.rowPitch);
+
+        bool const swizzleBGRA = (m_vkFormat == VK_FORMAT_B8G8R8A8_UNORM || m_vkFormat == VK_FORMAT_B8G8R8A8_SRGB);
+
+        uint8_t const* data = static_cast<uint8_t const*>(stagingImage->Map());
+        std::vector<uint8_t> dataCopy(targetWidth * targetHeight * 4);
+        for (uint32_t row = 0; row < targetHeight; ++row) {
+            uint8_t const* src = data + (row * rowPitch);
+            uint8_t* dst = dataCopy.data() + (row * targetWidth * 4);
+            if (swizzleBGRA) {
+                for (uint32_t col = 0; col < targetWidth; ++col) {
+                    dst[(col * 4) + 0] = src[(col * 4) + 2];
+                    dst[(col * 4) + 1] = src[(col * 4) + 1];
+                    dst[(col * 4) + 2] = src[(col * 4) + 0];
+                    dst[(col * 4) + 3] = src[(col * 4) + 3];
+                }
+            } else {
+                for (uint32_t col = 0; col < targetWidth; ++col) {
+                    dst[(col * 4) + 0] = src[(col * 4) + 0];
+                    dst[(col * 4) + 1] = src[(col * 4) + 1];
+                    dst[(col * 4) + 2] = src[(col * 4) + 2];
+                    dst[(col * 4) + 3] = src[(col * 4) + 3];
+                }
+            }
+        }
+        stbi_write_png(path.string().c_str(), static_cast<int>(targetWidth), static_cast<int>(targetHeight), 4, dataCopy.data(), static_cast<int>(targetWidth) * 4);
+        stagingImage->Unmap();
     }
 
     void Texture::SetAddressMode(TextureAddressMode u, TextureAddressMode v) {

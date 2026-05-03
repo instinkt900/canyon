@@ -1,4 +1,4 @@
-// Pins the method signatures of the core graphics interfaces: IGraphics, IImage,
+// Pins the method signatures of the core graphics interfaces: IGraphics, Image,
 // IFont, and ITarget. Every method pointer assignment fails to compile if a
 // method is renamed, removed, or its signature changes.
 
@@ -21,14 +21,12 @@ TEST_CASE("IGraphics method signatures are stable", "[api][graphics][igraphics]"
     void (IGraphics::*clear)()                                = &IGraphics::Clear;
     void (IGraphics::*pushXform)(FloatMat4x4 const&)          = &IGraphics::PushTransform;
     void (IGraphics::*popXform)()                             = &IGraphics::PopTransform;
-    void (IGraphics::*drawImg)(IImage&, IntRect const&,
+    void (IGraphics::*drawImg)(Image const&, IntRect const&,
                                IntRect const*)                = &IGraphics::DrawImage;
-    void (IGraphics::*drawImgPivot)(IImage&, IntVec2 const&,
+    void (IGraphics::*drawImgPivot)(Image const&, IntVec2 const&,
                                     FloatVec2 const&)         = &IGraphics::DrawImage;
-    void (IGraphics::*drawImgTiled)(IImage&, IntRect const&,
+    void (IGraphics::*drawImgTiled)(Image const&, IntRect const&,
                                     IntRect const*, float)    = &IGraphics::DrawImageTiled;
-    void (IGraphics::*drawToPng)(IImage&,
-                                 std::filesystem::path const&) = &IGraphics::DrawToPNG;
     void (IGraphics::*drawRect)(FloatRect const&)             = &IGraphics::DrawRectF;
     void (IGraphics::*drawFill)(FloatRect const&)             = &IGraphics::DrawFillRectF;
     void (IGraphics::*drawLine)(FloatVec2 const&,
@@ -47,20 +45,23 @@ TEST_CASE("IGraphics method signatures are stable", "[api][graphics][igraphics]"
     (void)initImgui; (void)getSurface; (void)begin; (void)end;
     (void)setBlend; (void)setColor; (void)clear;
     (void)pushXform; (void)popXform;
-    (void)drawImg; (void)drawImgPivot; (void)drawImgTiled; (void)drawToPng;
+    (void)drawImg; (void)drawImgPivot; (void)drawImgTiled;
     (void)drawRect; (void)drawFill; (void)drawLine; (void)drawText;
     (void)setClip; (void)createTarget; (void)getTarget; (void)setTarget;
     (void)setLogical;
     SUCCEED();
 }
 
-TEST_CASE("IImage method signatures are stable", "[api][graphics][iimage]") {
-    int (IImage::*getW)() const                                           = &IImage::GetWidth;
-    int (IImage::*getH)() const                                           = &IImage::GetHeight;
-    std::shared_ptr<ITexture> (IImage::*getTex)() const                   = &IImage::GetTexture;
-    void (IImage::*imgui)(IntVec2 const&, FloatVec2 const&,
-                          FloatVec2 const&) const                         = &IImage::ImGui;
-    (void)getW; (void)getH; (void)getTex; (void)imgui;
+TEST_CASE("Image method signatures are stable", "[api][graphics][image]") {
+    int (Image::*getW)() const                                            = &Image::GetWidth;
+    int (Image::*getH)() const                                            = &Image::GetHeight;
+    std::shared_ptr<ITexture> const& (Image::*getTex)() const             = &Image::GetTexture;
+    IntRect const& (Image::*getSrc)() const                               = &Image::GetSourceRect;
+    void (Image::*imguiSrc)(IntVec2 const&) const                          = &Image::DrawImGui;
+    void (Image::*imguiRaw)(IntVec2 const&, FloatVec2 const&,
+                            FloatVec2 const&) const                         = &Image::DrawImGui;
+    void (Image::*savePng)(std::filesystem::path const&)                   = &Image::SaveToPNG;
+    (void)getW; (void)getH; (void)getTex; (void)getSrc; (void)imguiSrc; (void)imguiRaw; (void)savePng;
     SUCCEED();
 }
 
@@ -71,7 +72,7 @@ TEST_CASE("IFont method signatures are stable", "[api][graphics][ifont]") {
 }
 
 TEST_CASE("ITarget method signatures are stable", "[api][graphics][itarget]") {
-    IImage* (ITarget::*getImg)() = &ITarget::GetImage;
+    Image (ITarget::*getImg)() const = &ITarget::GetImage;
     (void)getImg;
     SUCCEED();
 }

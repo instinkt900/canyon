@@ -1,20 +1,20 @@
 #include "common.h"
-#include "moth_graphics/graphics/image_factory.h"
+#include "moth_graphics/graphics/texture_factory.h"
 #include "moth_graphics/graphics/itexture.h"
 
 //NOLINTBEGIN(readability-function-cognitive-complexity)
 
 namespace moth_graphics::graphics {
-    ImageFactory::ImageFactory(AssetContext& context)
+    TextureFactory::TextureFactory(AssetContext& context)
         : m_context(context) {
     }
 
-    void ImageFactory::FlushCache() {
-        m_cachedImages.clear();
+    void TextureFactory::FlushCache() {
+        m_cachedTextures.clear();
         m_fallbackDesc.reset();
     }
 
-    bool ImageFactory::LoadTexturePack(std::filesystem::path const& path) {
+    bool TextureFactory::LoadTexturePack(std::filesystem::path const& path) {
         auto const rootPath = path.parent_path();
 
         if (!std::filesystem::exists(path)) {
@@ -83,7 +83,7 @@ namespace moth_graphics::graphics {
                     std::filesystem::path relPath;
                     imageJson.at("path").get_to(relPath);
                     auto const absPath = std::filesystem::absolute(rootPath / relPath).lexically_normal();
-                    ImageDesc desc;
+                    TextureDesc desc;
                     desc.m_texture = sharedTexture;
                     desc.m_path = absPath;
                     auto const& rectJson = imageJson.at("rect");
@@ -92,7 +92,7 @@ namespace moth_graphics::graphics {
                     int const w = rectJson.at("w").get<int>();
                     int const h = rectJson.at("h").get<int>();
                     desc.sourceRect = moth_graphics::MakeRect(x, y, w, h);
-                    m_cachedImages.insert(std::make_pair(absPath.string(), desc));
+                    m_cachedTextures.insert(std::make_pair(absPath.string(), desc));
                     anyCached = true;
                 } catch (std::exception& e) {
                     spdlog::error("LoadTexturePack: '{}': failed to load image entry: {}", atlasAbsPath.string(), e.what());
@@ -104,40 +104,58 @@ namespace moth_graphics::graphics {
         return anyCached;
     }
 
-    std::unique_ptr<IImage> ImageFactory::GetImage(std::filesystem::path const& path) {
+    std::shared_ptr<ITexture> TextureFactory::GetTexture(std::filesystem::path const& path) {
         auto const key = std::filesystem::absolute(path).lexically_normal().string();
-        auto const cacheIt = m_cachedImages.find(key);
-        if (std::end(m_cachedImages) != cacheIt) {
-            auto const& imageDesc = cacheIt->second;
-            return m_context.NewImage(imageDesc.m_texture, imageDesc.sourceRect);
+        auto const cacheIt = m_cachedTextures.find(key);
+        if (std::end(m_cachedTextures) != cacheIt) {
+            return cacheIt->second.m_texture;
         }
         if (std::shared_ptr<ITexture> texture = m_context.TextureFromFile(path)) {
             IntVec2 textureDimensions{ texture->GetWidth(), texture->GetHeight() };
             IntRect sourceRect{ { 0, 0 }, textureDimensions };
-            ImageDesc cacheDesc;
+            TextureDesc cacheDesc;
             cacheDesc.m_path = key;
             cacheDesc.sourceRect = sourceRect;
             cacheDesc.m_texture = texture;
-            m_cachedImages.insert(std::make_pair(key, cacheDesc));
-            return m_context.NewImage(texture, sourceRect);
+            m_cachedTextures.insert(std::make_pair(key, cacheDesc));
+            return texture;
         }
         if (m_fallbackDesc) {
-            spdlog::warn("ImageFactory: '{}' not found, using fallback", path.string());
-            return m_context.NewImage(m_fallbackDesc->m_texture, m_fallbackDesc->sourceRect);
+            spdlog::warn("TextureFactory: '{}' not found, using fallback", path.string());
+            return m_fallbackDesc->m_texture;
         }
-        spdlog::error("ImageFactory: '{}' not found and no fallback set", path.string());
+        spdlog::error("TextureFactory: '{}' not found and no fallback set", path.string());
         return nullptr;
     }
 
-    void ImageFactory::SetFallbackImage(std::shared_ptr<ITexture> texture) {
+    IntRect TextureFactory::GetTextureRect(std::filesystem::path const& path) const {
+        auto const key = std::filesystem::absolute(path).lexically_normal().string();
+        auto const cacheIt = m_cachedTextures.find(key);
+        if (std::end(m_cachedTextures) != cacheIt) {
+            return cacheIt->second.sourceRect;
+        }
+        if (m_fallbackDesc) {
+            return m_fallbackDesc->sourceRect;
+        }
+        return {};
+    }
+
+    void TextureFactory::SetFallbackTexture(std::shared_ptr<ITexture> texture) {
         if (!texture) {
             m_fallbackDesc.reset();
             return;
         }
         IntRect const sourceRect{ { 0, 0 }, { texture->GetWidth(), texture->GetHeight() } };
-        m_fallbackDesc = ImageDesc{ texture, sourceRect, {} };
+        m_fallbackDesc = TextureDesc{ texture, sourceRect, {} };
+    }
+
+    void TextureFactory::SetFallbackTexture(std::shared_ptr<ITexture> texture, IntRect const& sourceRect) {
+        if (!texture) {
+            m_fallbackDesc.reset();
+            return;
+        }
+        m_fallbackDesc = TextureDesc{ std::move(texture), sourceRect, {} };
     }
 }
 
 //NOLINTEND(readability-function-cognitive-complexity)
-

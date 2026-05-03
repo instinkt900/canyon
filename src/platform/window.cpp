@@ -14,8 +14,8 @@ namespace moth_graphics::platform {
     Window::~Window() {
     }
 
-    graphics::ImageFactory& Window::GetImageFactory() const {
-        return GetSurfaceContext().GetAssetContext().GetImageFactory();
+    graphics::TextureFactory& Window::GetTextureFactory() const {
+        return GetSurfaceContext().GetAssetContext().GetTextureFactory();
     }
 
     bool Window::OnEvent(moth_ui::Event const& event) {
@@ -37,7 +37,7 @@ namespace moth_graphics::platform {
     void Window::PostCreate() {
         auto& assetContext = GetSurfaceContext().GetAssetContext();
         m_uiRenderer = std::make_unique<moth_graphics::graphics::MothRenderer>(*m_graphics);
-        m_mothImageFactory = std::make_unique<moth_graphics::graphics::MothImageFactory>(assetContext.GetImageFactory());
+        m_mothImageFactory = std::make_unique<moth_graphics::graphics::MothImageFactory>(assetContext.GetTextureFactory());
         m_mothFontFactory = std::make_unique<moth_graphics::graphics::MothFontFactory>(assetContext.GetFontFactory());
         m_mothFlipbookFactory = std::make_unique<moth_graphics::graphics::MothFlipbookFactory>(assetContext.GetSpriteSheetFactory());
         m_mothContext = std::make_shared<moth_ui::Context>(m_mothImageFactory.get(), m_mothFontFactory.get(), m_uiRenderer.get(), m_mothFlipbookFactory.get());
