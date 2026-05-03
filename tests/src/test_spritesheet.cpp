@@ -1,5 +1,6 @@
 #include "moth_graphics/graphics/spritesheet.h"
 #include "moth_graphics/graphics/iimage.h"
+#include "moth_graphics/graphics/itexture.h"
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/vector.h"
 
@@ -11,7 +12,15 @@ using namespace moth_graphics;
 using namespace moth_graphics::graphics;
 
 namespace {
-    // Empty Image — no GPU resources required for these tests.
+    struct MockTexture : ITexture {
+        int GetWidth() const override { return 64; }
+        int GetHeight() const override { return 64; }
+        void SetFilter(TextureFilter, TextureFilter) override {}
+        void SetAddressMode(TextureAddressMode, TextureAddressMode) override {}
+        void DrawImGui(IntVec2 const&, FloatVec2 const&, FloatVec2 const&) const override {}
+        void SaveToPNG(std::filesystem::path const&, IntRect const&) override {}
+    };
+
     Image MakeDummyImage() {
         return Image{};
     }
@@ -97,7 +106,10 @@ TEST_CASE("SpriteSheet GetClipDesc returns false for unknown clip name", "[sprit
 }
 
 TEST_CASE("SpriteSheet GetImage returns the image passed at construction", "[spritesheet]") {
-    SpriteSheet sheet(Image{}, { MakeFrame(0, 0, 8, 8) }, {});
-    // Default-constructed Image is empty; matching here just verifies the round-trip.
-    REQUIRE(static_cast<bool>(sheet.GetImage()) == false);
+    auto tex = std::make_shared<MockTexture>();
+    Image sentinel{ tex };
+    SpriteSheet sheet(sentinel, { MakeFrame(0, 0, 8, 8) }, {});
+    REQUIRE(sheet.GetImage().GetTexture() == tex);
+    REQUIRE(sheet.GetImage().GetWidth() == 64);
+    REQUIRE(sheet.GetImage().GetHeight() == 64);
 }
