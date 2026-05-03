@@ -14,7 +14,7 @@
 #include <string_view>
 
 namespace moth_graphics::platform {
-    /// @brief Base class for a canyon application.
+    /// @brief Base class for a moth_graphics application.
     ///
     /// Drives the main loop via @c Ticker, owns the primary @c Window, and
     /// routes platform events to the layer stack. Subclass and override

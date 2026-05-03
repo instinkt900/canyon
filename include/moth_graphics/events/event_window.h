@@ -1,6 +1,6 @@
 #pragma once
 
-#include "moth_graphics/events/canyon_events.h"
+#include "moth_graphics/events/moth_graphics_events.h"
 
 #include <moth_ui/events/event.h>
 

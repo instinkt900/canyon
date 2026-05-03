@@ -12,7 +12,7 @@ class MothGraphicsTests(ConanFile):
         self.requires("catch2/3.13.0")
         # moth_graphics is built from source via add_subdirectory;
         # list its external Conan dependencies here.
-        self.requires("moth_ui/1.0.0-rc.1", transitive_headers=True)
+        self.requires("moth_ui/1.0.0", transitive_headers=True)
         self.requires("spdlog/[~1.14]", transitive_headers=True)
         # SDL2/SDL_image/SDL_ttf and GLFW/Freetype/HarfBuzz come from the system
         # package manager on Linux (GTK3/GDK-Pixbuf conflict). On Windows they

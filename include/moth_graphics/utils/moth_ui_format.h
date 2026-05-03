@@ -1,7 +1,7 @@
 #pragma once
 
 // fmt/spdlog formatters for moth_ui types.
-// Placed in canyon to keep moth_ui free of formatting dependencies.
+// Placed in moth_graphics to keep moth_ui free of formatting dependencies.
 //
 // Include this header wherever you want to use moth_ui types in fmt/spdlog calls.
 // It supersedes rect_format.h — including both is safe (rect_format.h includes
