@@ -244,16 +244,27 @@ namespace moth_graphics::graphics::vulkan {
         vkGetImageSubresourceLayout(m_context.GetVkDevice(), stagingImage->GetVkImage(), &subresource, &subLayout);
         auto const rowPitch = static_cast<uint32_t>(subLayout.rowPitch);
 
+        bool const swizzleBGRA = (m_vkFormat == VK_FORMAT_B8G8R8A8_UNORM || m_vkFormat == VK_FORMAT_B8G8R8A8_SRGB);
+
         uint8_t const* data = static_cast<uint8_t const*>(stagingImage->Map());
         std::vector<uint8_t> dataCopy(targetWidth * targetHeight * 4);
         for (uint32_t row = 0; row < targetHeight; ++row) {
             uint8_t const* src = data + (row * rowPitch);
             uint8_t* dst = dataCopy.data() + (row * targetWidth * 4);
-            for (uint32_t col = 0; col < targetWidth; ++col) {
-                dst[(col * 4) + 0] = src[(col * 4) + 2];
-                dst[(col * 4) + 1] = src[(col * 4) + 1];
-                dst[(col * 4) + 2] = src[(col * 4) + 0];
-                dst[(col * 4) + 3] = src[(col * 4) + 3];
+            if (swizzleBGRA) {
+                for (uint32_t col = 0; col < targetWidth; ++col) {
+                    dst[(col * 4) + 0] = src[(col * 4) + 2];
+                    dst[(col * 4) + 1] = src[(col * 4) + 1];
+                    dst[(col * 4) + 2] = src[(col * 4) + 0];
+                    dst[(col * 4) + 3] = src[(col * 4) + 3];
+                }
+            } else {
+                for (uint32_t col = 0; col < targetWidth; ++col) {
+                    dst[(col * 4) + 0] = src[(col * 4) + 0];
+                    dst[(col * 4) + 1] = src[(col * 4) + 1];
+                    dst[(col * 4) + 2] = src[(col * 4) + 2];
+                    dst[(col * 4) + 3] = src[(col * 4) + 3];
+                }
             }
         }
         stbi_write_png(path.string().c_str(), static_cast<int>(targetWidth), static_cast<int>(targetHeight), 4, dataCopy.data(), static_cast<int>(targetWidth) * 4);
