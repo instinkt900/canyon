@@ -57,10 +57,11 @@ TEST_CASE("Image method signatures are stable", "[api][graphics][image]") {
     int (Image::*getH)() const                                            = &Image::GetHeight;
     std::shared_ptr<ITexture> const& (Image::*getTex)() const             = &Image::GetTexture;
     IntRect const& (Image::*getSrc)() const                               = &Image::GetSourceRect;
-    void (Image::*imgui)(IntVec2 const&, FloatVec2 const&,
-                         FloatVec2 const&) const                          = &Image::DrawImGui;
-    void (Image::*savePng)(std::filesystem::path const&)                  = &Image::SaveToPNG;
-    (void)getW; (void)getH; (void)getTex; (void)getSrc; (void)imgui; (void)savePng;
+    void (Image::*imguiSrc)(IntVec2 const&) const                          = &Image::DrawImGui;
+    void (Image::*imguiRaw)(IntVec2 const&, FloatVec2 const&,
+                            FloatVec2 const&) const                         = &Image::DrawImGui;
+    void (Image::*savePng)(std::filesystem::path const&)                   = &Image::SaveToPNG;
+    (void)getW; (void)getH; (void)getTex; (void)getSrc; (void)imguiSrc; (void)imguiRaw; (void)savePng;
     SUCCEED();
 }
 

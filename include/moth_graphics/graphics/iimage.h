@@ -50,11 +50,24 @@ namespace moth_graphics::graphics {
         /// @brief Returns @c true if this image has a backing texture.
         explicit operator bool() const { return m_texture != nullptr; }
 
-        /// @brief Render the image as an ImGui image widget.
+        /// @brief Render the image's source rectangle as an ImGui image widget.
         /// @param size Display size in ImGui pixels.
-        /// @param uv0 Top-left UV coordinate (default: top-left of texture).
-        /// @param uv1 Bottom-right UV coordinate (default: bottom-right of texture).
-        void DrawImGui(IntVec2 const& size, FloatVec2 const& uv0 = { 0, 0 }, FloatVec2 const& uv1 = { 1, 1 }) const;
+        ///
+        /// UVs are derived from @c m_sourceRect relative to the backing texture
+        /// dimensions, so atlas / sub-region images render only their region.
+        /// Equivalent to @c DrawImGui(size, {0,0}, {1,1}).
+        void DrawImGui(IntVec2 const& size) const;
+
+        /// @brief Render a sub-region of the image as an ImGui image widget.
+        /// @param size Display size in ImGui pixels.
+        /// @param uv0 Top-left UV coordinate relative to the image's source rect
+        ///            (0,0 = top-left of source rect, 1,1 = bottom-right).
+        /// @param uv1 Bottom-right UV coordinate relative to the image's source rect.
+        ///
+        /// The UVs are remapped through the source rectangle so callers can
+        /// work in image-local coordinates regardless of whether the image is
+        /// a standalone texture or an atlas sub-region.
+        void DrawImGui(IntVec2 const& size, FloatVec2 const& uv0, FloatVec2 const& uv1) const;
 
         /// @brief Save this image's source region to a PNG file.
         /// @param path Destination file path.
