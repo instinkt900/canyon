@@ -9,6 +9,8 @@
 #include <string_view>
 
 namespace moth_graphics::graphics {
+    class IGraphics;
+
     /// @brief Animated sprite driven by a SpriteSheet.
     ///
     /// Manages clip selection, frame advancement, and loop behaviour independently
@@ -90,4 +92,13 @@ namespace moth_graphics::graphics {
         float m_accumulatedMs = 0.0f;
         bool m_playing = false;
     };
+
+    /// @brief Draw the current frame of a sprite into a destination rectangle.
+    void DrawSprite(IGraphics& graphics, Sprite& sprite, IntRect const& destRect);
+
+    /// @brief Draw the current frame of a sprite at a position, offset by a normalized pivot.
+    void DrawSprite(IGraphics& graphics, Sprite& sprite, IntVec2 const& pos, FloatVec2 const& pivot);
+
+    /// @brief Draw the current frame of a sprite at a position using the frame's own pivot.
+    void DrawSprite(IGraphics& graphics, Sprite& sprite, IntVec2 const& pos);
 }

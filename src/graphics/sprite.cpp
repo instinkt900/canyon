@@ -1,5 +1,6 @@
 #include "common.h"
 #include "moth_graphics/graphics/sprite.h"
+#include "moth_graphics/graphics/igraphics.h"
 
 namespace moth_graphics::graphics {
     std::unique_ptr<Sprite> Sprite::Create(std::shared_ptr<SpriteSheet> spriteSheet) {
@@ -129,5 +130,40 @@ namespace moth_graphics::graphics {
 
     Image const& Sprite::GetImage() const {
         return m_spriteSheet->GetImage();
+    }
+
+    void DrawSprite(IGraphics& graphics, Sprite& sprite, IntRect const& destRect) {
+        auto const& image = sprite.GetImage();
+        if (image) {
+            auto const frameRect = sprite.GetCurrentFrameRect();
+            graphics.DrawImage(image, destRect, &frameRect);
+        }
+    }
+
+    void DrawSprite(IGraphics& graphics, Sprite& sprite, IntVec2 const& pos, FloatVec2 const& pivot) {
+        auto const& image = sprite.GetImage();
+        if (image) {
+            auto const frameRect = sprite.GetCurrentFrameRect();
+            IntRect const destRect = MakeRect(
+                pos.x - static_cast<int>(pivot.x * static_cast<float>(frameRect.w())),
+                pos.y - static_cast<int>(pivot.y * static_cast<float>(frameRect.h())),
+                frameRect.w(),
+                frameRect.h());
+            graphics.DrawImage(image, destRect, &frameRect);
+        }
+    }
+
+    void DrawSprite(IGraphics& graphics, Sprite& sprite, IntVec2 const& pos) {
+        auto const& image = sprite.GetImage();
+        if (image) {
+            auto const frameRect = sprite.GetCurrentFrameRect();
+            auto const framePivot = sprite.GetCurrentFramePivot();
+            IntRect const destRect = MakeRect(
+                pos.x - framePivot.x,
+                pos.y - framePivot.y,
+                frameRect.w(),
+                frameRect.h());
+            graphics.DrawImage(image, destRect, &frameRect);
+        }
     }
 }
