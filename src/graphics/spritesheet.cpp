@@ -2,7 +2,7 @@
 #include "moth_graphics/graphics/spritesheet.h"
 
 namespace moth_graphics::graphics {
-    SpriteSheet::SpriteSheet(std::shared_ptr<IImage> image,
+    SpriteSheet::SpriteSheet(Image image,
                              std::vector<FrameEntry> frames,
                              std::vector<ClipEntry> clips)
         : m_image(std::move(image))
@@ -10,7 +10,7 @@ namespace moth_graphics::graphics {
         , m_clips(std::move(clips)) {
     }
 
-    std::shared_ptr<IImage> SpriteSheet::GetImage() const {
+    Image const& SpriteSheet::GetImage() const {
         return m_image;
     }
 

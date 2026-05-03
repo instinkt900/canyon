@@ -5,20 +5,19 @@
 #include <moth_ui/utils/vector.h>
 #include <moth_ui/graphics/iimage.h>
 
-#include <memory>
-
 namespace moth_graphics::graphics {
+    /// @brief moth_ui::IImage adapter wrapping a moth_graphics::graphics::Image.
     class MothImage : public moth_ui::IImage {
     public:
-        explicit MothImage(std::shared_ptr<moth_graphics::graphics::IImage> baseImage);
+        explicit MothImage(Image baseImage);
         ~MothImage() override = default;
 
         int GetWidth() const override;
         int GetHeight() const override;
         moth_ui::IntVec2 GetDimensions() const override;
-        std::shared_ptr<moth_graphics::graphics::IImage> GetImage() const { return m_baseImage; }
+        Image const& GetImage() const { return m_baseImage; }
 
     private:
-        std::shared_ptr<moth_graphics::graphics::IImage> m_baseImage;
+        Image m_baseImage;
     };
 }

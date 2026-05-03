@@ -1,6 +1,6 @@
 #pragma once
 
-#include "moth_graphics/graphics/image_factory.h"
+#include "moth_graphics/graphics/texture_factory.h"
 
 #include <moth_ui/iimage_factory.h>
 #include <moth_ui/graphics/iimage.h>
@@ -11,7 +11,7 @@
 namespace moth_graphics::graphics {
     class MothImageFactory : public moth_ui::IImageFactory {
     public:
-        explicit MothImageFactory(graphics::ImageFactory& factoryImpl);
+        explicit MothImageFactory(graphics::TextureFactory& factoryImpl);
         ~MothImageFactory() override = default;
 
         void FlushCache();
@@ -19,7 +19,7 @@ namespace moth_graphics::graphics {
         std::unique_ptr<moth_ui::IImage> GetImage(std::filesystem::path const& path) override;
 
     private:
-        graphics::ImageFactory& m_factoryImpl;
+        graphics::TextureFactory& m_factoryImpl;
     };
 }
 

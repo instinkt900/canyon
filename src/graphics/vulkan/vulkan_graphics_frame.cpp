@@ -57,7 +57,7 @@ namespace moth_graphics::graphics::vulkan {
         commandBuffer.BeginRecord();
         commandBuffer.HostWriteToVertexBarrier(*context->m_vertexBuffer);
         if (IsRenderTarget()) {
-            commandBuffer.TransitionImageLayout(*context->m_target->GetVkImage().GetVkTexture(), context->m_target->GetVkFormat(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+            commandBuffer.TransitionImageLayout(context->m_target->GetVkTexture(), context->m_target->GetVkFormat(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         }
         commandBuffer.BeginRenderPass(GetCurrentRenderPass(), *context->m_target);
 

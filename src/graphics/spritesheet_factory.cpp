@@ -70,13 +70,13 @@ namespace moth_graphics::graphics {
             return nullptr;
         }
 
-        auto image = m_context.ImageFromFile(imageAbsPath);
-        if (!image) {
+        std::shared_ptr<ITexture> texture(m_context.TextureFromFile(imageAbsPath));
+        if (!texture) {
             spdlog::error("SpriteSheetFactory: '{}' failed to load image '{}'",
                           path.string(), imageAbsPath.string());
             return nullptr;
         }
-        auto sharedImage = std::shared_ptr<IImage>(std::move(image));
+        Image image(texture);
 
         // Parse frames array
         std::vector<SpriteSheet::FrameEntry> frames;
@@ -188,7 +188,7 @@ namespace moth_graphics::graphics {
             }
         }
 
-        auto sheet = std::make_shared<SpriteSheet>(sharedImage, std::move(frames), std::move(clips));
+        auto sheet = std::make_shared<SpriteSheet>(std::move(image), std::move(frames), std::move(clips));
         m_cache.insert({ key, sheet });
         return sheet;
     }

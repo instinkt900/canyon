@@ -120,12 +120,6 @@ namespace moth_graphics::graphics::vulkan {
         context->m_currentBlendMode = mode;
     }
 
-    // void Graphics::SetBlendMode(std::shared_ptr<IImage> target, EBlendMode mode) {
-    // }
-
-    // void Graphics::SetColorMod(std::shared_ptr<IImage> target, Color const& color) {
-    // }
-
     void Graphics::SetColor(Color const& color) {
         auto* context = CurrentContext();
         context->m_currentColor = color;
@@ -153,7 +147,7 @@ namespace moth_graphics::graphics::vulkan {
         }
     }
 
-    void Graphics::DrawImage(IImage& image, IntVec2 const& pos, FloatVec2 const& pivot) {
+    void Graphics::DrawImage(Image const& image, IntVec2 const& pos, FloatVec2 const& pivot) {
         auto const imageWidth = image.GetWidth();
         auto const imageHeight = image.GetHeight();
         auto const offsetX = static_cast<int>(static_cast<float>(imageWidth) * pivot.x);
@@ -162,10 +156,12 @@ namespace moth_graphics::graphics::vulkan {
         DrawImage(image, destRect - IntVec2{ offsetX, offsetY }, nullptr);
     }
 
-    void Graphics::DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect) {
+    void Graphics::DrawImage(Image const& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto* context = CurrentContext();
-        auto& vulkanImage = dynamic_cast<Image&>(image);
-        auto texture = vulkanImage.GetVkTexture();
+        auto texture = std::dynamic_pointer_cast<Texture>(image.GetTexture());
+        if (!texture) {
+            return;
+        }
 
         FloatRect fDestRect = static_cast<FloatRect>(destRect);
 
@@ -177,7 +173,7 @@ namespace moth_graphics::graphics::vulkan {
         }
 
         FloatVec2 textureDimensions = FloatVec2{ texture->GetVkExtent().width, texture->GetVkExtent().height };
-        imageRect += static_cast<FloatVec2>(vulkanImage.GetSourceRect().topLeft);
+        imageRect += static_cast<FloatVec2>(image.GetSourceRect().topLeft);
         imageRect /= textureDimensions;
 
         auto const t = CurrentTransform();
@@ -207,70 +203,22 @@ namespace moth_graphics::graphics::vulkan {
         SubmitVertices(vertices, 6, ETopologyType::Triangles, descriptorSet);
     }
 
-    void Graphics::DrawImageTiled(graphics::IImage& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
+    void Graphics::DrawImageTiled(Image const& image, IntRect const& destRect, IntRect const* sourceRect, float scale) {
         IntRect const imageRect = MakeRect(0, 0, image.GetWidth(), image.GetHeight());
         if (sourceRect == nullptr) {
             sourceRect = &imageRect;
         }
         auto const imageWidth = static_cast<int>(static_cast<float>(sourceRect->w()) * scale);
         auto const imageHeight = static_cast<int>(static_cast<float>(sourceRect->h()) * scale);
+        if (imageWidth <= 0 || imageHeight <= 0) {
+            return;
+        }
         for (auto y = destRect.topLeft.y; y < destRect.bottomRight.y; y += imageHeight) {
             for (auto x = destRect.topLeft.x; x < destRect.bottomRight.x; x += imageWidth) {
                 IntRect const tiledDstRect{ { x, y }, { x + imageWidth, y + imageHeight } };
                 DrawImage(image, tiledDstRect, sourceRect);
             }
         }
-    }
-
-    void Graphics::DrawToPNG(IImage& image, std::filesystem::path const& path) {
-        auto& srcVkImage = dynamic_cast<Image&>(image);
-        auto srcTexture = srcVkImage.GetVkTexture();
-        auto const srcFormat = srcTexture->GetVkFormat();
-
-        auto const targetWidth = static_cast<uint32_t>(image.GetWidth());
-        auto const targetHeight = static_cast<uint32_t>(image.GetHeight());
-        auto const targetFormat = VK_FORMAT_R8G8B8A8_UNORM;
-        auto stagingImage = std::make_unique<Texture>(
-            m_surfaceContext, targetWidth, targetHeight,
-            targetFormat, VK_IMAGE_TILING_LINEAR,
-            VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-        // Render target images are in SHADER_READ_ONLY_OPTIMAL after SetTarget(nullptr).
-        VkImageLayout const srcLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-        auto commandBuffer = std::make_unique<CommandBuffer>(m_surfaceContext);
-        commandBuffer->BeginRecord();
-        commandBuffer->TransitionImageLayout(*srcTexture, srcFormat, srcLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-        commandBuffer->TransitionImageLayout(*stagingImage, targetFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        commandBuffer->CopyImageToImage(*srcTexture, *stagingImage);
-        commandBuffer->TransitionImageLayout(*stagingImage, targetFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL);
-        commandBuffer->TransitionImageLayout(*srcTexture, srcFormat, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, srcLayout);
-        commandBuffer->SubmitAndWait();
-
-        // Query the actual row pitch — linear images may have alignment padding
-        // that makes rowPitch > width * bytesPerPixel.
-        VkImageSubresource subresource{};
-        subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        VkSubresourceLayout subLayout{};
-        vkGetImageSubresourceLayout(m_surfaceContext.GetVkDevice(), stagingImage->GetVkImage(), &subresource, &subLayout);
-        auto const rowPitch = static_cast<uint32_t>(subLayout.rowPitch);
-
-        // Swizzle BGRA → RGBA row by row, respecting the actual row pitch.
-        uint8_t const* data = static_cast<uint8_t const*>(stagingImage->Map());
-        std::vector<uint8_t> dataCopy(targetWidth * targetHeight * 4);
-        for (uint32_t row = 0; row < targetHeight; ++row) {
-            uint8_t const* src = data + (row * rowPitch);
-            uint8_t* dst = dataCopy.data() + (row * targetWidth * 4);
-            for (uint32_t col = 0; col < targetWidth; ++col) {
-                dst[(col * 4) + 0] = src[(col * 4) + 2];
-                dst[(col * 4) + 1] = src[(col * 4) + 1];
-                dst[(col * 4) + 2] = src[(col * 4) + 0];
-                dst[(col * 4) + 3] = src[(col * 4) + 3];
-            }
-        }
-        stbi_write_png(path.string().c_str(), static_cast<int>(targetWidth), static_cast<int>(targetHeight), 4, dataCopy.data(), static_cast<int>(targetWidth) * 4);
-        stagingImage->Unmap();
     }
 
     void Graphics::DrawRectF(FloatRect const& rect) {

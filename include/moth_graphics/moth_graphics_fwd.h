@@ -44,7 +44,7 @@ namespace moth_graphics::graphics {
     // -------------------------------------------------------------------------
     class AssetContext;
     class IGraphics;
-    class IImage;
+    class Image;
     class IFont;
     class ITarget;
     class ITexture;
@@ -55,7 +55,7 @@ namespace moth_graphics::graphics {
     class Context;
     class SurfaceContext;
     class FontFactory;
-    class ImageFactory;
+    class TextureFactory;
 
     // -------------------------------------------------------------------------
     // moth_ui bridge

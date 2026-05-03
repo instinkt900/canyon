@@ -115,11 +115,10 @@ namespace moth_graphics::graphics {
         if (mothImagePtr == nullptr) {
             return;
         }
-        auto internalImagePtr = mothImagePtr->GetImage();
-        if (internalImagePtr == nullptr) {
+        auto const& internalImage = mothImagePtr->GetImage();
+        if (!internalImage) {
             return;
         }
-        auto& internalImage = *internalImagePtr;
         auto const srcRect = sourceRect;
 
         if (destRect.w() <= 0 || destRect.h() <= 0) {

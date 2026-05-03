@@ -132,7 +132,7 @@ namespace moth_graphics::graphics::vulkan {
         // destructor body completes — too late for the VMA allocator. Explicitly
         // releasing cached textures here ensures all VMA allocations are freed
         // while the allocator is still alive.
-        m_assetContext.GetImageFactory().FlushCache();
+        m_assetContext.GetTextureFactory().FlushCache();
         m_assetContext.GetFontFactory().ClearFonts();
         m_assetContext.GetSpriteSheetFactory().FlushCache();
         vkDestroyDescriptorPool(m_vkDevice, m_vkDescriptorPool, nullptr);

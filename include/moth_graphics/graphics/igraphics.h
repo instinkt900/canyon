@@ -11,7 +11,6 @@
 #include "moth_graphics/utils/transform.h"
 #include "moth_graphics/utils/vector.h"
 
-#include <filesystem>
 #include <memory>
 
 namespace moth_graphics::platform {
@@ -74,9 +73,10 @@ namespace moth_graphics::graphics {
         /// @param sprite  The sprite to draw; must be loaded with a valid clip set.
         /// @param destRect Destination rectangle in local (pre-transform) space.
         void DrawSprite(Sprite& sprite, IntRect const& destRect) {
-            if (auto* image = sprite.GetImage()) {
+            auto const& image = sprite.GetImage();
+            if (image) {
                 auto const frameRect = sprite.GetCurrentFrameRect();
-                DrawImage(*image, destRect, &frameRect);
+                DrawImage(image, destRect, &frameRect);
             }
         }
 
@@ -86,14 +86,15 @@ namespace moth_graphics::graphics {
         /// @param pivot  Normalized pivot within the frame: {0,0} = top-left, {0.5,0.5} = center,
         ///               {1,1} = bottom-right.
         void DrawSprite(Sprite& sprite, IntVec2 const& pos, FloatVec2 const& pivot) {
-            if (auto* image = sprite.GetImage()) {
+            auto const& image = sprite.GetImage();
+            if (image) {
                 auto const frameRect = sprite.GetCurrentFrameRect();
                 IntRect const destRect = MakeRect(
                     pos.x - static_cast<int>(pivot.x * static_cast<float>(frameRect.w())),
                     pos.y - static_cast<int>(pivot.y * static_cast<float>(frameRect.h())),
                     frameRect.w(),
                     frameRect.h());
-                DrawImage(*image, destRect, &frameRect);
+                DrawImage(image, destRect, &frameRect);
             }
         }
 
@@ -101,7 +102,8 @@ namespace moth_graphics::graphics {
         /// @param sprite The sprite to draw at its natural frame size.
         /// @param pos    The screen point that the frame's pivot should land on.
         void DrawSprite(Sprite& sprite, IntVec2 const& pos) {
-            if (auto* image = sprite.GetImage()) {
+            auto const& image = sprite.GetImage();
+            if (image) {
                 auto const frameRect  = sprite.GetCurrentFrameRect();
                 auto const framePivot = sprite.GetCurrentFramePivot();
                 IntRect const destRect = MakeRect(
@@ -109,7 +111,7 @@ namespace moth_graphics::graphics {
                     pos.y - framePivot.y,
                     frameRect.w(),
                     frameRect.h());
-                DrawImage(*image, destRect, &frameRect);
+                DrawImage(image, destRect, &frameRect);
             }
         }
 
@@ -117,26 +119,21 @@ namespace moth_graphics::graphics {
         /// @param image The image to draw.
         /// @param destRect Destination rectangle in local (pre-transform) space.
         /// @param sourceRect Sub-region of the image to sample, or @c nullptr for the full image.
-        virtual void DrawImage(IImage& image, IntRect const& destRect, IntRect const* sourceRect = nullptr) = 0;
+        virtual void DrawImage(Image const& image, IntRect const& destRect, IntRect const* sourceRect = nullptr) = 0;
 
         /// @brief Draw an image at a position, offset so that @p pivot within the image aligns with @p pos.
         /// @param image  The image to draw at natural size.
         /// @param pos    Destination point in logical pixels.
         /// @param pivot  Normalized pivot within the image: {0,0} = top-left, {0.5,0.5} = center,
         ///               {1,1} = bottom-right. Defaults to center.
-        virtual void DrawImage(IImage& image, IntVec2 const& pos, FloatVec2 const& pivot = { 0.5f, 0.5f }) = 0;
+        virtual void DrawImage(Image const& image, IntVec2 const& pos, FloatVec2 const& pivot = { 0.5f, 0.5f }) = 0;
 
         /// @brief Tile an image to fill a destination rectangle.
         /// @param image The image to tile.
         /// @param destRect Destination rectangle in logical pixels.
         /// @param sourceRect Sub-region of the image to tile, or @c nullptr for the full image.
         /// @param scale Scale factor applied to each tile.
-        virtual void DrawImageTiled(IImage& image, IntRect const& destRect, IntRect const* sourceRect = nullptr, float scale = 1.0f) = 0;
-
-        /// @brief Capture an image and write it to a PNG file.
-        /// @param image The image to capture (typically from @c ITarget::GetImage()).
-        /// @param path Destination file path.
-        virtual void DrawToPNG(IImage& image, std::filesystem::path const& path) = 0;
+        virtual void DrawImageTiled(Image const& image, IntRect const& destRect, IntRect const* sourceRect = nullptr, float scale = 1.0f) = 0;
 
         /// @brief Draw an axis-aligned rectangle outline using the current color.
         /// @param rect Rectangle in logical pixels.

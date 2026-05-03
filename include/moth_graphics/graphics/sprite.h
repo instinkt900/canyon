@@ -78,7 +78,7 @@ namespace moth_graphics::graphics {
         int GetHeight() const;
 
         /// @brief Returns the underlying sprite sheet image.
-        IImage* GetImage() const;
+        Image const& GetImage() const;
 
     private:
         explicit Sprite(std::shared_ptr<SpriteSheet> spriteSheet);

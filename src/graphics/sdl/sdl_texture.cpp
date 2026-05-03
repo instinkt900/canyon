@@ -1,6 +1,9 @@
 #include "common.h"
 #include "moth_graphics/graphics/sdl/sdl_texture.h"
+#include "moth_graphics/graphics/sdl/sdl_utils.hpp"
 #include "moth_graphics/graphics/sdl/smart_sdl.hpp"
+
+#include "imgui.h"
 
 namespace moth_graphics::graphics::sdl {
     Texture::Texture(SDL_Renderer* renderer, SDLTextureRef texture)
@@ -37,6 +40,26 @@ namespace moth_graphics::graphics::sdl {
         SDL_RenderFlush(m_renderer);
         SDL_SetTextureScaleMode(m_texture->GetImpl(), mode);
         m_scaleMode = mode;
+    }
+
+    void Texture::DrawImGui(IntVec2 const& size, FloatVec2 const& uv0, FloatVec2 const& uv1) const {
+        ImGui::Image(m_texture ? m_texture->GetImpl() : nullptr,
+                     ImVec2(static_cast<float>(size.x), static_cast<float>(size.y)),
+                     ImVec2(uv0.x, uv0.y),
+                     ImVec2(uv1.x, uv1.y));
+    }
+
+    void Texture::SaveToPNG(std::filesystem::path const& path, IntRect const& sourceRect) {
+        SDL_Rect const srcRect = ToSDL(sourceRect);
+
+        SDL_Texture* prevTarget = SDL_GetRenderTarget(m_renderer);
+        SDL_SetRenderTarget(m_renderer, m_texture->GetImpl());
+
+        SurfaceRef surface = CreateSurfaceRef(SDL_CreateRGBSurface(0, srcRect.w, srcRect.h, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000));
+        SDL_RenderReadPixels(m_renderer, &srcRect, surface->format->format, surface->pixels, surface->pitch);
+        IMG_SavePNG(surface.get(), path.string().c_str());
+
+        SDL_SetRenderTarget(m_renderer, prevTarget);
     }
 
     std::unique_ptr<Texture> Texture::FromFile(SDL_Renderer* renderer, std::filesystem::path const& path) {

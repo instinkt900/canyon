@@ -3,7 +3,7 @@
 #include "moth_graphics/graphics/moth_ui/moth_image.h"
 
 namespace moth_graphics::graphics {
-    MothImageFactory::MothImageFactory(graphics::ImageFactory& factoryImpl)
+    MothImageFactory::MothImageFactory(graphics::TextureFactory& factoryImpl)
         : m_factoryImpl(factoryImpl) {
     }
 
@@ -16,10 +16,11 @@ namespace moth_graphics::graphics {
     }
 
     std::unique_ptr<::moth_ui::IImage> MothImageFactory::GetImage(std::filesystem::path const& path) {
-        std::shared_ptr<IImage> intlImage = m_factoryImpl.GetImage(path);
-        if (!intlImage) {
+        auto texture = m_factoryImpl.GetTexture(path);
+        if (!texture) {
             return nullptr;
         }
-        return std::make_unique<MothImage>(intlImage);
+        auto const sourceRect = m_factoryImpl.GetTextureRect(path);
+        return std::make_unique<MothImage>(Image{ texture, sourceRect });
     }
 }

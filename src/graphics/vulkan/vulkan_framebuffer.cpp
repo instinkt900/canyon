@@ -12,9 +12,7 @@ namespace moth_graphics::graphics::vulkan {
         m_commandBuffer = std::make_unique<CommandBuffer>(context);
         m_fence = std::make_unique<Fence>(context);
 
-        auto texture = std::make_unique<Texture>(context, image, view, VkExtent2D{ width, height }, format, false);
-        IntRect rec = { { 0, 0 }, { width, height } };
-        m_image = std::make_unique<Image>(std::move(texture), rec);
+        m_texture = std::make_shared<Texture>(context, image, view, VkExtent2D{ width, height }, format, false);
         CreateFramebufferResource(renderPass);
     }
 
@@ -23,13 +21,11 @@ namespace moth_graphics::graphics::vulkan {
         m_commandBuffer = std::make_unique<CommandBuffer>(context);
         m_fence = std::make_unique<Fence>(context);
 
-        auto texture = std::make_unique<Texture>(context, width, height, format, tiling, usage);
-        IntRect rec = { { 0, 0 }, { width, height } };
-        m_image = std::make_unique<Image>(std::move(texture), rec);
+        m_texture = std::make_shared<Texture>(context, width, height, format, tiling, usage);
         CreateFramebufferResource(renderPass);
 
         m_commandBuffer->BeginRecord();
-        m_commandBuffer->TransitionImageLayout(*m_image->GetVkTexture(), m_image->GetVkTexture()->GetVkFormat(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        m_commandBuffer->TransitionImageLayout(*m_texture, m_texture->GetVkFormat(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         m_commandBuffer->SubmitAndWait();
     }
 
@@ -38,15 +34,11 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     VkExtent2D Framebuffer::GetVkExtent() const {
-        return m_image->GetVkTexture()->GetVkExtent();
+        return m_texture->GetVkExtent();
     }
 
     VkFormat Framebuffer::GetVkFormat() const {
-        return m_image->GetVkTexture()->GetVkFormat();
-    }
-
-    Image& Framebuffer::GetVkImage() {
-        return *m_image;
+        return m_texture->GetVkFormat();
     }
 
     VkSemaphore Framebuffer::GetAvailableSemaphore() const {
@@ -57,15 +49,15 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     void Framebuffer::CreateFramebufferResource(VkRenderPass renderPass) {
-        VkImageView attachments[] = { m_image->GetVkTexture()->GetVkView() };
+        VkImageView attachments[] = { m_texture->GetVkView() };
         VkFramebufferCreateInfo info{};
         info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         info.pNext = nullptr;
         info.renderPass = renderPass;
         info.pAttachments = attachments;
         info.attachmentCount = 1;
-        info.width = m_image->GetWidth();
-        info.height = m_image->GetHeight();
+        info.width = m_texture->GetWidth();
+        info.height = m_texture->GetHeight();
         info.layers = 1;
         CHECK_VK_RESULT(vkCreateFramebuffer(m_context.GetVkDevice(), &info, nullptr, &m_vkFramebuffer));
     }

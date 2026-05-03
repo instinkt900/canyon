@@ -11,17 +11,9 @@ using namespace moth_graphics;
 using namespace moth_graphics::graphics;
 
 namespace {
-    // Minimal IImage stub — no GPU resources, satisfies the constructor's non-null invariant.
-    class DummyImage : public IImage {
-    public:
-        int GetWidth() const override { return 64; }
-        int GetHeight() const override { return 64; }
-        std::shared_ptr<ITexture> GetTexture() const override { return nullptr; }
-        void ImGui(IntVec2 const& /*size*/, FloatVec2 const& /*uv0*/, FloatVec2 const& /*uv1*/) const override {}
-    };
-
-    std::shared_ptr<IImage> MakeDummyImage() {
-        return std::make_shared<DummyImage>();
+    // Empty Image — no GPU resources required for these tests.
+    Image MakeDummyImage() {
+        return Image{};
     }
 
     SpriteSheet::FrameEntry MakeFrame(int x, int y, int w, int h, int px = 0, int py = 0) {
@@ -105,7 +97,7 @@ TEST_CASE("SpriteSheet GetClipDesc returns false for unknown clip name", "[sprit
 }
 
 TEST_CASE("SpriteSheet GetImage returns the image passed at construction", "[spritesheet]") {
-    auto img = MakeDummyImage();
-    SpriteSheet sheet(img, { MakeFrame(0, 0, 8, 8) }, {});
-    REQUIRE(sheet.GetImage() == img);
+    SpriteSheet sheet(Image{}, { MakeFrame(0, 0, 8, 8) }, {});
+    // Default-constructed Image is empty; matching here just verifies the round-trip.
+    REQUIRE(static_cast<bool>(sheet.GetImage()) == false);
 }
