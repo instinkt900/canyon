@@ -132,7 +132,7 @@ namespace moth_graphics::graphics {
         return m_spriteSheet->GetImage();
     }
 
-    void DrawSprite(IGraphics& graphics, Sprite& sprite, IntRect const& destRect) {
+    void DrawSprite(IGraphics& graphics, Sprite const& sprite, IntRect const& destRect) {
         auto const& image = sprite.GetImage();
         if (image) {
             auto const frameRect = sprite.GetCurrentFrameRect();
@@ -140,7 +140,7 @@ namespace moth_graphics::graphics {
         }
     }
 
-    void DrawSprite(IGraphics& graphics, Sprite& sprite, IntVec2 const& pos, FloatVec2 const& pivot) {
+    void DrawSprite(IGraphics& graphics, Sprite const& sprite, IntVec2 const& pos, FloatVec2 const& pivot) {
         auto const& image = sprite.GetImage();
         if (image) {
             auto const frameRect = sprite.GetCurrentFrameRect();
@@ -153,7 +153,7 @@ namespace moth_graphics::graphics {
         }
     }
 
-    void DrawSprite(IGraphics& graphics, Sprite& sprite, IntVec2 const& pos) {
+    void DrawSprite(IGraphics& graphics, Sprite const& sprite, IntVec2 const& pos) {
         auto const& image = sprite.GetImage();
         if (image) {
             auto const frameRect = sprite.GetCurrentFrameRect();
