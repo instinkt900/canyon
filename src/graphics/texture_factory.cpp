@@ -134,6 +134,9 @@ namespace moth_graphics::graphics {
         if (std::end(m_cachedTextures) != cacheIt) {
             return cacheIt->second.sourceRect;
         }
+        if (m_fallbackDesc) {
+            return m_fallbackDesc->sourceRect;
+        }
         return {};
     }
 
