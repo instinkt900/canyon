@@ -9,7 +9,7 @@
 #include "moth_graphics/graphics/texture_filter.h"
 
 // Rect and vector types are re-exported aliases from moth_ui; pull in its
-// forward declarations so canyon consumers can use them without a full include.
+// forward declarations so moth_graphics consumers can use them without a full include.
 #include "moth_ui/moth_ui_fwd.h"
 
 namespace moth_graphics {

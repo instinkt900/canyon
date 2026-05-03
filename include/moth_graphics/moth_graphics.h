@@ -6,7 +6,7 @@
 #define MOTH_GRAPHICS_API
 
 // events
-#include "moth_graphics/events/canyon_events.h"
+#include "moth_graphics/events/moth_graphics_events.h"
 #include "moth_graphics/events/event_emitter.h"
 #include "moth_graphics/events/event_window.h"
 
