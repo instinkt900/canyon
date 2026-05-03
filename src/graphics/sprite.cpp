@@ -3,18 +3,6 @@
 #include "moth_graphics/graphics/igraphics.h"
 
 namespace moth_graphics::graphics {
-    std::unique_ptr<Sprite> Sprite::Create(std::shared_ptr<SpriteSheet> spriteSheet) {
-        if (!spriteSheet) {
-            spdlog::error("Sprite::Create: spriteSheet must not be null");
-            return nullptr;
-        }
-        if (spriteSheet->GetFrameCount() <= 0) {
-            spdlog::error("Sprite::Create: spriteSheet has no frames");
-            return nullptr;
-        }
-        return std::unique_ptr<Sprite>(new Sprite(std::move(spriteSheet)));
-    }
-
     Sprite::Sprite(std::shared_ptr<SpriteSheet> spriteSheet)
         : m_spriteSheet(std::move(spriteSheet)) {
     }

@@ -17,14 +17,11 @@ namespace moth_graphics::graphics {
     /// of any rendering layer. Call Update() each frame with the elapsed time in
     /// milliseconds, then use GetCurrentFrameRect() and GetImage() to render.
     ///
-    /// A Sprite must always have an associated sprite sheet. Use Create() to
-    /// construct one; it returns @c nullptr if the sheet has no frames.
+    /// Construct with a sprite sheet; SpriteSheet already enforces non-empty
+    /// frames, so a successfully loaded sheet is always valid.
     class Sprite {
     public:
-        /// @brief Attempt to create a Sprite from a sprite sheet.
-        /// @param spriteSheet The sprite sheet to animate. Must not be null.
-        /// @return A Sprite on success, or @c nullptr if the sheet has no frames.
-        static std::unique_ptr<Sprite> Create(std::shared_ptr<SpriteSheet> spriteSheet);
+        explicit Sprite(std::shared_ptr<SpriteSheet> spriteSheet);
 
         Sprite(Sprite&&) = default;
         Sprite& operator=(Sprite&&) = default;
@@ -83,8 +80,6 @@ namespace moth_graphics::graphics {
         Image const& GetImage() const;
 
     private:
-        explicit Sprite(std::shared_ptr<SpriteSheet> spriteSheet);
-
         std::shared_ptr<SpriteSheet> m_spriteSheet;
         std::optional<SpriteSheet::ClipDesc> m_currentClip;
         std::string m_currentClipName;
