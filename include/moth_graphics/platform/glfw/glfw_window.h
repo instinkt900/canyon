@@ -25,7 +25,7 @@ namespace moth_graphics::platform::glfw {
         VkSurfaceKHR GetVkSurface() const { return m_customVkSurface; }
 
         void Update(uint32_t ticks) override;
-        void Draw() override;
+        bool Draw() override;
 
     private:
         bool CreateWindow();

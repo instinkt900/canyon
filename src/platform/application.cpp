@@ -26,7 +26,10 @@ namespace moth_graphics::platform {
         }
         m_window->AddEventListener(this);
         m_imguiContext = m_platform.CreateImGuiContext();
-        m_imguiContext->Init(*m_window, m_window->GetGraphics(), m_imguiViewportsEnabled);
+        if (!m_imguiContext->Init(*m_window, m_window->GetGraphics(), m_imguiViewportsEnabled)) {
+            spdlog::error("Application: ImGui context initialization failed");
+            throw std::runtime_error("ImGui context initialization failed");
+        }
         PostCreateWindow();
         spdlog::info("Application: ready");
     }
@@ -68,7 +71,8 @@ namespace moth_graphics::platform {
 
     void Application::Tick(uint32_t ticks) {
         m_imguiContext->NewFrame();
-        m_window->Draw();
-        m_imguiContext->Render(m_window->GetGraphics());
+        if (m_window->Draw()) {
+            m_imguiContext->Render(m_window->GetGraphics());
+        }
     }
 }

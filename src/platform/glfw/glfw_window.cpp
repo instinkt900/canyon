@@ -33,15 +33,16 @@ namespace moth_graphics::platform::glfw {
         m_layerStack->Update(ticks);
     }
 
-    void Window::Draw() {
+    bool Window::Draw() {
         if (!m_graphics->Begin()) {
             // Swapchain is out of date (e.g. minimised or mid-resize).
             // Skip rendering this frame; Begin() has already triggered recreation
             // if the surface extent was non-zero.
-            return;
+            return false;
         }
         m_layerStack->Draw();
         m_graphics->End();
+        return true;
     }
 
     bool Window::CreateWindow() {
