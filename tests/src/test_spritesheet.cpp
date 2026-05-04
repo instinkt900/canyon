@@ -44,22 +44,21 @@ TEST_CASE("SpriteSheet reports correct frame count", "[spritesheet]") {
 TEST_CASE("SpriteSheet GetFrameDesc returns correct rect and pivot", "[spritesheet]") {
     SpriteSheet sheet(MakeDummyImage(), { MakeFrame(4, 8, 32, 16, 5, 3) }, {});
 
-    SpriteSheet::FrameEntry entry{};
-    REQUIRE(sheet.GetFrameDesc(0, entry));
-    REQUIRE(entry.rect.x() == 4);
-    REQUIRE(entry.rect.y() == 8);
-    REQUIRE(entry.rect.w() == 32);
-    REQUIRE(entry.rect.h() == 16);
-    REQUIRE(entry.pivot.x == 5);
-    REQUIRE(entry.pivot.y == 3);
+    auto entry = sheet.GetFrameDesc(0);
+    REQUIRE(entry.has_value());
+    REQUIRE(entry->rect.x() == 4);
+    REQUIRE(entry->rect.y() == 8);
+    REQUIRE(entry->rect.w() == 32);
+    REQUIRE(entry->rect.h() == 16);
+    REQUIRE(entry->pivot.x == 5);
+    REQUIRE(entry->pivot.y == 3);
 }
 
 TEST_CASE("SpriteSheet GetFrameDesc returns false for out-of-range index", "[spritesheet]") {
     SpriteSheet sheet(MakeDummyImage(), { MakeFrame(0, 0, 8, 8) }, {});
 
-    SpriteSheet::FrameEntry entry{};
-    REQUIRE_FALSE(sheet.GetFrameDesc(-1, entry));
-    REQUIRE_FALSE(sheet.GetFrameDesc(1, entry));
+    REQUIRE_FALSE(sheet.GetFrameDesc(-1).has_value());
+    REQUIRE_FALSE(sheet.GetFrameDesc(1).has_value());
 }
 
 TEST_CASE("SpriteSheet reports correct clip count", "[spritesheet]") {
@@ -89,20 +88,19 @@ TEST_CASE("SpriteSheet GetClipDesc returns correct clip data", "[spritesheet]") 
     };
     SpriteSheet sheet(MakeDummyImage(), { MakeFrame(0, 0, 8, 8), MakeFrame(8, 0, 8, 8) }, clips);
 
-    SpriteSheet::ClipDesc desc{};
-    REQUIRE(sheet.GetClipDesc("walk", desc));
-    REQUIRE(desc.loop == SpriteSheet::LoopType::Loop);
-    REQUIRE(desc.frames.size() == 2);
-    REQUIRE(desc.frames[0].frameIndex == 0);
-    REQUIRE(desc.frames[0].durationMs == 80);
-    REQUIRE(desc.frames[1].frameIndex == 1);
-    REQUIRE(desc.frames[1].durationMs == 120);
+    auto desc = sheet.GetClipDesc("walk");
+    REQUIRE(desc.has_value());
+    REQUIRE(desc->loop == SpriteSheet::LoopType::Loop);
+    REQUIRE(desc->frames.size() == 2);
+    REQUIRE(desc->frames[0].frameIndex == 0);
+    REQUIRE(desc->frames[0].durationMs == 80);
+    REQUIRE(desc->frames[1].frameIndex == 1);
+    REQUIRE(desc->frames[1].durationMs == 120);
 }
 
 TEST_CASE("SpriteSheet GetClipDesc returns false for unknown clip name", "[spritesheet]") {
     SpriteSheet sheet(MakeDummyImage(), { MakeFrame(0, 0, 8, 8) }, {});
-    SpriteSheet::ClipDesc desc{};
-    REQUIRE_FALSE(sheet.GetClipDesc("missing", desc));
+    REQUIRE_FALSE(sheet.GetClipDesc("missing").has_value());
 }
 
 TEST_CASE("SpriteSheet GetImage returns the image passed at construction", "[spritesheet]") {

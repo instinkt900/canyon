@@ -4,6 +4,7 @@
 #include "moth_graphics/utils/rect.h"
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -67,9 +68,8 @@ namespace moth_graphics::graphics {
         /// @brief Returns the total number of frames in the atlas.
         int GetFrameCount() const;
 
-        /// @brief Populates @p outEntry with the frame at @p index.
-        /// @return @c true if the index is valid, @c false otherwise.
-        bool GetFrameDesc(int index, FrameEntry& outEntry) const;
+        /// @brief Returns the frame at @p index, or @c std::nullopt if out of range.
+        std::optional<FrameEntry> GetFrameDesc(int index) const;
 
         /// @brief Returns the number of named clips.
         int GetClipCount() const;
@@ -77,9 +77,8 @@ namespace moth_graphics::graphics {
         /// @brief Returns the clip name at @p index, or empty if out of range.
         std::string_view GetClipName(int index) const;
 
-        /// @brief Looks up a clip by name.
-        /// @return @c true if found, @c false otherwise.
-        bool GetClipDesc(std::string_view name, ClipDesc& outDesc) const;
+        /// @brief Looks up a clip by name, or @c std::nullopt if not found.
+        std::optional<ClipDesc> GetClipDesc(std::string_view name) const;
 
     private:
         Image m_image;

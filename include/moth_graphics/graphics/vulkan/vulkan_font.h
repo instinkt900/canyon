@@ -31,9 +31,9 @@ namespace moth_graphics::graphics::vulkan {
 
         IntVec2 Measure(std::string_view text) const override;
 
-        int32_t GetLineHeight() const { return m_lineHeight; }
-        int32_t GetAscent() const { return m_ascent; }
-        int32_t GetDescent() const { return m_descent; }
+        int GetLineHeight() const override { return m_lineHeight; }
+        int GetAscent() const override { return m_ascent; }
+        int GetDescent() const override { return m_descent; }
         int32_t GetUnderline() const { return m_underline; }
 
         IntVec2 const& GetGlyphBearing(int glyphIndex) const;

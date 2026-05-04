@@ -66,7 +66,10 @@ TEST_CASE("Image method signatures are stable", "[api][graphics][image]") {
 
 TEST_CASE("IFont method signatures are stable", "[api][graphics][ifont]") {
     IntVec2 (IFont::*measure)(std::string_view) const = &IFont::Measure;
-    (void)measure;
+    int (IFont::*lineHeight)() const                 = &IFont::GetLineHeight;
+    int (IFont::*ascent)() const                     = &IFont::GetAscent;
+    int (IFont::*descent)() const                    = &IFont::GetDescent;
+    (void)measure; (void)lineHeight; (void)ascent; (void)descent;
     SUCCEED();
 }
 

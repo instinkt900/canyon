@@ -18,9 +18,9 @@ namespace moth_graphics::graphics {
             return;
         }
 
-        SpriteSheet::ClipDesc clipDesc;
-        if (m_spriteSheet->GetClipDesc(name, clipDesc)) {
-            m_currentClip = std::move(clipDesc);
+        auto clipDesc = m_spriteSheet->GetClipDesc(name);
+        if (clipDesc) {
+            m_currentClip = std::move(*clipDesc);
             m_currentClipName = name;
         } else {
             spdlog::warn("Sprite::SetClip: clip '{}' not found", name);
@@ -85,35 +85,29 @@ namespace moth_graphics::graphics {
     }
 
     IntRect Sprite::GetCurrentFrameRect() const {
-        SpriteSheet::FrameEntry entry;
-        if (m_spriteSheet->GetFrameDesc(GetCurrentFrame(), entry)) {
-            return entry.rect;
+        auto entry = m_spriteSheet->GetFrameDesc(GetCurrentFrame());
+        if (entry) {
+            return entry->rect;
         }
         return {};
     }
 
     IntVec2 Sprite::GetCurrentFramePivot() const {
-        SpriteSheet::FrameEntry entry;
-        if (m_spriteSheet->GetFrameDesc(GetCurrentFrame(), entry)) {
-            return entry.pivot;
+        auto entry = m_spriteSheet->GetFrameDesc(GetCurrentFrame());
+        if (entry) {
+            return entry->pivot;
         }
         return {};
     }
 
     int Sprite::GetWidth() const {
-        SpriteSheet::FrameEntry entry;
-        if (m_spriteSheet->GetFrameDesc(GetCurrentFrame(), entry)) {
-            return entry.rect.bottomRight.x - entry.rect.topLeft.x;
-        }
-        return 0;
+        auto const rect = GetCurrentFrameRect();
+        return rect.bottomRight.x - rect.topLeft.x;
     }
 
     int Sprite::GetHeight() const {
-        SpriteSheet::FrameEntry entry;
-        if (m_spriteSheet->GetFrameDesc(GetCurrentFrame(), entry)) {
-            return entry.rect.bottomRight.y - entry.rect.topLeft.y;
-        }
-        return 0;
+        auto const rect = GetCurrentFrameRect();
+        return rect.bottomRight.y - rect.topLeft.y;
     }
 
     Image const& Sprite::GetImage() const {

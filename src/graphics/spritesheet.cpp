@@ -1,6 +1,8 @@
 #include "common.h"
 #include "moth_graphics/graphics/spritesheet.h"
 
+#include <optional>
+
 namespace moth_graphics::graphics {
     SpriteSheet::SpriteSheet(Image image,
                              std::vector<FrameEntry> frames,
@@ -18,12 +20,11 @@ namespace moth_graphics::graphics {
         return static_cast<int>(m_frames.size());
     }
 
-    bool SpriteSheet::GetFrameDesc(int index, FrameEntry& outEntry) const {
+    std::optional<SpriteSheet::FrameEntry> SpriteSheet::GetFrameDesc(int index) const {
         if (index < 0 || index >= static_cast<int>(m_frames.size())) {
-            return false;
+            return std::nullopt;
         }
-        outEntry = m_frames[static_cast<size_t>(index)];
-        return true;
+        return m_frames[static_cast<size_t>(index)];
     }
 
     int SpriteSheet::GetClipCount() const {
@@ -37,13 +38,12 @@ namespace moth_graphics::graphics {
         return m_clips[static_cast<size_t>(index)].name;
     }
 
-    bool SpriteSheet::GetClipDesc(std::string_view name, ClipDesc& outDesc) const {
+    std::optional<SpriteSheet::ClipDesc> SpriteSheet::GetClipDesc(std::string_view name) const {
         for (auto const& entry : m_clips) {
             if (entry.name == name) {
-                outDesc = entry.desc;
-                return true;
+                return entry.desc;
             }
         }
-        return false;
+        return std::nullopt;
     }
 }

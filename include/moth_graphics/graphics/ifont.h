@@ -17,5 +17,14 @@ namespace moth_graphics::graphics {
         /// @param text UTF-8 text to measure.
         /// @return Width and height in pixels.
         virtual IntVec2 Measure(std::string_view text) const = 0;
+
+        /// @brief Returns the distance between consecutive baselines in pixels.
+        virtual int GetLineHeight() const = 0;
+
+        /// @brief Returns the distance from the baseline to the top of the tallest glyph in pixels.
+        virtual int GetAscent() const = 0;
+
+        /// @brief Returns the distance from the baseline to the bottom of the lowest descender in pixels.
+        virtual int GetDescent() const = 0;
     };
 }
