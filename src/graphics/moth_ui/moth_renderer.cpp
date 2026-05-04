@@ -17,6 +17,7 @@ namespace moth_graphics::graphics {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });
         m_blendMode.push(BlendMode::Replace);
         m_transform.push(moth_ui::FloatMat4x4::Identity());
+        m_graphics.SetTransform(m_transform.top());
         m_textureFilter.push(moth_ui::TextureFilter::Linear);
     }
 
