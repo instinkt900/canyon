@@ -16,6 +16,7 @@ namespace moth_graphics::graphics {
         : m_graphics(graphics) {
         m_drawColor.push({ 1.0f, 1.0f, 1.0f, 1.0f });
         m_blendMode.push(BlendMode::Replace);
+        m_transform.push(moth_ui::FloatMat4x4::Identity());
         m_textureFilter.push(moth_ui::TextureFilter::Linear);
     }
 
@@ -52,11 +53,16 @@ namespace moth_graphics::graphics {
     }
 
     void MothRenderer::PushTransform(moth_ui::FloatMat4x4 const& transform) {
-        m_graphics.PushTransform(transform);
+        auto const combined = m_transform.top() * transform;
+        m_transform.push(combined);
+        m_graphics.SetTransform(combined);
     }
 
     void MothRenderer::PopTransform() {
-        m_graphics.PopTransform();
+        if (m_transform.size() > 1) {
+            m_transform.pop();
+            m_graphics.SetTransform(m_transform.top());
+        }
     }
 
     void MothRenderer::PushClip(moth_ui::IntRect const& rect) {

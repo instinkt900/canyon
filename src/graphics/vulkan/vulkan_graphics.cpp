@@ -131,20 +131,11 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     FloatMat4x4 Graphics::CurrentTransform() const {
-        if (m_transformStack.empty()) {
-            return FloatMat4x4::Identity();
-        }
-        return m_transformStack.top();
+        return m_currentTransform;
     }
 
-    void Graphics::PushTransform(FloatMat4x4 const& transform) {
-        m_transformStack.push(transform);
-    }
-
-    void Graphics::PopTransform() {
-        if (!m_transformStack.empty()) {
-            m_transformStack.pop();
-        }
+    void Graphics::SetTransform(FloatMat4x4 const& transform) {
+        m_currentTransform = transform;
     }
 
     void Graphics::DrawImage(Image const& image, IntVec2 const& pos, FloatVec2 const& pivot) {

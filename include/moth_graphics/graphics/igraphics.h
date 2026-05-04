@@ -61,12 +61,9 @@ namespace moth_graphics::graphics {
         /// @brief Fill the entire render target with the current color.
         virtual void Clear() = 0;
 
-        /// @brief Push a transform onto the transform stack. Draw calls will apply the active transform to all coordinates.
+        /// @brief Set the active transform applied to all subsequent draw coordinates.
         /// @param transform Local-to-world transform for subsequent draw calls.
-        virtual void PushTransform(FloatMat4x4 const& transform) = 0;
-
-        /// @brief Pop the top transform, restoring the previous one.
-        virtual void PopTransform() = 0;
+        virtual void SetTransform(FloatMat4x4 const& transform) = 0;
 
         /// @brief Draw an image into a destination rectangle in local space. The active transform is applied.
         /// @param image The image to draw.

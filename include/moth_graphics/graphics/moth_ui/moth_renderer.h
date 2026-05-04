@@ -44,6 +44,7 @@ namespace moth_graphics::graphics {
         IGraphics& m_graphics;
         std::stack<Color> m_drawColor;
         std::stack<BlendMode> m_blendMode;
+        std::stack<moth_ui::FloatMat4x4> m_transform;
         std::stack<IntRect> m_clip;
         std::stack<moth_ui::TextureFilter> m_textureFilter;
     };
