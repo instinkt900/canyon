@@ -1,6 +1,7 @@
 #pragma once
 
 #include "moth_graphics/graphics/context.h"
+#include "moth_graphics/platform/imgui_context.h"
 
 #include <string_view>
 #include <memory>
@@ -32,5 +33,8 @@ namespace moth_graphics::platform {
         /// @param width Initial window width in pixels.
         /// @param height Initial window height in pixels.
         virtual std::unique_ptr<Window> CreateWindow(std::string_view title, int width, int height) = 0;
+
+        /// @brief Create the ImGui context for this platform backend.
+        virtual std::unique_ptr<ImGuiContext> CreateImGuiContext() = 0;
     };
 }

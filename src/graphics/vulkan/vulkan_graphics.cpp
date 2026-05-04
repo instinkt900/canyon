@@ -6,9 +6,6 @@
 #include "moth_graphics/graphics/vulkan/vulkan_utils.h"
 #include "stb_image_write.h"
 
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_vulkan.h"
-
 namespace moth_graphics::graphics::vulkan {
     Graphics::Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
         : m_surfaceContext(context)
@@ -30,11 +27,6 @@ namespace moth_graphics::graphics::vulkan {
     Graphics::~Graphics() {
         vkDeviceWaitIdle(m_surfaceContext.GetVkDevice());
 
-        if (m_imguiInitialized) {
-            ImGui_ImplVulkan_Shutdown();
-            ImGui_ImplGlfw_Shutdown();
-            ImGui::DestroyContext();
-        }
         if (m_overrideContext.m_vertexBuffer != nullptr && m_overrideContext.m_vertexBufferData != nullptr) {
             m_overrideContext.m_vertexBuffer->Unmap();
             m_overrideContext.m_vertexBufferData = nullptr;
@@ -65,12 +57,6 @@ namespace moth_graphics::graphics::vulkan {
             }
         }
 
-        if (m_imguiInitialized) {
-            ImGui_ImplVulkan_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-        }
-
         VkFence cmdFence = m_defaultContext.m_target->GetFence().GetVkFence();
         vkResetFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence);
 
@@ -79,18 +65,6 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     void Graphics::End() {
-        if (m_imguiInitialized) {
-            ImGui::Render();
-            if ((ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0) {
-                ImGui::UpdatePlatformWindows();
-                ImGui::RenderPlatformWindowsDefault();
-            }
-            if (ImDrawData* drawData = ImGui::GetDrawData()) {
-                FlushPendingBatch();
-                ImGui_ImplVulkan_RenderDrawData(drawData, GetCurrentCommandBuffer()->GetVkCommandBuffer());
-            }
-        }
-
         EndContext();
 
         VkSemaphore waitSemaphores[] = { m_defaultContext.m_target->GetRenderFinishedSemaphore() };

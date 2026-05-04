@@ -80,5 +80,6 @@ namespace moth_graphics::platform {
         bool m_mainWindowMaximized = false;
         bool m_imguiViewportsEnabled = false;
         std::unique_ptr<Window> m_window;
+        std::unique_ptr<ImGuiContext> m_imguiContext;
     };
 }

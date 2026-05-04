@@ -84,7 +84,6 @@ if(NOT MOTH_GRAPHICS_DISABLE_VULKAN)
         src/graphics/vulkan/vulkan_framebuffer.cpp
         src/graphics/vulkan/vulkan_graphics.cpp
         src/graphics/vulkan/vulkan_graphics_frame.cpp
-        src/graphics/vulkan/vulkan_graphics_imgui.cpp
         src/graphics/vulkan/vulkan_graphics_pipeline.cpp
         src/graphics/vulkan/vulkan_pipeline.cpp
         src/graphics/vulkan/vulkan_renderpass.cpp

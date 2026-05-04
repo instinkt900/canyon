@@ -1,5 +1,6 @@
 #include "common.h"
 #include "moth_graphics/platform/application.h"
+#include "moth_graphics/platform/imgui_context.h"
 #include "moth_graphics/platform/window.h"
 
 #include <stdexcept>
@@ -24,7 +25,8 @@ namespace moth_graphics::platform {
             throw;
         }
         m_window->AddEventListener(this);
-        m_window->GetGraphics().InitImgui(*m_window, m_imguiViewportsEnabled);
+        m_imguiContext = m_platform.CreateImGuiContext();
+        m_imguiContext->Init(*m_window, m_window->GetGraphics(), m_imguiViewportsEnabled);
         PostCreateWindow();
         spdlog::info("Application: ready");
     }
@@ -33,6 +35,8 @@ namespace moth_graphics::platform {
         spdlog::info("Application: running");
         TickSync();
         spdlog::info("Application: shutting down");
+        m_imguiContext->Shutdown();
+        m_imguiContext.reset();
         Shutdown();
     }
 
@@ -63,6 +67,8 @@ namespace moth_graphics::platform {
     }
 
     void Application::Tick(uint32_t ticks) {
+        m_imguiContext->NewFrame();
         m_window->Draw();
+        m_imguiContext->Render(m_window->GetGraphics());
     }
 }
