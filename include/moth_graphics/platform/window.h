@@ -75,9 +75,10 @@ namespace moth_graphics::platform {
         // Must be called after PostCreate (i.e. after the native window exists).
         void PushLayer(std::unique_ptr<moth_ui::Layer> layer);
 
-    protected:
-        /// @brief Returns the moth_ui layer stack. Only for internal/platform use.
+        /// @brief Returns the moth_ui layer stack.
         moth_ui::LayerStack& GetLayerStack() const { return *m_layerStack; }
+
+    protected:
         /// @brief Called after the native window and graphics objects are created.
         void PostCreate();
 

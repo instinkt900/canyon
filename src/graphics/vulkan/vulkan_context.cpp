@@ -80,7 +80,7 @@ namespace {
         ;
 
 namespace moth_graphics::graphics::vulkan {
-    Context::Context() {
+    bool Context::Startup() {
         spdlog::info("Vulkan: initializing context");
 
         spdlog::info("Vulkan: initializing FreeType");
@@ -156,13 +156,15 @@ namespace moth_graphics::graphics::vulkan {
             CHECK_VK_RESULT(CreateDebugUtilsMessengerEXT(m_vkInstance, &createInfo, nullptr, &m_vkDebugMessenger));
         }
         spdlog::info("Vulkan: context ready");
+        return true;
     }
 
-    Context::~Context() {
+    void Context::Shutdown() {
         spdlog::info("Vulkan: destroying context");
         if (enableValidationLayers) {
             DestroyDebugUtilsMessengerEXT(m_vkInstance, m_vkDebugMessenger, nullptr);
         }
         vkDestroyInstance(m_vkInstance, nullptr);
+        FT_Done_FreeType(m_ftLibrary);
     }
 }
