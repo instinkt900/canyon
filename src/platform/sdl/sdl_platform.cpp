@@ -20,13 +20,21 @@ namespace moth_graphics::platform::sdl {
         }
         spdlog::info("SDL: initialized");
         m_context = std::make_unique<graphics::sdl::Context>();
-        return m_context->Startup();
+        if (!m_context->Startup()) {
+            spdlog::error("SDL: graphics context startup failed");
+            m_context.reset();
+            SDL_Quit();
+            return false;
+        }
+        return true;
     }
 
     void Platform::Shutdown() {
         spdlog::info("SDL: shutting down");
-        m_context->Shutdown();
-        m_context.reset();
+        if (m_context) {
+            m_context->Shutdown();
+            m_context.reset();
+        }
         SDL_Quit();
     }
 }
