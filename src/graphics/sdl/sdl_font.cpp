@@ -16,6 +16,18 @@ namespace moth_graphics::graphics::sdl {
         };
     }
 
+    int Font::GetLineHeight() const {
+        return static_cast<int>(FC_GetLineHeight(m_fontObj.get()));
+    }
+
+    int Font::GetAscent() const {
+        return FC_GetAscent(m_fontObj.get(), "%s", " "); // NOLINT(cppcoreguidelines-pro-type-vararg)
+    }
+
+    int Font::GetDescent() const {
+        return FC_GetDescent(m_fontObj.get(), "%s", " "); // NOLINT(cppcoreguidelines-pro-type-vararg)
+    }
+
     std::unique_ptr<IFont> Font::Load(SDL_Renderer& renderer, const std::filesystem::path& path, int size) {
         SDL_Color defaultColor{ 0x00, 0x00, 0x00, 0xFF };
         return std::make_unique<Font>(CreateCachedFontRef(&renderer, path.string().c_str(), size, defaultColor, TTF_STYLE_NORMAL));

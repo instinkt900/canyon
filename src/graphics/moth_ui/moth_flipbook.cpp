@@ -27,12 +27,12 @@ namespace moth_graphics::graphics {
     }
 
     bool MothFlipbook::GetFrameDesc(int index, moth_ui::IFlipbook::FrameDesc& outDesc) const {
-        graphics::SpriteSheet::FrameEntry entry;
-        if (!m_spriteSheet->GetFrameDesc(index, entry)) {
+        auto entry = m_spriteSheet->GetFrameDesc(index);
+        if (!entry) {
             return false;
         }
-        outDesc.rect  = entry.rect;
-        outDesc.pivot = entry.pivot;
+        outDesc.rect  = entry->rect;
+        outDesc.pivot = entry->pivot;
         return true;
     }
 
@@ -45,14 +45,14 @@ namespace moth_graphics::graphics {
     }
 
     bool MothFlipbook::GetClipDesc(std::string_view name, moth_ui::IFlipbook::ClipDesc& outDesc) const {
-        graphics::SpriteSheet::ClipDesc internal;
-        if (!m_spriteSheet->GetClipDesc(name, internal)) {
+        auto internal = m_spriteSheet->GetClipDesc(name);
+        if (!internal) {
             return false;
         }
-        outDesc.loop = ToMothLoopType(internal.loop);
+        outDesc.loop = ToMothLoopType(internal->loop);
         outDesc.frames.clear();
-        outDesc.frames.reserve(internal.frames.size());
-        for (auto const& step : internal.frames) {
+        outDesc.frames.reserve(internal->frames.size());
+        for (auto const& step : internal->frames) {
             moth_ui::IFlipbook::ClipFrame f;
             f.frameIndex = step.frameIndex;
             f.durationMs = step.durationMs;

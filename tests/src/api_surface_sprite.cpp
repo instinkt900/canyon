@@ -25,11 +25,10 @@ TEST_CASE("SpriteSheet method signatures are stable", "[api][sprite][spritesheet
     // Method signatures
     Image const& (SpriteSheet::*getImg)() const                                      = &SpriteSheet::GetImage;
     int  (SpriteSheet::*getFrameCount)() const                                       = &SpriteSheet::GetFrameCount;
-    bool (SpriteSheet::*getFrameDesc)(int, SpriteSheet::FrameEntry&) const           = &SpriteSheet::GetFrameDesc;
+    std::optional<SpriteSheet::FrameEntry> (SpriteSheet::*getFrameDesc)(int) const   = &SpriteSheet::GetFrameDesc;
     int  (SpriteSheet::*getClipCount)() const                                        = &SpriteSheet::GetClipCount;
     std::string_view (SpriteSheet::*getClipName)(int) const                          = &SpriteSheet::GetClipName;
-    bool (SpriteSheet::*getClipDesc)(std::string_view,
-                                     SpriteSheet::ClipDesc&) const                  = &SpriteSheet::GetClipDesc;
+    std::optional<SpriteSheet::ClipDesc> (SpriteSheet::*getClipDesc)(std::string_view) const = &SpriteSheet::GetClipDesc;
 
     (void)getImg; (void)getFrameCount; (void)getFrameDesc;
     (void)getClipCount; (void)getClipName; (void)getClipDesc;
