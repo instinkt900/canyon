@@ -36,8 +36,6 @@ namespace moth_graphics::graphics::vulkan {
         Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
         ~Graphics();
 
-        void InitImgui(moth_graphics::platform::Window const& window, bool enableViewports = false) override;
-
         SurfaceContext& GetSurfaceContext() const override { return m_surfaceContext; }
 
         struct Vertex {
@@ -100,7 +98,6 @@ namespace moth_graphics::graphics::vulkan {
     private:
         FloatMat4x4 CurrentTransform() const;
 
-        bool m_imguiInitialized = false;
         SurfaceContext& m_surfaceContext;
         VkSurfaceKHR m_vkSurface = VK_NULL_HANDLE;
         FloatMat4x4 m_currentTransform = FloatMat4x4::Identity();

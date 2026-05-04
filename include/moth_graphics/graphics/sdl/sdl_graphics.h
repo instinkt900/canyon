@@ -25,8 +25,6 @@ namespace moth_graphics::graphics::sdl {
         Graphics(SurfaceContext& context);
         ~Graphics() override;
 
-        void InitImgui(moth_graphics::platform::Window const& window, bool enableViewports = false) override;
-
         SurfaceContext& GetSurfaceContext() const override { return m_surfaceContext; }
 
         bool Begin() override;
@@ -58,7 +56,6 @@ namespace moth_graphics::graphics::sdl {
         Color m_drawColor;
         BlendMode m_blendMode = BlendMode::Replace;
         ITarget* m_currentRenderTarget = nullptr;
-        SDL_Window* m_imguiWindow = nullptr;
         FloatMat4x4 m_currentTransform = FloatMat4x4::Identity();
         SDLTextureRef m_textScratchTexture;
         int m_textScratchWidth = 0;

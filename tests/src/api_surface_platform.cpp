@@ -26,7 +26,8 @@ TEST_CASE("IPlatform method signatures are stable", "[api][platform][iplatform]"
     Context& (IPlatform::*getCtx)()                                       = &IPlatform::GetGraphicsContext;
     std::unique_ptr<Window> (IPlatform::*createWin)(
         std::string_view, int, int)                                       = &IPlatform::CreateWindow;
-    (void)startup; (void)shutdown; (void)getCtx; (void)createWin;
+    std::unique_ptr<ImGuiContext> (IPlatform::*createImGui)()             = &IPlatform::CreateImGuiContext;
+    (void)startup; (void)shutdown; (void)getCtx; (void)createWin; (void)createImGui;
     SUCCEED();
 }
 
@@ -46,7 +47,7 @@ TEST_CASE("Window inherits EventEmitter and IEventListener", "[api][platform][wi
 
 TEST_CASE("Window method signatures are stable", "[api][platform][window]") {
     void (Window::*update)(uint32_t)                            = &Window::Update;
-    void (Window::*draw)()                                      = &Window::Draw;
+    bool (Window::*draw)()                                      = &Window::Draw;
     graphics::SurfaceContext& (Window::*getSurface)() const     = &Window::GetSurfaceContext;
     void (Window::*setTitle)(std::string_view)                  = &Window::SetWindowTitle;
     bool (Window::*isMaximized)() const                         = &Window::IsMaximized;

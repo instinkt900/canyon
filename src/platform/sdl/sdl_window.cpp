@@ -160,13 +160,14 @@ namespace moth_graphics::platform::sdl {
         SDL_SetWindowTitle(m_window, m_title.c_str());
     }
 
-    void Window::Draw() {
+    bool Window::Draw() {
         if (!m_graphics->Begin()) {
-            return;
+            return false;
         }
         m_layerStack->Draw();
         m_graphics->End();
         SDL_RenderPresent(m_renderer);
+        return true;
     }
 
     void Window::DestroyWindow() {

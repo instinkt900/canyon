@@ -26,7 +26,7 @@ namespace moth_graphics::platform::sdl {
         SDL_Renderer* GetSDLRenderer() const { return m_renderer; }
 
         void Update(uint32_t ticks) override;
-        void Draw() override;
+        bool Draw() override;
 
     private:
         bool CreateWindow();

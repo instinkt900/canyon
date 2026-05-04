@@ -39,7 +39,8 @@ namespace moth_graphics::platform {
         virtual void Update(uint32_t ticks) {}
 
         /// @brief Render one frame to this window.
-        virtual void Draw() {}
+        /// @return @c true if a frame was rendered, @c false if the backend skipped it.
+        virtual bool Draw() { return false; }
 
         /// @brief Returns the per-window GPU resource context.
         virtual graphics::SurfaceContext& GetSurfaceContext() const = 0;

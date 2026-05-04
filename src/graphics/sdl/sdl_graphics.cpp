@@ -7,50 +7,19 @@
 #include "moth_graphics/platform/sdl/sdl_window.h"
 #include "../utils.h"
 
-#include "backends/imgui_impl_sdl2.h"
-#include "backends/imgui_impl_sdlrenderer2.h"
-
 namespace moth_graphics::graphics::sdl {
     Graphics::Graphics(SurfaceContext& context)
         : m_surfaceContext(context)
         , m_drawColor(graphics::BasicColors::White) {
     }
 
-    Graphics::~Graphics() {
-        if (m_imguiWindow != nullptr) {
-            ImGui_ImplSDLRenderer2_Shutdown();
-            ImGui_ImplSDL2_Shutdown();
-            ImGui::DestroyContext();
-        }
-    }
-
-    void Graphics::InitImgui(moth_graphics::platform::Window const& window, bool /*enableViewports*/) {
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        auto& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        ImGui::StyleColorsDark();
-
-        const auto& sdlWindow = dynamic_cast<moth_graphics::platform::sdl::Window const&>(window);
-        m_imguiWindow = sdlWindow.GetSDLWindow();
-        ImGui_ImplSDL2_InitForSDLRenderer(sdlWindow.GetSDLWindow(), sdlWindow.GetSDLRenderer());
-        ImGui_ImplSDLRenderer2_Init(sdlWindow.GetSDLRenderer());
-    }
+    Graphics::~Graphics() = default;
 
     bool Graphics::Begin() {
-        if (m_imguiWindow != nullptr) {
-            ImGui_ImplSDLRenderer2_NewFrame();
-            ImGui_ImplSDL2_NewFrame();
-            ImGui::NewFrame();
-        }
         return true;
     }
 
     void Graphics::End() {
-        if (m_imguiWindow != nullptr) {
-            ImGui::Render();
-            ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
-        }
     }
 
     void Graphics::SetBlendMode(graphics::BlendMode mode) {
