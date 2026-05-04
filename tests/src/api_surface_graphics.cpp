@@ -19,8 +19,7 @@ TEST_CASE("IGraphics method signatures are stable", "[api][graphics][igraphics]"
     void (IGraphics::*setBlend)(BlendMode)                    = &IGraphics::SetBlendMode;
     void (IGraphics::*setColor)(Color const&)                 = &IGraphics::SetColor;
     void (IGraphics::*clear)()                                = &IGraphics::Clear;
-    void (IGraphics::*pushXform)(FloatMat4x4 const&)          = &IGraphics::PushTransform;
-    void (IGraphics::*popXform)()                             = &IGraphics::PopTransform;
+    void (IGraphics::*setXform)(FloatMat4x4 const&)           = &IGraphics::SetTransform;
     void (IGraphics::*drawImg)(Image const&, IntRect const&,
                                IntRect const*)                = &IGraphics::DrawImage;
     void (IGraphics::*drawImgPivot)(Image const&, IntVec2 const&,
@@ -44,7 +43,7 @@ TEST_CASE("IGraphics method signatures are stable", "[api][graphics][igraphics]"
 
     (void)initImgui; (void)getSurface; (void)begin; (void)end;
     (void)setBlend; (void)setColor; (void)clear;
-    (void)pushXform; (void)popXform;
+    (void)setXform;
     (void)drawImg; (void)drawImgPivot; (void)drawImgTiled;
     (void)drawRect; (void)drawFill; (void)drawLine; (void)drawText;
     (void)setClip; (void)createTarget; (void)getTarget; (void)setTarget;

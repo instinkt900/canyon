@@ -66,8 +66,7 @@ namespace moth_graphics::graphics::vulkan {
         void SetBlendMode(BlendMode mode) override;
         void SetColor(Color const& color) override;
         void Clear() override;
-        void PushTransform(FloatMat4x4 const& transform) override;
-        void PopTransform() override;
+        void SetTransform(FloatMat4x4 const& transform) override;
         void DrawImage(Image const& image, IntVec2 const& pos, FloatVec2 const& pivot) override;
         void DrawImage(Image const& image, IntRect const& destRect, IntRect const* sourceRect) override;
         void DrawImageTiled(Image const& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
@@ -104,7 +103,7 @@ namespace moth_graphics::graphics::vulkan {
         bool m_imguiInitialized = false;
         SurfaceContext& m_surfaceContext;
         VkSurfaceKHR m_vkSurface = VK_NULL_HANDLE;
-        std::stack<FloatMat4x4> m_transformStack;
+        FloatMat4x4 m_currentTransform = FloatMat4x4::Identity();
 
         struct PushConstants {
             FloatVec2 xyScale;

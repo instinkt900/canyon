@@ -35,8 +35,7 @@ namespace moth_graphics::graphics::sdl {
         void SetBlendMode(BlendMode mode) override;
         void SetColor(Color const& color) override;
         void Clear() override;
-        void PushTransform(FloatMat4x4 const& transform) override;
-        void PopTransform() override;
+        void SetTransform(FloatMat4x4 const& transform) override;
         void DrawImage(Image const& image, IntVec2 const& pos, FloatVec2 const& pivot) override;
         void DrawImage(Image const& image, IntRect const& destRect, IntRect const* sourceRect) override;
         void DrawImageTiled(Image const& image, IntRect const& destRect, IntRect const* sourceRect, float scale) override;
@@ -60,7 +59,7 @@ namespace moth_graphics::graphics::sdl {
         BlendMode m_blendMode = BlendMode::Replace;
         ITarget* m_currentRenderTarget = nullptr;
         SDL_Window* m_imguiWindow = nullptr;
-        std::stack<FloatMat4x4> m_transformStack;
+        FloatMat4x4 m_currentTransform = FloatMat4x4::Identity();
         SDLTextureRef m_textScratchTexture;
         int m_textScratchWidth = 0;
         int m_textScratchHeight = 0;
