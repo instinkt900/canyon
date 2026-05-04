@@ -12,8 +12,11 @@ typedef FT_LibraryRec_* FT_Library;
 namespace moth_graphics::graphics::vulkan {
     class Context : public moth_graphics::graphics::Context {
     public:
-        Context();
-        virtual ~Context();
+        Context() = default;
+        ~Context() override = default;
+
+        bool Startup() override;
+        void Shutdown() override;
 
         VkInstance const& GetInstance() const { return m_vkInstance; }
         FT_Library const& GetFTLibrary() const { return m_ftLibrary; }

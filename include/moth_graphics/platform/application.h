@@ -37,15 +37,6 @@ namespace moth_graphics::platform {
 
         bool OnEvent(moth_ui::Event const& event) override;
 
-        /// @brief Called when the window is resized. Returns @c false by default.
-        bool OnWindowSizeEvent(EventWindowSize const& event);
-
-        /// @brief Called on a quit request (e.g. window close button); stops the loop.
-        bool OnRequestQuitEvent(EventRequestQuit const& event);
-
-        /// @brief Called on a hard quit event; stops the loop.
-        bool OnQuitEvent(EventQuit const& event);
-
         void TickFixed(uint32_t ticks) override;
         void Tick(uint32_t ticks) override;
 
@@ -61,6 +52,11 @@ namespace moth_graphics::platform {
         Application& operator=(Application const&) = delete;
         Application(Application&&) = delete;
         Application& operator=(Application&&) = delete;
+
+    private:
+        bool OnWindowSizeEvent(EventWindowSize const& event);
+        bool OnRequestQuitEvent(EventRequestQuit const& event);
+        bool OnQuitEvent(EventQuit const& event);
 
     protected:
         /// @brief Override to perform setup before the window is created.

@@ -7,5 +7,8 @@ namespace moth_graphics::graphics::sdl {
     public:
         Context() = default;
         ~Context() override = default;
+
+        bool Startup() override { return true; }
+        void Shutdown() override {}
     };
 }

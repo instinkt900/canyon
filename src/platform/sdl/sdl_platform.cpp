@@ -56,10 +56,6 @@ namespace moth_graphics::platform::sdl {
     }
 
     graphics::Context& Platform::GetGraphicsContext() {
-        // lazy init this will mean the first window created is linked to this context
-        if (!m_context) {
-            m_context = std::make_unique<graphics::sdl::Context>();
-        }
         return *m_context;
     }
 
@@ -74,11 +70,22 @@ namespace moth_graphics::platform::sdl {
             return false;
         }
         spdlog::info("SDL: initialized");
+        m_context = std::make_unique<graphics::sdl::Context>();
+        if (!m_context->Startup()) {
+            spdlog::error("SDL: graphics context startup failed");
+            m_context.reset();
+            SDL_Quit();
+            return false;
+        }
         return true;
     }
 
     void Platform::Shutdown() {
         spdlog::info("SDL: shutting down");
+        if (m_context) {
+            m_context->Shutdown();
+            m_context.reset();
+        }
         SDL_Quit();
     }
 

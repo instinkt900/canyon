@@ -124,11 +124,21 @@ namespace moth_graphics::platform::glfw {
         }
         spdlog::info("GLFW: initialized");
         m_context = std::make_unique<graphics::vulkan::Context>();
+        if (!m_context->Startup()) {
+            spdlog::error("GLFW: graphics context startup failed");
+            m_context.reset();
+            glfwTerminate();
+            return false;
+        }
         return true;
     }
 
     void Platform::Shutdown() {
         spdlog::info("GLFW: shutting down");
+        if (m_context) {
+            m_context->Shutdown();
+            m_context.reset();
+        }
         glfwTerminate();
     }
 
