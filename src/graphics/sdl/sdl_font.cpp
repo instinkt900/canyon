@@ -21,11 +21,11 @@ namespace moth_graphics::graphics::sdl {
     }
 
     int Font::GetAscent() const {
-        return FC_GetAscent(m_fontObj.get(), nullptr);
+        return FC_GetAscent(m_fontObj.get(), nullptr); // NOLINT(cppcoreguidelines-pro-type-vararg)
     }
 
     int Font::GetDescent() const {
-        return FC_GetDescent(m_fontObj.get(), nullptr);
+        return FC_GetDescent(m_fontObj.get(), nullptr); // NOLINT(cppcoreguidelines-pro-type-vararg)
     }
 
     std::unique_ptr<IFont> Font::Load(SDL_Renderer& renderer, const std::filesystem::path& path, int size) {
