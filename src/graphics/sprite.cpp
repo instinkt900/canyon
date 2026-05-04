@@ -101,19 +101,13 @@ namespace moth_graphics::graphics {
     }
 
     int Sprite::GetWidth() const {
-        auto entry = m_spriteSheet->GetFrameDesc(GetCurrentFrame());
-        if (entry) {
-            return entry->rect.bottomRight.x - entry->rect.topLeft.x;
-        }
-        return 0;
+        auto const rect = GetCurrentFrameRect();
+        return rect.bottomRight.x - rect.topLeft.x;
     }
 
     int Sprite::GetHeight() const {
-        auto entry = m_spriteSheet->GetFrameDesc(GetCurrentFrame());
-        if (entry) {
-            return entry->rect.bottomRight.y - entry->rect.topLeft.y;
-        }
-        return 0;
+        auto const rect = GetCurrentFrameRect();
+        return rect.bottomRight.y - rect.topLeft.y;
     }
 
     Image const& Sprite::GetImage() const {
