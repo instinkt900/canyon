@@ -3,7 +3,7 @@
 #include "moth_graphics/platform/sdl/sdl_window.h"
 #include "moth_graphics/graphics/sdl/sdl_surface_context.h"
 #include "moth_graphics/platform/sdl/sdl_events.h"
-#include "moth_graphics/graphics/sdl/sdl_graphics.h"
+#include "graphics/sdl/sdl_graphics.h"
 
 #include <stdexcept>
 

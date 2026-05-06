@@ -1,5 +1,5 @@
 #include "common.h"
-#include "moth_graphics/graphics/sdl/sdl_font.h"
+#include "sdl_font.h"
 #include "SDL_FontCache.h"
 #include <SDL_ttf.h>
 

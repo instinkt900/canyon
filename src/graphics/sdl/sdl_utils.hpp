@@ -2,7 +2,7 @@
 
 #include "moth_graphics/graphics/blend_mode.h"
 #include "moth_graphics/graphics/color.h"
-#include "graphics/sdl/SDL_FontCache.h"
+#include "SDL_FontCache.h"
 #include "moth_graphics/graphics/text_alignment.h"
 #include "moth_graphics/utils/rect.h"
 

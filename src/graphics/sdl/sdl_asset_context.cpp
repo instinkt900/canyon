@@ -1,8 +1,8 @@
 #include "common.h"
-#include "moth_graphics/graphics/sdl/sdl_asset_context.h"
+#include "sdl_asset_context.h"
 #include "moth_graphics/graphics/sdl/sdl_surface_context.h"
-#include "moth_graphics/graphics/sdl/sdl_font.h"
-#include "moth_graphics/graphics/sdl/sdl_texture.h"
+#include "sdl_font.h"
+#include "sdl_texture.h"
 
 namespace moth_graphics::graphics::sdl {
     AssetContext::AssetContext(SurfaceContext& context)
