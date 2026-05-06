@@ -23,7 +23,7 @@ jobs:
       matrix:
         include:
           - os: windows
-            runs_on: windows-latest
+            runs_on: windows-2022
             configure_preset: conan-default
           - os: linux
             runs_on: ubuntu-latest
@@ -47,9 +47,9 @@ jobs:
     - name: Configure and build
       shell: bash
       run: |
-        conan install . -pr .conan/profile -s build_type=Release --build=missing -c tools.cmake.cmaketoolchain:generator=Ninja
+        conan install . -pr .conan/profile -s build_type=Release --build=missing
         cmake --preset ${{ matrix.configure_preset }}
-        cmake --build --preset conan-release
+        cmake --build --preset conan-release --config Release
 
   test:
     runs-on: ${{ matrix.runs_on }}
@@ -57,7 +57,7 @@ jobs:
       matrix:
         include:
           - os: windows
-            runs_on: windows-latest
+            runs_on: windows-2022
             configure_preset: conan-default
             build_preset: conan-release
             test_preset: conan-release
@@ -88,7 +88,7 @@ jobs:
       working-directory: tests
       shell: bash
       run: |
-        conan install . -pr ../.conan/profile -s build_type=${{ matrix.build_type }} --build=missing -c tools.cmake.cmaketoolchain:generator=Ninja
+        conan install . -pr ../.conan/profile -s build_type=${{ matrix.build_type }} --build=missing
         cmake --preset ${{ matrix.configure_preset }}
         cmake --build --preset ${{ matrix.build_preset }}
         ctest --preset ${{ matrix.test_preset }} --output-on-failure
