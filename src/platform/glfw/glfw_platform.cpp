@@ -18,6 +18,10 @@ namespace {
 
 namespace moth_graphics::platform::glfw {
 
+    Platform::~Platform() noexcept {
+        delete m_context;
+    }
+
     namespace {
         class VulkanImGuiContext : public moth_graphics::platform::ImGuiContext {
         public:
@@ -123,10 +127,11 @@ namespace moth_graphics::platform::glfw {
             return false;
         }
         spdlog::info("GLFW: initialized");
-        m_context = std::make_unique<graphics::vulkan::Context>();
+        m_context = new graphics::vulkan::Context(); // NOLINT(cppcoreguidelines-owning-memory)
         if (!m_context->Startup()) {
             spdlog::error("GLFW: graphics context startup failed");
-            m_context.reset();
+            delete m_context;
+            m_context = nullptr;
             glfwTerminate();
             return false;
         }
@@ -135,9 +140,10 @@ namespace moth_graphics::platform::glfw {
 
     void Platform::Shutdown() {
         spdlog::info("GLFW: shutting down");
-        if (m_context) {
+        if (m_context != nullptr) {
             m_context->Shutdown();
-            m_context.reset();
+            delete m_context;
+            m_context = nullptr;
         }
         glfwTerminate();
     }

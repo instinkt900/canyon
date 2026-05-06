@@ -1,7 +1,5 @@
 #pragma once
 
-#include "moth_graphics/graphics/vulkan/vulkan_context.h"
-#include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
 #include "moth_graphics/graphics/surface_context.h"
 #include "moth_graphics/platform/window.h"
 #include "moth_graphics/utils/vector.h"
@@ -13,13 +11,18 @@
 #include <string_view>
 #include <cstdint>
 
+namespace moth_graphics::graphics::vulkan {
+    class Context;
+    class SurfaceContext;
+}
+
 namespace moth_graphics::platform::glfw {
     class Window : public moth_graphics::platform::Window {
     public:
         Window(graphics::vulkan::Context& context, std::string_view title, int width, int height);
         ~Window() override;
 
-        graphics::SurfaceContext & GetSurfaceContext() const override { return *m_surfaceContext; }
+        graphics::SurfaceContext & GetSurfaceContext() const override;
         void SetWindowTitle(std::string_view title) override;
         GLFWwindow* GetGLFWWindow() const { return m_glfwWindow; }
         VkSurfaceKHR GetVkSurface() const { return m_customVkSurface; }

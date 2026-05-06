@@ -1,6 +1,6 @@
 #include "common.h"
 #include "sdl_asset_context.h"
-#include "moth_graphics/graphics/sdl/sdl_surface_context.h"
+#include "sdl_surface_context.h"
 #include "sdl_font.h"
 #include "sdl_texture.h"
 

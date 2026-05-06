@@ -2,9 +2,9 @@
 
 #include "moth_graphics/graphics/ifont.h"
 #include "vulkan_shader.h"
-#include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
+#include "vulkan_surface_context.h"
 #include "vulkan_buffer.h"
-#include "moth_graphics/graphics/vulkan/vulkan_texture.h"
+#include "vulkan_texture.h"
 #include "moth_graphics/utils/vector.h"
 
 #include <harfbuzz/hb.h>

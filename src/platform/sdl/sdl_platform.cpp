@@ -1,5 +1,5 @@
 #include "common.h"
-#include "moth_graphics/graphics/sdl/sdl_context.h"
+#include "graphics/sdl/sdl_context.h"
 #include "moth_graphics/platform/imgui_context.h"
 #include "moth_graphics/platform/sdl/sdl_window.h"
 #include "moth_graphics/platform/sdl/sdl_platform.h"
@@ -8,6 +8,10 @@
 #include "backends/imgui_impl_sdlrenderer2.h"
 
 namespace moth_graphics::platform::sdl {
+
+    Platform::~Platform() noexcept {
+        delete m_context;
+    }
 
     namespace {
         class SDLImGuiContext : public moth_graphics::platform::ImGuiContext {
@@ -70,10 +74,11 @@ namespace moth_graphics::platform::sdl {
             return false;
         }
         spdlog::info("SDL: initialized");
-        m_context = std::make_unique<graphics::sdl::Context>();
+        m_context = new graphics::sdl::Context(); // NOLINT(cppcoreguidelines-owning-memory)
         if (!m_context->Startup()) {
             spdlog::error("SDL: graphics context startup failed");
-            m_context.reset();
+            delete m_context;
+            m_context = nullptr;
             SDL_Quit();
             return false;
         }
@@ -82,9 +87,10 @@ namespace moth_graphics::platform::sdl {
 
     void Platform::Shutdown() {
         spdlog::info("SDL: shutting down");
-        if (m_context) {
+        if (m_context != nullptr) {
             m_context->Shutdown();
-            m_context.reset();
+            delete m_context;
+            m_context = nullptr;
         }
         SDL_Quit();
     }
