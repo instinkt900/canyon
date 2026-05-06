@@ -54,9 +54,8 @@ namespace moth_graphics::graphics {
     }
 
     void MothRenderer::PushTransform(moth_ui::FloatMat4x4 const& transform) {
-        auto const combined = m_transform.top() * transform;
-        m_transform.push(combined);
-        m_graphics.SetTransform(combined);
+        m_transform.push(transform);
+        m_graphics.SetTransform(transform);
     }
 
     void MothRenderer::PopTransform() {
