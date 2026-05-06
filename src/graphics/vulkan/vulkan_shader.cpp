@@ -1,6 +1,6 @@
 #include "common.h"
-#include "moth_graphics/graphics/vulkan/vulkan_shader.h"
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "vulkan_shader.h"
+#include "vulkan_utils.h"
 
 namespace moth_graphics::graphics::vulkan {
     Shader::Shader(uint32_t hash)

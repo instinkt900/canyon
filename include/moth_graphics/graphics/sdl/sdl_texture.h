@@ -2,7 +2,7 @@
 
 #include "moth_graphics/graphics/itexture.h"
 #include "moth_graphics/utils/vector.h"
-#include "moth_graphics/graphics/sdl/smart_sdl.hpp"
+#include "graphics/sdl/smart_sdl.hpp"
 
 #include <SDL_render.h>
 

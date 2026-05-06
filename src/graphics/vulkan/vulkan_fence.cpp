@@ -1,6 +1,6 @@
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "vulkan_utils.h"
 #include "common.h"
-#include "moth_graphics/graphics/vulkan/vulkan_fence.h"
+#include "vulkan_fence.h"
 
 namespace moth_graphics::graphics::vulkan {
     Fence::Fence(SurfaceContext& context)

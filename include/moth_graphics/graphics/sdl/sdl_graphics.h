@@ -11,7 +11,7 @@
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/vector.h"
 
-#include "moth_graphics/graphics/sdl/smart_sdl.hpp"
+#include "graphics/sdl/smart_sdl.hpp"
 
 #include <SDL_video.h>
 #include <filesystem>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "moth_graphics/graphics/ifont.h"
-#include "moth_graphics/graphics/sdl/smart_sdl.hpp"
+#include "graphics/sdl/smart_sdl.hpp"
 
 #include <SDL_render.h>
 #include <memory>

@@ -2,7 +2,7 @@
 
 #include "moth_graphics/graphics/iimage.h"
 #include "moth_graphics/graphics/itarget.h"
-#include "moth_graphics/graphics/vulkan/vulkan_fence.h"
+#include "vulkan_fence.h"
 #include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
 #include "moth_graphics/graphics/vulkan/vulkan_texture.h"
 

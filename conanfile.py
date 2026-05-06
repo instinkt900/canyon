@@ -46,9 +46,10 @@ class MothGraphics(ConanFile):
         if not self.options.disable_vulkan:
             if self.settings.os == "Windows":
                 self.requires("glfw/3.3.8", transitive_headers=True)
-                # vulkan_context.h includes <ft2build.h> and vulkan_font.h includes
-                # <harfbuzz/hb.h> so consumers need both headers. On Linux these
-                # come from the system package manager.
+                # vulkan_context.h uses FreeType (FT_Library). The Vulkan font
+                # backend (now in private src/) uses HarfBuzz. Both are kept
+                # transitive for safety on Windows where they come from Conan.
+                # On Linux these come from the system package manager.
                 self.requires("freetype/[~2.13]", transitive_headers=True)
                 self.requires("harfbuzz/[~8.3]", transitive_headers=True)
             self.requires("vulkan-headers/1.3.243.0", transitive_headers=True)

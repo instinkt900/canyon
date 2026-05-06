@@ -1,7 +1,7 @@
 #include "common.h"
-#include "moth_graphics/graphics/vulkan/vulkan_swapchain.h"
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
-#include "moth_graphics/graphics/vulkan/vulkan_command_buffer.h"
+#include "vulkan_swapchain.h"
+#include "vulkan_utils.h"
+#include "vulkan_command_buffer.h"
 
 namespace {
     VkExtent2D chooseSwapExtent(uint32_t width, uint32_t height, const VkSurfaceCapabilitiesKHR& capabilities) {

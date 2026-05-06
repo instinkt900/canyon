@@ -1,6 +1,6 @@
 #include "common.h"
-#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "graphics/vulkan/vulkan_graphics.h"
+#include "graphics/vulkan/vulkan_utils.h"
 #include "moth_graphics/platform/glfw/glfw_platform.h"
 #include "moth_graphics/platform/glfw/glfw_window.h"
 #include "moth_graphics/platform/imgui_context.h"

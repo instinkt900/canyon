@@ -1,7 +1,7 @@
 #include "common.h"
 #include "moth_graphics/graphics/vulkan/vulkan_texture.h"
-#include "moth_graphics/graphics/vulkan/vulkan_command_buffer.h"
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "vulkan_command_buffer.h"
+#include "vulkan_utils.h"
 #include "stb_image.h"
 #include "stb_image_write.h"
 
