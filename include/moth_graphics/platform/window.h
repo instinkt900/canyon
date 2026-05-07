@@ -42,10 +42,10 @@ namespace moth_graphics::platform {
         /// @return @c true on success, @c false if the backend skipped this frame
         ///         (e.g. Vulkan swapchain out-of-date). On @c false, do not call
         ///         @c EndFrame.
-        virtual bool BeginFrame() { return false; }
+        virtual bool BeginFrame() = 0;
 
         /// @brief Finish rendering the frame begun by @c BeginFrame.
-        virtual void EndFrame() {}
+        virtual void EndFrame() = 0;
 
         /// @brief Render one frame to this window: @c BeginFrame, draw the layer
         ///        stack, @c EndFrame.

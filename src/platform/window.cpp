@@ -22,7 +22,10 @@ namespace moth_graphics::platform {
         if (!BeginFrame()) {
             return false;
         }
-        m_layerStack->Draw();
+        assert(m_layerStack && "Draw called before PostCreate; layer stack not yet initialised");
+        if (m_layerStack) {
+            m_layerStack->Draw();
+        }
         EndFrame();
         return true;
     }
