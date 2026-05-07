@@ -1,6 +1,6 @@
 #pragma once
 
-#include "moth_graphics/graphics/iimage.h"
+#include "moth_graphics/graphics/image.h"
 #include "moth_graphics/utils/rect.h"
 
 #include <memory>

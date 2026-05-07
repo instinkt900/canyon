@@ -104,7 +104,7 @@ auto& gfx = window.GetGraphics();
 gfx.Begin();
 gfx.SetColor({ 1, 0, 0, 1 });
 gfx.DrawFillRectF({ { 10, 10 }, { 110, 110 } });
-gfx.DrawImage(*image, destRect);
+gfx.DrawImage(image, destRect);
 gfx.DrawText("Hello", *font, destRect);
 gfx.End();
 ```
@@ -116,25 +116,27 @@ auto target = gfx.CreateTarget(256, 256);
 gfx.SetTarget(target.get());
 // ... draw into target ...
 gfx.SetTarget(nullptr);
-gfx.DrawImage(*target->GetImage(), destRect);
+gfx.DrawImage(target->GetImage(), destRect);
 ```
 
 ### Asset loading
 
-Images and fonts are loaded through `AssetContext`, obtained from the window's surface context:
+Textures and fonts are loaded through `AssetContext`, obtained from the window's surface context. `Image` is a cheap value type — wrap a loaded texture in one to draw it:
 
 ```cpp
 auto& assets = window.GetSurfaceContext().GetAssetContext();
-auto image = assets.ImageFromFile("assets/sprite.png");
-auto font  = assets.FontFromFile("assets/fonts/roboto.ttf", 16);
+auto texture = assets.TextureFromFile("assets/sprite.png");
+moth_graphics::graphics::Image image{ std::move(texture) };
+auto font = assets.FontFromFile("assets/fonts/roboto.ttf", 16);
 ```
 
-For cached, atlas-aware loading use `ImageFactory` directly:
+For cached, atlas-aware loading use the `TextureFactory` exposed by the asset context:
 
 ```cpp
-moth_graphics::graphics::ImageFactory imageFactory(window.GetSurfaceContext().GetAssetContext());
-imageFactory.LoadTexturePack("assets/sprites.json");
-auto sprite = imageFactory.GetImage("assets/sprites/player.png"); // sourced from atlas
+auto& textureFactory = window.GetSurfaceContext().GetAssetContext().GetTextureFactory();
+textureFactory.LoadTexturePack("assets/sprites.json");
+auto texture = textureFactory.GetTexture("assets/sprites/player.png");
+moth_graphics::graphics::Image sprite{ texture, textureFactory.GetTextureRect("assets/sprites/player.png") };
 ```
 
 ### moth_ui integration

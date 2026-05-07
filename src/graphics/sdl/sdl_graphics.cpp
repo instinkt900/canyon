@@ -171,7 +171,12 @@ namespace moth_graphics::graphics::sdl {
 
     void Graphics::DrawText(std::string_view text, graphics::IFont& font, IntRect const& destRect, graphics::TextHorizAlignment horizontalAlignment, graphics::TextVertAlignment verticalAlignment) {
         std::string const textStr(text);
-        auto const fcFont = dynamic_cast<Font&>(font).GetFontObj();
+        auto* sdlFont = dynamic_cast<Font*>(&font);
+        if (sdlFont == nullptr) {
+            spdlog::warn("DrawText: font is not an SDL Font; skipping");
+            return;
+        }
+        auto const fcFont = sdlFont->GetFontObj();
 
         auto const destWidth = destRect.bottomRight.x - destRect.topLeft.x;
         auto const destHeight = destRect.bottomRight.y - destRect.topLeft.y;

@@ -56,7 +56,15 @@ namespace moth_graphics::platform::glfw {
                     return false;
                 }
 
-                auto& vkGraphics = dynamic_cast<moth_graphics::graphics::vulkan::Graphics&>(graphics);
+                auto* vkGraphicsPtr = dynamic_cast<moth_graphics::graphics::vulkan::Graphics*>(&graphics);
+                if (vkGraphicsPtr == nullptr) {
+                    spdlog::error("Vulkan: InitImgui called with non-Vulkan graphics");
+                    ImGui_ImplGlfw_Shutdown();
+                    ImGui::DestroyContext();
+                    return false;
+                }
+                m_vkGraphics = vkGraphicsPtr;
+                auto& vkGraphics = *vkGraphicsPtr;
                 auto& surfaceContext = vkGraphics.GetSurfaceContext();
 
                 ImGui_ImplVulkan_InitInfo initInfo{};
@@ -94,8 +102,8 @@ namespace moth_graphics::platform::glfw {
                 }
             }
 
-            void Render(moth_graphics::graphics::IGraphics& graphics) override {
-                if (!m_initialized) {
+            void Render(moth_graphics::graphics::IGraphics& /*graphics*/) override {
+                if (!m_initialized || m_vkGraphics == nullptr) {
                     return;
                 }
                 ImGui::Render();
@@ -104,8 +112,17 @@ namespace moth_graphics::platform::glfw {
                     ImGui::RenderPlatformWindowsDefault();
                 }
                 if (ImDrawData* drawData = ImGui::GetDrawData()) {
-                    auto& vkGraphics = dynamic_cast<moth_graphics::graphics::vulkan::Graphics&>(graphics);
-                    ImGui_ImplVulkan_RenderDrawData(drawData, vkGraphics.GetCurrentCommandBuffer()->GetVkCommandBuffer());
+                    // Flush any moth pending batch before ImGui binds its own
+                    // pipeline; otherwise End()'s final flush would draw moth
+                    // vertices using ImGui's pipeline.
+                    m_vkGraphics->Flush();
+                    ImGui_ImplVulkan_RenderDrawData(drawData, m_vkGraphics->GetCurrentCommandBuffer()->GetVkCommandBuffer());
+                }
+            }
+
+            void DiscardFrame() override {
+                if (m_initialized) {
+                    ImGui::EndFrame();
                 }
             }
 
@@ -115,11 +132,13 @@ namespace moth_graphics::platform::glfw {
                     ImGui_ImplGlfw_Shutdown();
                     ImGui::DestroyContext();
                     m_initialized = false;
+                    m_vkGraphics = nullptr;
                 }
             }
 
         private:
             bool m_initialized = false;
+            moth_graphics::graphics::vulkan::Graphics* m_vkGraphics = nullptr;
         };
     }
 

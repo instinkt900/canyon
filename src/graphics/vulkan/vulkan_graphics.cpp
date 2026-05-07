@@ -271,9 +271,14 @@ namespace moth_graphics::graphics::vulkan {
 
     void Graphics::DrawText(std::string_view text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment) {
         std::string const textStr(text);
+        auto* vulkanFontPtr = dynamic_cast<Font*>(&font);
+        if (vulkanFontPtr == nullptr) {
+            spdlog::warn("DrawText: font is not a Vulkan Font; skipping");
+            return;
+        }
+        Font& vulkanFont = *vulkanFontPtr;
         auto* context = CurrentContext();
         context->m_currentBlendMode = BlendMode::Alpha; // force alpha blending for text
-        Font& vulkanFont = dynamic_cast<Font&>(font);
 
         uint32_t const glyphStart = context->m_glyphCount;
         FontGlyphInstance* glyphInstances = static_cast<FontGlyphInstance*>(context->m_fontInstanceStagingBuffer->Map());
@@ -388,6 +393,23 @@ namespace moth_graphics::graphics::vulkan {
 
     std::unique_ptr<ITarget> Graphics::CreateTarget(int width, int height) {
         return std::make_unique<Framebuffer>(m_surfaceContext, width, height, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, m_rtRenderPass->GetRenderPass());
+    }
+
+    void Graphics::Drain() {
+        vkDeviceWaitIdle(m_surfaceContext.GetVkDevice());
+        if (m_swapchain) {
+            m_swapchain->ResetCommandBuffers();
+        }
+    }
+
+    void Graphics::Flush() {
+        if (m_contextStack.empty() || m_contextStack.top() == nullptr) {
+            return;
+        }
+        FlushPendingBatch();
+        // Foreign code is about to bind its own pipeline; forget our cached
+        // pipeline id so the next moth draw rebinds.
+        m_contextStack.top()->m_currentPipelineId = 0;
     }
 
     bool Graphics::IsRenderTarget() const {

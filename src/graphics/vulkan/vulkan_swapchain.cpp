@@ -96,6 +96,12 @@ namespace moth_graphics::graphics::vulkan {
         m_imageCount = imageCount;
     }
 
+    void Swapchain::ResetCommandBuffers() {
+        for (auto& framebuffer : m_framebuffers) {
+            framebuffer->GetCommandBuffer().Reset();
+        }
+    }
+
     Swapchain::~Swapchain() {
         for (uint32_t i = 0; i < m_imageCount; ++i) {
             auto& slot = m_frames[i];

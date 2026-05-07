@@ -30,6 +30,12 @@ namespace moth_graphics::graphics::vulkan {
 
         uint32_t GetImageCount() const { return m_imageCount; }
 
+        /// @brief Reset every framebuffer's command buffer.
+        ///
+        /// Drops all recorded commands so foreign-bound pipelines can be
+        /// destroyed safely. Caller must ensure the device is idle first.
+        void ResetCommandBuffers();
+
     private:
         SurfaceContext& m_context;
         VkExtent2D m_extent;

@@ -38,9 +38,20 @@ namespace moth_graphics::platform {
         spdlog::info("Application: running");
         TickSync();
         spdlog::info("Application: shutting down");
+        // ImGui's backend records pipeline binds directly into moth's command
+        // buffers. Drain so the next step's pipeline destruction doesn't fire
+        // "pipeline in use by command buffer" validation errors.
+        m_window->GetGraphics().Drain();
         m_imguiContext->Shutdown();
         m_imguiContext.reset();
         Shutdown();
+        // Tear down the window (and its graphics/surface context) here so the
+        // platform's instance/device outlive them. main() typically calls
+        // platform.Shutdown() right after Run() returns, and the platform owns
+        // the Vulkan instance — letting m_window destruct in ~Application
+        // (after platform shutdown) leaks the device and triggers validation
+        // errors about live VkDevice/VkBuffer/VkSurfaceKHR at vkDestroyInstance.
+        m_window.reset();
     }
 
     bool Application::OnEvent(moth_ui::Event const& event) {
@@ -71,8 +82,12 @@ namespace moth_graphics::platform {
 
     void Application::Tick(uint32_t ticks) {
         m_imguiContext->NewFrame();
-        if (m_window->Draw()) {
-            m_imguiContext->Render(m_window->GetGraphics());
+        if (!m_window->BeginFrame()) {
+            m_imguiContext->DiscardFrame();
+            return;
         }
+        m_window->GetLayerStack().Draw();
+        m_imguiContext->Render(m_window->GetGraphics());
+        m_window->EndFrame();
     }
 }
