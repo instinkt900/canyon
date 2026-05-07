@@ -56,7 +56,14 @@ namespace moth_graphics::platform::glfw {
                     return false;
                 }
 
-                auto& vkGraphics = dynamic_cast<moth_graphics::graphics::vulkan::Graphics&>(graphics);
+                auto* vkGraphicsPtr = dynamic_cast<moth_graphics::graphics::vulkan::Graphics*>(&graphics);
+                if (vkGraphicsPtr == nullptr) {
+                    spdlog::error("Vulkan: InitImgui called with non-Vulkan graphics");
+                    ImGui_ImplGlfw_Shutdown();
+                    ImGui::DestroyContext();
+                    return false;
+                }
+                auto& vkGraphics = *vkGraphicsPtr;
                 auto& surfaceContext = vkGraphics.GetSurfaceContext();
 
                 ImGui_ImplVulkan_InitInfo initInfo{};
@@ -104,8 +111,12 @@ namespace moth_graphics::platform::glfw {
                     ImGui::RenderPlatformWindowsDefault();
                 }
                 if (ImDrawData* drawData = ImGui::GetDrawData()) {
-                    auto& vkGraphics = dynamic_cast<moth_graphics::graphics::vulkan::Graphics&>(graphics);
-                    ImGui_ImplVulkan_RenderDrawData(drawData, vkGraphics.GetCurrentCommandBuffer()->GetVkCommandBuffer());
+                    auto* vkGraphicsPtr = dynamic_cast<moth_graphics::graphics::vulkan::Graphics*>(&graphics);
+                    if (vkGraphicsPtr == nullptr) {
+                        spdlog::warn("Vulkan: ImGui Render called with non-Vulkan graphics; skipping");
+                        return;
+                    }
+                    ImGui_ImplVulkan_RenderDrawData(drawData, vkGraphicsPtr->GetCurrentCommandBuffer()->GetVkCommandBuffer());
                 }
             }
 

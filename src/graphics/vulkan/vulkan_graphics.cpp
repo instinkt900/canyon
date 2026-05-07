@@ -271,9 +271,14 @@ namespace moth_graphics::graphics::vulkan {
 
     void Graphics::DrawText(std::string_view text, IFont& font, IntRect const& destRect, TextHorizAlignment horizontalAlignment, TextVertAlignment verticalAlignment) {
         std::string const textStr(text);
+        auto* vulkanFontPtr = dynamic_cast<Font*>(&font);
+        if (vulkanFontPtr == nullptr) {
+            spdlog::warn("DrawText: font is not a Vulkan Font; skipping");
+            return;
+        }
+        Font& vulkanFont = *vulkanFontPtr;
         auto* context = CurrentContext();
         context->m_currentBlendMode = BlendMode::Alpha; // force alpha blending for text
-        Font& vulkanFont = dynamic_cast<Font&>(font);
 
         uint32_t const glyphStart = context->m_glyphCount;
         FontGlyphInstance* glyphInstances = static_cast<FontGlyphInstance*>(context->m_fontInstanceStagingBuffer->Map());
