@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphics/sdl/sdl_asset_context.h"
+#include "sdl_asset_context.h"
 #include "sdl_context.h"
 #include "moth_graphics/graphics/surface_context.h"
 
