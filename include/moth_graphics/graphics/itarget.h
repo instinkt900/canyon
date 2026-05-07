@@ -1,6 +1,6 @@
 #pragma once
 
-#include "moth_graphics/graphics/iimage.h"
+#include "moth_graphics/graphics/image.h"
 
 namespace moth_graphics::graphics {
     /// @brief Abstract off-screen render target.

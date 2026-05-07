@@ -1,6 +1,6 @@
 #pragma once
 
-#include "moth_graphics/graphics/iimage.h"
+#include "moth_graphics/graphics/image.h"
 #include "moth_graphics/graphics/itarget.h"
 #include "vulkan_fence.h"
 #include "vulkan_surface_context.h"

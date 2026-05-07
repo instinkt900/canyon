@@ -18,7 +18,7 @@
 #include "moth_graphics/graphics/font_factory.h"
 #include "moth_graphics/graphics/ifont.h"
 #include "moth_graphics/graphics/igraphics.h"
-#include "moth_graphics/graphics/iimage.h"
+#include "moth_graphics/graphics/image.h"
 #include "moth_graphics/graphics/texture_factory.h"
 #include "moth_graphics/graphics/image_scale_type.h"
 #include "moth_graphics/graphics/itarget.h"

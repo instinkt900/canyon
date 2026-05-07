@@ -1,5 +1,5 @@
 #include "common.h"
-#include "moth_graphics/graphics/iimage.h"
+#include "moth_graphics/graphics/image.h"
 
 namespace moth_graphics::graphics {
     Image::Image(std::shared_ptr<ITexture> texture)

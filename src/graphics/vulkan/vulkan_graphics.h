@@ -4,7 +4,7 @@
 #include "moth_graphics/graphics/color.h"
 #include "moth_graphics/graphics/ifont.h"
 #include "moth_graphics/graphics/igraphics.h"
-#include "moth_graphics/graphics/iimage.h"
+#include "moth_graphics/graphics/image.h"
 #include "moth_graphics/graphics/itarget.h"
 #include "moth_graphics/graphics/text_alignment.h"
 #include "vulkan_buffer.h"

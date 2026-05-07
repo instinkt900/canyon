@@ -1,6 +1,6 @@
 #include "moth_graphics/graphics/sprite.h"
 #include "moth_graphics/graphics/spritesheet.h"
-#include "moth_graphics/graphics/iimage.h"
+#include "moth_graphics/graphics/image.h"
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/vector.h"
 
