@@ -36,7 +36,7 @@ namespace moth_graphics::platform {
         ~Window() override;
 
         /// @brief Poll events and advance the UI layer stack by @p ticks milliseconds.
-        virtual void Update(uint32_t ticks) {}
+        virtual void Update(uint32_t ticks) = 0;
 
         /// @brief Begin rendering one frame.
         /// @return @c true on success, @c false if the backend skipped this frame
@@ -100,6 +100,7 @@ namespace moth_graphics::platform {
         /// @brief Called before the native window and graphics objects are destroyed.
         void PreDestroy();
 
+        void SetGraphics(std::unique_ptr<graphics::IGraphics> graphics) { m_graphics = std::move(graphics); }
 
         std::string m_title;
         int m_windowWidth = 0;
@@ -107,6 +108,7 @@ namespace moth_graphics::platform {
         IntVec2 m_windowPos = { -1, -1 };
         bool m_windowMaximized = false;
 
+    private:
         std::unique_ptr<graphics::IGraphics> m_graphics;
         std::unique_ptr<moth_ui::LayerStack> m_layerStack;
 

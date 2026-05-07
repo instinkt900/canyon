@@ -124,17 +124,17 @@ namespace moth_graphics::platform::sdl {
             if (auto const translatedEvent = FromSDL(event)) {
                 moth_ui::EventDispatch dispatch(*translatedEvent);
                 dispatch.Dispatch(this, &Window::OnResizeEvent);
-                dispatch.Dispatch(m_layerStack.get());
+                dispatch.Dispatch(&GetLayerStack());
                 if (!dispatch.GetHandled()) {
                     EmitEvent(*translatedEvent);
                 }
             }
         }
-        m_layerStack->Update(ticks);
+        GetLayerStack().Update(ticks);
     }
 
     bool Window::OnResizeEvent(EventWindowSize const& event) {
-        m_layerStack->SetWindowSize({ event.GetWidth(), event.GetHeight() });
+        GetLayerStack().SetWindowSize({ event.GetWidth(), event.GetHeight() });
         return false;
     }
 
@@ -153,7 +153,7 @@ namespace moth_graphics::platform::sdl {
         }
 
         m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_context, m_renderer);
-        m_graphics = std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext);
+        SetGraphics(std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext));
         m_windowId = SDL_GetWindowID(m_window);
         spdlog::info("SDL: window '{}' ready", m_title);
         return true;
@@ -165,18 +165,18 @@ namespace moth_graphics::platform::sdl {
     }
 
     bool Window::BeginFrame() {
-        return m_graphics->Begin();
+        return GetGraphics().Begin();
     }
 
     void Window::EndFrame() {
-        m_graphics->End();
+        GetGraphics().End();
         SDL_RenderPresent(m_renderer);
     }
 
     void Window::DestroyWindow() {
         spdlog::info("SDL: destroying window '{}'", m_title);
         PreDestroy();
-        m_graphics.reset();
+        SetGraphics(nullptr);
         m_surfaceContext.reset();
         SDL_DestroyRenderer(m_renderer);
         SDL_DestroyWindow(m_window);

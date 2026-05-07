@@ -36,18 +36,18 @@ namespace moth_graphics::platform::glfw {
         }
 
         m_windowMaximized = glfwGetWindowAttrib(m_glfwWindow, GLFW_MAXIMIZED) == GLFW_TRUE;
-        m_layerStack->Update(ticks);
+        GetLayerStack().Update(ticks);
     }
 
     bool Window::BeginFrame() {
         // Returns false when the swapchain is out of date (e.g. minimised or
         // mid-resize). Begin() has already triggered recreation if the surface
         // extent was non-zero.
-        return m_graphics->Begin();
+        return GetGraphics().Begin();
     }
 
     void Window::EndFrame() {
-        m_graphics->End();
+        GetGraphics().End();
     }
 
     bool Window::CreateWindow() {
@@ -139,7 +139,7 @@ namespace moth_graphics::platform::glfw {
         CHECK_VK_RESULT(glfwCreateWindowSurface(m_context.GetInstance(), m_glfwWindow, nullptr, &m_customVkSurface));
         m_surfaceContext = std::make_unique<graphics::vulkan::SurfaceContext>(m_context);
 
-        m_graphics = std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight);
+        SetGraphics(std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight));
         spdlog::info("GLFW: window '{}' ready", m_title);
         return true;
     }
@@ -156,7 +156,7 @@ namespace moth_graphics::platform::glfw {
             vkDeviceWaitIdle(m_surfaceContext->GetVkDevice());
         }
         PreDestroy();
-        m_graphics = nullptr;
+        SetGraphics(nullptr);
         m_surfaceContext = nullptr;
         if (m_glfwWindow != nullptr) {
             if (m_customVkSurface != VK_NULL_HANDLE) {
@@ -178,12 +178,12 @@ namespace moth_graphics::platform::glfw {
             // Window is minimised or has a zero dimension; skip swapchain recreation.
             return;
         }
-        auto* graphics = dynamic_cast<graphics::vulkan::Graphics*>(m_graphics.get());
+        auto* graphics = dynamic_cast<graphics::vulkan::Graphics*>(&GetGraphics());
         if (graphics == nullptr) {
             spdlog::error("GLFW: OnResize called but graphics backend is not Vulkan");
             return;
         }
         graphics->OnResize(m_customVkSurface, static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight));
-        m_layerStack->SetWindowSize({ m_windowWidth, m_windowHeight });
+        GetLayerStack().SetWindowSize({ m_windowWidth, m_windowHeight });
     }
 }
