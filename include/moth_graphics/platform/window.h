@@ -38,9 +38,23 @@ namespace moth_graphics::platform {
         /// @brief Poll events and advance the UI layer stack by @p ticks milliseconds.
         virtual void Update(uint32_t ticks) {}
 
-        /// @brief Render one frame to this window.
+        /// @brief Begin rendering one frame.
+        /// @return @c true on success, @c false if the backend skipped this frame
+        ///         (e.g. Vulkan swapchain out-of-date). On @c false, do not call
+        ///         @c EndFrame.
+        virtual bool BeginFrame() { return false; }
+
+        /// @brief Finish rendering the frame begun by @c BeginFrame.
+        virtual void EndFrame() {}
+
+        /// @brief Render one frame to this window: @c BeginFrame, draw the layer
+        ///        stack, @c EndFrame.
         /// @return @c true if a frame was rendered, @c false if the backend skipped it.
-        virtual bool Draw() { return false; }
+        ///
+        /// Convenience wrapper for the common case. Callers that need to interleave
+        /// work with the live frame (e.g. ImGui rendering) should call
+        /// @c BeginFrame / @c EndFrame directly.
+        bool Draw();
 
         /// @brief Returns the per-window GPU resource context.
         virtual graphics::SurfaceContext& GetSurfaceContext() const = 0;

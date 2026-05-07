@@ -116,7 +116,17 @@ namespace moth_graphics::platform::glfw {
                         spdlog::warn("Vulkan: ImGui Render called with non-Vulkan graphics; skipping");
                         return;
                     }
+                    // Flush any moth pending batch before ImGui binds its own
+                    // pipeline; otherwise End()'s final flush would draw moth
+                    // vertices using ImGui's pipeline.
+                    vkGraphicsPtr->Flush();
                     ImGui_ImplVulkan_RenderDrawData(drawData, vkGraphicsPtr->GetCurrentCommandBuffer()->GetVkCommandBuffer());
+                }
+            }
+
+            void DiscardFrame() override {
+                if (m_initialized) {
+                    ImGui::EndFrame();
                 }
             }
 

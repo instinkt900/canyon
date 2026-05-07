@@ -79,6 +79,7 @@ namespace moth_graphics::graphics::vulkan {
         void SetTarget(ITarget* target) override;
 
         void SetLogicalSize(IntVec2 const& logicalSize) override;
+        void Drain() override;
 
         Swapchain& GetSwapchain() const { return *m_swapchain; }
         RenderPass& GetRenderPass() const { return *m_renderPass; }
@@ -94,6 +95,14 @@ namespace moth_graphics::graphics::vulkan {
         Shader& GetFontShader() { return *m_fontShader; }
 
         void OnResize(VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
+
+        /// @brief Flush any pending vertex batch into the active command buffer.
+        ///
+        /// Call this before issuing draw commands that bind a different pipeline
+        /// (e.g. ImGui's Vulkan backend). Without it, moth's pending batch would
+        /// be flushed at @c End() against whatever pipeline the foreign code
+        /// last bound, producing garbage geometry.
+        void Flush();
 
     private:
         FloatMat4x4 CurrentTransform() const;

@@ -395,6 +395,23 @@ namespace moth_graphics::graphics::vulkan {
         return std::make_unique<Framebuffer>(m_surfaceContext, width, height, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, m_rtRenderPass->GetRenderPass());
     }
 
+    void Graphics::Drain() {
+        vkDeviceWaitIdle(m_surfaceContext.GetVkDevice());
+        if (m_swapchain) {
+            m_swapchain->ResetCommandBuffers();
+        }
+    }
+
+    void Graphics::Flush() {
+        if (m_contextStack.empty() || m_contextStack.top() == nullptr) {
+            return;
+        }
+        FlushPendingBatch();
+        // Foreign code is about to bind its own pipeline; forget our cached
+        // pipeline id so the next moth draw rebinds.
+        m_contextStack.top()->m_currentPipelineId = 0;
+    }
+
     bool Graphics::IsRenderTarget() const {
         return m_contextStack.top() == &m_overrideContext;
     }

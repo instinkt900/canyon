@@ -118,5 +118,17 @@ namespace moth_graphics::graphics {
         /// @brief Override the logical rendering resolution used to map draw coordinates.
         /// @param logicalSize Logical width and height in pixels.
         virtual void SetLogicalSize(IntVec2 const& logicalSize) = 0;
+
+        /// @brief Wait for any in-flight GPU work to complete and clear per-frame
+        ///        command-buffer state.
+        ///
+        /// Required before destroying foreign GPU resources that may have been
+        /// recorded into the active frame's command buffers. The canonical case
+        /// is shutdown: ImGui's Vulkan backend records draws (and pipeline binds)
+        /// directly into moth's command buffer; without this drain its pipeline
+        /// destruction triggers a "pipeline in use by command buffer" validation
+        /// error. SDL has no analogous state to clear and implements this as a
+        /// no-op.
+        virtual void Drain() {}
     };
 }

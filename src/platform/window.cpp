@@ -18,6 +18,15 @@ namespace moth_graphics::platform {
         return GetSurfaceContext().GetAssetContext().GetTextureFactory();
     }
 
+    bool Window::Draw() {
+        if (!BeginFrame()) {
+            return false;
+        }
+        m_layerStack->Draw();
+        EndFrame();
+        return true;
+    }
+
     bool Window::OnEvent(moth_ui::Event const& event) {
         // FireEvent from layers: dispatch to all layers first, then external
         // listeners if unhandled.
