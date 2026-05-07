@@ -28,7 +28,7 @@ namespace moth_graphics::platform::glfw {
     private:
         void ShutdownImpl();
 
-        std::unique_ptr<moth_graphics::graphics::vulkan::Context> m_context;
+        std::unique_ptr<moth_graphics::graphics::vulkan::Context> m_context = nullptr;
         bool m_initialized = false;
     };
 }

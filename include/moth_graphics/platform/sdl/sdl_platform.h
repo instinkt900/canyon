@@ -27,7 +27,7 @@ namespace moth_graphics::platform::sdl {
     private:
         void ShutdownImpl();
 
-        std::unique_ptr<graphics::sdl::Context> m_context;
+        std::unique_ptr<graphics::sdl::Context> m_context = nullptr;
         bool m_initialized = false;
     };
 }
