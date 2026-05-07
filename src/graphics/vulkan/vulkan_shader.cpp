@@ -1,5 +1,6 @@
 #include "common.h"
 #include "vulkan_shader.h"
+#include "vulkan_texture.h"
 #include "vulkan_utils.h"
 
 namespace moth_graphics::graphics::vulkan {
