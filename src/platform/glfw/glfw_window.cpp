@@ -7,6 +7,8 @@
 #include "moth_graphics/events/event_window.h"
 #include <moth_ui/events/event_mouse.h>
 
+#include <cassert>
+
 namespace moth_graphics::platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string_view title, int width, int height)
         : moth_graphics::platform::Window(title, width, height)
@@ -21,6 +23,7 @@ namespace moth_graphics::platform::glfw {
     }
 
     graphics::SurfaceContext& Window::GetSurfaceContext() const {
+        assert(m_surfaceContext && "GetSurfaceContext called on a window without a valid surface context (CreateWindow failed or already destroyed)");
         return *m_surfaceContext;
     }
 
