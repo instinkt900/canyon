@@ -1,7 +1,7 @@
 #pragma once
 
-#include "moth_graphics/graphics/vulkan/vulkan_shader.h"
-#include "moth_graphics/graphics/vulkan/vulkan_renderpass.h"
+#include "vulkan_shader.h"
+#include "vulkan_renderpass.h"
 
 #include <vulkan/vulkan_core.h>
 

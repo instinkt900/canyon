@@ -1,8 +1,6 @@
 #pragma once
 
 #include "moth_graphics/events/event_window.h"
-#include "moth_graphics/graphics/sdl/sdl_context.h"
-#include "moth_graphics/graphics/sdl/sdl_surface_context.h"
 #include "moth_graphics/graphics/surface_context.h"
 #include "moth_graphics/platform/window.h"
 
@@ -13,13 +11,18 @@
 #include <string_view>
 #include <cstdint>
 
+namespace moth_graphics::graphics::sdl {
+    class Context;
+    class SurfaceContext;
+}
+
 namespace moth_graphics::platform::sdl {
     class Window : public platform::Window {
     public:
         Window(graphics::sdl::Context& context, std::string_view applicationTitle, int width, int height);
         ~Window() override;
 
-        graphics::SurfaceContext & GetSurfaceContext() const override { return *m_surfaceContext; }
+        graphics::SurfaceContext & GetSurfaceContext() const override;
         void SetWindowTitle(std::string_view title) override;
 
         SDL_Window* GetSDLWindow() const { return m_window; }

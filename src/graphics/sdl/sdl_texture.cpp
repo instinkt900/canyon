@@ -1,7 +1,7 @@
 #include "common.h"
-#include "moth_graphics/graphics/sdl/sdl_texture.h"
-#include "moth_graphics/graphics/sdl/sdl_utils.hpp"
-#include "moth_graphics/graphics/sdl/smart_sdl.hpp"
+#include "sdl_texture.h"
+#include "sdl_utils.hpp"
+#include "smart_sdl.hpp"
 
 #include "imgui.h"
 

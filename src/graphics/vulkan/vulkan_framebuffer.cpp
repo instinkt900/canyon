@@ -1,8 +1,8 @@
 #include "common.h"
-#include "moth_graphics/graphics/vulkan/vulkan_framebuffer.h"
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
-#include "moth_graphics/graphics/vulkan/vulkan_command_buffer.h"
-#include "moth_graphics/graphics/vulkan/vulkan_swapchain.h"
+#include "vulkan_framebuffer.h"
+#include "vulkan_utils.h"
+#include "vulkan_command_buffer.h"
+#include "vulkan_swapchain.h"
 #include <vulkan/vulkan_core.h>
 
 namespace moth_graphics::graphics::vulkan {

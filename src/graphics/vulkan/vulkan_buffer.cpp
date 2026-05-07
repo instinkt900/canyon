@@ -1,6 +1,6 @@
 #include "common.h"
-#include "moth_graphics/graphics/vulkan/vulkan_buffer.h"
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "vulkan_buffer.h"
+#include "vulkan_utils.h"
 
 namespace moth_graphics::graphics::vulkan {
     Buffer::Buffer(SurfaceContext& context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)

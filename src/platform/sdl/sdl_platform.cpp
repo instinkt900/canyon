@@ -1,5 +1,5 @@
 #include "common.h"
-#include "moth_graphics/graphics/sdl/sdl_context.h"
+#include "graphics/sdl/sdl_context.h"
 #include "moth_graphics/platform/imgui_context.h"
 #include "moth_graphics/platform/sdl/sdl_window.h"
 #include "moth_graphics/platform/sdl/sdl_platform.h"
@@ -8,6 +8,12 @@
 #include "backends/imgui_impl_sdlrenderer2.h"
 
 namespace moth_graphics::platform::sdl {
+
+    Platform::Platform() = default;
+
+    Platform::~Platform() noexcept {
+        ShutdownImpl();
+    }
 
     namespace {
         class SDLImGuiContext : public moth_graphics::platform::ImGuiContext {
@@ -77,16 +83,25 @@ namespace moth_graphics::platform::sdl {
             SDL_Quit();
             return false;
         }
+        m_initialized = true;
         return true;
     }
 
     void Platform::Shutdown() {
+        ShutdownImpl();
+    }
+
+    void Platform::ShutdownImpl() {
+        if (!m_initialized) {
+            return;
+        }
         spdlog::info("SDL: shutting down");
         if (m_context) {
             m_context->Shutdown();
             m_context.reset();
         }
         SDL_Quit();
+        m_initialized = false;
     }
 
     std::unique_ptr<moth_graphics::platform::ImGuiContext> Platform::CreateImGuiContext() {

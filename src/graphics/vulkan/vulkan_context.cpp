@@ -1,8 +1,8 @@
 #include "common.h"
-#include "moth_graphics/graphics/vulkan/vulkan_context.h"
+#include "vulkan_context.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "vulkan_utils.h"
 
 #include <spdlog/spdlog.h>
 

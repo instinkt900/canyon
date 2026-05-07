@@ -1,7 +1,7 @@
 #pragma once
 
-#include "moth_graphics/graphics/vulkan/vulkan_asset_context.h"
-#include "moth_graphics/graphics/vulkan/vulkan_context.h"
+#include "vulkan_asset_context.h"
+#include "vulkan_context.h"
 #include "moth_graphics/graphics/surface_context.h"
 
 #include <vulkan/vulkan_core.h>

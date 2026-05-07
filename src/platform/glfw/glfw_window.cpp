@@ -1,12 +1,13 @@
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "graphics/vulkan/vulkan_utils.h"
 #include "common.h"
 #include "moth_graphics/platform/glfw/glfw_window.h"
-#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
-#include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
+#include "graphics/vulkan/vulkan_graphics.h"
+#include "graphics/vulkan/vulkan_surface_context.h"
 #include "moth_graphics/platform/glfw/glfw_events.h"
 #include "moth_graphics/events/event_window.h"
-#include "moth_graphics/graphics/moth_ui/utils.h"
 #include <moth_ui/events/event_mouse.h>
+
+#include <cassert>
 
 namespace moth_graphics::platform::glfw {
     Window::Window(graphics::vulkan::Context& context, std::string_view title, int width, int height)
@@ -19,6 +20,11 @@ namespace moth_graphics::platform::glfw {
 
     Window::~Window() {
         DestroyWindow();
+    }
+
+    graphics::SurfaceContext& Window::GetSurfaceContext() const {
+        assert(m_surfaceContext && "GetSurfaceContext called on a window without a valid surface context (CreateWindow failed or already destroyed)");
+        return *m_surfaceContext;
     }
 
     void Window::Update(uint32_t ticks) {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "moth_graphics/graphics/sdl/SDL_FontCache.h"
+#include "SDL_FontCache.h"
 
 #include <SDL_image.h>
 #include <SDL_pixels.h>

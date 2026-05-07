@@ -6,12 +6,12 @@
 #include "moth_graphics/graphics/igraphics.h"
 #include "moth_graphics/graphics/iimage.h"
 #include "moth_graphics/graphics/itarget.h"
-#include "moth_graphics/graphics/sdl/sdl_surface_context.h"
+#include "sdl_surface_context.h"
 #include "moth_graphics/graphics/text_alignment.h"
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/vector.h"
 
-#include "moth_graphics/graphics/sdl/smart_sdl.hpp"
+#include "smart_sdl.hpp"
 
 #include <SDL_video.h>
 #include <filesystem>

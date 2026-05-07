@@ -1,9 +1,9 @@
 #include "common.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "moth_graphics/graphics/vulkan/vulkan_font.h"
+#include "vulkan_font.h"
 #include "stb_rect_pack.h"
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "vulkan_utils.h"
 #include "stb_image_write.h"
 #include "harfbuzz/hb-ft.h"
 

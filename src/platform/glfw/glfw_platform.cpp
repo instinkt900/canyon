@@ -1,6 +1,6 @@
 #include "common.h"
-#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "graphics/vulkan/vulkan_graphics.h"
+#include "graphics/vulkan/vulkan_utils.h"
 #include "moth_graphics/platform/glfw/glfw_platform.h"
 #include "moth_graphics/platform/glfw/glfw_window.h"
 #include "moth_graphics/platform/imgui_context.h"
@@ -17,6 +17,12 @@ namespace {
 }
 
 namespace moth_graphics::platform::glfw {
+
+    Platform::Platform() = default;
+
+    Platform::~Platform() noexcept {
+        ShutdownImpl();
+    }
 
     namespace {
         class VulkanImGuiContext : public moth_graphics::platform::ImGuiContext {
@@ -130,16 +136,25 @@ namespace moth_graphics::platform::glfw {
             glfwTerminate();
             return false;
         }
+        m_initialized = true;
         return true;
     }
 
     void Platform::Shutdown() {
+        ShutdownImpl();
+    }
+
+    void Platform::ShutdownImpl() {
+        if (!m_initialized) {
+            return;
+        }
         spdlog::info("GLFW: shutting down");
         if (m_context) {
             m_context->Shutdown();
             m_context.reset();
         }
         glfwTerminate();
+        m_initialized = false;
     }
 
     graphics::Context& Platform::GetGraphicsContext() {

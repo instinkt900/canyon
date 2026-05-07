@@ -1,9 +1,9 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "common.h"
 #include "moth_graphics/platform/sdl/sdl_window.h"
-#include "moth_graphics/graphics/sdl/sdl_surface_context.h"
+#include "graphics/sdl/sdl_surface_context.h"
 #include "moth_graphics/platform/sdl/sdl_events.h"
-#include "moth_graphics/graphics/sdl/sdl_graphics.h"
+#include "graphics/sdl/sdl_graphics.h"
 
 #include <stdexcept>
 
@@ -110,6 +110,10 @@ namespace moth_graphics::platform::sdl {
 
     Window::~Window() {
         DestroyWindow();
+    }
+
+    graphics::SurfaceContext& Window::GetSurfaceContext() const {
+        return *m_surfaceContext;
     }
 
     void Window::Update(uint32_t ticks) {

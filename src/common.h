@@ -27,7 +27,7 @@
 #include <SDL.h>
 #include <SDL_rect.h>
 #include <SDL_image.h>
-#include "moth_graphics/graphics/sdl/smart_sdl.hpp"
+#include "graphics/sdl/smart_sdl.hpp"
 #endif
 
 #include <spdlog/spdlog.h>

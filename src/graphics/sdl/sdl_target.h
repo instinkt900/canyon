@@ -1,7 +1,7 @@
 #pragma once
 
 #include "moth_graphics/graphics/itarget.h"
-#include "moth_graphics/graphics/sdl/sdl_texture.h"
+#include "sdl_texture.h"
 
 #include <memory>
 

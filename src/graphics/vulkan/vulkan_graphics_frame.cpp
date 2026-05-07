@@ -1,7 +1,7 @@
 #include "common.h"
-#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
-#include "moth_graphics/graphics/vulkan/vulkan_command_buffer.h"
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "vulkan_graphics.h"
+#include "vulkan_command_buffer.h"
+#include "vulkan_utils.h"
 
 namespace moth_graphics::graphics::vulkan {
     // Allocated size of the vertex buffer.

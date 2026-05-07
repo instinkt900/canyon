@@ -1,7 +1,5 @@
 #pragma once
 
-#include "moth_graphics/graphics/vulkan/vulkan_texture.h"
-
 #include <vulkan/vulkan_core.h>
 
 #include <memory>
@@ -12,6 +10,8 @@
 #include <stddef.h>
 
 namespace moth_graphics::graphics::vulkan {
+    class Texture;
+
     struct Shader {
         Shader(uint32_t hash);
         ~Shader();

@@ -1,9 +1,9 @@
 #include "common.h"
-#include "moth_graphics/graphics/vulkan/vulkan_graphics.h"
-#include "moth_graphics/graphics/vulkan/vulkan_command_buffer.h"
-#include "moth_graphics/graphics/vulkan/vulkan_font.h"
-#include "moth_graphics/graphics/vulkan/vulkan_texture.h"
-#include "moth_graphics/graphics/vulkan/vulkan_utils.h"
+#include "vulkan_graphics.h"
+#include "vulkan_command_buffer.h"
+#include "vulkan_font.h"
+#include "vulkan_texture.h"
+#include "vulkan_utils.h"
 #include "stb_image_write.h"
 
 namespace moth_graphics::graphics::vulkan {

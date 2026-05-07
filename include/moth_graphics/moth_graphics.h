@@ -34,7 +34,6 @@
 #include "moth_graphics/graphics/moth_ui/moth_image.h"
 #include "moth_graphics/graphics/moth_ui/moth_image_factory.h"
 #include "moth_graphics/graphics/moth_ui/moth_renderer.h"
-#include "moth_graphics/graphics/moth_ui/utils.h"
 
 // platform
 #include "moth_graphics/platform/application.h"

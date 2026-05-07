@@ -1,5 +1,5 @@
 #include "common.h"
-#include "moth_graphics/graphics/sdl/sdl_surface_context.h"
+#include "sdl_surface_context.h"
 
 namespace moth_graphics::graphics::sdl {
     SurfaceContext::SurfaceContext(Context& context, SDL_Renderer* renderer)
