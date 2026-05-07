@@ -13,6 +13,7 @@ namespace moth_graphics::graphics::vulkan {
 namespace moth_graphics::platform::glfw {
     class Platform : public IPlatform {
     public:
+        Platform();
         ~Platform() noexcept override;
 
         bool Startup() override;
@@ -25,6 +26,9 @@ namespace moth_graphics::platform::glfw {
         std::unique_ptr<ImGuiContext> CreateImGuiContext() override;
 
     private:
-        moth_graphics::graphics::vulkan::Context* m_context = nullptr;
+        void ShutdownImpl();
+
+        std::unique_ptr<moth_graphics::graphics::vulkan::Context> m_context;
+        bool m_initialized = false;
     };
 }

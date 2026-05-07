@@ -9,8 +9,10 @@
 
 namespace moth_graphics::platform::sdl {
 
+    Platform::Platform() = default;
+
     Platform::~Platform() noexcept {
-        delete m_context;
+        ShutdownImpl();
     }
 
     namespace {
@@ -74,25 +76,32 @@ namespace moth_graphics::platform::sdl {
             return false;
         }
         spdlog::info("SDL: initialized");
-        m_context = new graphics::sdl::Context(); // NOLINT(cppcoreguidelines-owning-memory)
+        m_context = std::make_unique<graphics::sdl::Context>();
         if (!m_context->Startup()) {
             spdlog::error("SDL: graphics context startup failed");
-            delete m_context;
-            m_context = nullptr;
+            m_context.reset();
             SDL_Quit();
             return false;
         }
+        m_initialized = true;
         return true;
     }
 
     void Platform::Shutdown() {
+        ShutdownImpl();
+    }
+
+    void Platform::ShutdownImpl() {
+        if (!m_initialized) {
+            return;
+        }
         spdlog::info("SDL: shutting down");
-        if (m_context != nullptr) {
+        if (m_context) {
             m_context->Shutdown();
-            delete m_context;
-            m_context = nullptr;
+            m_context.reset();
         }
         SDL_Quit();
+        m_initialized = false;
     }
 
     std::unique_ptr<moth_graphics::platform::ImGuiContext> Platform::CreateImGuiContext() {

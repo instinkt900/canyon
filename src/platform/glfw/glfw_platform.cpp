@@ -18,8 +18,10 @@ namespace {
 
 namespace moth_graphics::platform::glfw {
 
+    Platform::Platform() = default;
+
     Platform::~Platform() noexcept {
-        delete m_context;
+        ShutdownImpl();
     }
 
     namespace {
@@ -127,25 +129,32 @@ namespace moth_graphics::platform::glfw {
             return false;
         }
         spdlog::info("GLFW: initialized");
-        m_context = new graphics::vulkan::Context(); // NOLINT(cppcoreguidelines-owning-memory)
+        m_context = std::make_unique<graphics::vulkan::Context>();
         if (!m_context->Startup()) {
             spdlog::error("GLFW: graphics context startup failed");
-            delete m_context;
-            m_context = nullptr;
+            m_context.reset();
             glfwTerminate();
             return false;
         }
+        m_initialized = true;
         return true;
     }
 
     void Platform::Shutdown() {
+        ShutdownImpl();
+    }
+
+    void Platform::ShutdownImpl() {
+        if (!m_initialized) {
+            return;
+        }
         spdlog::info("GLFW: shutting down");
-        if (m_context != nullptr) {
+        if (m_context) {
             m_context->Shutdown();
-            delete m_context;
-            m_context = nullptr;
+            m_context.reset();
         }
         glfwTerminate();
+        m_initialized = false;
     }
 
     graphics::Context& Platform::GetGraphicsContext() {

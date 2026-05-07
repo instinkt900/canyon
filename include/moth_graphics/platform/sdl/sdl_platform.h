@@ -12,6 +12,7 @@ namespace moth_graphics::graphics::sdl {
 namespace moth_graphics::platform::sdl {
     class Platform : public IPlatform {
     public:
+        Platform();
         ~Platform() noexcept override;
 
         bool Startup() override;
@@ -24,7 +25,10 @@ namespace moth_graphics::platform::sdl {
         std::unique_ptr<ImGuiContext> CreateImGuiContext() override;
 
     private:
-        graphics::sdl::Context* m_context = nullptr;
+        void ShutdownImpl();
+
+        std::unique_ptr<graphics::sdl::Context> m_context;
+        bool m_initialized = false;
     };
 }
 
