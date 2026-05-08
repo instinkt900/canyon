@@ -18,6 +18,7 @@ namespace moth_graphics::graphics {
            auto const font = m_factoryImpl.GetFont(it->second.string(), size);
            return std::make_shared<MothFont>(font);
         }
+        spdlog::warn("MothFontFactory: font '{}' not registered (call AddFont first)", name);
         return nullptr;
     }
 }

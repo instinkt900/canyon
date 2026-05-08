@@ -68,7 +68,7 @@ namespace moth_graphics::graphics {
     private:
         struct TextureDesc {
             std::shared_ptr<ITexture> m_texture;
-            IntRect sourceRect;
+            IntRect m_sourceRect;
             std::filesystem::path m_path;
         };
 

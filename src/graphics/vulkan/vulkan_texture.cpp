@@ -47,7 +47,7 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     Texture::Texture(SurfaceContext& context)
-        : id(NextTextureId++)
+        : m_id(NextTextureId++)
         , m_context(context)
         , m_vkExtent{}
         , m_vkFormat(VK_FORMAT_UNDEFINED) {
@@ -55,7 +55,7 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     Texture::Texture(SurfaceContext& context, VkImage image, VkImageView view, VkExtent2D extent, VkFormat format, bool owning)
-        : id(NextTextureId++)
+        : m_id(NextTextureId++)
         , m_context(context)
         , m_vkExtent(extent)
         , m_vkFormat(format)
@@ -66,7 +66,7 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     Texture::Texture(SurfaceContext& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, bool owning)
-        : id(NextTextureId++)
+        : m_id(NextTextureId++)
         , m_context(context)
         , m_vkExtent{ width, height }
         , m_vkFormat(format)

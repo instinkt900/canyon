@@ -91,7 +91,7 @@ namespace moth_graphics::graphics {
                     int const y = rectJson.at("y").get<int>();
                     int const w = rectJson.at("w").get<int>();
                     int const h = rectJson.at("h").get<int>();
-                    desc.sourceRect = moth_graphics::MakeRect(x, y, w, h);
+                    desc.m_sourceRect = moth_graphics::MakeRect(x, y, w, h);
                     m_cachedTextures.insert(std::make_pair(absPath.string(), desc));
                     anyCached = true;
                 } catch (std::exception& e) {
@@ -115,7 +115,7 @@ namespace moth_graphics::graphics {
             IntRect sourceRect{ { 0, 0 }, textureDimensions };
             TextureDesc cacheDesc;
             cacheDesc.m_path = key;
-            cacheDesc.sourceRect = sourceRect;
+            cacheDesc.m_sourceRect = sourceRect;
             cacheDesc.m_texture = texture;
             m_cachedTextures.insert(std::make_pair(key, cacheDesc));
             return texture;
@@ -132,10 +132,10 @@ namespace moth_graphics::graphics {
         auto const key = std::filesystem::absolute(path).lexically_normal().string();
         auto const cacheIt = m_cachedTextures.find(key);
         if (std::end(m_cachedTextures) != cacheIt) {
-            return cacheIt->second.sourceRect;
+            return cacheIt->second.m_sourceRect;
         }
         if (m_fallbackDesc) {
-            return m_fallbackDesc->sourceRect;
+            return m_fallbackDesc->m_sourceRect;
         }
         return {};
     }

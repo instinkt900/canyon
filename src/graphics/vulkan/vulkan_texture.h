@@ -19,7 +19,7 @@ namespace moth_graphics::graphics::vulkan {
         Texture(SurfaceContext& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties = 0, bool owning = true);
         ~Texture();
 
-        uint32_t GetId() const { return id; }
+        uint32_t GetId() const { return m_id; }
 
         VkImage GetVkImage() const { return m_vkImage; }
         VkExtent2D GetVkExtent() const { return m_vkExtent; }
@@ -42,7 +42,7 @@ namespace moth_graphics::graphics::vulkan {
         void SaveToPNG(std::filesystem::path const& path, IntRect const& sourceRect) override;
 
     protected:
-        uint32_t id;
+        uint32_t m_id;
         SurfaceContext& m_context;
         VkExtent2D m_vkExtent;
         VkFormat m_vkFormat;
