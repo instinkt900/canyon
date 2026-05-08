@@ -47,7 +47,7 @@ TEST_CASE("Window inherits EventEmitter and IEventListener", "[api][platform][wi
 
 TEST_CASE("Window method signatures are stable", "[api][platform][window]") {
     void (Window::*update)(uint32_t)                            = &Window::Update;
-    bool (Window::*draw)()                                      = &Window::Draw;
+    void (Window::*draw)()                                      = &Window::Draw;
     graphics::SurfaceContext& (Window::*getSurface)() const     = &Window::GetSurfaceContext;
     void (Window::*setTitle)(std::string_view)                  = &Window::SetWindowTitle;
     bool (Window::*isMaximized)() const                         = &Window::IsMaximized;

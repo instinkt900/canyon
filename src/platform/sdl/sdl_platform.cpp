@@ -35,12 +35,6 @@ namespace moth_graphics::platform::sdl {
                 }
             }
 
-            void DiscardFrame() override {
-                if (m_sdlWindow != nullptr) {
-                    ImGui::EndFrame();
-                }
-            }
-
             void Shutdown() override {
                 if (m_sdlWindow != nullptr) {
                     ImGui_ImplSDLRenderer2_Shutdown();

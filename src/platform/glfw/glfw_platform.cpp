@@ -49,17 +49,15 @@ namespace moth_graphics::platform::glfw {
                     ImGui::RenderPlatformWindowsDefault();
                 }
                 if (ImDrawData* drawData = ImGui::GetDrawData()) {
+                    auto* cb = m_vkGraphics->GetCurrentCommandBuffer();
+                    if (cb == nullptr) {
+                        return;  // null frame — swapchain unavailable
+                    }
                     // Flush any moth pending batch before ImGui binds its own
                     // pipeline; otherwise End()'s final flush would draw moth
                     // vertices using ImGui's pipeline.
                     m_vkGraphics->Flush();
-                    ImGui_ImplVulkan_RenderDrawData(drawData, m_vkGraphics->GetCurrentCommandBuffer()->GetVkCommandBuffer());
-                }
-            }
-
-            void DiscardFrame() override {
-                if (m_initialized) {
-                    ImGui::EndFrame();
+                    ImGui_ImplVulkan_RenderDrawData(drawData, cb->GetVkCommandBuffer());
                 }
             }
 

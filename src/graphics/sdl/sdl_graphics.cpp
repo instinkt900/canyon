@@ -15,8 +15,7 @@ namespace moth_graphics::graphics::sdl {
 
     Graphics::~Graphics() = default;
 
-    bool Graphics::Begin() {
-        return true;
+    void Graphics::Begin() {
     }
 
     void Graphics::End() {

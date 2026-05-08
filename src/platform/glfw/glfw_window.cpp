@@ -39,11 +39,8 @@ namespace moth_graphics::platform::glfw {
         GetLayerStack().Update(ticks);
     }
 
-    bool Window::BeginFrame() {
-        // Returns false when the swapchain is out of date (e.g. minimised or
-        // mid-resize). Begin() has already triggered recreation if the surface
-        // extent was non-zero.
-        return GetGraphics().Begin();
+    void Window::BeginFrame() {
+        GetGraphics().Begin();
     }
 
     void Window::EndFrame() {

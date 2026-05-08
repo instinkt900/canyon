@@ -12,7 +12,7 @@ using namespace moth_graphics;
 using namespace moth_graphics::graphics;
 
 TEST_CASE("IGraphics method signatures are stable", "[api][graphics][igraphics]") {
-    bool (IGraphics::*begin)()                                  = &IGraphics::Begin;
+    void (IGraphics::*begin)()                                  = &IGraphics::Begin;
     void (IGraphics::*end)()                                  = &IGraphics::End;
     void (IGraphics::*setBlend)(BlendMode)                    = &IGraphics::SetBlendMode;
     void (IGraphics::*setColor)(Color const&)                 = &IGraphics::SetColor;

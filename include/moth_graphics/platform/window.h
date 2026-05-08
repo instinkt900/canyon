@@ -39,22 +39,18 @@ namespace moth_graphics::platform {
         virtual void Update(uint32_t ticks) = 0;
 
         /// @brief Begin rendering one frame.
-        /// @return @c true on success, @c false if the backend skipped this frame
-        ///         (e.g. Vulkan swapchain out-of-date). On @c false, do not call
-        ///         @c EndFrame.
-        virtual bool BeginFrame() = 0;
+        virtual void BeginFrame() = 0;
 
         /// @brief Finish rendering the frame begun by @c BeginFrame.
         virtual void EndFrame() = 0;
 
         /// @brief Render one frame to this window: @c BeginFrame, draw the layer
         ///        stack, @c EndFrame.
-        /// @return @c true if a frame was rendered, @c false if the backend skipped it.
         ///
-        /// Convenience wrapper for the common case. Callers that need to interleave
-        /// work with the live frame (e.g. ImGui rendering) should call
-        /// @c BeginFrame / @c EndFrame directly.
-        bool Draw();
+        /// Convenience wrapper. Callers that need to interleave work with the
+        /// live frame (e.g. ImGui rendering) should call @c BeginFrame /
+        /// @c EndFrame directly.
+        void Draw();
 
         /// @brief Returns the per-window GPU resource context.
         virtual graphics::SurfaceContext& GetSurfaceContext() const = 0;

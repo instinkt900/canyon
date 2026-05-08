@@ -29,14 +29,13 @@ namespace moth_graphics::graphics {
         virtual ~IGraphics() {}
 
         /// @brief Begin a new frame. Must be called before any draw operations.
-        /// @returns @c true if the frame can proceed, @c false if the swapchain was
-        ///          out-of-date and the frame should be skipped (e.g. the window is
-        ///          minimised or being resized). When @c false is returned, @c End()
-        ///          must NOT be called for this frame.
-        virtual bool Begin() = 0;
+        ///
+        /// Always succeeds — if the swapchain is unavailable (e.g. window
+        /// minimised), a null frame is started and all draw calls silently
+        /// no-op until the next successful @c Begin().
+        virtual void Begin() = 0;
 
-        /// @brief End the current frame and present it. Only call when @c Begin()
-        ///        returned @c true.
+        /// @brief End the current frame and present it.
         virtual void End() = 0;
 
         /// @brief Set the active blend mode for subsequent draw calls.

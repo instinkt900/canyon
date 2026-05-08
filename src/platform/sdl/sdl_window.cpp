@@ -164,8 +164,8 @@ namespace moth_graphics::platform::sdl {
         SDL_SetWindowTitle(m_window, m_title.c_str());
     }
 
-    bool Window::BeginFrame() {
-        return GetGraphics().Begin();
+    void Window::BeginFrame() {
+        GetGraphics().Begin();
     }
 
     void Window::EndFrame() {

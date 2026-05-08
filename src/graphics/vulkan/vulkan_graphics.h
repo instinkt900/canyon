@@ -58,7 +58,7 @@ namespace moth_graphics::graphics::vulkan {
             Color color;
         };
 
-        bool Begin() override;
+        void Begin() override;
         void End() override;
 
         void SetBlendMode(BlendMode mode) override;
@@ -171,9 +171,8 @@ namespace moth_graphics::graphics::vulkan {
         Pipeline& GetCurrentPipeline(ETopologyType topology);
         Pipeline& GetCurrentFontPipeline();
 
+        /// @brief Returns the current draw context, or @c nullptr for a null frame.
         DrawContext* CurrentContext() {
-            assert(!m_contextStack.empty() && m_contextStack.top() != nullptr
-                   && "Begin() must be called before any draw operations");
             return m_contextStack.top();
         }
 

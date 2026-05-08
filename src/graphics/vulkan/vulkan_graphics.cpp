@@ -38,22 +38,22 @@ namespace moth_graphics::graphics::vulkan {
         vkDestroyPipelineCache(m_surfaceContext.GetVkDevice(), m_vkPipelineCache, nullptr);
     }
 
-    bool Graphics::Begin() {
+    void Graphics::Begin() {
         m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
         if (m_defaultContext.m_target == nullptr) {
-            // Swapchain is out-of-date (e.g. window was resized between Update and
-            // Draw).  Query the actual surface size from Vulkan, skip recreation
-            // entirely when the window is minimised (0×0 extent), and retry once.
             VkSurfaceCapabilitiesKHR caps{};
             vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
                 m_surfaceContext.GetVkPhysicalDevice(), m_vkSurface, &caps);
             if (caps.currentExtent.width == 0 || caps.currentExtent.height == 0) {
-                return false;
+                // Window minimised — start a null frame.
+                m_contextStack.push(nullptr);
+                return;
             }
             OnResize(m_vkSurface, caps.currentExtent.width, caps.currentExtent.height);
             m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
             if (m_defaultContext.m_target == nullptr) {
-                return false;
+                m_contextStack.push(nullptr);
+                return;
             }
         }
 
@@ -61,10 +61,13 @@ namespace moth_graphics::graphics::vulkan {
         vkResetFences(m_surfaceContext.GetVkDevice(), 1, &cmdFence);
 
         BeginContext(&m_defaultContext);
-        return true;
     }
 
     void Graphics::End() {
+        if (CurrentContext() == nullptr) {
+            m_contextStack.pop();
+            return;
+        }
         EndContext();
 
         VkSemaphore waitSemaphores[] = { m_defaultContext.m_target->GetRenderFinishedSemaphore() };
@@ -91,16 +94,25 @@ namespace moth_graphics::graphics::vulkan {
 
     void Graphics::SetBlendMode(BlendMode mode) {
         auto* context = CurrentContext();
+        if (context == nullptr) {
+            return;
+        }
         context->m_currentBlendMode = mode;
     }
 
     void Graphics::SetColor(Color const& color) {
         auto* context = CurrentContext();
+        if (context == nullptr) {
+            return;
+        }
         context->m_currentColor = color;
     }
 
     void Graphics::Clear() {
         auto* context = CurrentContext();
+        if (context == nullptr) {
+            return;
+        }
         DrawFillRectF({ { 0, 0 }, { static_cast<float>(context->m_logicalExtent.width), static_cast<float>(context->m_logicalExtent.height) } });
     }
 
@@ -123,6 +135,9 @@ namespace moth_graphics::graphics::vulkan {
 
     void Graphics::DrawImage(Image const& image, IntRect const& destRect, IntRect const* sourceRect) {
         auto* context = CurrentContext();
+        if (context == nullptr) {
+            return;
+        }
         auto texture = std::dynamic_pointer_cast<Texture>(image.GetTexture());
         if (!texture) {
             return;
@@ -188,6 +203,9 @@ namespace moth_graphics::graphics::vulkan {
 
     void Graphics::DrawRectF(FloatRect const& rect) {
         auto* context = CurrentContext();
+        if (context == nullptr) {
+            return;
+        }
         auto const t = CurrentTransform();
         auto const tl = t.TransformPoint({ rect.topLeft.x, rect.topLeft.y });
         auto const tr = t.TransformPoint({ rect.bottomRight.x, rect.topLeft.y });
@@ -225,6 +243,9 @@ namespace moth_graphics::graphics::vulkan {
 
     void Graphics::DrawFillRectF(FloatRect const& rect) {
         auto* context = CurrentContext();
+        if (context == nullptr) {
+            return;
+        }
         auto const t = CurrentTransform();
         auto const tl = t.TransformPoint({ rect.topLeft.x, rect.topLeft.y });
         auto const tr = t.TransformPoint({ rect.bottomRight.x, rect.topLeft.y });
@@ -256,6 +277,9 @@ namespace moth_graphics::graphics::vulkan {
 
     void Graphics::DrawLineF(FloatVec2 const& p0, FloatVec2 const& p1) {
         auto* context = CurrentContext();
+        if (context == nullptr) {
+            return;
+        }
         auto const t = CurrentTransform();
         Vertex vertices[2];
 
@@ -278,6 +302,9 @@ namespace moth_graphics::graphics::vulkan {
         }
         Font& vulkanFont = *vulkanFontPtr;
         auto* context = CurrentContext();
+        if (context == nullptr) {
+            return;
+        }
         context->m_currentBlendMode = BlendMode::Alpha; // force alpha blending for text
 
         uint32_t const glyphStart = context->m_glyphCount;
@@ -372,8 +399,11 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     void Graphics::SetClip(IntRect const* clipRect) {
-        FlushPendingBatch();
         auto* context = CurrentContext();
+        if (context == nullptr) {
+            return;
+        }
+        FlushPendingBatch();
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         if (clipRect != nullptr) {
             VkRect2D scissor;
@@ -437,6 +467,9 @@ namespace moth_graphics::graphics::vulkan {
 
     void Graphics::SetLogicalSize(IntVec2 const& logicalSize) {
         auto* context = CurrentContext();
+        if (context == nullptr) {
+            return;
+        }
         auto& commandBuffer = context->m_target->GetCommandBuffer();
         PushConstants constants;
         constants.xyScale = { 2.0f / static_cast<float>(logicalSize.x), 2.0f / static_cast<float>(logicalSize.y) };

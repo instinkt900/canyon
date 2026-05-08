@@ -78,10 +78,7 @@ namespace moth_graphics::platform {
 
     void Application::Tick(uint32_t ticks) {
         m_imguiContext->NewFrame();
-        if (!m_window->BeginFrame()) {
-            m_imguiContext->DiscardFrame();
-            return;
-        }
+        m_window->BeginFrame();
         m_window->GetLayerStack().Draw();
         m_imguiContext->Render(m_window->GetGraphics());
         m_window->EndFrame();
