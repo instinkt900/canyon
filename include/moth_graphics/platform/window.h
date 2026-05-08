@@ -101,6 +101,7 @@ namespace moth_graphics::platform {
         void PreDestroy();
 
         void SetGraphics(std::unique_ptr<graphics::IGraphics> graphics) { m_graphics = std::move(graphics); }
+        graphics::IGraphics* GetGraphicsPtr() const { return m_graphics.get(); }
 
         std::string m_title;
         int m_windowWidth = 0;

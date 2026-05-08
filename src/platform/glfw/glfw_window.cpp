@@ -178,7 +178,7 @@ namespace moth_graphics::platform::glfw {
             // Window is minimised or has a zero dimension; skip swapchain recreation.
             return;
         }
-        auto* g = &GetGraphics();
+        auto* g = GetGraphicsPtr();
         if (g == nullptr) {
             spdlog::error("GLFW: OnResize called but graphics is null");
             return;

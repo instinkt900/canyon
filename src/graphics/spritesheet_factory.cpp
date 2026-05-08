@@ -45,11 +45,21 @@ std::optional<std::vector<SpriteSheet::FrameEntry>> ParseFrames(
         SpriteSheet::FrameEntry entry;
         entry.rect = MakeRect(x, y, w, h);
         entry.pivot.x = 0;
-        if (frameJson.contains("pivot_x") && frameJson["pivot_x"].is_number_integer()) {
+        if (frameJson.contains("pivot_x")) {
+            if (!frameJson["pivot_x"].is_number_integer()) {
+                spdlog::error("SpriteSheetFactory: '{}' pivot_x must be an integer — aborting",
+                              path);
+                return std::nullopt;
+            }
             entry.pivot.x = frameJson["pivot_x"].get<int>();
         }
         entry.pivot.y = 0;
-        if (frameJson.contains("pivot_y") && frameJson["pivot_y"].is_number_integer()) {
+        if (frameJson.contains("pivot_y")) {
+            if (!frameJson["pivot_y"].is_number_integer()) {
+                spdlog::error("SpriteSheetFactory: '{}' pivot_y must be an integer — aborting",
+                              path);
+                return std::nullopt;
+            }
             entry.pivot.y = frameJson["pivot_y"].get<int>();
         }
         frames.push_back(entry);
@@ -218,7 +228,12 @@ std::vector<SpriteSheet::ClipEntry> ParseClips(
         int const totalFrames = static_cast<int>(frames->size());
 
         std::vector<SpriteSheet::ClipEntry> clips;
-        if (json.contains("clips") && json["clips"].is_array()) {
+        if (json.contains("clips")) {
+            if (!json["clips"].is_array()) {
+                spdlog::error("SpriteSheetFactory: '{}' 'clips' field must be an array (got {})",
+                              path.string(), json["clips"].type_name());
+                return nullptr;
+            }
             clips = ParseClips(json["clips"], path.string(), totalFrames);
         }
 
