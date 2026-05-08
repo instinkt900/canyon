@@ -25,8 +25,8 @@ namespace moth_graphics::platform {
             throw;
         }
         m_window->AddEventListener(this);
-        m_imguiContext = m_platform.CreateImGuiContext();
-        if (!m_imguiContext->Init(*m_window, m_window->GetGraphics(), m_imguiViewportsEnabled)) {
+        m_imguiContext = m_platform.CreateImGuiContext(*m_window, m_window->GetGraphics(), m_imguiViewportsEnabled);
+        if (!m_imguiContext) {
             spdlog::error("Application: ImGui context initialization failed");
             throw std::runtime_error("ImGui context initialization failed");
         }

@@ -27,72 +27,9 @@ namespace moth_graphics::platform::glfw {
     namespace {
         class VulkanImGuiContext : public moth_graphics::platform::ImGuiContext {
         public:
-            bool Init(moth_graphics::platform::Window& window, moth_graphics::graphics::IGraphics& graphics, bool enableViewports) override {
-                auto* glfwWindowPtr = dynamic_cast<moth_graphics::platform::glfw::Window*>(&window);
-                if (glfwWindowPtr == nullptr) {
-                    spdlog::error("Vulkan: InitImgui called with non-GLFW window");
-                    return false;
-                }
-
-                IMGUI_CHECKVERSION();
-                ImGui::CreateContext();
-                ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-                if (enableViewports) {
-                    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-                }
-
-                ImGui::StyleColorsDark();
-                if (enableViewports) {
-                    ImGuiStyle& style = ImGui::GetStyle();
-                    style.WindowRounding = 0;
-                    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-                }
-
-                auto const& glfwWindow = *glfwWindowPtr;
-
-                if (!ImGui_ImplGlfw_InitForVulkan(glfwWindow.GetGLFWWindow(), true)) {
-                    spdlog::error("Vulkan: ImGui_ImplGlfw_InitForVulkan failed");
-                    ImGui::DestroyContext();
-                    return false;
-                }
-
-                auto* vkGraphicsPtr = dynamic_cast<moth_graphics::graphics::vulkan::Graphics*>(&graphics);
-                if (vkGraphicsPtr == nullptr) {
-                    spdlog::error("Vulkan: InitImgui called with non-Vulkan graphics");
-                    ImGui_ImplGlfw_Shutdown();
-                    ImGui::DestroyContext();
-                    return false;
-                }
-                m_vkGraphics = vkGraphicsPtr;
-                auto& vkGraphics = *vkGraphicsPtr;
-                auto& surfaceContext = vkGraphics.GetSurfaceContext();
-
-                ImGui_ImplVulkan_InitInfo initInfo{};
-                initInfo.Instance = surfaceContext.GetContext().GetInstance();
-                initInfo.PhysicalDevice = surfaceContext.GetVkPhysicalDevice();
-                initInfo.Device = surfaceContext.GetVkDevice();
-                initInfo.QueueFamily = surfaceContext.GetVkQueueFamily();
-                initInfo.Queue = surfaceContext.GetVkQueue();
-                initInfo.DescriptorPool = surfaceContext.GetVkDescriptorPool();
-                initInfo.RenderPass = vkGraphics.GetRenderPass().GetRenderPass();
-                initInfo.Subpass = 0;
-                initInfo.MinImageCount = vkGraphics.GetSwapchain().GetImageCount();
-                initInfo.ImageCount = vkGraphics.GetSwapchain().GetImageCount();
-                initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-                initInfo.Allocator = nullptr;
-                initInfo.CheckVkResultFn = checkVkResult;
-                if (!ImGui_ImplVulkan_Init(&initInfo)) {
-                    spdlog::error("Vulkan: ImGui_ImplVulkan_Init failed");
-                    ImGui_ImplGlfw_Shutdown();
-                    ImGui::DestroyContext();
-                    return false;
-                }
-
-                ImGui_ImplVulkan_CreateFontsTexture();
-
-                m_initialized = true;
-                return true;
-            }
+            explicit VulkanImGuiContext(moth_graphics::graphics::vulkan::Graphics* vkGraphics)
+                : m_initialized(true)
+                , m_vkGraphics(vkGraphics) {}
 
             void NewFrame() override {
                 if (m_initialized) {
@@ -184,8 +121,70 @@ namespace moth_graphics::platform::glfw {
         return std::make_unique<platform::glfw::Window>(*m_context, title, width, height);
     }
 
-    std::unique_ptr<moth_graphics::platform::ImGuiContext> Platform::CreateImGuiContext() {
-        return std::make_unique<VulkanImGuiContext>();
+    std::unique_ptr<moth_graphics::platform::ImGuiContext> Platform::CreateImGuiContext(
+        moth_graphics::platform::Window& window, moth_graphics::graphics::IGraphics& graphics, bool enableViewports) {
+        auto* glfwWindowPtr = dynamic_cast<moth_graphics::platform::glfw::Window*>(&window);
+        if (glfwWindowPtr == nullptr) {
+            spdlog::error("Vulkan: CreateImGuiContext called with non-GLFW window");
+            return nullptr;
+        }
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        if (enableViewports) {
+            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        }
+
+        ImGui::StyleColorsDark();
+        if (enableViewports) {
+            ImGuiStyle& style = ImGui::GetStyle();
+            style.WindowRounding = 0;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
+
+        auto const& glfwWindow = *glfwWindowPtr;
+
+        if (!ImGui_ImplGlfw_InitForVulkan(glfwWindow.GetGLFWWindow(), true)) {
+            spdlog::error("Vulkan: ImGui_ImplGlfw_InitForVulkan failed");
+            ImGui::DestroyContext();
+            return nullptr;
+        }
+
+        auto* vkGraphicsPtr = dynamic_cast<moth_graphics::graphics::vulkan::Graphics*>(&graphics);
+        if (vkGraphicsPtr == nullptr) {
+            spdlog::error("Vulkan: CreateImGuiContext called with non-Vulkan graphics");
+            ImGui_ImplGlfw_Shutdown();
+            ImGui::DestroyContext();
+            return nullptr;
+        }
+        auto& vkGraphics = *vkGraphicsPtr;
+        auto& surfaceContext = vkGraphics.GetSurfaceContext();
+
+        ImGui_ImplVulkan_InitInfo initInfo{};
+        initInfo.Instance = surfaceContext.GetContext().GetInstance();
+        initInfo.PhysicalDevice = surfaceContext.GetVkPhysicalDevice();
+        initInfo.Device = surfaceContext.GetVkDevice();
+        initInfo.QueueFamily = surfaceContext.GetVkQueueFamily();
+        initInfo.Queue = surfaceContext.GetVkQueue();
+        initInfo.DescriptorPool = surfaceContext.GetVkDescriptorPool();
+        initInfo.RenderPass = vkGraphics.GetRenderPass().GetRenderPass();
+        initInfo.Subpass = 0;
+        initInfo.MinImageCount = vkGraphics.GetSwapchain().GetImageCount();
+        initInfo.ImageCount = vkGraphics.GetSwapchain().GetImageCount();
+        initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+        initInfo.Allocator = nullptr;
+        initInfo.CheckVkResultFn = checkVkResult;
+        if (!ImGui_ImplVulkan_Init(&initInfo)) {
+            spdlog::error("Vulkan: ImGui_ImplVulkan_Init failed");
+            ImGui_ImplGlfw_Shutdown();
+            ImGui::DestroyContext();
+            return nullptr;
+        }
+
+        ImGui_ImplVulkan_CreateFontsTexture();
+
+        return std::make_unique<VulkanImGuiContext>(vkGraphicsPtr);
     }
 }
 

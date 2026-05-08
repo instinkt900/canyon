@@ -22,7 +22,7 @@ namespace moth_graphics::platform::sdl {
 
         std::unique_ptr<platform::Window> CreateWindow(std::string_view title, int width, int height) override;
 
-        std::unique_ptr<ImGuiContext> CreateImGuiContext() override;
+        std::unique_ptr<ImGuiContext> CreateImGuiContext(platform::Window& window, graphics::IGraphics& graphics, bool enableViewports) override;
 
     private:
         void ShutdownImpl();

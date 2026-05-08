@@ -26,7 +26,7 @@ TEST_CASE("IPlatform method signatures are stable", "[api][platform][iplatform]"
     Context& (IPlatform::*getCtx)()                                       = &IPlatform::GetGraphicsContext;
     std::unique_ptr<Window> (IPlatform::*createWin)(
         std::string_view, int, int)                                       = &IPlatform::CreateWindow;
-    std::unique_ptr<ImGuiContext> (IPlatform::*createImGui)()             = &IPlatform::CreateImGuiContext;
+    std::unique_ptr<ImGuiContext> (IPlatform::*createImGui)(Window&, graphics::IGraphics&, bool) = &IPlatform::CreateImGuiContext;
     (void)startup; (void)shutdown; (void)getCtx; (void)createWin; (void)createImGui;
     SUCCEED();
 }

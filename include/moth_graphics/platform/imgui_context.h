@@ -15,7 +15,6 @@ namespace moth_graphics::platform {
     public:
         virtual ~ImGuiContext() = default;
 
-        virtual bool Init(Window& window, graphics::IGraphics& graphics, bool enableViewports) = 0;
         virtual void NewFrame() = 0;
         virtual void Render(graphics::IGraphics& graphics) = 0;
 
