@@ -65,6 +65,11 @@ namespace moth_graphics::platform::glfw {
 
             void Shutdown() override {
                 if (m_initialized) {
+                    // Drain moth's command buffers before destroying ImGui
+                    // resources that were recorded into them (pipelines, etc.).
+                    if (m_vkGraphics != nullptr) {
+                        m_vkGraphics->Drain();
+                    }
                     ImGui_ImplVulkan_Shutdown();
                     ImGui_ImplGlfw_Shutdown();
                     ImGui::DestroyContext();

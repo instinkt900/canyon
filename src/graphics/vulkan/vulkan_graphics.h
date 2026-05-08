@@ -36,7 +36,7 @@ namespace moth_graphics::graphics::vulkan {
         Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
         ~Graphics();
 
-        SurfaceContext& GetSurfaceContext() const override { return m_surfaceContext; }
+        SurfaceContext& GetSurfaceContext() const { return m_surfaceContext; }
 
         struct Vertex {
             FloatVec2 xy;
@@ -79,7 +79,7 @@ namespace moth_graphics::graphics::vulkan {
         void SetTarget(ITarget* target) override;
 
         void SetLogicalSize(IntVec2 const& logicalSize) override;
-        void Drain() override;
+        void Drain();
 
         Swapchain& GetSwapchain() const { return *m_swapchain; }
         RenderPass& GetRenderPass() const { return *m_renderPass; }

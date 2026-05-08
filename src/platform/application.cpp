@@ -38,10 +38,6 @@ namespace moth_graphics::platform {
         spdlog::info("Application: running");
         TickSync();
         spdlog::info("Application: shutting down");
-        // ImGui's backend records pipeline binds directly into moth's command
-        // buffers. Drain so the next step's pipeline destruction doesn't fire
-        // "pipeline in use by command buffer" validation errors.
-        m_window->GetGraphics().Drain();
         m_imguiContext->Shutdown();
         m_imguiContext.reset();
         Shutdown();
