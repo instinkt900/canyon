@@ -44,8 +44,14 @@ std::optional<std::vector<SpriteSheet::FrameEntry>> ParseFrames(
         }
         SpriteSheet::FrameEntry entry;
         entry.rect = MakeRect(x, y, w, h);
-        entry.pivot.x = frameJson.value("pivot_x", 0);
-        entry.pivot.y = frameJson.value("pivot_y", 0);
+        entry.pivot.x = 0;
+        if (frameJson.contains("pivot_x") && frameJson["pivot_x"].is_number_integer()) {
+            entry.pivot.x = frameJson["pivot_x"].get<int>();
+        }
+        entry.pivot.y = 0;
+        if (frameJson.contains("pivot_y") && frameJson["pivot_y"].is_number_integer()) {
+            entry.pivot.y = frameJson["pivot_y"].get<int>();
+        }
         frames.push_back(entry);
     }
     return frames;

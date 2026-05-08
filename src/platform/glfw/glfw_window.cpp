@@ -178,7 +178,12 @@ namespace moth_graphics::platform::glfw {
             // Window is minimised or has a zero dimension; skip swapchain recreation.
             return;
         }
-        auto* graphics = dynamic_cast<graphics::vulkan::Graphics*>(&GetGraphics());
+        auto* g = &GetGraphics();
+        if (g == nullptr) {
+            spdlog::error("GLFW: OnResize called but graphics is null");
+            return;
+        }
+        auto* graphics = dynamic_cast<graphics::vulkan::Graphics*>(g);
         if (graphics == nullptr) {
             spdlog::error("GLFW: OnResize called but graphics backend is not Vulkan");
             return;

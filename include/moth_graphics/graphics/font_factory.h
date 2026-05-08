@@ -10,8 +10,8 @@
 namespace moth_graphics::graphics {
     /// @brief Cached font loader.
     ///
-    /// Loads fonts from disk on first request and caches them by name and size.
-    /// Fonts are shared — multiple callers requesting the same name/size receive
+    /// Loads fonts from disk on first request and caches them by path and size.
+    /// Fonts are shared — multiple callers requesting the same path/size receive
     /// the same @c IFont instance.
     class FontFactory {
     public:

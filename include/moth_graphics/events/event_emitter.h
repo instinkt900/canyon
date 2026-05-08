@@ -100,9 +100,12 @@ namespace moth_graphics {
 
         /// @brief Dispatch @p event to all registered listeners.
         /// @returns @c true if any listener handled the event.
-        /// @note O(n²) in the number of listeners due to a per-listener liveness
-        ///       check against concurrent removals. Acceptable for small listener
-        ///       counts (the common case); avoid registering more than ~50.
+        /// @note O(n²) in the number of listeners: each callback is preceded by a
+        ///       linear liveness check because listeners may remove themselves (or
+        ///       each other) during emission. This is not thread-safe — add, remove,
+        ///       and emit must all happen on the same thread or be externally
+        ///       synchronized. Acceptable for small listener counts (the common
+        ///       case); avoid registering more than ~50.
         bool EmitEvent(moth_ui::Event const& event) {
             moth_ui::EventDispatch dispatch(event);
             std::vector<moth_ui::IEventListener*> snapshot(m_listeners);
