@@ -9,8 +9,8 @@ namespace moth_graphics::graphics {
         m_fonts.clear();
     }
 
-    std::shared_ptr<IFont> FontFactory::GetFont(std::string const& name, int size) {
-        auto fileIt = m_fonts.find(name);
+    std::shared_ptr<IFont> FontFactory::GetFont(std::string const& path, int size) {
+        auto fileIt = m_fonts.find(path);
         if (fileIt != m_fonts.end()) {
             auto const& sizeMap = fileIt->second;
             auto sizeIt = sizeMap.find(size);
@@ -19,9 +19,10 @@ namespace moth_graphics::graphics {
             }
         }
 
-        std::shared_ptr<IFont> font = m_context.FontFromFile(name, size);
-        auto& sizeMap = m_fonts[name];
-        sizeMap[size] = font;
+        std::shared_ptr<IFont> font = m_context.FontFromFile(path, size);
+        if (font) {
+            m_fonts[path][size] = font;
+        }
         return font;
     }
 }

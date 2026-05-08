@@ -23,10 +23,11 @@ namespace moth_graphics::graphics {
         void ClearFonts();
 
         /// @brief Load or retrieve a cached font by file path and pixel size.
-        /// @param name Path to the font file (TTF/OTF).
+        /// @param path Path to the font file (TTF/OTF).
         /// @param size Font size in pixels.
-        /// @returns Shared font handle, or @c nullptr on failure.
-        std::shared_ptr<IFont> GetFont(std::string const& name, int size);
+        /// @returns Shared font handle, or @c nullptr on failure. A failed load is
+        ///          not cached — retrying the same path later will re-attempt loading.
+        std::shared_ptr<IFont> GetFont(std::string const& path, int size);
 
     private:
         AssetContext& m_context;
