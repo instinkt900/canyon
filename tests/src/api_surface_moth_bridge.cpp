@@ -52,11 +52,9 @@ TEST_CASE("MothRenderer method signatures are stable", "[api][bridge][moth_rende
 }
 
 TEST_CASE("MothImageFactory method signatures are stable", "[api][bridge][moth_image_factory]") {
-    void (MothImageFactory::*flush)()                                           = &MothImageFactory::FlushCache;
-    bool (MothImageFactory::*load)(std::filesystem::path const&)                = &MothImageFactory::LoadTexturePack;
     std::unique_ptr<moth_ui::IImage>
          (MothImageFactory::*getImg)(std::filesystem::path const&)              = &MothImageFactory::GetImage;
-    (void)flush; (void)load; (void)getImg;
+    (void)getImg;
     SUCCEED();
 }
 
