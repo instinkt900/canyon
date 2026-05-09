@@ -17,8 +17,6 @@ namespace moth_graphics::platform {
 }
 
 namespace moth_graphics::graphics {
-    class SurfaceContext;
-
     /// @brief Abstract 2D rendering interface.
     ///
     /// All drawing operations are batched between a @c Begin() / @c End() pair.
@@ -28,18 +26,14 @@ namespace moth_graphics::graphics {
     public:
         virtual ~IGraphics() {}
 
-        /// @brief Returns the surface context that owns this graphics instance.
-        virtual SurfaceContext& GetSurfaceContext() const = 0;
-
         /// @brief Begin a new frame. Must be called before any draw operations.
-        /// @returns @c true if the frame can proceed, @c false if the swapchain was
-        ///          out-of-date and the frame should be skipped (e.g. the window is
-        ///          minimised or being resized). When @c false is returned, @c End()
-        ///          must NOT be called for this frame.
-        virtual bool Begin() = 0;
+        ///
+        /// Always succeeds — if the swapchain is unavailable (e.g. window
+        /// minimised), a null frame is started and all draw calls silently
+        /// no-op until the next successful @c Begin().
+        virtual void Begin() = 0;
 
-        /// @brief End the current frame and present it. Only call when @c Begin()
-        ///        returned @c true.
+        /// @brief End the current frame and present it.
         virtual void End() = 0;
 
         /// @brief Set the active blend mode for subsequent draw calls.
@@ -119,16 +113,5 @@ namespace moth_graphics::graphics {
         /// @param logicalSize Logical width and height in pixels.
         virtual void SetLogicalSize(IntVec2 const& logicalSize) = 0;
 
-        /// @brief Wait for any in-flight GPU work to complete and clear per-frame
-        ///        command-buffer state.
-        ///
-        /// Required before destroying foreign GPU resources that may have been
-        /// recorded into the active frame's command buffers. The canonical case
-        /// is shutdown: ImGui's Vulkan backend records draws (and pipeline binds)
-        /// directly into moth's command buffer; without this drain its pipeline
-        /// destruction triggers a "pipeline in use by command buffer" validation
-        /// error. SDL has no analogous state to clear and implements this as a
-        /// no-op.
-        virtual void Drain() {}
     };
 }

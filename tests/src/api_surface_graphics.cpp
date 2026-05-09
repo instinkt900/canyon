@@ -12,8 +12,7 @@ using namespace moth_graphics;
 using namespace moth_graphics::graphics;
 
 TEST_CASE("IGraphics method signatures are stable", "[api][graphics][igraphics]") {
-    SurfaceContext& (IGraphics::*getSurface)() const            = &IGraphics::GetSurfaceContext;
-    bool (IGraphics::*begin)()                                  = &IGraphics::Begin;
+    void (IGraphics::*begin)()                                  = &IGraphics::Begin;
     void (IGraphics::*end)()                                  = &IGraphics::End;
     void (IGraphics::*setBlend)(BlendMode)                    = &IGraphics::SetBlendMode;
     void (IGraphics::*setColor)(Color const&)                 = &IGraphics::SetColor;
@@ -40,7 +39,7 @@ TEST_CASE("IGraphics method signatures are stable", "[api][graphics][igraphics]"
     void (IGraphics::*setTarget)(ITarget*)                    = &IGraphics::SetTarget;
     void (IGraphics::*setLogical)(IntVec2 const&)             = &IGraphics::SetLogicalSize;
 
-    (void)getSurface; (void)begin; (void)end;
+    (void)begin; (void)end;
     (void)setBlend; (void)setColor; (void)clear;
     (void)setXform;
     (void)drawImg; (void)drawImgPivot; (void)drawImgTiled;

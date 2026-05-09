@@ -16,8 +16,12 @@ namespace moth_graphics::graphics {
         auto it = m_fontPaths.find(name);
         if (it != m_fontPaths.end()) {
            auto const font = m_factoryImpl.GetFont(it->second.string(), size);
+           if (!font) {
+               return nullptr;
+           }
            return std::make_shared<MothFont>(font);
         }
+        spdlog::warn("MothFontFactory: font '{}' not registered (call AddFont first)", name);
         return nullptr;
     }
 }

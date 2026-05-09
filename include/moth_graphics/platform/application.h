@@ -8,6 +8,7 @@
 #include <moth_ui/events/event_listener.h>
 #include <moth_ui/events/event.h>
 
+#include <cassert>
 #include <memory>
 #include <cstdint>
 #include <string>
@@ -46,7 +47,10 @@ namespace moth_graphics::platform {
         /// @brief Enable or disable ImGui multi-viewport support. Must be called before Init().
         /// When enabled, floating ImGui windows are promoted to native OS windows.
         /// Avoid on tiling window managers (i3, sway) — new OS windows disrupt drag-and-drop.
-        void SetImGuiViewportsEnabled(bool enabled) { m_imguiViewportsEnabled = enabled; }
+        void SetImGuiViewportsEnabled(bool enabled) {
+            assert(m_imguiContext == nullptr && "SetImGuiViewportsEnabled must be called before Init()");
+            m_imguiViewportsEnabled = enabled;
+        }
 
         Application(Application const&) = delete;
         Application& operator=(Application const&) = delete;

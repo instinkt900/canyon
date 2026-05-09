@@ -14,8 +14,6 @@ namespace moth_graphics::graphics {
         explicit MothImageFactory(graphics::TextureFactory& factoryImpl);
         ~MothImageFactory() override = default;
 
-        void FlushCache();
-        bool LoadTexturePack(std::filesystem::path const& path);
         std::unique_ptr<moth_ui::IImage> GetImage(std::filesystem::path const& path) override;
 
     private:

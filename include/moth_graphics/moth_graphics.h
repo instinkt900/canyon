@@ -51,7 +51,6 @@
 #include "moth_graphics/utils/math_utils.h"
 #include "moth_graphics/utils/moth_ui_format.h"
 #include "moth_graphics/utils/rect.h"
-#include "moth_graphics/utils/rect_format.h"
 #include "moth_graphics/utils/ticker.h"
 #include "moth_graphics/utils/transform.h"
 #include "moth_graphics/utils/vector.h"

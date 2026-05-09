@@ -36,7 +36,7 @@ namespace moth_graphics::graphics::vulkan {
         Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight);
         ~Graphics();
 
-        SurfaceContext& GetSurfaceContext() const override { return m_surfaceContext; }
+        SurfaceContext& GetSurfaceContext() const { return m_surfaceContext; }
 
         struct Vertex {
             FloatVec2 xy;
@@ -58,7 +58,7 @@ namespace moth_graphics::graphics::vulkan {
             Color color;
         };
 
-        bool Begin() override;
+        void Begin() override;
         void End() override;
 
         void SetBlendMode(BlendMode mode) override;
@@ -79,7 +79,7 @@ namespace moth_graphics::graphics::vulkan {
         void SetTarget(ITarget* target) override;
 
         void SetLogicalSize(IntVec2 const& logicalSize) override;
-        void Drain() override;
+        void Drain();
 
         Swapchain& GetSwapchain() const { return *m_swapchain; }
         RenderPass& GetRenderPass() const { return *m_renderPass; }
@@ -171,9 +171,13 @@ namespace moth_graphics::graphics::vulkan {
         Pipeline& GetCurrentPipeline(ETopologyType topology);
         Pipeline& GetCurrentFontPipeline();
 
+        /// @brief Returns the current draw context, or @c nullptr for a null frame.
+        ///
+        /// @note The constructor pushes a nullptr sentinel onto m_contextStack.
+        ///       Begin()/End() push/pop real contexts; a null frame pushes an
+        ///       additional nullptr. The stack is never empty.
         DrawContext* CurrentContext() {
-            assert(!m_contextStack.empty() && m_contextStack.top() != nullptr
-                   && "Begin() must be called before any draw operations");
+            assert(!m_contextStack.empty());
             return m_contextStack.top();
         }
 

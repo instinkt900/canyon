@@ -25,8 +25,8 @@ namespace moth_graphics::platform {
             throw;
         }
         m_window->AddEventListener(this);
-        m_imguiContext = m_platform.CreateImGuiContext();
-        if (!m_imguiContext->Init(*m_window, m_window->GetGraphics(), m_imguiViewportsEnabled)) {
+        m_imguiContext = m_platform.CreateImGuiContext(*m_window, m_window->GetGraphics(), m_imguiViewportsEnabled);
+        if (!m_imguiContext) {
             spdlog::error("Application: ImGui context initialization failed");
             throw std::runtime_error("ImGui context initialization failed");
         }
@@ -38,10 +38,6 @@ namespace moth_graphics::platform {
         spdlog::info("Application: running");
         TickSync();
         spdlog::info("Application: shutting down");
-        // ImGui's backend records pipeline binds directly into moth's command
-        // buffers. Drain so the next step's pipeline destruction doesn't fire
-        // "pipeline in use by command buffer" validation errors.
-        m_window->GetGraphics().Drain();
         m_imguiContext->Shutdown();
         m_imguiContext.reset();
         Shutdown();
@@ -82,10 +78,7 @@ namespace moth_graphics::platform {
 
     void Application::Tick(uint32_t ticks) {
         m_imguiContext->NewFrame();
-        if (!m_window->BeginFrame()) {
-            m_imguiContext->DiscardFrame();
-            return;
-        }
+        m_window->BeginFrame();
         m_window->GetLayerStack().Draw();
         m_imguiContext->Render(m_window->GetGraphics());
         m_window->EndFrame();

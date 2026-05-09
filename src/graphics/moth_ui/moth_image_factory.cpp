@@ -7,14 +7,6 @@ namespace moth_graphics::graphics {
         : m_factoryImpl(factoryImpl) {
     }
 
-    void MothImageFactory::FlushCache() {
-        m_factoryImpl.FlushCache();
-    }
-
-    bool MothImageFactory::LoadTexturePack(std::filesystem::path const& path) {
-        return m_factoryImpl.LoadTexturePack(path);
-    }
-
     std::unique_ptr<::moth_ui::IImage> MothImageFactory::GetImage(std::filesystem::path const& path) {
         auto texture = m_factoryImpl.GetTexture(path);
         if (!texture) {

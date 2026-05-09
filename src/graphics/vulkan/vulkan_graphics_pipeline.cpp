@@ -152,7 +152,6 @@ namespace moth_graphics::graphics::vulkan {
     void Graphics::CreateRenderPass() {
         {
             VkAttachmentDescription colorAttachment{};
-            // colorAttachment.format = VK_FORMAT_R8G8B8A8_SRGB; // TODO this might have to change?
             colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
             colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
             colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;

@@ -18,25 +18,7 @@ namespace moth_graphics::platform::sdl {
     namespace {
         class SDLImGuiContext : public moth_graphics::platform::ImGuiContext {
         public:
-            bool Init(moth_graphics::platform::Window& window, moth_graphics::graphics::IGraphics& /*graphics*/, bool /*enableViewports*/) override {
-                auto* sdlWindowPtr = dynamic_cast<moth_graphics::platform::sdl::Window*>(&window);
-                if (sdlWindowPtr == nullptr) {
-                    spdlog::error("SDL: InitImgui called with non-SDL window");
-                    return false;
-                }
-
-                IMGUI_CHECKVERSION();
-                ImGui::CreateContext();
-                auto& io = ImGui::GetIO();
-                io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-                ImGui::StyleColorsDark();
-
-                auto& sdlWindow = *sdlWindowPtr;
-                m_sdlWindow = sdlWindow.GetSDLWindow();
-                ImGui_ImplSDL2_InitForSDLRenderer(sdlWindow.GetSDLWindow(), sdlWindow.GetSDLRenderer());
-                ImGui_ImplSDLRenderer2_Init(sdlWindow.GetSDLRenderer());
-                return true;
-            }
+            explicit SDLImGuiContext(SDL_Window* window) : m_sdlWindow(window) {}
 
             void NewFrame() override {
                 if (m_sdlWindow != nullptr) {
@@ -50,12 +32,6 @@ namespace moth_graphics::platform::sdl {
                 if (m_sdlWindow != nullptr) {
                     ImGui::Render();
                     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
-                }
-            }
-
-            void DiscardFrame() override {
-                if (m_sdlWindow != nullptr) {
-                    ImGui::EndFrame();
                 }
             }
 
@@ -116,7 +92,28 @@ namespace moth_graphics::platform::sdl {
         m_initialized = false;
     }
 
-    std::unique_ptr<moth_graphics::platform::ImGuiContext> Platform::CreateImGuiContext() {
-        return std::make_unique<SDLImGuiContext>();
+    std::unique_ptr<moth_graphics::platform::ImGuiContext> Platform::CreateImGuiContext(
+        moth_graphics::platform::Window& window, moth_graphics::graphics::IGraphics& /*graphics*/, bool enableViewports) {
+        if (enableViewports) {
+            spdlog::warn("SDL: ImGui viewports requested but SDL_Renderer backend does not support platform viewports — flag ignored");
+        }
+
+        auto* sdlWindowPtr = dynamic_cast<moth_graphics::platform::sdl::Window*>(&window);
+        if (sdlWindowPtr == nullptr) {
+            spdlog::error("SDL: CreateImGuiContext called with non-SDL window");
+            return nullptr;
+        }
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        auto& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        ImGui::StyleColorsDark();
+
+        auto& sdlWindow = *sdlWindowPtr;
+        ImGui_ImplSDL2_InitForSDLRenderer(sdlWindow.GetSDLWindow(), sdlWindow.GetSDLRenderer());
+        ImGui_ImplSDLRenderer2_Init(sdlWindow.GetSDLRenderer());
+
+        return std::make_unique<SDLImGuiContext>(sdlWindow.GetSDLWindow());
     }
 }

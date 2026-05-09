@@ -23,11 +23,6 @@ namespace moth_graphics::graphics {
     public:
         explicit Sprite(std::shared_ptr<SpriteSheet> spriteSheet);
 
-        Sprite(Sprite&&) = default;
-        Sprite& operator=(Sprite&&) = default;
-        Sprite(Sprite const&) = default;
-        Sprite& operator=(Sprite const&) = default;
-
         /// @brief Returns the sprite sheet backing this sprite.
         SpriteSheet const& GetSpriteSheet() const { return *m_spriteSheet; }
 

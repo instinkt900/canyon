@@ -34,7 +34,12 @@ namespace moth_graphics::platform {
         /// @param height Initial window height in pixels.
         virtual std::unique_ptr<Window> CreateWindow(std::string_view title, int width, int height) = 0;
 
-        /// @brief Create the ImGui context for this platform backend.
-        virtual std::unique_ptr<ImGuiContext> CreateImGuiContext() = 0;
+        /// @brief Create and initialize the ImGui context for this platform backend.
+        /// @param window The window the context will render into.
+        /// @param graphics The graphics backend for the window.
+        /// @param enableViewports Whether to enable multi-viewport support.
+        /// @returns A fully initialized ImGui context, or @c nullptr on failure.
+        virtual std::unique_ptr<ImGuiContext> CreateImGuiContext(
+            Window& window, graphics::IGraphics& graphics, bool enableViewports) = 0;
     };
 }

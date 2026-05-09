@@ -17,9 +17,11 @@
 #include <cassert>
 #include <cstdint>
 
-namespace moth_graphics::platform {
+namespace moth_graphics::graphics {
     class SurfaceContext;
+}
 
+namespace moth_graphics::platform {
     /// @brief A platform window and its associated rendering resources.
     ///
     /// Owns the @c IGraphics instance, the moth_ui @c LayerStack, and the
@@ -36,25 +38,21 @@ namespace moth_graphics::platform {
         ~Window() override;
 
         /// @brief Poll events and advance the UI layer stack by @p ticks milliseconds.
-        virtual void Update(uint32_t ticks) {}
+        virtual void Update(uint32_t ticks) = 0;
 
         /// @brief Begin rendering one frame.
-        /// @return @c true on success, @c false if the backend skipped this frame
-        ///         (e.g. Vulkan swapchain out-of-date). On @c false, do not call
-        ///         @c EndFrame.
-        virtual bool BeginFrame() = 0;
+        virtual void BeginFrame() = 0;
 
         /// @brief Finish rendering the frame begun by @c BeginFrame.
         virtual void EndFrame() = 0;
 
         /// @brief Render one frame to this window: @c BeginFrame, draw the layer
         ///        stack, @c EndFrame.
-        /// @return @c true if a frame was rendered, @c false if the backend skipped it.
         ///
-        /// Convenience wrapper for the common case. Callers that need to interleave
-        /// work with the live frame (e.g. ImGui rendering) should call
-        /// @c BeginFrame / @c EndFrame directly.
-        bool Draw();
+        /// Convenience wrapper. Callers that need to interleave work with the
+        /// live frame (e.g. ImGui rendering) should call @c BeginFrame /
+        /// @c EndFrame directly.
+        void Draw();
 
         /// @brief Returns the per-window GPU resource context.
         virtual graphics::SurfaceContext& GetSurfaceContext() const = 0;
@@ -100,6 +98,8 @@ namespace moth_graphics::platform {
         /// @brief Called before the native window and graphics objects are destroyed.
         void PreDestroy();
 
+        void SetGraphics(std::unique_ptr<graphics::IGraphics> graphics) { m_graphics = std::move(graphics); }
+        graphics::IGraphics* GetGraphicsPtr() const { return m_graphics.get(); }
 
         std::string m_title;
         int m_windowWidth = 0;
@@ -107,6 +107,7 @@ namespace moth_graphics::platform {
         IntVec2 m_windowPos = { -1, -1 };
         bool m_windowMaximized = false;
 
+    private:
         std::unique_ptr<graphics::IGraphics> m_graphics;
         std::unique_ptr<moth_ui::LayerStack> m_layerStack;
 

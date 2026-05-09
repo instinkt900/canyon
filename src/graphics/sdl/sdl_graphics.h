@@ -25,9 +25,9 @@ namespace moth_graphics::graphics::sdl {
         Graphics(SurfaceContext& context);
         ~Graphics() override;
 
-        SurfaceContext& GetSurfaceContext() const override { return m_surfaceContext; }
+        SurfaceContext& GetSurfaceContext() const { return m_surfaceContext; }
 
-        bool Begin() override;
+        void Begin() override;
         void End() override;
 
         void SetBlendMode(BlendMode mode) override;
