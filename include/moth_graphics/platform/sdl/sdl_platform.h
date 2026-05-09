@@ -5,10 +5,6 @@
 
 #include <memory>
 
-namespace moth_graphics::graphics::sdl {
-    class Context;
-}
-
 namespace moth_graphics::platform::sdl {
     class Platform : public IPlatform {
     public:
@@ -26,7 +22,6 @@ namespace moth_graphics::platform::sdl {
     private:
         void ShutdownImpl();
 
-        std::unique_ptr<graphics::sdl::Context> m_context = nullptr;
         bool m_initialized = false;
     };
 }

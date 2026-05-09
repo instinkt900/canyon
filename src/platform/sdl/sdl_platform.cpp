@@ -1,5 +1,4 @@
 #include "common.h"
-#include "moth_graphics/graphics/sdl/sdl_context.h"
 #include "moth_graphics/platform/imgui_context.h"
 #include "moth_graphics/platform/sdl/sdl_window.h"
 #include "moth_graphics/platform/sdl/sdl_platform.h"
@@ -50,7 +49,7 @@ namespace moth_graphics::platform::sdl {
     }
 
     std::unique_ptr<platform::Window> Platform::CreateWindow(std::string_view title, int width, int height) {
-        return std::make_unique<platform::sdl::Window>(*m_context, title, width, height);
+        return std::make_unique<platform::sdl::Window>(title, width, height);
     }
 
     bool Platform::Startup() {
@@ -60,13 +59,6 @@ namespace moth_graphics::platform::sdl {
             return false;
         }
         spdlog::info("SDL: initialized");
-        m_context = std::make_unique<graphics::sdl::Context>();
-        if (!m_context->Startup()) {
-            spdlog::error("SDL: graphics context startup failed");
-            m_context.reset();
-            SDL_Quit();
-            return false;
-        }
         m_initialized = true;
         return true;
     }
@@ -80,10 +72,6 @@ namespace moth_graphics::platform::sdl {
             return;
         }
         spdlog::info("SDL: shutting down");
-        if (m_context) {
-            m_context->Shutdown();
-            m_context.reset();
-        }
         SDL_Quit();
         m_initialized = false;
     }

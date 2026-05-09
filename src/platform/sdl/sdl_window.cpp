@@ -99,9 +99,8 @@ namespace {
 }
 
 namespace moth_graphics::platform::sdl {
-    Window::Window(graphics::sdl::Context& context, std::string_view title, int width, int height)
-        : platform::Window(title, width, height)
-        , m_context(context) {
+    Window::Window(std::string_view title, int width, int height)
+        : platform::Window(title, width, height) {
         if (!CreateWindow()) {
             throw std::runtime_error("SDL: failed to create window '" + std::string(title) + "'");
         }
@@ -152,7 +151,7 @@ namespace moth_graphics::platform::sdl {
             return false;
         }
 
-        m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_context, m_renderer);
+        m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_renderer);
         SetGraphics(std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext));
         m_windowId = SDL_GetWindowID(m_window);
         spdlog::info("SDL: window '{}' ready", m_title);

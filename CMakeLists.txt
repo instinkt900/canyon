@@ -56,7 +56,6 @@ if(NOT MOTH_GRAPHICS_DISABLE_SDL)
     list(APPEND SOURCES
         external/imgui/backends/imgui_impl_sdl2.cpp
         external/imgui/backends/imgui_impl_sdlrenderer2.cpp
-        src/graphics/sdl/sdl_context.cpp
         src/graphics/sdl/sdl_font.cpp
         src/graphics/sdl/sdl_graphics.cpp
         src/graphics/sdl/sdl_target.cpp
