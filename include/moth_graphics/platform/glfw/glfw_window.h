@@ -12,7 +12,7 @@
 #include <cstdint>
 
 namespace moth_graphics::graphics::vulkan {
-    class Context;
+    struct Context;
     class SurfaceContext;
 }
 

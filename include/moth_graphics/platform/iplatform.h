@@ -1,6 +1,5 @@
 #pragma once
 
-#include "moth_graphics/graphics/context.h"
 #include "moth_graphics/platform/imgui_context.h"
 
 #include <string_view>
@@ -24,9 +23,6 @@ namespace moth_graphics::platform {
 
         /// @brief Tear down the platform layer. Called after all windows are destroyed.
         virtual void Shutdown() = 0;
-
-        /// @brief Returns the graphics context owned by this platform.
-        virtual moth_graphics::graphics::Context& GetGraphicsContext() = 0;
 
         /// @brief Create a new window.
         /// @param title Initial window title.

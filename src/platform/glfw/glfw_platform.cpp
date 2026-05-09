@@ -117,10 +117,6 @@ namespace moth_graphics::platform::glfw {
         m_initialized = false;
     }
 
-    graphics::Context& Platform::GetGraphicsContext() {
-        return *m_context;
-    }
-
     std::unique_ptr<moth_graphics::platform::Window> Platform::CreateWindow(std::string_view title, int width, int height) {
         return std::make_unique<platform::glfw::Window>(m_context->GetContext(), title, width, height);
     }
@@ -165,7 +161,7 @@ namespace moth_graphics::platform::glfw {
         auto& surfaceContext = vkGraphics.GetSurfaceContext();
 
         ImGui_ImplVulkan_InitInfo initInfo{};
-        initInfo.Instance = surfaceContext.GetContext().GetInstance();
+        initInfo.Instance = surfaceContext.GetContext().instance;
         initInfo.PhysicalDevice = surfaceContext.GetVkPhysicalDevice();
         initInfo.Device = surfaceContext.GetVkDevice();
         initInfo.QueueFamily = surfaceContext.GetVkQueueFamily();

@@ -36,9 +36,9 @@ namespace moth_graphics::graphics::vulkan {
         // select device
         {
             uint32_t gpuCount = 0;
-            CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.GetInstance(), &gpuCount, nullptr));
+            CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.instance, &gpuCount, nullptr));
             std::vector<VkPhysicalDevice> gpus(gpuCount);
-            CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.GetInstance(), &gpuCount, gpus.data()));
+            CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.instance, &gpuCount, gpus.data()));
             spdlog::info("Vulkan: {} physical device(s) found", gpuCount);
 
             uint32_t selectedGpu = 0;
@@ -139,7 +139,7 @@ namespace moth_graphics::graphics::vulkan {
         // allocator
         {
             VmaAllocatorCreateInfo allocatorCreateInfo{};
-            allocatorCreateInfo.instance = m_context.GetInstance();
+            allocatorCreateInfo.instance = m_context.instance;
             allocatorCreateInfo.physicalDevice = m_vkPhysicalDevice;
             allocatorCreateInfo.device = m_vkDevice;
             vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator);

@@ -160,7 +160,8 @@ namespace moth_graphics::graphics::vulkan {
         }
         spdlog::info("Vulkan: context ready");
 
-        m_context.SetHandles(vkInstance, ftLibrary);
+        m_context.instance = vkInstance;
+        m_context.ftLibrary = ftLibrary;
         m_debugMessenger = vkDebugMessenger;
         return true;
     }
@@ -168,9 +169,9 @@ namespace moth_graphics::graphics::vulkan {
     void ManagedContext::Shutdown() {
         spdlog::info("Vulkan: destroying context");
         if (enableValidationLayers) {
-            DestroyDebugUtilsMessengerEXT(m_context.GetInstance(), m_debugMessenger, nullptr);
+            DestroyDebugUtilsMessengerEXT(m_context.instance, m_debugMessenger, nullptr);
         }
-        vkDestroyInstance(m_context.GetInstance(), nullptr);
-        FT_Done_FreeType(m_context.GetFTLibrary());
+        vkDestroyInstance(m_context.instance, nullptr);
+        FT_Done_FreeType(m_context.ftLibrary);
     }
 }

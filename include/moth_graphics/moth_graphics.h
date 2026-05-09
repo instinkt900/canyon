@@ -15,7 +15,6 @@
 #include "moth_graphics/graphics/asset_context.h"
 #include "moth_graphics/graphics/blend_mode.h"
 #include "moth_graphics/graphics/color.h"
-#include "moth_graphics/graphics/context.h"
 #include "moth_graphics/graphics/font_factory.h"
 #include "moth_graphics/graphics/ifont.h"
 #include "moth_graphics/graphics/igraphics.h"

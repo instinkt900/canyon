@@ -1,6 +1,5 @@
 #pragma once
 
-#include "moth_graphics/graphics/context.h"
 #include "moth_graphics/graphics/vulkan/vulkan_context.h"
 
 namespace moth_graphics::graphics::vulkan {
@@ -8,19 +7,16 @@ namespace moth_graphics::graphics::vulkan {
     ///
     /// Creates and owns a VkInstance and FT_Library via Startup(), tears them
     /// down via Shutdown().  The result can be used as a plain Context&.
-    class ManagedContext : public graphics::Context {
+    class ManagedContext {
     public:
-        ManagedContext() = default;
-        ~ManagedContext() override = default;
+        bool Startup();
+        void Shutdown();
 
-        bool Startup() override;
-        void Shutdown() override;
-
-        moth_graphics::graphics::vulkan::Context& GetContext() { return m_context; }
-        moth_graphics::graphics::vulkan::Context const& GetContext() const { return m_context; }
+        Context& GetContext() { return m_context; }
+        Context const& GetContext() const { return m_context; }
 
     private:
-        moth_graphics::graphics::vulkan::Context m_context{VK_NULL_HANDLE, nullptr};
+        Context m_context;
         VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
     };
 }

@@ -23,11 +23,10 @@ TEST_CASE("Ticker method signatures are stable", "[api][platform][ticker]") {
 TEST_CASE("IPlatform method signatures are stable", "[api][platform][iplatform]") {
     bool (IPlatform::*startup)()                                          = &IPlatform::Startup;
     void (IPlatform::*shutdown)()                                         = &IPlatform::Shutdown;
-    Context& (IPlatform::*getCtx)()                                       = &IPlatform::GetGraphicsContext;
     std::unique_ptr<Window> (IPlatform::*createWin)(
         std::string_view, int, int)                                       = &IPlatform::CreateWindow;
     std::unique_ptr<ImGuiContext> (IPlatform::*createImGui)(Window&, graphics::IGraphics&, bool) = &IPlatform::CreateImGuiContext;
-    (void)startup; (void)shutdown; (void)getCtx; (void)createWin; (void)createImGui;
+    (void)startup; (void)shutdown; (void)createWin; (void)createImGui;
     SUCCEED();
 }
 

@@ -133,7 +133,7 @@ namespace moth_graphics::platform::glfw {
             glfwMaximizeWindow(m_glfwWindow);
         }
 
-        CHECK_VK_RESULT(glfwCreateWindowSurface(m_context.GetInstance(), m_glfwWindow, nullptr, &m_customVkSurface));
+        CHECK_VK_RESULT(glfwCreateWindowSurface(m_context.instance, m_glfwWindow, nullptr, &m_customVkSurface));
         m_surfaceContext = std::make_unique<graphics::vulkan::SurfaceContext>(m_context);
 
         SetGraphics(std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight));
@@ -157,7 +157,7 @@ namespace moth_graphics::platform::glfw {
         m_surfaceContext = nullptr;
         if (m_glfwWindow != nullptr) {
             if (m_customVkSurface != VK_NULL_HANDLE) {
-                vkDestroySurfaceKHR(m_context.GetInstance(), m_customVkSurface, nullptr);
+                vkDestroySurfaceKHR(m_context.instance, m_customVkSurface, nullptr);
                 m_customVkSurface = VK_NULL_HANDLE;
             }
             glfwDestroyWindow(m_glfwWindow);

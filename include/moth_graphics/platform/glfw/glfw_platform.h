@@ -1,13 +1,12 @@
 #pragma once
 
-#include "moth_graphics/graphics/context.h"
 #include "moth_graphics/platform/iplatform.h"
 #include "moth_graphics/platform/window.h"
 
 #include <memory>
 
 namespace moth_graphics::graphics::vulkan {
-    class Context;
+    struct Context;
     class ManagedContext;
 }
 
@@ -19,8 +18,6 @@ namespace moth_graphics::platform::glfw {
 
         bool Startup() override;
         void Shutdown() override;
-
-        moth_graphics::graphics::Context& GetGraphicsContext() override;
 
         std::unique_ptr<moth_graphics::platform::Window> CreateWindow(std::string_view title, int width, int height) override;
 

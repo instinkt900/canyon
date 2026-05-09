@@ -1,7 +1,7 @@
 #pragma once
 
 #include "moth_graphics/platform/iplatform.h"
-#include "moth_graphics/graphics/context.h"
+
 
 #include <memory>
 
@@ -18,7 +18,6 @@ namespace moth_graphics::platform::sdl {
         bool Startup() override;
         void Shutdown() override;
 
-        graphics::Context& GetGraphicsContext() override;
 
         std::unique_ptr<platform::Window> CreateWindow(std::string_view title, int width, int height) override;
 
