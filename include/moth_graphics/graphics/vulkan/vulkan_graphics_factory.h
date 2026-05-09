@@ -13,9 +13,12 @@ namespace moth_graphics::graphics::vulkan {
     /// @brief Create a Vulkan graphics instance for standalone use.
     ///
     /// Constructs the Vulkan backend renderer without requiring Window or
-    /// Application. The caller owns the surface and is responsible for
-    /// presenting the swapchain images (via IGraphics::End) and recreating
-    /// the swapchain on resize (via vulkan::Graphics::OnResize).
+    /// Application. Begin() self-heals when the swapchain is unavailable
+    /// (e.g. window minimised) — callers do not need to handle resize.
+    ///
+    /// Power users can interleave their own Vulkan commands via
+    /// vulkan::Graphics::Flush() and GetCurrentCommandBuffer() (accessible
+    /// by downcasting the returned IGraphics).
     ///
     /// @param surfaceContext  Initialized Vulkan surface context.
     /// @param surface         Vulkan surface to render into.

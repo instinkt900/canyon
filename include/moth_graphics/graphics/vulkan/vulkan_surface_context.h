@@ -30,7 +30,7 @@ namespace moth_graphics::graphics::vulkan {
 
         graphics::AssetContext& GetAssetContext() override { return m_assetContext; }
 
-        // Internal — not part of the public SurfaceContext interface.
+        // Extension methods — not on the base SurfaceContext interface.
         Context& GetContext() const { return m_context; }
 
         VkPhysicalDevice const& GetVkPhysicalDevice() const { return m_vkPhysicalDevice; }

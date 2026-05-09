@@ -14,7 +14,7 @@ namespace moth_graphics::graphics::sdl {
 
         graphics::AssetContext& GetAssetContext() override { return m_assetContext; }
 
-        // Internal — not part of the public SurfaceContext interface.
+        // Extension methods — not on the base SurfaceContext interface.
         Context& GetContext() const { return m_context; }
         SDL_Renderer* GetRenderer() const { return m_renderer; }
 
