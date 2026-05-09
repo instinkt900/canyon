@@ -172,7 +172,12 @@ namespace moth_graphics::graphics::vulkan {
         Pipeline& GetCurrentFontPipeline();
 
         /// @brief Returns the current draw context, or @c nullptr for a null frame.
+        ///
+        /// @note The constructor pushes a nullptr sentinel onto m_contextStack.
+        ///       Begin()/End() push/pop real contexts; a null frame pushes an
+        ///       additional nullptr. The stack is never empty.
         DrawContext* CurrentContext() {
+            assert(!m_contextStack.empty());
             return m_contextStack.top();
         }
 

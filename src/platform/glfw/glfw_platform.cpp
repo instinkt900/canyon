@@ -132,6 +132,12 @@ namespace moth_graphics::platform::glfw {
             return nullptr;
         }
 
+        auto* vkGraphicsPtr = dynamic_cast<moth_graphics::graphics::vulkan::Graphics*>(&graphics);
+        if (vkGraphicsPtr == nullptr) {
+            spdlog::error("Vulkan: CreateImGuiContext called with non-Vulkan graphics");
+            return nullptr;
+        }
+
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -154,13 +160,6 @@ namespace moth_graphics::platform::glfw {
             return nullptr;
         }
 
-        auto* vkGraphicsPtr = dynamic_cast<moth_graphics::graphics::vulkan::Graphics*>(&graphics);
-        if (vkGraphicsPtr == nullptr) {
-            spdlog::error("Vulkan: CreateImGuiContext called with non-Vulkan graphics");
-            ImGui_ImplGlfw_Shutdown();
-            ImGui::DestroyContext();
-            return nullptr;
-        }
         auto& vkGraphics = *vkGraphicsPtr;
         auto& surfaceContext = vkGraphics.GetSurfaceContext();
 

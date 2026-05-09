@@ -17,8 +17,6 @@ namespace moth_graphics::platform {
 }
 
 namespace moth_graphics::graphics {
-    class SurfaceContext;
-
     /// @brief Abstract 2D rendering interface.
     ///
     /// All drawing operations are batched between a @c Begin() / @c End() pair.

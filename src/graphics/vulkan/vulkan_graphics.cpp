@@ -42,8 +42,14 @@ namespace moth_graphics::graphics::vulkan {
         m_defaultContext.m_target = m_swapchain->GetNextFramebuffer();
         if (m_defaultContext.m_target == nullptr) {
             VkSurfaceCapabilitiesKHR caps{};
-            vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+            VkResult const capsResult = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
                 m_surfaceContext.GetVkPhysicalDevice(), m_vkSurface, &caps);
+            if (capsResult != VK_SUCCESS) {
+                spdlog::warn("Vulkan: vkGetPhysicalDeviceSurfaceCapabilitiesKHR returned {} — starting null frame",
+                             static_cast<int>(capsResult));
+                m_contextStack.push(nullptr);
+                return;
+            }
             if (caps.currentExtent.width == 0 || caps.currentExtent.height == 0) {
                 // Window minimised — start a null frame.
                 m_contextStack.push(nullptr);

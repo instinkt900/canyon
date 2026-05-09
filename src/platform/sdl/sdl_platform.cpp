@@ -93,7 +93,11 @@ namespace moth_graphics::platform::sdl {
     }
 
     std::unique_ptr<moth_graphics::platform::ImGuiContext> Platform::CreateImGuiContext(
-        moth_graphics::platform::Window& window, moth_graphics::graphics::IGraphics& /*graphics*/, bool /*enableViewports*/) {
+        moth_graphics::platform::Window& window, moth_graphics::graphics::IGraphics& /*graphics*/, bool enableViewports) {
+        if (enableViewports) {
+            spdlog::warn("SDL: ImGui viewports requested but SDL_Renderer backend does not support platform viewports — flag ignored");
+        }
+
         auto* sdlWindowPtr = dynamic_cast<moth_graphics::platform::sdl::Window*>(&window);
         if (sdlWindowPtr == nullptr) {
             spdlog::error("SDL: CreateImGuiContext called with non-SDL window");
