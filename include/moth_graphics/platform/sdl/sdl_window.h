@@ -33,7 +33,6 @@ namespace moth_graphics::platform::sdl {
 
     private:
         bool CreateWindow();
-        void DestroyWindow();
 
 
         std::unique_ptr<graphics::sdl::SurfaceContext> m_surfaceContext;

@@ -15,9 +15,13 @@ namespace moth_graphics::platform::sdl {
     }
 
     namespace {
-        class SDLImGuiContext : public moth_graphics::platform::ImGuiContext {
+        class SDLImGuiContext final : public moth_graphics::platform::ImGuiContext {
         public:
             explicit SDLImGuiContext(SDL_Window* window) : m_sdlWindow(window) {}
+
+            ~SDLImGuiContext() override {
+                SDLImGuiContext::Shutdown();
+            }
 
             void NewFrame() override {
                 if (m_sdlWindow != nullptr) {

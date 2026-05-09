@@ -108,8 +108,22 @@ namespace moth_graphics::platform::sdl {
         PostCreate();
     }
 
+    // Subclass members destroy before base members, so the layer stack and
+    // ImGui context (base members) must be released here while the SDL window
+    // and renderer are still alive.
     Window::~Window() {
-        DestroyWindow();
+        spdlog::info("SDL: destroying window '{}'", m_title);
+        ReleaseUiResources();      // layer stack → ImGui context
+        SetGraphics(nullptr);      // sdl::Graphics (uses renderer)
+        m_surfaceContext.reset();
+        if (m_renderer != nullptr) {
+            SDL_DestroyRenderer(m_renderer);
+            m_renderer = nullptr;
+        }
+        if (m_window != nullptr) {
+            SDL_DestroyWindow(m_window);
+            m_window = nullptr;
+        }
     }
 
     graphics::SurfaceContext& Window::GetSurfaceContext() const {
@@ -171,14 +185,5 @@ namespace moth_graphics::platform::sdl {
     void Window::EndFrame() {
         GetGraphics().End();
         SDL_RenderPresent(m_renderer);
-    }
-
-    void Window::DestroyWindow() {
-        spdlog::info("SDL: destroying window '{}'", m_title);
-        PreDestroy();
-        SetGraphics(nullptr);
-        m_surfaceContext.reset();
-        SDL_DestroyRenderer(m_renderer);
-        SDL_DestroyWindow(m_window);
     }
 }

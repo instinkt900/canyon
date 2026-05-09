@@ -54,12 +54,11 @@ namespace moth_graphics::platform {
         m_layerStack->SetEventListener(this);
     }
 
-    void Window::PreDestroy() {
-        m_uiRenderer.reset();
-        m_mothImageFactory.reset();
-        m_mothFontFactory.reset();
-        m_mothFlipbookFactory.reset();
-        m_mothContext.reset();
+    void Window::ReleaseUiResources() {
+        // Order matters: textures owned by the layer stack call
+        // ImGui_ImplVulkan_RemoveTexture in their destructors, so the layer
+        // stack must die before the ImGui context shuts down its Vulkan pool.
         m_layerStack.reset();
+        m_imguiContext.reset();
     }
 }

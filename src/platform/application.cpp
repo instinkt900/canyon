@@ -25,11 +25,12 @@ namespace moth_graphics::platform {
             throw;
         }
         m_window->AddEventListener(this);
-        m_imguiContext = m_platform.CreateImGuiContext(*m_window, m_window->GetGraphics(), m_imguiViewportsEnabled);
-        if (!m_imguiContext) {
+        auto imguiContext = m_platform.CreateImGuiContext(*m_window, m_window->GetGraphics(), m_imguiViewportsEnabled);
+        if (!imguiContext) {
             spdlog::error("Application: ImGui context initialization failed");
             throw std::runtime_error("ImGui context initialization failed");
         }
+        m_window->SetImGuiContext(std::move(imguiContext));
         PostCreateWindow();
         spdlog::info("Application: ready");
     }
@@ -38,15 +39,10 @@ namespace moth_graphics::platform {
         spdlog::info("Application: running");
         TickSync();
         spdlog::info("Application: shutting down");
-        m_imguiContext->Shutdown();
-        m_imguiContext.reset();
         Shutdown();
-        // Tear down the window (and its graphics/surface context) here so the
-        // platform's instance/device outlive them. main() typically calls
-        // platform.Shutdown() right after Run() returns, and the platform owns
-        // the Vulkan instance — letting m_window destruct in ~Application
-        // (after platform shutdown) leaks the device and triggers validation
-        // errors about live VkDevice/VkBuffer/VkSurfaceKHR at vkDestroyInstance.
+        // Tear down the window before main() calls platform.Shutdown() (which
+        // destroys the Vulkan instance). The window's destructor handles the
+        // layer-stack → ImGui → graphics → native-handle teardown internally.
         m_window.reset();
     }
 
@@ -77,10 +73,19 @@ namespace moth_graphics::platform {
     }
 
     void Application::Tick(uint32_t ticks) {
-        m_imguiContext->NewFrame();
+        // ImGui is optional. Custom Application frameworks may run a Window
+        // with no ImGui context (e.g. a pure game window), or own ImGui
+        // separately (e.g. multi-context mode where the framework drives
+        // ImGui::SetCurrentContext before each window's frame).
+        ImGuiContext* imgui = m_window->HasImGuiContext() ? &m_window->GetImGuiContext() : nullptr;
+        if (imgui != nullptr) {
+            imgui->NewFrame();
+        }
         m_window->BeginFrame();
         m_window->GetLayerStack().Draw();
-        m_imguiContext->Render(m_window->GetGraphics());
+        if (imgui != nullptr) {
+            imgui->Render(m_window->GetGraphics());
+        }
         m_window->EndFrame();
     }
 }

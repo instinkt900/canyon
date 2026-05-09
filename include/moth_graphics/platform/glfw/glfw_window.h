@@ -33,8 +33,6 @@ namespace moth_graphics::platform::glfw {
 
     private:
         bool CreateWindow();
-        void DestroyWindow();
-
 
         graphics::vulkan::Context& m_context;
         std::unique_ptr<graphics::vulkan::SurfaceContext> m_surfaceContext;

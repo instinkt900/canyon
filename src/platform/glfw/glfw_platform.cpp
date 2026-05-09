@@ -26,11 +26,15 @@ namespace moth_graphics::platform::glfw {
     }
 
     namespace {
-        class VulkanImGuiContext : public moth_graphics::platform::ImGuiContext {
+        class VulkanImGuiContext final : public moth_graphics::platform::ImGuiContext {
         public:
             explicit VulkanImGuiContext(moth_graphics::graphics::vulkan::Graphics* vkGraphics)
                 : m_initialized(true)
                 , m_vkGraphics(vkGraphics) {}
+
+            ~VulkanImGuiContext() override {
+                VulkanImGuiContext::Shutdown();
+            }
 
             void NewFrame() override {
                 if (m_initialized) {
