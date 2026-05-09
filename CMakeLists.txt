@@ -78,7 +78,7 @@ if(NOT MOTH_GRAPHICS_DISABLE_VULKAN)
         src/graphics/vulkan/shaders/vulkan_shaders.cpp
         src/graphics/vulkan/vulkan_buffer.cpp
         src/graphics/vulkan/vulkan_command_buffer.cpp
-        src/graphics/vulkan/vulkan_context.cpp
+        src/graphics/vulkan/vulkan_managed_context.cpp
         src/graphics/vulkan/vulkan_fence.cpp
         src/graphics/vulkan/vulkan_font.cpp
         src/graphics/vulkan/vulkan_framebuffer.cpp

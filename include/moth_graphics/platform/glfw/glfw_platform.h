@@ -8,6 +8,7 @@
 
 namespace moth_graphics::graphics::vulkan {
     class Context;
+    class ManagedContext;
 }
 
 namespace moth_graphics::platform::glfw {
@@ -28,7 +29,7 @@ namespace moth_graphics::platform::glfw {
     private:
         void ShutdownImpl();
 
-        std::unique_ptr<moth_graphics::graphics::vulkan::Context> m_context = nullptr;
+        std::unique_ptr<moth_graphics::graphics::vulkan::ManagedContext> m_context = nullptr;
         bool m_initialized = false;
     };
 }

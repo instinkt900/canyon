@@ -1,5 +1,5 @@
 #include "common.h"
-#include "graphics/sdl/sdl_context.h"
+#include "moth_graphics/graphics/sdl/sdl_context.h"
 #include "moth_graphics/platform/imgui_context.h"
 #include "moth_graphics/platform/sdl/sdl_window.h"
 #include "moth_graphics/platform/sdl/sdl_platform.h"

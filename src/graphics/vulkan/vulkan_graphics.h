@@ -13,7 +13,7 @@
 #include "vulkan_pipeline.h"
 #include "vulkan_renderpass.h"
 #include "vulkan_shader.h"
-#include "vulkan_surface_context.h"
+#include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
 #include "vulkan_swapchain.h"
 #include "vulkan_texture.h"
 #include "moth_graphics/platform/window.h"

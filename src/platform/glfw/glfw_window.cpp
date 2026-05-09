@@ -2,7 +2,7 @@
 #include "common.h"
 #include "moth_graphics/platform/glfw/glfw_window.h"
 #include "graphics/vulkan/vulkan_graphics.h"
-#include "graphics/vulkan/vulkan_surface_context.h"
+#include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
 #include "moth_graphics/platform/glfw/glfw_events.h"
 #include "moth_graphics/events/event_window.h"
 #include <moth_ui/events/event_mouse.h>

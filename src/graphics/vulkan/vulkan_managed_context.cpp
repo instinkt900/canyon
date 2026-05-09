@@ -1,8 +1,8 @@
 #include "common.h"
-#include "vulkan_context.h"
+#include "vulkan_managed_context.h"
+#include "vulkan_utils.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "vulkan_utils.h"
 
 #include <spdlog/spdlog.h>
 
@@ -80,13 +80,16 @@ namespace {
         ;
 
 namespace moth_graphics::graphics::vulkan {
-    bool Context::Startup() {
+    bool ManagedContext::Startup() {
         spdlog::info("Vulkan: initializing context");
 
         spdlog::info("Vulkan: initializing FreeType");
-        FT_CHECK(FT_Init_FreeType(&m_ftLibrary));
+        FT_Library ftLibrary = nullptr;
+        FT_CHECK(FT_Init_FreeType(&ftLibrary));
 
         // create instance
+        VkInstance vkInstance = VK_NULL_HANDLE;
+        VkDebugUtilsMessengerEXT vkDebugMessenger = VK_NULL_HANDLE;
         {
             VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
             VkInstanceCreateInfo createInfo{};
@@ -145,7 +148,7 @@ namespace moth_graphics::graphics::vulkan {
 
             createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
             createInfo.ppEnabledExtensionNames = extensions.data();
-            CHECK_VK_RESULT(vkCreateInstance(&createInfo, nullptr, &m_vkInstance));
+            CHECK_VK_RESULT(vkCreateInstance(&createInfo, nullptr, &vkInstance));
             spdlog::info("Vulkan: instance created");
         }
 
@@ -153,18 +156,21 @@ namespace moth_graphics::graphics::vulkan {
             spdlog::info("Vulkan: enabling validation layers");
             VkDebugUtilsMessengerCreateInfoEXT createInfo{};
             populateDebugMessengerCreateInfo(createInfo);
-            CHECK_VK_RESULT(CreateDebugUtilsMessengerEXT(m_vkInstance, &createInfo, nullptr, &m_vkDebugMessenger));
+            CHECK_VK_RESULT(CreateDebugUtilsMessengerEXT(vkInstance, &createInfo, nullptr, &vkDebugMessenger));
         }
         spdlog::info("Vulkan: context ready");
+
+        m_context.SetHandles(vkInstance, ftLibrary);
+        m_debugMessenger = vkDebugMessenger;
         return true;
     }
 
-    void Context::Shutdown() {
+    void ManagedContext::Shutdown() {
         spdlog::info("Vulkan: destroying context");
         if (enableValidationLayers) {
-            DestroyDebugUtilsMessengerEXT(m_vkInstance, m_vkDebugMessenger, nullptr);
+            DestroyDebugUtilsMessengerEXT(m_context.GetInstance(), m_debugMessenger, nullptr);
         }
-        vkDestroyInstance(m_vkInstance, nullptr);
-        FT_Done_FreeType(m_ftLibrary);
+        vkDestroyInstance(m_context.GetInstance(), nullptr);
+        FT_Done_FreeType(m_context.GetFTLibrary());
     }
 }
