@@ -93,6 +93,10 @@ namespace {
 
 namespace moth_graphics::graphics::vulkan {
     std::unique_ptr<Font> Font::Load(std::filesystem::path const& path, int size, SurfaceContext& context) {
+        if (context.GetContext().ftLibrary == nullptr) {
+            spdlog::error("Vulkan: Font::Load called with uninitialized FreeType library");
+            return nullptr;
+        }
         FT_Face face = nullptr;
         if (FT_New_Face(context.GetContext().ftLibrary, path.string().c_str(), 0, &face) != 0) {
             return nullptr;

@@ -41,6 +41,11 @@ namespace moth_graphics::graphics::vulkan {
             CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.instance, &gpuCount, gpus.data()));
             spdlog::info("Vulkan: {} physical device(s) found", gpuCount);
 
+            if (gpuCount == 0) {
+                spdlog::error("Vulkan: no physical devices found");
+                abort();
+            }
+
             uint32_t selectedGpu = 0;
             for (uint32_t i = 0; i < gpuCount; ++i) {
                 VkPhysicalDeviceFeatures features;
@@ -142,7 +147,7 @@ namespace moth_graphics::graphics::vulkan {
             allocatorCreateInfo.instance = m_context.instance;
             allocatorCreateInfo.physicalDevice = m_vkPhysicalDevice;
             allocatorCreateInfo.device = m_vkDevice;
-            vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator);
+            CHECK_VK_RESULT(vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator));
         }
     }
 

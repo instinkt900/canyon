@@ -118,6 +118,10 @@ namespace moth_graphics::platform::glfw {
     }
 
     std::unique_ptr<moth_graphics::platform::Window> Platform::CreateWindow(std::string_view title, int width, int height) {
+        if (m_context == nullptr) {
+            spdlog::error("GLFW: Platform::CreateWindow called without an active graphics context");
+            return nullptr;
+        }
         return std::make_unique<platform::glfw::Window>(m_context->GetContext(), title, width, height);
     }
 
