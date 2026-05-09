@@ -184,8 +184,7 @@ namespace moth_graphics::platform::glfw {
             return nullptr;
         }
 
-        ImGui_ImplVulkan_CreateFontsTexture();
-
+        // Font atlas is uploaded lazily on the first NewFrame().
         return std::make_unique<VulkanImGuiContext>(vkGraphicsPtr);
     }
 }
