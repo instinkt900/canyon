@@ -100,7 +100,8 @@ namespace {
 
 namespace moth_graphics::platform::sdl {
     Window::Window(std::string_view title, int width, int height)
-        : platform::Window(title, width, height) {
+        : platform::Window(title, width, height)
+        , m_surfaceContext(nullptr) {
         if (!CreateWindow()) {
             throw std::runtime_error("SDL: failed to create window '" + std::string(title) + "'");
         }

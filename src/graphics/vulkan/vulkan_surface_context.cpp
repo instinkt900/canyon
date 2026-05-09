@@ -22,6 +22,10 @@ namespace moth_graphics::graphics::vulkan {
         , m_vkQueue(queue)
         , m_assetContext(*this)
         , m_ownsDevice(false) {
+        if (m_vkPhysicalDevice == VK_NULL_HANDLE || m_vkDevice == VK_NULL_HANDLE || m_vkQueue == VK_NULL_HANDLE) {
+            spdlog::critical("Vulkan: BYO-device SurfaceContext requires non-null physicalDevice, device, and queue");
+            abort();
+        }
         vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkDeviceProperties);
         spdlog::info("Vulkan: surface context wrapping existing device: {}",
                      m_vkDeviceProperties.deviceName);
