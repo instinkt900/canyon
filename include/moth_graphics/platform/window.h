@@ -17,9 +17,11 @@
 #include <cassert>
 #include <cstdint>
 
-namespace moth_graphics::platform {
+namespace moth_graphics::graphics {
     class SurfaceContext;
+}
 
+namespace moth_graphics::platform {
     /// @brief A platform window and its associated rendering resources.
     ///
     /// Owns the @c IGraphics instance, the moth_ui @c LayerStack, and the
