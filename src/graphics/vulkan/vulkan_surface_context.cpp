@@ -3,6 +3,8 @@
 #include "moth_graphics/graphics/vulkan/vulkan_context.h"
 #include "vulkan_utils.h"
 
+#include <stdexcept>
+
 namespace {
     char const* const deviceExtensions[] = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
@@ -23,8 +25,7 @@ namespace moth_graphics::graphics::vulkan {
         , m_assetContext(*this)
         , m_ownsDevice(false) {
         if (m_vkPhysicalDevice == VK_NULL_HANDLE || m_vkDevice == VK_NULL_HANDLE || m_vkQueue == VK_NULL_HANDLE) {
-            spdlog::critical("Vulkan: BYO-device SurfaceContext requires non-null physicalDevice, device, and queue");
-            abort();
+            throw std::invalid_argument("Vulkan: BYO-device SurfaceContext requires non-null physicalDevice, device, and queue");
         }
         vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkDeviceProperties);
         spdlog::info("Vulkan: surface context wrapping existing device: {}",
@@ -46,8 +47,7 @@ namespace moth_graphics::graphics::vulkan {
             spdlog::info("Vulkan: {} physical device(s) found", gpuCount);
 
             if (gpuCount == 0) {
-                spdlog::error("Vulkan: no physical devices found");
-                abort();
+                throw std::runtime_error("Vulkan: no physical devices found");
             }
 
             uint32_t selectedGpu = 0;
