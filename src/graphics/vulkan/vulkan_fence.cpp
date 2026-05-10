@@ -4,15 +4,13 @@
 
 namespace moth_graphics::graphics::vulkan {
     Fence::Fence(SurfaceContext& context)
-        : m_context(context)
-        , m_vkFence(VK_NULL_HANDLE) {
+        : m_context(context) {
         VkFenceCreateInfo fenceInfo{};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-        CHECK_VK_RESULT(vkCreateFence(m_context.GetVkDevice(), &fenceInfo, nullptr, &m_vkFence));
-    }
-
-    Fence::~Fence() {
-        vkDestroyFence(m_context.GetVkDevice(), m_vkFence, nullptr);
+        VkFence fence = VK_NULL_HANDLE;
+        CHECK_VK_RESULT(vkCreateFence(m_context.GetVkDevice(), &fenceInfo, nullptr, &fence));
+        VkDevice const device = m_context.GetVkDevice();
+        m_vkFence = UniqueHandle<VkFence>(fence, [device](VkFence h) { vkDestroyFence(device, h, nullptr); });
     }
 }

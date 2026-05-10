@@ -3,6 +3,7 @@
 #include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
 #include "vulkan_framebuffer.h"
 #include "vulkan_renderpass.h"
+#include "vulkan_unique.h"
 
 #include <vulkan/vulkan_core.h>
 
@@ -12,15 +13,15 @@
 
 namespace moth_graphics::graphics::vulkan {
     struct FrameSlot {
-        VkSemaphore imageAvailable;
-        VkSemaphore renderFinished;
+        UniqueHandle<VkSemaphore> imageAvailable;
+        UniqueHandle<VkSemaphore> renderFinished;
         uint32_t lastImageIndex = UINT32_MAX;
     };
 
     class Swapchain {
     public:
         Swapchain(SurfaceContext& context, RenderPass& renderPass, VkSurfaceKHR surface, VkExtent2D extent);
-        ~Swapchain();
+        ~Swapchain() = default;
 
         VkExtent2D GetExtent() const { return m_extent; }
 
@@ -39,7 +40,10 @@ namespace moth_graphics::graphics::vulkan {
     private:
         SurfaceContext& m_context;
         VkExtent2D m_extent;
-        VkSwapchainKHR m_vkSwapchain;
+        // Framebuffers reference the swapchain's images, so they must be torn
+        // down before the swapchain handle. Declaration order: swapchain first
+        // (destroyed last), framebuffers after (destroyed first).
+        UniqueHandle<VkSwapchainKHR> m_vkSwapchain;
         std::vector<std::unique_ptr<Framebuffer>> m_framebuffers;
         uint32_t m_currentFrame = 0;
         uint32_t m_imageCount = 0;

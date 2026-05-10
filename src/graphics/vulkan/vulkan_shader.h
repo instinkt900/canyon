@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vulkan_unique.h"
+
 #include <vulkan/vulkan_core.h>
 
 #include <memory>
@@ -18,7 +20,7 @@ namespace moth_graphics::graphics::vulkan {
 
         struct Stage {
             VkShaderStageFlagBits m_stageFlags;
-            VkShaderModule m_module;
+            UniqueHandle<VkShaderModule> m_module;
             std::string m_entryPoint;
         };
 
@@ -26,14 +28,15 @@ namespace moth_graphics::graphics::vulkan {
         VkDevice m_device;
         VkDescriptorPool m_descriptorPool;
         std::vector<Shader::Stage> m_stages;
-        VkDescriptorSetLayout m_descriptorSetLayout;
-        VkPipelineLayout m_pipelineLayout;
+        UniqueHandle<VkDescriptorSetLayout> m_descriptorSetLayout;
+        UniqueHandle<VkPipelineLayout> m_pipelineLayout;
 
         VkDescriptorSet GetDescriptorSet(Texture& image);
         VkDescriptorSet CreateDescriptorSet(Texture& image);
 
         // Keyed by (image_id, sampler) so that the same texture with two different
         // filter modes can coexist without any descriptor set being freed mid-frame.
+        // Sets are batch-freed in the destructor before the pool/layouts go away.
         std::map<std::pair<uint32_t, VkSampler>, VkDescriptorSet> m_descriptorSets;
     };
 

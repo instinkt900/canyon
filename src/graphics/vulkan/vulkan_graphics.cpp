@@ -9,15 +9,19 @@
 namespace moth_graphics::graphics::vulkan {
     Graphics::Graphics(SurfaceContext& context, VkSurfaceKHR surface, uint32_t surfaceWidth, uint32_t surfaceHeight)
         : m_surfaceContext(context)
-        , m_vkSurface(surface)
-        , m_vkPipelineCache(VK_NULL_HANDLE) {
+        , m_vkSurface(surface) {
         CreateRenderPass();
         CreateShaders();
         CreateDefaultImage();
 
         VkPipelineCacheCreateInfo cacheInfo{};
         cacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-        CHECK_VK_RESULT(vkCreatePipelineCache(m_surfaceContext.GetVkDevice(), &cacheInfo, nullptr, &m_vkPipelineCache));
+        VkPipelineCache cache = VK_NULL_HANDLE;
+        CHECK_VK_RESULT(vkCreatePipelineCache(m_surfaceContext.GetVkDevice(), &cacheInfo, nullptr, &cache));
+        VkDevice const device = m_surfaceContext.GetVkDevice();
+        m_vkPipelineCache = UniqueHandle<VkPipelineCache>(cache, [device](VkPipelineCache h) {
+            vkDestroyPipelineCache(device, h, nullptr);
+        });
 
         m_swapchain = std::make_unique<Swapchain>(m_surfaceContext, *m_renderPass, surface, VkExtent2D{ surfaceWidth, surfaceHeight });
 
@@ -35,7 +39,6 @@ namespace moth_graphics::graphics::vulkan {
             m_defaultContext.m_vertexBuffer->Unmap();
             m_defaultContext.m_vertexBufferData = nullptr;
         }
-        vkDestroyPipelineCache(m_surfaceContext.GetVkDevice(), m_vkPipelineCache, nullptr);
     }
 
     void Graphics::Begin() {

@@ -388,11 +388,12 @@ namespace moth_graphics::graphics::vulkan {
         if (std::end(m_vkDescriptorSets) == it) {
             VkDescriptorSet vkDescriptorSet = VK_NULL_HANDLE;
 
+            VkDescriptorSetLayout const setLayoutHandle = shader.m_descriptorSetLayout.Get();
             VkDescriptorSetAllocateInfo alloc_info{};
             alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
             alloc_info.descriptorPool = shader.m_descriptorPool;
             alloc_info.descriptorSetCount = 1;
-            alloc_info.pSetLayouts = &shader.m_descriptorSetLayout;
+            alloc_info.pSetLayouts = &setLayoutHandle;
             CHECK_VK_RESULT(vkAllocateDescriptorSets(m_context.GetVkDevice(), &alloc_info, &vkDescriptorSet));
 
             VkDescriptorBufferInfo glyph_info[1] = {};

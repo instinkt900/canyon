@@ -25,8 +25,7 @@ namespace {
 namespace moth_graphics::graphics::vulkan {
     Swapchain::Swapchain(SurfaceContext& context, RenderPass& renderPass, VkSurfaceKHR surface, VkExtent2D extent)
         : m_context(context)
-        , m_extent{}
-        , m_vkSwapchain(VK_NULL_HANDLE) {
+        , m_extent{} {
         VkSurfaceCapabilitiesKHR capabilities;
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_context.GetVkPhysicalDevice(), surface, &capabilities);
         m_extent = chooseSwapExtent(extent.width, extent.height, capabilities);
@@ -54,7 +53,12 @@ namespace moth_graphics::graphics::vulkan {
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
         createInfo.oldSwapchain = VK_NULL_HANDLE;
-        CHECK_VK_RESULT(vkCreateSwapchainKHR(m_context.GetVkDevice(), &createInfo, nullptr, &m_vkSwapchain));
+        VkSwapchainKHR swapchain = VK_NULL_HANDLE;
+        CHECK_VK_RESULT(vkCreateSwapchainKHR(m_context.GetVkDevice(), &createInfo, nullptr, &swapchain));
+        VkDevice const device = m_context.GetVkDevice();
+        m_vkSwapchain = UniqueHandle<VkSwapchainKHR>(swapchain, [device](VkSwapchainKHR h) {
+            vkDestroySwapchainKHR(device, h, nullptr);
+        });
 
         uint32_t imageCount = 0;
         std::vector<VkImage> swapchainImages;
@@ -87,8 +91,16 @@ namespace moth_graphics::graphics::vulkan {
             auto slot = std::make_shared<FrameSlot>();
             VkSemaphoreCreateInfo semaphoreInfo{};
             semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-            CHECK_VK_RESULT(vkCreateSemaphore(m_context.GetVkDevice(), &semaphoreInfo, nullptr, &slot->imageAvailable));
-            CHECK_VK_RESULT(vkCreateSemaphore(m_context.GetVkDevice(), &semaphoreInfo, nullptr, &slot->renderFinished));
+            VkSemaphore imageAvailable = VK_NULL_HANDLE;
+            VkSemaphore renderFinished = VK_NULL_HANDLE;
+            CHECK_VK_RESULT(vkCreateSemaphore(m_context.GetVkDevice(), &semaphoreInfo, nullptr, &imageAvailable));
+            CHECK_VK_RESULT(vkCreateSemaphore(m_context.GetVkDevice(), &semaphoreInfo, nullptr, &renderFinished));
+            slot->imageAvailable = UniqueHandle<VkSemaphore>(imageAvailable, [device](VkSemaphore h) {
+                vkDestroySemaphore(device, h, nullptr);
+            });
+            slot->renderFinished = UniqueHandle<VkSemaphore>(renderFinished, [device](VkSemaphore h) {
+                vkDestroySemaphore(device, h, nullptr);
+            });
             m_frames.push_back(slot);
         }
         commandBuffer->SubmitAndWait();
@@ -100,19 +112,6 @@ namespace moth_graphics::graphics::vulkan {
         for (auto& framebuffer : m_framebuffers) {
             framebuffer->GetCommandBuffer().Reset();
         }
-    }
-
-    Swapchain::~Swapchain() {
-        for (uint32_t i = 0; i < m_imageCount; ++i) {
-            auto& slot = m_frames[i];
-            if (slot->imageAvailable != VK_NULL_HANDLE) {
-                vkDestroySemaphore(m_context.GetVkDevice(), slot->imageAvailable, nullptr);
-            }
-            if (slot->renderFinished != VK_NULL_HANDLE) {
-                vkDestroySemaphore(m_context.GetVkDevice(), slot->renderFinished, nullptr);
-            }
-        }
-        vkDestroySwapchainKHR(m_context.GetVkDevice(), m_vkSwapchain, nullptr);
     }
 
     Framebuffer* Swapchain::GetNextFramebuffer() {

@@ -16,6 +16,7 @@
 #include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
 #include "vulkan_swapchain.h"
 #include "vulkan_texture.h"
+#include "vulkan_unique.h"
 #include "moth_graphics/platform/window.h"
 #include "moth_graphics/utils/rect.h"
 #include "moth_graphics/utils/vector.h"
@@ -147,7 +148,7 @@ namespace moth_graphics::graphics::vulkan {
             std::optional<PendingBatch> m_pendingBatch;
         };
 
-        VkPipelineCache m_vkPipelineCache;
+        UniqueHandle<VkPipelineCache> m_vkPipelineCache;
         std::map<uint32_t, std::shared_ptr<Pipeline>> m_pipelines;
         std::map<uint32_t, std::shared_ptr<Pipeline>> m_fontPipelines;
         std::unique_ptr<RenderPass> m_renderPass;
