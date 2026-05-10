@@ -6,8 +6,8 @@ namespace moth_graphics::graphics::vulkan {
     Pipeline::Pipeline(uint32_t hash, VkDevice device, VkPipeline pipeline, std::shared_ptr<Shader> shader)
         : m_hash(hash)
         , m_device(device)
-        , m_pipeline(pipeline, [device](VkPipeline h) { vkDestroyPipeline(device, h, nullptr); })
-        , m_shader(shader) {
+        , m_shader(shader)
+        , m_pipeline(pipeline, [device](VkPipeline h) { vkDestroyPipeline(device, h, nullptr); }) {
     }
 
     PipelineBuilder::PipelineBuilder(VkDevice device)

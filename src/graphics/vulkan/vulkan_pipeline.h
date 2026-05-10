@@ -18,8 +18,11 @@ namespace moth_graphics::graphics::vulkan {
 
         uint32_t m_hash;
         VkDevice m_device;
-        UniqueHandle<VkPipeline> m_pipeline;
+        // m_shader is declared before m_pipeline so it is destroyed last —
+        // VkPipeline must be destroyed before any VkPipelineLayout owned by
+        // the shader could be released (matches pre-refactor body ordering).
         std::shared_ptr<Shader> m_shader; // need to keep this around as long as the pipeline uses them
+        UniqueHandle<VkPipeline> m_pipeline;
 
     private:
         Pipeline(Pipeline const&) = delete;
