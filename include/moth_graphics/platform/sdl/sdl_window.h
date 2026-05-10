@@ -12,14 +12,13 @@
 #include <cstdint>
 
 namespace moth_graphics::graphics::sdl {
-    class Context;
     class SurfaceContext;
 }
 
 namespace moth_graphics::platform::sdl {
     class Window : public platform::Window {
     public:
-        Window(graphics::sdl::Context& context, std::string_view applicationTitle, int width, int height);
+        Window(std::string_view applicationTitle, int width, int height);
         ~Window() override;
 
         graphics::SurfaceContext & GetSurfaceContext() const override;
@@ -34,10 +33,8 @@ namespace moth_graphics::platform::sdl {
 
     private:
         bool CreateWindow();
-        void DestroyWindow();
 
 
-        graphics::sdl::Context& m_context;
         std::unique_ptr<graphics::sdl::SurfaceContext> m_surfaceContext;
 
         uint32_t m_windowId = 0;

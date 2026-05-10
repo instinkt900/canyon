@@ -56,7 +56,6 @@ if(NOT MOTH_GRAPHICS_DISABLE_SDL)
     list(APPEND SOURCES
         external/imgui/backends/imgui_impl_sdl2.cpp
         external/imgui/backends/imgui_impl_sdlrenderer2.cpp
-        src/graphics/sdl/sdl_context.cpp
         src/graphics/sdl/sdl_font.cpp
         src/graphics/sdl/sdl_graphics.cpp
         src/graphics/sdl/sdl_target.cpp
@@ -78,7 +77,7 @@ if(NOT MOTH_GRAPHICS_DISABLE_VULKAN)
         src/graphics/vulkan/shaders/vulkan_shaders.cpp
         src/graphics/vulkan/vulkan_buffer.cpp
         src/graphics/vulkan/vulkan_command_buffer.cpp
-        src/graphics/vulkan/vulkan_context.cpp
+        src/graphics/vulkan/vulkan_managed_context.cpp
         src/graphics/vulkan/vulkan_fence.cpp
         src/graphics/vulkan/vulkan_font.cpp
         src/graphics/vulkan/vulkan_framebuffer.cpp

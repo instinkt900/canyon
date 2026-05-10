@@ -2,7 +2,7 @@
 #include "common.h"
 #include "moth_graphics/platform/glfw/glfw_window.h"
 #include "graphics/vulkan/vulkan_graphics.h"
-#include "graphics/vulkan/vulkan_surface_context.h"
+#include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
 #include "moth_graphics/platform/glfw/glfw_events.h"
 #include "moth_graphics/events/event_window.h"
 #include <moth_ui/events/event_mouse.h>
@@ -18,8 +18,26 @@ namespace moth_graphics::platform::glfw {
         }
     }
 
+    // Subclass member dtors run BEFORE the base dtor's members, so the layer
+    // stack and ImGui context (base members that depend on GLFW + Vulkan
+    // resources we own here) must be released explicitly in the right order
+    // before this body returns.
     Window::~Window() {
-        DestroyWindow();
+        spdlog::info("GLFW: destroying window '{}'", m_title);
+        if (m_surfaceContext) {
+            vkDeviceWaitIdle(m_surfaceContext->GetVkDevice());
+        }
+        ReleaseUiResources();      // layer stack → ImGui context
+        SetGraphics(nullptr);      // vulkan::Graphics (uses surface, pool)
+        m_surfaceContext.reset();
+        if (m_customVkSurface != VK_NULL_HANDLE) {
+            vkDestroySurfaceKHR(m_context.instance, m_customVkSurface, nullptr);
+            m_customVkSurface = VK_NULL_HANDLE;
+        }
+        if (m_glfwWindow != nullptr) {
+            glfwDestroyWindow(m_glfwWindow);
+            m_glfwWindow = nullptr;
+        }
     }
 
     graphics::SurfaceContext& Window::GetSurfaceContext() const {
@@ -133,7 +151,7 @@ namespace moth_graphics::platform::glfw {
             glfwMaximizeWindow(m_glfwWindow);
         }
 
-        CHECK_VK_RESULT(glfwCreateWindowSurface(m_context.GetInstance(), m_glfwWindow, nullptr, &m_customVkSurface));
+        CHECK_VK_RESULT(glfwCreateWindowSurface(m_context.instance, m_glfwWindow, nullptr, &m_customVkSurface));
         m_surfaceContext = std::make_unique<graphics::vulkan::SurfaceContext>(m_context);
 
         SetGraphics(std::make_unique<graphics::vulkan::Graphics>(*m_surfaceContext, m_customVkSurface, m_windowWidth, m_windowHeight));
@@ -144,25 +162,6 @@ namespace moth_graphics::platform::glfw {
     void Window::SetWindowTitle(std::string_view title) {
         m_title = title;
         glfwSetWindowTitle(m_glfwWindow, m_title.c_str());
-    }
-
-    void Window::DestroyWindow() {
-        spdlog::info("GLFW: destroying window '{}'", m_title);
-        // Wait for all GPU work to finish before destroying Vulkan-backed resources
-        if (m_surfaceContext) {
-            vkDeviceWaitIdle(m_surfaceContext->GetVkDevice());
-        }
-        PreDestroy();
-        SetGraphics(nullptr);
-        m_surfaceContext = nullptr;
-        if (m_glfwWindow != nullptr) {
-            if (m_customVkSurface != VK_NULL_HANDLE) {
-                vkDestroySurfaceKHR(m_context.GetInstance(), m_customVkSurface, nullptr);
-                m_customVkSurface = VK_NULL_HANDLE;
-            }
-            glfwDestroyWindow(m_glfwWindow);
-            m_glfwWindow = nullptr;
-        }
     }
 
     void Window::OnResize() {

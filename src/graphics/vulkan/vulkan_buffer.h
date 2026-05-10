@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vulkan_surface_context.h"
+#include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
 
 #include <vulkan/vulkan_core.h>
 

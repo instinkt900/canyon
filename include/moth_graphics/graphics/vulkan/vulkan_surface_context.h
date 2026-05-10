@@ -12,12 +12,25 @@
 namespace moth_graphics::graphics::vulkan {
     class SurfaceContext : public graphics::SurfaceContext {
     public:
+        /// @brief Create a surface context that selects a physical device and
+        ///        creates a logical device, descriptor pool, command pool, and
+        ///        memory allocator.
         SurfaceContext(Context& context);
+
+        /// @brief Create a surface context wrapping an existing device and queue.
+        ///        Moth still creates its own descriptor pool, command pool, and
+        ///        memory allocator. The caller retains ownership of the device.
+        SurfaceContext(Context& context,
+                       VkPhysicalDevice physicalDevice,
+                       VkDevice device,
+                       uint32_t queueFamily,
+                       VkQueue queue);
+
         ~SurfaceContext() override;
 
         graphics::AssetContext& GetAssetContext() override { return m_assetContext; }
 
-        // Internal — not part of the public SurfaceContext interface.
+        // Extension methods — not on the base SurfaceContext interface.
         Context& GetContext() const { return m_context; }
 
         VkPhysicalDevice const& GetVkPhysicalDevice() const { return m_vkPhysicalDevice; }
@@ -38,6 +51,8 @@ namespace moth_graphics::graphics::vulkan {
         static int getMinImageCountFromPresentMode(VkPresentModeKHR present_mode);
 
     private:
+        void initPools();
+
         Context& m_context;
 
         VkPhysicalDevice m_vkPhysicalDevice = VK_NULL_HANDLE;
@@ -50,5 +65,6 @@ namespace moth_graphics::graphics::vulkan {
         VkPhysicalDeviceProperties m_vkDeviceProperties = {};
 
         AssetContext m_assetContext;
+        bool m_ownsDevice = true;
     };
 }

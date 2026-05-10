@@ -291,4 +291,8 @@ namespace moth_graphics::graphics::sdl {
     void Graphics::SetLogicalSize(IntVec2 const& logicalSize) {
         SDL_RenderSetLogicalSize(m_surfaceContext.GetRenderer(), logicalSize.x, logicalSize.y);
     }
+
+    std::unique_ptr<IGraphics> CreateGraphics(SurfaceContext& surfaceContext) {
+        return std::make_unique<Graphics>(surfaceContext);
+    }
 }

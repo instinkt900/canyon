@@ -489,4 +489,10 @@ namespace moth_graphics::graphics::vulkan {
         m_swapchain.reset();
         m_swapchain = std::make_unique<Swapchain>(m_surfaceContext, *m_renderPass, surface, VkExtent2D{ surfaceWidth, surfaceHeight });
     }
+
+    std::unique_ptr<IGraphics> CreateGraphics(
+        SurfaceContext& surfaceContext, VkSurfaceKHR surface,
+        uint32_t surfaceWidth, uint32_t surfaceHeight) {
+        return std::make_unique<Graphics>(surfaceContext, surface, surfaceWidth, surfaceHeight);
+    }
 }

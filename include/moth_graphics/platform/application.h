@@ -48,7 +48,7 @@ namespace moth_graphics::platform {
         /// When enabled, floating ImGui windows are promoted to native OS windows.
         /// Avoid on tiling window managers (i3, sway) — new OS windows disrupt drag-and-drop.
         void SetImGuiViewportsEnabled(bool enabled) {
-            assert(m_imguiContext == nullptr && "SetImGuiViewportsEnabled must be called before Init()");
+            assert(m_window == nullptr && "SetImGuiViewportsEnabled must be called before Init()");
             m_imguiViewportsEnabled = enabled;
         }
 
@@ -80,6 +80,5 @@ namespace moth_graphics::platform {
         bool m_mainWindowMaximized = false;
         bool m_imguiViewportsEnabled = false;
         std::unique_ptr<Window> m_window;
-        std::unique_ptr<ImGuiContext> m_imguiContext;
     };
 }

@@ -1,7 +1,9 @@
 #include "common.h"
-#include "vulkan_surface_context.h"
-#include "vulkan_context.h"
+#include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
+#include "moth_graphics/graphics/vulkan/vulkan_context.h"
 #include "vulkan_utils.h"
+
+#include <stdexcept>
 
 namespace {
     char const* const deviceExtensions[] = {
@@ -10,6 +12,27 @@ namespace {
 }
 
 namespace moth_graphics::graphics::vulkan {
+    SurfaceContext::SurfaceContext(Context& context,
+                                   VkPhysicalDevice physicalDevice,
+                                   VkDevice device,
+                                   uint32_t queueFamily,
+                                   VkQueue queue)
+        : m_context(context)
+        , m_vkPhysicalDevice(physicalDevice)
+        , m_vkQueueFamily(queueFamily)
+        , m_vkDevice(device)
+        , m_vkQueue(queue)
+        , m_assetContext(*this)
+        , m_ownsDevice(false) {
+        if (m_vkPhysicalDevice == VK_NULL_HANDLE || m_vkDevice == VK_NULL_HANDLE || m_vkQueue == VK_NULL_HANDLE) {
+            throw std::invalid_argument("Vulkan: BYO-device SurfaceContext requires non-null physicalDevice, device, and queue");
+        }
+        vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &m_vkDeviceProperties);
+        spdlog::info("Vulkan: surface context wrapping existing device: {}",
+                     m_vkDeviceProperties.deviceName);
+        initPools();
+    }
+
     SurfaceContext::SurfaceContext(Context& context)
         : m_context(context)
         , m_assetContext(*this) {
@@ -18,10 +41,14 @@ namespace moth_graphics::graphics::vulkan {
         // select device
         {
             uint32_t gpuCount = 0;
-            CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.GetInstance(), &gpuCount, nullptr));
+            CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.instance, &gpuCount, nullptr));
             std::vector<VkPhysicalDevice> gpus(gpuCount);
-            CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.GetInstance(), &gpuCount, gpus.data()));
+            CHECK_VK_RESULT(vkEnumeratePhysicalDevices(m_context.instance, &gpuCount, gpus.data()));
             spdlog::info("Vulkan: {} physical device(s) found", gpuCount);
+
+            if (gpuCount == 0) {
+                throw std::runtime_error("Vulkan: no physical devices found");
+            }
 
             uint32_t selectedGpu = 0;
             for (uint32_t i = 0; i < gpuCount; ++i) {
@@ -79,6 +106,11 @@ namespace moth_graphics::graphics::vulkan {
             spdlog::info("Vulkan: logical device created (queue family {})", m_vkQueueFamily);
         }
 
+        initPools();
+        spdlog::info("Vulkan: surface context ready");
+    }
+
+    void SurfaceContext::initPools() {
         // descriptor pool
         {
             VkDescriptorPoolSize poolSizes[] = {
@@ -116,12 +148,11 @@ namespace moth_graphics::graphics::vulkan {
         // allocator
         {
             VmaAllocatorCreateInfo allocatorCreateInfo{};
-            allocatorCreateInfo.instance = m_context.GetInstance();
+            allocatorCreateInfo.instance = m_context.instance;
             allocatorCreateInfo.physicalDevice = m_vkPhysicalDevice;
             allocatorCreateInfo.device = m_vkDevice;
-            vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator);
+            CHECK_VK_RESULT(vmaCreateAllocator(&allocatorCreateInfo, &m_vmaAllocator));
         }
-        spdlog::info("Vulkan: surface context ready");
     }
 
     SurfaceContext::~SurfaceContext() {
@@ -138,7 +169,9 @@ namespace moth_graphics::graphics::vulkan {
         vkDestroyDescriptorPool(m_vkDevice, m_vkDescriptorPool, nullptr);
         vkDestroyCommandPool(m_vkDevice, m_vkCommandPool, nullptr);
         vmaDestroyAllocator(m_vmaAllocator);
-        vkDestroyDevice(m_vkDevice, nullptr);
+        if (m_ownsDevice) {
+            vkDestroyDevice(m_vkDevice, nullptr);
+        }
     }
 
     VkCommandBuffer SurfaceContext::beginSingleTimeCommands() {

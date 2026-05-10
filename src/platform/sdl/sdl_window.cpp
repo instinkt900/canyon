@@ -1,7 +1,7 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "common.h"
 #include "moth_graphics/platform/sdl/sdl_window.h"
-#include "graphics/sdl/sdl_surface_context.h"
+#include "moth_graphics/graphics/sdl/sdl_surface_context.h"
 #include "moth_graphics/platform/sdl/sdl_events.h"
 #include "graphics/sdl/sdl_graphics.h"
 
@@ -99,17 +99,31 @@ namespace {
 }
 
 namespace moth_graphics::platform::sdl {
-    Window::Window(graphics::sdl::Context& context, std::string_view title, int width, int height)
+    Window::Window(std::string_view title, int width, int height)
         : platform::Window(title, width, height)
-        , m_context(context) {
+        , m_surfaceContext(nullptr) {
         if (!CreateWindow()) {
             throw std::runtime_error("SDL: failed to create window '" + std::string(title) + "'");
         }
         PostCreate();
     }
 
+    // Subclass members destroy before base members, so the layer stack and
+    // ImGui context (base members) must be released here while the SDL window
+    // and renderer are still alive.
     Window::~Window() {
-        DestroyWindow();
+        spdlog::info("SDL: destroying window '{}'", m_title);
+        ReleaseUiResources();      // layer stack → ImGui context
+        SetGraphics(nullptr);      // sdl::Graphics (uses renderer)
+        m_surfaceContext.reset();
+        if (m_renderer != nullptr) {
+            SDL_DestroyRenderer(m_renderer);
+            m_renderer = nullptr;
+        }
+        if (m_window != nullptr) {
+            SDL_DestroyWindow(m_window);
+            m_window = nullptr;
+        }
     }
 
     graphics::SurfaceContext& Window::GetSurfaceContext() const {
@@ -152,7 +166,7 @@ namespace moth_graphics::platform::sdl {
             return false;
         }
 
-        m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_context, m_renderer);
+        m_surfaceContext = std::make_unique<graphics::sdl::SurfaceContext>(m_renderer);
         SetGraphics(std::make_unique<graphics::sdl::Graphics>(*m_surfaceContext));
         m_windowId = SDL_GetWindowID(m_window);
         spdlog::info("SDL: window '{}' ready", m_title);
@@ -171,14 +185,5 @@ namespace moth_graphics::platform::sdl {
     void Window::EndFrame() {
         GetGraphics().End();
         SDL_RenderPresent(m_renderer);
-    }
-
-    void Window::DestroyWindow() {
-        spdlog::info("SDL: destroying window '{}'", m_title);
-        PreDestroy();
-        SetGraphics(nullptr);
-        m_surfaceContext.reset();
-        SDL_DestroyRenderer(m_renderer);
-        SDL_DestroyWindow(m_window);
     }
 }

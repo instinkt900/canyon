@@ -1,5 +1,6 @@
 #include "common.h"
 #include "graphics/vulkan/vulkan_graphics.h"
+#include "graphics/vulkan/vulkan_managed_context.h"
 #include "graphics/vulkan/vulkan_utils.h"
 #include "moth_graphics/platform/glfw/glfw_platform.h"
 #include "moth_graphics/platform/glfw/glfw_window.h"
@@ -25,11 +26,15 @@ namespace moth_graphics::platform::glfw {
     }
 
     namespace {
-        class VulkanImGuiContext : public moth_graphics::platform::ImGuiContext {
+        class VulkanImGuiContext final : public moth_graphics::platform::ImGuiContext {
         public:
             explicit VulkanImGuiContext(moth_graphics::graphics::vulkan::Graphics* vkGraphics)
                 : m_initialized(true)
                 , m_vkGraphics(vkGraphics) {}
+
+            ~VulkanImGuiContext() override {
+                VulkanImGuiContext::Shutdown();
+            }
 
             void NewFrame() override {
                 if (m_initialized) {
@@ -88,7 +93,7 @@ namespace moth_graphics::platform::glfw {
             return false;
         }
         spdlog::info("GLFW: initialized");
-        m_context = std::make_unique<graphics::vulkan::Context>();
+        m_context = std::make_unique<graphics::vulkan::ManagedContext>();
         if (!m_context->Startup()) {
             spdlog::error("GLFW: graphics context startup failed");
             m_context.reset();
@@ -116,12 +121,12 @@ namespace moth_graphics::platform::glfw {
         m_initialized = false;
     }
 
-    graphics::Context& Platform::GetGraphicsContext() {
-        return *m_context;
-    }
-
     std::unique_ptr<moth_graphics::platform::Window> Platform::CreateWindow(std::string_view title, int width, int height) {
-        return std::make_unique<platform::glfw::Window>(*m_context, title, width, height);
+        if (m_context == nullptr) {
+            spdlog::error("GLFW: Platform::CreateWindow called without an active graphics context");
+            return nullptr;
+        }
+        return std::make_unique<platform::glfw::Window>(m_context->GetContext(), title, width, height);
     }
 
     std::unique_ptr<moth_graphics::platform::ImGuiContext> Platform::CreateImGuiContext(
@@ -164,7 +169,7 @@ namespace moth_graphics::platform::glfw {
         auto& surfaceContext = vkGraphics.GetSurfaceContext();
 
         ImGui_ImplVulkan_InitInfo initInfo{};
-        initInfo.Instance = surfaceContext.GetContext().GetInstance();
+        initInfo.Instance = surfaceContext.GetContext().instance;
         initInfo.PhysicalDevice = surfaceContext.GetVkPhysicalDevice();
         initInfo.Device = surfaceContext.GetVkDevice();
         initInfo.QueueFamily = surfaceContext.GetVkQueueFamily();
