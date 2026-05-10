@@ -5,6 +5,7 @@
 #include "vulkan_fence.h"
 #include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
 #include "vulkan_texture.h"
+#include "vulkan_unique.h"
 
 #include <vulkan/vulkan_core.h>
 
@@ -19,7 +20,7 @@ namespace moth_graphics::graphics::vulkan {
     public:
         Framebuffer(SurfaceContext& context, uint32_t width, uint32_t height, VkImage image, VkImageView view, VkFormat format, VkRenderPass renderPass, uint32_t swapchainIndex);
         Framebuffer(SurfaceContext& context, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkRenderPass renderPass);
-        virtual ~Framebuffer();
+        ~Framebuffer() override = default;
 
         int GetWidth() const { return m_texture ? m_texture->GetWidth() : 0; }
         int GetHeight() const { return m_texture ? m_texture->GetHeight() : 0; }
@@ -39,11 +40,13 @@ namespace moth_graphics::graphics::vulkan {
 
     protected:
         SurfaceContext& m_context;
-        VkFramebuffer m_vkFramebuffer = VK_NULL_HANDLE;
         std::unique_ptr<CommandBuffer> m_commandBuffer;
         std::shared_ptr<Texture> m_texture;
         std::unique_ptr<Fence> m_fence;
         std::shared_ptr<FrameSlot> m_frameSlot;
+        // Declared last so it is destroyed first — matches the previous order
+        // where vkDestroyFramebuffer ran before texture/view release.
+        UniqueHandle<VkFramebuffer> m_vkFramebuffer;
 
         uint32_t m_swapchainIndex = 0;
 

@@ -7,25 +7,20 @@ namespace moth_graphics::graphics::vulkan {
     Shader::Shader(uint32_t hash)
         : m_hash(hash)
         , m_device(VK_NULL_HANDLE)
-        , m_descriptorPool(VK_NULL_HANDLE)
-        , m_descriptorSetLayout(VK_NULL_HANDLE)
-        , m_pipelineLayout(VK_NULL_HANDLE) {
+        , m_descriptorPool(VK_NULL_HANDLE) {
     }
 
     Shader::~Shader() {
+        // Descriptor sets must be freed before the pool/layouts they reference.
+        // Member RAII handles the rest in reverse declaration order.
         if (!m_descriptorSets.empty()) {
             std::vector<VkDescriptorSet> freedSets;
+            freedSets.reserve(m_descriptorSets.size());
             for (auto& [key, descriptorSet] : m_descriptorSets) {
                 freedSets.push_back(descriptorSet);
             }
             vkFreeDescriptorSets(m_device, m_descriptorPool, static_cast<uint32_t>(freedSets.size()), freedSets.data());
         }
-
-        for (auto& stage : m_stages) {
-            vkDestroyShaderModule(m_device, stage.m_module, nullptr);
-        }
-        vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
-        vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, nullptr);
     }
 
     VkDescriptorSet Shader::GetDescriptorSet(Texture& image) {
@@ -41,11 +36,12 @@ namespace moth_graphics::graphics::vulkan {
     VkDescriptorSet Shader::CreateDescriptorSet(Texture& image) {
         VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
 
+        VkDescriptorSetLayout const setLayoutHandle = m_descriptorSetLayout.Get();
         VkDescriptorSetAllocateInfo alloc_info{};
         alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         alloc_info.descriptorPool = m_descriptorPool;
         alloc_info.descriptorSetCount = 1;
-        alloc_info.pSetLayouts = &m_descriptorSetLayout;
+        alloc_info.pSetLayouts = &setLayoutHandle;
         CHECK_VK_RESULT(vkAllocateDescriptorSets(m_device, &alloc_info, &descriptorSet));
 
         VkSampler const sampler = image.GetVkSampler();
@@ -108,6 +104,7 @@ namespace moth_graphics::graphics::vulkan {
         newShader->m_device = m_device;
         newShader->m_descriptorPool = m_descriptorPool;
         newShader->m_stages.reserve(m_stages.size());
+        VkDevice const device = m_device;
         for (auto& stage : m_stages) {
             Shader::Stage newStage;
             newStage.m_stageFlags = stage.m_stageFlags;
@@ -117,24 +114,37 @@ namespace moth_graphics::graphics::vulkan {
             createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
             createInfo.codeSize = stage.m_byteCode.size();
             createInfo.pCode = reinterpret_cast<uint32_t const*>(stage.m_byteCode.data()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-            CHECK_VK_RESULT(vkCreateShaderModule(m_device, &createInfo, nullptr, &newStage.m_module));
+            VkShaderModule module = VK_NULL_HANDLE;
+            CHECK_VK_RESULT(vkCreateShaderModule(m_device, &createInfo, nullptr, &module));
+            newStage.m_module = UniqueHandle<VkShaderModule>(module, [device](VkShaderModule h) {
+                vkDestroyShaderModule(device, h, nullptr);
+            });
 
-            newShader->m_stages.push_back(newStage);
+            newShader->m_stages.push_back(std::move(newStage));
         }
 
         VkDescriptorSetLayoutCreateInfo setLayoutInfo{};
         setLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         setLayoutInfo.bindingCount = static_cast<uint32_t>(m_layoutBindings.size());
         setLayoutInfo.pBindings = m_layoutBindings.data();
-        CHECK_VK_RESULT(vkCreateDescriptorSetLayout(m_device, &setLayoutInfo, nullptr, &newShader->m_descriptorSetLayout));
+        VkDescriptorSetLayout setLayout = VK_NULL_HANDLE;
+        CHECK_VK_RESULT(vkCreateDescriptorSetLayout(m_device, &setLayoutInfo, nullptr, &setLayout));
+        newShader->m_descriptorSetLayout = UniqueHandle<VkDescriptorSetLayout>(setLayout, [device](VkDescriptorSetLayout h) {
+            vkDestroyDescriptorSetLayout(device, h, nullptr);
+        });
 
+        VkDescriptorSetLayout const setLayoutHandle = newShader->m_descriptorSetLayout.Get();
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts = &newShader->m_descriptorSetLayout;
+        pipelineLayoutInfo.pSetLayouts = &setLayoutHandle;
         pipelineLayoutInfo.pushConstantRangeCount = static_cast<uint32_t>(m_pushConstants.size());
         pipelineLayoutInfo.pPushConstantRanges = m_pushConstants.data();
-        CHECK_VK_RESULT(vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &newShader->m_pipelineLayout));
+        VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
+        CHECK_VK_RESULT(vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &pipelineLayout));
+        newShader->m_pipelineLayout = UniqueHandle<VkPipelineLayout>(pipelineLayout, [device](VkPipelineLayout h) {
+            vkDestroyPipelineLayout(device, h, nullptr);
+        });
 
         return newShader;
     }

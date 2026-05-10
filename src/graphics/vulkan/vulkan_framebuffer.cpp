@@ -29,10 +29,6 @@ namespace moth_graphics::graphics::vulkan {
         m_commandBuffer->SubmitAndWait();
     }
 
-    Framebuffer::~Framebuffer() {
-        vkDestroyFramebuffer(m_context.GetVkDevice(), m_vkFramebuffer, nullptr);
-    }
-
     VkExtent2D Framebuffer::GetVkExtent() const {
         return m_texture->GetVkExtent();
     }
@@ -42,10 +38,10 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     VkSemaphore Framebuffer::GetAvailableSemaphore() const {
-        return m_frameSlot ? m_frameSlot->imageAvailable : VK_NULL_HANDLE;
+        return m_frameSlot ? m_frameSlot->imageAvailable.Get() : VK_NULL_HANDLE;
     }
     VkSemaphore Framebuffer::GetRenderFinishedSemaphore() const {
-        return m_frameSlot ? m_frameSlot->renderFinished : VK_NULL_HANDLE;
+        return m_frameSlot ? m_frameSlot->renderFinished.Get() : VK_NULL_HANDLE;
     }
 
     void Framebuffer::CreateFramebufferResource(VkRenderPass renderPass) {
@@ -59,6 +55,11 @@ namespace moth_graphics::graphics::vulkan {
         info.width = m_texture->GetWidth();
         info.height = m_texture->GetHeight();
         info.layers = 1;
-        CHECK_VK_RESULT(vkCreateFramebuffer(m_context.GetVkDevice(), &info, nullptr, &m_vkFramebuffer));
+        VkFramebuffer framebuffer = VK_NULL_HANDLE;
+        CHECK_VK_RESULT(vkCreateFramebuffer(m_context.GetVkDevice(), &info, nullptr, &framebuffer));
+        VkDevice const device = m_context.GetVkDevice();
+        m_vkFramebuffer = UniqueHandle<VkFramebuffer>(framebuffer, [device](VkFramebuffer h) {
+            vkDestroyFramebuffer(device, h, nullptr);
+        });
     }
 }

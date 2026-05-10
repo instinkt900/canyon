@@ -6,11 +6,7 @@ namespace moth_graphics::graphics::vulkan {
     RenderPass::RenderPass(uint32_t hash, VkDevice device, VkRenderPass renderPass)
         : m_hash(hash)
         , m_device(device)
-        , m_renderPass(renderPass) {
-    }
-
-    RenderPass ::~RenderPass() {
-        vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+        , m_renderPass(renderPass, [device](VkRenderPass h) { vkDestroyRenderPass(device, h, nullptr); }) {
     }
 
     RenderPassBuilder::RenderPassBuilder(VkDevice device)

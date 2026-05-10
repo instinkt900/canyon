@@ -2,6 +2,7 @@
 
 #include "moth_graphics/graphics/itexture.h"
 #include "moth_graphics/graphics/vulkan/vulkan_surface_context.h"
+#include "vulkan_unique.h"
 
 #include <vulkan/vulkan_core.h>
 
@@ -47,16 +48,19 @@ namespace moth_graphics::graphics::vulkan {
         VkExtent2D m_vkExtent;
         VkFormat m_vkFormat;
 
+        // Image+VMA allocation are paired and freed together in the destructor;
+        // they stay raw because vmaFreeMemory + vkDestroyImage operate as a unit
+        // gated by m_owningImage.
         VkImage m_vkImage = VK_NULL_HANDLE;
         VmaAllocation m_vmaAllocation = VK_NULL_HANDLE;
-        mutable VkImageView m_vkView = VK_NULL_HANDLE;
+        mutable UniqueHandle<VkImageView> m_vkView;
         // One persistent sampler per filter mode, lazily created. Never destroyed
         // during a frame — only in the destructor — so command buffers in flight are
         // never invalidated by a mid-frame SetFilter call.
-        mutable VkSampler m_vkSamplerLinear = VK_NULL_HANDLE;
-        mutable VkSampler m_vkSamplerNearest = VK_NULL_HANDLE;
+        mutable UniqueHandle<VkSampler> m_vkSamplerLinear;
+        mutable UniqueHandle<VkSampler> m_vkSamplerNearest;
         // ImGui-managed descriptor set and the sampler it was created with.
-        mutable VkDescriptorSet m_vkDescriptorSet = VK_NULL_HANDLE;
+        mutable UniqueHandle<VkDescriptorSet> m_vkDescriptorSet;
         mutable VkSampler m_vkDescriptorSetSampler = VK_NULL_HANDLE;
         VkFilter m_minFilter = VK_FILTER_LINEAR;
         VkFilter m_magFilter = VK_FILTER_LINEAR;

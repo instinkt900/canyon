@@ -60,8 +60,13 @@ namespace moth_graphics::graphics::vulkan {
         , m_vkExtent(extent)
         , m_vkFormat(format)
         , m_vkImage(image)
-        , m_vkView(view)
         , m_owningImage(owning) {
+        if (view != VK_NULL_HANDLE) {
+            VkDevice const device = m_context.GetVkDevice();
+            m_vkView = UniqueHandle<VkImageView>(view, [device](VkImageView h) {
+                vkDestroyImageView(device, h, nullptr);
+            });
+        }
         Texture::SetFilter(TextureFilter::Linear, TextureFilter::Linear);
     }
 
@@ -78,18 +83,9 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     Texture::~Texture() {
-        if (m_vkDescriptorSet != VK_NULL_HANDLE) {
-            ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
-        }
-        if (m_vkSamplerLinear != VK_NULL_HANDLE) {
-            vkDestroySampler(m_context.GetVkDevice(), m_vkSamplerLinear, nullptr);
-        }
-        if (m_vkSamplerNearest != VK_NULL_HANDLE) {
-            vkDestroySampler(m_context.GetVkDevice(), m_vkSamplerNearest, nullptr);
-        }
-        if (m_vkView != VK_NULL_HANDLE) {
-            vkDestroyImageView(m_context.GetVkDevice(), m_vkView, nullptr);
-        }
+        // Sampler / view / descriptor set members release themselves via RAII.
+        // Image + VMA allocation are paired and gated by m_owningImage, so they
+        // remain manually managed here.
         if (m_owningImage && m_vkImage != VK_NULL_HANDLE) {
             vmaFreeMemory(m_context.GetVmaAllocator(), m_vmaAllocation);
             vkDestroyImage(m_context.GetVkDevice(), m_vkImage, nullptr);
@@ -97,29 +93,33 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     VkImageView Texture::GetVkView() const {
-        if (m_vkView == VK_NULL_HANDLE) {
+        if (!m_vkView) {
             CreateView();
         }
         return m_vkView;
     }
     VkSampler Texture::GetVkSampler() const {
         bool const nearest = (m_minFilter == VK_FILTER_NEAREST || m_magFilter == VK_FILTER_NEAREST);
-        VkSampler& slot = nearest ? m_vkSamplerNearest : m_vkSamplerLinear;
-        if (slot == VK_NULL_HANDLE) {
-            slot = CreateSampler(m_minFilter, m_magFilter);
+        UniqueHandle<VkSampler>& slot = nearest ? m_vkSamplerNearest : m_vkSamplerLinear;
+        if (!slot) {
+            VkDevice const device = m_context.GetVkDevice();
+            slot = UniqueHandle<VkSampler>(CreateSampler(m_minFilter, m_magFilter), [device](VkSampler h) {
+                vkDestroySampler(device, h, nullptr);
+            });
         }
         return slot;
     }
 
     VkDescriptorSet Texture::GetDescriptorSet() const {
         VkSampler const currentSampler = GetVkSampler();
-        if (m_vkDescriptorSet != VK_NULL_HANDLE && m_vkDescriptorSetSampler == currentSampler) {
+        if (m_vkDescriptorSet && m_vkDescriptorSetSampler == currentSampler) {
             return m_vkDescriptorSet;
         }
-        if (m_vkDescriptorSet != VK_NULL_HANDLE) {
-            ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
-        }
-        m_vkDescriptorSet = ImGui_ImplVulkan_AddTexture(currentSampler, GetVkView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        m_vkDescriptorSet.Reset();
+        VkDescriptorSet const newSet = ImGui_ImplVulkan_AddTexture(currentSampler, GetVkView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        m_vkDescriptorSet = UniqueHandle<VkDescriptorSet>(newSet, [](VkDescriptorSet h) {
+            ImGui_ImplVulkan_RemoveTexture(h);
+        });
         m_vkDescriptorSetSampler = currentSampler;
         return m_vkDescriptorSet;
     }
@@ -170,7 +170,12 @@ namespace moth_graphics::graphics::vulkan {
         info.subresourceRange.baseArrayLayer = 0;
         info.subresourceRange.layerCount = 1;
         info.image = m_vkImage;
-        CHECK_VK_RESULT(vkCreateImageView(m_context.GetVkDevice(), &info, nullptr, &m_vkView));
+        VkImageView view = VK_NULL_HANDLE;
+        CHECK_VK_RESULT(vkCreateImageView(m_context.GetVkDevice(), &info, nullptr, &view));
+        VkDevice const device = m_context.GetVkDevice();
+        m_vkView = UniqueHandle<VkImageView>(view, [device](VkImageView h) {
+            vkDestroyImageView(device, h, nullptr);
+        });
     }
 
     namespace {
@@ -282,20 +287,13 @@ namespace moth_graphics::graphics::vulkan {
         // Address mode affects sampler state. Invalidate cached samplers so they
         // are recreated with the new mode on next use. Safe to destroy here because
         // SetAddressMode is not called during frame recording.
-        if (m_vkSamplerLinear != VK_NULL_HANDLE) {
+        if (m_vkSamplerLinear) {
             vkDeviceWaitIdle(m_context.GetVkDevice());
-            vkDestroySampler(m_context.GetVkDevice(), m_vkSamplerLinear, nullptr);
-            m_vkSamplerLinear = VK_NULL_HANDLE;
         }
-        if (m_vkSamplerNearest != VK_NULL_HANDLE) {
-            vkDestroySampler(m_context.GetVkDevice(), m_vkSamplerNearest, nullptr);
-            m_vkSamplerNearest = VK_NULL_HANDLE;
-        }
-        if (m_vkDescriptorSet != VK_NULL_HANDLE) {
-            ImGui_ImplVulkan_RemoveTexture(m_vkDescriptorSet);
-            m_vkDescriptorSet = VK_NULL_HANDLE;
-            m_vkDescriptorSetSampler = VK_NULL_HANDLE;
-        }
+        m_vkSamplerLinear.Reset();
+        m_vkSamplerNearest.Reset();
+        m_vkDescriptorSet.Reset();
+        m_vkDescriptorSetSampler = VK_NULL_HANDLE;
     }
 
     VkSampler Texture::CreateSampler(VkFilter min, VkFilter mag) const {

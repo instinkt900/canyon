@@ -2,6 +2,7 @@
 
 #include "vulkan_shader.h"
 #include "vulkan_renderpass.h"
+#include "vulkan_unique.h"
 
 #include <vulkan/vulkan_core.h>
 
@@ -13,11 +14,11 @@ namespace moth_graphics::graphics::vulkan {
     class Pipeline {
     public:
         Pipeline(uint32_t hash, VkDevice device, VkPipeline pipeline, std::shared_ptr<Shader> shader);
-        ~Pipeline();
+        ~Pipeline() = default;
 
         uint32_t m_hash;
         VkDevice m_device;
-        VkPipeline m_pipeline;
+        UniqueHandle<VkPipeline> m_pipeline;
         std::shared_ptr<Shader> m_shader; // need to keep this around as long as the pipeline uses them
 
     private:

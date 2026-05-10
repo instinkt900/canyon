@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vulkan_unique.h"
+
 #include <vulkan/vulkan_core.h>
 
 #include <vector>
@@ -10,7 +12,7 @@ namespace moth_graphics::graphics::vulkan {
     class RenderPass {
     public:
         RenderPass(uint32_t hash, VkDevice device, VkRenderPass renderPass);
-        ~RenderPass();
+        ~RenderPass() = default;
 
         uint32_t GetHash() const { return m_hash; }
         VkDevice GetDevice() const { return m_device; }
@@ -19,7 +21,7 @@ namespace moth_graphics::graphics::vulkan {
     private:
         uint32_t m_hash;
         VkDevice m_device;
-        VkRenderPass m_renderPass;
+        UniqueHandle<VkRenderPass> m_renderPass;
     };
 
     class RenderPassBuilder {
