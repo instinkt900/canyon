@@ -83,9 +83,14 @@ namespace moth_graphics::graphics::vulkan {
     }
 
     Texture::~Texture() {
-        // Sampler / view / descriptor set members release themselves via RAII.
-        // Image + VMA allocation are paired and gated by m_owningImage, so they
-        // remain manually managed here.
+        // Release dependents (descriptor set, samplers, view) before the image
+        // they reference. Member RAII would also do this in reverse declaration
+        // order, but the image+VMA pair is freed manually below and would
+        // otherwise run before the wrapped members.
+        m_vkDescriptorSet.Reset();
+        m_vkSamplerNearest.Reset();
+        m_vkSamplerLinear.Reset();
+        m_vkView.Reset();
         if (m_owningImage && m_vkImage != VK_NULL_HANDLE) {
             vmaFreeMemory(m_context.GetVmaAllocator(), m_vmaAllocation);
             vkDestroyImage(m_context.GetVkDevice(), m_vkImage, nullptr);
@@ -285,9 +290,10 @@ namespace moth_graphics::graphics::vulkan {
         m_addressModeU = newU;
         m_addressModeV = newV;
         // Address mode affects sampler state. Invalidate cached samplers so they
-        // are recreated with the new mode on next use. Safe to destroy here because
-        // SetAddressMode is not called during frame recording.
-        if (m_vkSamplerLinear) {
+        // are recreated with the new mode on next use. Wait for any in-flight
+        // command buffer that may still reference either sampler/descriptor set
+        // before destroying them.
+        if (m_vkSamplerLinear || m_vkSamplerNearest) {
             vkDeviceWaitIdle(m_context.GetVkDevice());
         }
         m_vkSamplerLinear.Reset();
