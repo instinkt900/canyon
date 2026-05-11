@@ -40,7 +40,7 @@ moth_graphics provides:
 - **Graphics backends** — SDL2 renderer and Vulkan (with SPIR-V shaders, render targets, font rendering via FreeType + HarfBuzz)
 - **moth_ui integration** — bridges moth_graphics's rendering to moth_ui's layout and animation system
 - **Asset factories** — cached image and font loading with texture pack (atlas) support
-- **ImGui integration** — docking and multi-viewport support via the Vulkan backend
+- **ImGui integration** — docking on both backends via a platform-level `ImGuiContext`; multi-viewport support is opt-in (`Application::SetImGuiViewportsEnabled(true)` before `Init()`)
 - **spdlog logging** — structured logging throughout initialisation and window lifecycle
 
 ### AI Disclosure
