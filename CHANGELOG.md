@@ -3,6 +3,96 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
+## [1.0.0] - 2026-05-11
+### Features
+- Add font metrics to IFont, switch SpriteSheet getters to std::optional
+- Standalone graphics without Window/Application dependency
+
+### Bug Fixes
+- Update LayerStack constructor call for IntVec2 API
+- Guard PopClip against empty stack and rename textureFilter member
+- Make Texture lazy-create methods const
+- Guard GLFW DestroyWindow against null window handle
+- Remap DrawImGui UVs through Image source rect
+- GetTextureRect returns fallback source rect on cache miss
+- Strengthen SpriteSheet GetImage round-trip test with mock texture
+- Only swizzle BGRA→RGBA in Vulkan SaveToPNG when source is BGRA
+- DrawSprite takes Sprite const& for const-correctness
+- Sync backend transform with renderer stack on construction
+- Use nullptr for FC_GetAscent/GetDescent to get font-level metrics
+- Add NOLINT suppression for FC_GetAscent/GetDescent vararg calls
+- Match IFont override return types, deduplicate sprite frame lookups
+- Guard ImGui Render on Draw success, check ImGuiContext init return
+- Update test to match Window::Draw returning bool
+- Clean up platform resources when Context::Startup fails, guard Shutdown
+- Don't compose transforms in MothRenderer::PushTransform
+- Assert valid surface context in glfw Window::GetSurfaceContext
+- Initialise Platform m_context in-class to satisfy member-init lint
+- Replace throwing dynamic_cast<T&> with logged null-check pattern
+- Correct ImGui frame lifecycle and shutdown ordering
+- Add null guards and eliminate per-frame dynamic_cast in ImGui context
+- Make Update pure virtual and move owned pointers to private
+- Assert SetImGuiViewportsEnabled is called before Init()
+- Remove dead FlushCache/LoadTexturePack from MothImageFactory
+- Rename GetFont name->path and don't cache failed loads
+- Null-guard MothFont construction and validate pivot JSON types
+- Strict JSON validation for clips field and pivot types
+- Tighten Vulkan error handling and ImGui init ordering
+- Forward-declare SurfaceContext in correct namespace
+- Remove redundant ImGui_ImplVulkan_CreateFontsTexture call
+- Add null guards and error-result checks across Vulkan/GLFW backends
+- Add null guards and explicit member init in SDL/Vulkan surface constructors
+- Move ImGuiContext ownership into Window to fix exit-time SIGSEGV
+- Throw from vulkan SurfaceContext ctor instead of abort()
+- Address review — Texture destructor order and SetAddressMode waitIdle
+- Destroy VkPipeline before releasing the shared Shader
+
+### Refactoring
+- Make vulkan Image members private, expose accessors
+- Convert IImage to Image value type, ImageFactory to TextureFactory
+- Move DrawSprite overloads off IGraphics to free functions
+- Make Sprite a regular value type with public constructor
+- Replace IGraphics PushTransform/PopTransform with SetTransform
+- Extract ImGui from IGraphics into platform-level ImGuiContext
+- Move Vulkan/SDL backend impl headers from public include/ to private src/
+- Move remaining SDL backend impl headers to private src/
+- Make all Vulkan and SDL backend headers private
+- Restore unique_ptr<Context> in Platform classes
+- Forward-declare Texture in vulkan_shader.h
+- Rename iimage.h to image.h to match its type
+- Extract sprite sheet JSON parsing into named helpers
+- Merge ImGuiContext::Init into CreateImGuiContext
+- Remove GetSurfaceContext and Drain from IGraphics
+- Make IGraphics::Begin void with self-healing null frames
+- Make vulkan::Context a POD struct, remove graphics::Context base
+- Remove sdl::Context entirely, was an empty zombie type
+- Introduce UniqueHandle<T> RAII wrapper for internal Vulkan handles
+
+### Documentation
+- Fix README example to compile against current API
+- Complete the moth_graphics.h umbrella header
+- Note O(n²) behaviour in EventEmitter::EmitEvent
+- Fix stale docstrings in factory and surface context headers
+- Correct ImGui integration description in README
+
+### Testing
+- Remove MothImageFactory FlushCache/LoadTexturePack pins
+
+### Miscellaneous
+- Removing stale review doc
+- Rename canyon_events.h to moth_graphics_events.h and minor housekeeping
+- Bump moth_ui dep
+- Bump moth_ui dep for tests
+- Give Context Startup/Shutdown, move handlers private, expose LayerStack
+- Remove redundant explicitly-defaulted Sprite copy/move
+- Remove stale TODO from Vulkan render pass format
+- Fix naming inconsistencies and dead code (review nits)
+- Remove accidentally committed REVIEW.md
+
+### Changes
+- Use local include in sdl_surface_context.h
+- Update version from 1.0.0-rc.1 to 1.0.0
+
 ## [1.0.0-rc.1] - 2026-04-28
 ### Features
 - Replace uniform-grid sheet model with per-frame rects and explicit clip steps
