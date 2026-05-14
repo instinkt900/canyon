@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 Entries are generated automatically from git history using [git-cliff](https://github.com/orhun/git-cliff).
 
-## [1.0.0] - 2026-05-11
+## [1.0.0] - 2026-05-14
 ### Features
 - Add font metrics to IFont, switch SpriteSheet getters to std::optional
 - Standalone graphics without Window/Application dependency
@@ -46,6 +46,7 @@ Entries are generated automatically from git history using [git-cliff](https://g
 - Throw from vulkan SurfaceContext ctor instead of abort()
 - Address review — Texture destructor order and SetAddressMode waitIdle
 - Destroy VkPipeline before releasing the shared Shader
+- Fixing destructor issues with ManagedContext
 
 ### Refactoring
 - Make vulkan Image members private, expose accessors
