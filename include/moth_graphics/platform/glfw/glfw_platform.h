@@ -26,7 +26,14 @@ namespace moth_graphics::platform::glfw {
     private:
         void ShutdownImpl();
 
-        std::unique_ptr<moth_graphics::graphics::vulkan::ManagedContext> m_context = nullptr;
+        // No in-class `= nullptr` initializer: default-constructing
+        // unique_ptr already nulls it, and an in-class default member init
+        // forces the destructor of unique_ptr<ManagedContext> to instantiate
+        // in any TU that processes this class body (e.g. moth_editor's
+        // make_unique<Platform> call site), which then fails the incomplete-
+        // type sizeof check on ManagedContext. The destructor body for
+        // Platform is defined in glfw_platform.cpp where the type is complete.
+        std::unique_ptr<moth_graphics::graphics::vulkan::ManagedContext> m_context;
         bool m_initialized = false;
     };
 }
